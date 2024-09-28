@@ -6,11 +6,14 @@ type fetchRoleResult =
     | {
           role: UserRole;
           error: null;
+          userMissing: boolean;
       }
     | {
           role: null;
           error: PostgrestError;
+          userMissing: boolean;
       };
+
 export const fetchUserRole = async (userId: string): Promise<fetchRoleResult> => {
     const { data, error } = await supabase
         .from("profiles")
@@ -22,8 +25,9 @@ export const fetchUserRole = async (userId: string): Promise<fetchRoleResult> =>
         return {
             role: null,
             error: error,
+            userMissing: error.code === "PGRST116",
         };
     }
 
-    return { role: data.role, error: null };
+    return { role: data.role, error: null, userMissing: false };
 };
