@@ -2,7 +2,7 @@ import React from "react";
 import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
-import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
+import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { ClientCardProps } from "@/app/clients/form/ClientForm";
 import { LIST_TYPES_ARRAY } from "@/common/databaseListTypes";
 import { capitaliseWords } from "@/common/format";
@@ -26,11 +26,11 @@ const ListTypeCard: React.FC<ClientCardProps> = ({
             required={true}
             text="Which list should be used by default to pack parcels for this client?"
         >
-            <UncontrolledSelect
+            <ControlledSelect
                 selectLabelId="list-type-select-label"
                 labelsAndValues={listTypeLabelsAndValues}
                 listTitle="List Type"
-                defaultValue={fields.listType ?? ""}
+                value={fields.listType ?? ""}
                 onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "listType")}
             />
             <ErrorText>{getErrorText(formErrors.listType)}</ErrorText>

@@ -8,7 +8,7 @@ import {
     Person,
     Gender,
 } from "@/components/Form/formFunctions";
-import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
+import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { StyledCard, FormText } from "@/components/Form/formStyling";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { SelectChangeEventHandler } from "@/components/DataInput/inputHandlerFactories";
@@ -83,7 +83,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                     return (
                         <StyledCard key={child.primaryKey ?? `new-child-${index}`}>
                             <FormText>Child {index + 1}</FormText>
-                            <UncontrolledSelect
+                            <ControlledSelect
                                 selectLabelId="children-gender-select-label"
                                 labelsAndValues={[
                                     ["Male", "male"],
@@ -91,7 +91,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                     ["Prefer Not To Say", "other"],
                                 ]}
                                 listTitle="Gender"
-                                defaultValue={child.gender}
+                                value={child.gender}
                                 onChange={setChildrenFields(
                                     fieldSetter,
                                     fields.children,
@@ -99,14 +99,14 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                     "gender"
                                 )}
                             />
-                            <UncontrolledSelect
+                            <ControlledSelect
                                 selectLabelId="children-birth-year-select-label"
                                 labelsAndValues={getChildBirthYears().map((year) => [
                                     `${year}`,
                                     `${year}`,
                                 ])}
                                 listTitle="Year of Birth (optional)"
-                                defaultValue={child.birthYear?.toString()}
+                                value={child.birthYear?.toString() ?? ""}
                                 onChange={setChildrenFields(
                                     fieldSetter,
                                     fields.children,
@@ -114,7 +114,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                     "birthYear"
                                 )}
                             />
-                            <UncontrolledSelect
+                            <ControlledSelect
                                 selectLabelId="children-birth-month-select-label"
                                 labelsAndValues={
                                     child.birthYear === getCurrentYear()
@@ -122,7 +122,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                         : childBirthMonthList
                                 }
                                 listTitle="Month of Birth (optional)"
-                                defaultValue={child.birthMonth?.toString()}
+                                value={child.birthMonth?.toString() ?? ""}
                                 onChange={setChildrenFields(
                                     fieldSetter,
                                     fields.children,

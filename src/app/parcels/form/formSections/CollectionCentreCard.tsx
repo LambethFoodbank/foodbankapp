@@ -2,7 +2,7 @@ import React from "react";
 import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
-import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
+import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { CollectionCentresLabelsAndValues } from "@/common/fetch";
 import { ParcelCardProps } from "../ParcelForm";
 
@@ -23,11 +23,11 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
             text="What centre is the client collecting their parcel from?"
         >
             <>
-                <UncontrolledSelect
+                <ControlledSelect
                     selectLabelId="collection-centre-select-label"
                     labelsAndValues={collectionCentresLabelsAndValues}
                     listTitle="Collection Centre"
-                    defaultValue={fields.collectionCentre || collectionCentresLabelsAndValues[0][0]}
+                    value={fields.collectionCentre ?? ""}
                     onChange={valueOnChangeDropdownList(
                         fieldSetter,
                         errorSetter,

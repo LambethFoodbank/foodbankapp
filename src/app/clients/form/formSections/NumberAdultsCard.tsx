@@ -12,7 +12,7 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { SelectChangeEventHandler } from "@/components/DataInput/inputHandlerFactories";
 import { FormText, StyledCard } from "@/components/Form/formStyling";
 import { ClientCardProps, ClientSetter } from "@/app/clients/form/ClientForm";
-import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
+import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { getAdultBirthYears } from "@/app/clients/form/birthYearDropdown";
 import { MAXIMUM_NUMBER_OF_ADULTS, MINIMUM_NUMBER_OF_ADULTS } from "@/app/clients/form/bounds";
 
@@ -74,7 +74,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                     return (
                         <StyledCard key={adult.primaryKey ?? `new-adult-${index}`}>
                             <FormText>Adult {index + 1}</FormText>
-                            <UncontrolledSelect
+                            <ControlledSelect
                                 selectLabelId="adult-gender-select-label"
                                 labelsAndValues={[
                                     ["Male", "male"],
@@ -82,7 +82,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                                     ["Prefer Not To Say", "other"],
                                 ]}
                                 listTitle="Gender"
-                                defaultValue={adult.gender}
+                                value={adult.gender}
                                 onChange={setAdultsFields(
                                     fieldSetter,
                                     fields.adults,
@@ -90,14 +90,14 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                                     "gender"
                                 )}
                             />
-                            <UncontrolledSelect
+                            <ControlledSelect
                                 selectLabelId="adult-birth-year-select-label"
                                 labelsAndValues={getAdultBirthYears().map((year) => [
                                     `${year}`,
                                     `${year}`,
                                 ])}
                                 listTitle="Year of Birth (optional)"
-                                defaultValue={adult.birthYear?.toString()}
+                                value={adult.birthYear?.toString() ?? ""}
                                 onChange={setAdultsFields(
                                     fieldSetter,
                                     fields.adults,

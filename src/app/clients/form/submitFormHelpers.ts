@@ -24,17 +24,7 @@ export const getFamilyMembersForDatabase = (
     adults: Person[],
     children: Person[]
 ): FamilyDatabaseInsertRecord[] => {
-    const peopleToInsert = children
-        .map((child) => {
-            child.recordedAsChild = true;
-            return child;
-        })
-        .concat(
-            adults.map((adult) => {
-                adult.recordedAsChild = false;
-                return adult;
-            })
-        );
+    const peopleToInsert = children.concat(adults);
 
     return peopleToInsert.map((person) => personToFamilyRecordWithoutFamilyId(person));
 };
