@@ -208,7 +208,7 @@ describe("Parcels Page", () => {
             expect(
                 formatHouseholdFromFamilyDetails([
                     {
-                        birth_year: 2008,
+                        birth_year: 2007,
                         birth_month: null,
                         recorded_as_child: null,
                         gender: "female",
