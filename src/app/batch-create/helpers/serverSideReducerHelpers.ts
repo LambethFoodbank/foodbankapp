@@ -34,15 +34,20 @@ const getChildrenAndAdults = async (
             gender: person.gender,
             birthYear: person.birth_year,
             birthMonth: person.birth_month,
+            recordedAsChild: person.recorded_as_child,
         };
 
-        const birthDate = dayjs()
-            .year(formattedPerson.birthYear)
-            .month(formattedPerson.birthMonth || 0)
-            .startOf("month");
-        const age = currentDate.diff(birthDate, "year");
-        if (age < 16) {
-            children.push(formattedPerson);
+        if (formattedPerson.birthYear) {
+            const birthDate = dayjs()
+                .year(formattedPerson.birthYear || 0)
+                .month(formattedPerson.birthMonth || 0)
+                .startOf("month");
+            const age = currentDate.diff(birthDate, "year");
+            if (age < 16) {
+                children.push(formattedPerson);
+            } else {
+                adults.push(formattedPerson);
+            }
         } else {
             adults.push(formattedPerson);
         }

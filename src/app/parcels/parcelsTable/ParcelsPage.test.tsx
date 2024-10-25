@@ -160,27 +160,104 @@ describe("Parcels Page", () => {
         it("formatHouseholdFromFamilyDetails()", () => {
             expect(
                 formatHouseholdFromFamilyDetails([
-                    { birth_year: 1988, gender: "female" },
-                    { birth_year: 2019, gender: "male" },
-                    { birth_year: 2000, gender: "other" },
+                    {
+                        birth_year: 1988,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "female",
+                    },
+                    {
+                        birth_year: 2019,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "male",
+                    },
+                    {
+                        birth_year: 2000,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "other",
+                    },
                 ])
             ).toEqual("Family of 3 Occupants (2 adults, 1 child)");
 
             expect(
                 formatHouseholdFromFamilyDetails([
-                    { birth_year: 1988, gender: "female" },
-                    { birth_year: 2019, gender: "male" },
-                    { birth_year: 2020, gender: "female" },
-                    { birth_year: 2009, gender: "other" },
+                    {
+                        birth_year: 1988,
+                        birth_month: null,
+                        recorded_as_child: false,
+                        gender: "female",
+                    },
+                    {
+                        birth_year: 2019,
+                        birth_month: null,
+                        recorded_as_child: true,
+                        gender: "male",
+                    },
+                    {
+                        birth_year: null,
+                        birth_month: null,
+                        recorded_as_child: true,
+                        gender: "female",
+                    },
+                    { birth_year: 2020, birth_month: 4, recorded_as_child: true, gender: "other" },
                 ])
             ).toEqual("Family of 4 Occupants (1 adult, 3 children)");
 
             expect(
-                formatHouseholdFromFamilyDetails([{ birth_year: 2008, gender: "female" }])
+                formatHouseholdFromFamilyDetails([
+                    {
+                        birth_year: 2007,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "female",
+                    },
+                ])
             ).toEqual("Single Occupant (1 adult)");
 
             expect(
-                formatHouseholdFromFamilyDetails([{ birth_year: 2009, gender: "male" }])
+                formatHouseholdFromFamilyDetails([
+                    {
+                        birth_year: null,
+                        birth_month: null,
+                        recorded_as_child: false,
+                        gender: "male",
+                    },
+                ])
+            ).toEqual("Single Occupant (1 adult)");
+
+            expect(
+                formatHouseholdFromFamilyDetails([
+                    {
+                        birth_year: 2005,
+                        birth_month: null,
+                        recorded_as_child: true,
+                        gender: "female",
+                    },
+                ])
+            ).toEqual("Single Occupant (1 adult)");
+
+            expect(
+                formatHouseholdFromFamilyDetails([
+                    {
+                        birth_year: 2012,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "male",
+                    },
+                ])
+            ).toEqual("Single Occupant (1 child)");
+
+            expect(
+                formatHouseholdFromFamilyDetails([
+                    {
+                        birth_year: null,
+                        birth_month: null,
+                        recorded_as_child: true,
+                        gender: "male",
+                    },
+                ])
             ).toEqual("Single Occupant (1 child)");
         });
 
@@ -188,10 +265,30 @@ describe("Parcels Page", () => {
             const currentYear: number = new Date().getFullYear();
             expect(
                 formatBreakdownOfChildrenFromFamilyDetails([
-                    { birth_year: 1988, birth_month: null, gender: "female" },
-                    { birth_year: 2019, birth_month: null, gender: "male" },
-                    { birth_year: 2020, birth_month: null, gender: "female" },
-                    { birth_year: 2009, birth_month: null, gender: "other" },
+                    {
+                        birth_year: 1988,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "female",
+                    },
+                    {
+                        birth_year: 2019,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "male",
+                    },
+                    {
+                        birth_year: 2020,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "female",
+                    },
+                    {
+                        birth_year: 2009,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "other",
+                    },
                 ])
             ).toEqual(
                 `${currentYear - 2019}-years-old male, ${currentYear - 2020}-years-old female, ${currentYear - 2009}-years-old other`
@@ -199,15 +296,35 @@ describe("Parcels Page", () => {
 
             expect(
                 formatBreakdownOfChildrenFromFamilyDetails([
-                    { birth_year: 1988, birth_month: null, gender: "female" },
-                    { birth_year: 2009, birth_month: null, gender: "female" },
+                    {
+                        birth_year: 1988,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "female",
+                    },
+                    {
+                        birth_year: 2009,
+                        birth_month: null,
+                        recorded_as_child: null,
+                        gender: "female",
+                    },
                 ])
             ).toEqual(`${currentYear - 2009}-years-old female`);
 
             expect(
                 formatBreakdownOfChildrenFromFamilyDetails([
-                    { birth_year: 1988, birth_month: null, gender: "female" },
-                    { birth_year: 1998, birth_month: null, gender: "male" },
+                    {
+                        birth_year: 1988,
+                        birth_month: null,
+                        recorded_as_child: true,
+                        gender: "female",
+                    },
+                    {
+                        birth_year: null,
+                        birth_month: null,
+                        recorded_as_child: false,
+                        gender: "male",
+                    },
                 ])
             ).toEqual("No Children");
         });

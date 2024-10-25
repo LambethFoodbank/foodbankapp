@@ -189,6 +189,9 @@ const ClientsPage: React.FC = () => {
                             variant="filled"
                         ></FloatingToast>
                     )}
+                    <Centerer>
+                        <LinkButton link="/clients/add">Add Client</LinkButton>
+                    </Centerer>
                     <TableSurface>
                         <ServerPaginatedTable<ClientsTableRow, DbClientRow, string>
                             dataPortion={clientsDataPortion}
@@ -220,9 +223,6 @@ const ClientsPage: React.FC = () => {
                             columnDisplayFunctions={{ addressPostcode: formatNullPostcode }}
                         />
                     </TableSurface>
-                    <Centerer>
-                        <LinkButton link="/clients/add">Add Client</LinkButton>
-                    </Centerer>
 
                     <Modal
                         header={

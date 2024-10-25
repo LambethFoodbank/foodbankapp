@@ -20,7 +20,6 @@ export const OutsideDiv = styled.div`
 
 export const ContentDiv = styled.div`
     flex: 0 1 90%;
-    overflow: auto;
 `;
 
 export const ButtonsDiv = styled.div`

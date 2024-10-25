@@ -332,6 +332,7 @@ export const mockExistingFamily: Schema["families"][] = [
         gender: "male",
         birth_month: null,
         birth_year: 1980,
+        recorded_as_child: false,
     },
     {
         primary_key: "test-mum",
@@ -339,6 +340,7 @@ export const mockExistingFamily: Schema["families"][] = [
         gender: "female",
         birth_month: null,
         birth_year: 1985,
+        recorded_as_child: false,
     },
     {
         primary_key: "test-adult-child",
@@ -346,6 +348,7 @@ export const mockExistingFamily: Schema["families"][] = [
         gender: "female",
         birth_month: currentMonth,
         birth_year: currentYear - 16,
+        recorded_as_child: false,
     },
     {
         primary_key: "test-child-child",
@@ -353,6 +356,7 @@ export const mockExistingFamily: Schema["families"][] = [
         gender: "female",
         birth_month: currentMonth,
         birth_year: currentYear - 15,
+        recorded_as_child: true,
     },
 ];
 
@@ -388,6 +392,7 @@ export const mockExistingNappyFamily: Schema["families"][] = [
         gender: "male",
         birth_month: null,
         birth_year: 1980,
+        recorded_as_child: false,
     },
     {
         primary_key: "test-nappy-baby",
@@ -395,5 +400,6 @@ export const mockExistingNappyFamily: Schema["families"][] = [
         gender: "female",
         birth_month: null,
         birth_year: currentYear - 2,
+        recorded_as_child: true,
     },
 ];

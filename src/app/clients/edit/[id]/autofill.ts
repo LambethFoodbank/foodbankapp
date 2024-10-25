@@ -2,7 +2,7 @@ import { Schema } from "@/databaseUtils";
 import { ClientFields } from "@/app/clients/form/ClientForm";
 import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import { processExtraInformation } from "@/common/formatClientsData";
-import { isAdultPerson, isChildPerson } from "@/common/getAgesOfFamily";
+import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
 import { getFormattedPeople } from "@/common/formatFamiliesData";
 
 const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
@@ -15,9 +15,9 @@ const autofill = (
     clientData: Schema["clients"],
     familyData: Schema["families"][]
 ): ClientFields => {
-    const children = getFormattedPeople(familyData, isChildPerson);
+    const children = getFormattedPeople(familyData, isChildFamilyMember);
 
-    const adults = getFormattedPeople(familyData, isAdultPerson);
+    const adults = getFormattedPeople(familyData, isAdultFamilyMember);
 
     const { nappySize, extraInformation } = processExtraInformation(
         clientData.extra_information ?? ""

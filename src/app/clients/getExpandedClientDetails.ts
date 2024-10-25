@@ -4,9 +4,10 @@ import { DatabaseError } from "@/app/errorClasses";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { displayPostcodeForHomelessClient } from "@/common/format";
 import {
-    getAdultAgeUsingBirthYear,
-    getChildAgeUsingBirthYearAndMonth,
-    isAdultUsingBirthYear,
+    getAdultAgeStringUsingBirthYear,
+    getChildAgeStringUsingBirthYearAndMonth,
+    isAdultFamilyMember,
+    isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
 import { ListType } from "@/common/databaseListTypes";
 
@@ -36,7 +37,8 @@ const getRawClientDetails = async (clientId: string) => {
             family:families(
                 birth_year,
                 birth_month,
-                gender
+                gender,
+                recorded_as_child
             ),
     
             dietary_requirements,
@@ -133,13 +135,16 @@ export const formatAddressFromClientDetails = (
 };
 
 export const formatHouseholdFromFamilyDetails = (
-    family: Pick<Schema["families"], "birth_year" | "gender">[]
+    family: Pick<
+        Schema["families"],
+        "birth_year" | "birth_month" | "recorded_as_child" | "gender"
+    >[]
 ): string => {
     let adultCount = 0;
     let childCount = 0;
 
     for (const familyMember of family) {
-        if (isAdultUsingBirthYear(familyMember.birth_year)) {
+        if (isAdultFamilyMember(familyMember)) {
             adultCount++;
         } else {
             childCount++;
@@ -163,13 +168,16 @@ export const formatHouseholdFromFamilyDetails = (
 };
 
 export const formatBreakdownOfAdultsFromFamilyDetails = (
-    family: Pick<Schema["families"], "birth_year" | "gender">[]
+    family: Pick<
+        Schema["families"],
+        "birth_year" | "birth_month" | "recorded_as_child" | "gender"
+    >[]
 ): string => {
     const adultDetails = [];
 
     for (const familyMember of family) {
-        if (isAdultUsingBirthYear(familyMember.birth_year)) {
-            const age = getAdultAgeUsingBirthYear(familyMember.birth_year, false);
+        if (isAdultFamilyMember(familyMember)) {
+            const age = getAdultAgeStringUsingBirthYear(familyMember.birth_year, false);
             adultDetails.push(`${age} ${familyMember.gender}`);
         }
     }
@@ -182,13 +190,16 @@ export const formatBreakdownOfAdultsFromFamilyDetails = (
 };
 
 export const formatBreakdownOfChildrenFromFamilyDetails = (
-    family: Pick<Schema["families"], "birth_year" | "birth_month" | "gender">[]
+    family: Pick<
+        Schema["families"],
+        "birth_year" | "birth_month" | "recorded_as_child" | "gender"
+    >[]
 ): string => {
     const childDetails = [];
 
     for (const familyMember of family) {
-        if (!isAdultUsingBirthYear(familyMember.birth_year)) {
-            const age = getChildAgeUsingBirthYearAndMonth(
+        if (isChildFamilyMember(familyMember)) {
+            const age = getChildAgeStringUsingBirthYearAndMonth(
                 familyMember.birth_year,
                 familyMember.birth_month,
                 false

@@ -70,7 +70,8 @@ const getExpandedParcelDetails = async (
             family:families(
                 birth_year,
                 birth_month,
-                gender
+                gender,
+                recorded_as_child
             )
         ),
         events:events (

@@ -16,8 +16,6 @@ export const getAdultBirthYears = (): string[] => {
     return adultBirthYears;
 };
 
-export const youngestAdultBirthYear = (): string => getAdultBirthYears()[0];
-
 const monthsOfTheYear = [
     "January",
     "February",

@@ -9,7 +9,7 @@ import {
     addClientResult,
     ClientDatabaseInsertRecord,
     FamilyDatabaseInsertRecord,
-    getFamilyMembers,
+    getFamilyMembersForDatabase,
 } from "@/app/clients/form/submitFormHelpers";
 import { EXTRA_INFORMATION_LABEL, NAPPY_SIZE_LABEL } from "@/app/clients/form/labels";
 import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
@@ -62,7 +62,10 @@ const batchClientToInsertRecords = (
     const children: Person[] = client.childrenInfo?.children || [];
 
     const clientRecord: ClientDatabaseInsertRecord = batchClientToClientRecord(client);
-    const familyMembers: FamilyDatabaseInsertRecord[] = getFamilyMembers(adults, children);
+    const familyMembers: FamilyDatabaseInsertRecord[] = getFamilyMembersForDatabase(
+        adults,
+        children
+    );
 
     return { clientRecord, familyMembers };
 };

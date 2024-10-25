@@ -339,24 +339,27 @@ export type Database = {
       families: {
         Row: {
           birth_month: number | null
-          birth_year: number
+          birth_year: number | null
           family_id: string
           gender: Database["public"]["Enums"]["gender"]
           primary_key: string
+          recorded_as_child: boolean | null
         }
         Insert: {
           birth_month?: number | null
-          birth_year: number
+          birth_year?: number | null
           family_id: string
           gender?: Database["public"]["Enums"]["gender"]
           primary_key?: string
+          recorded_as_child?: boolean | null
         }
         Update: {
           birth_month?: number | null
-          birth_year?: number
+          birth_year?: number | null
           family_id?: string
           gender?: Database["public"]["Enums"]["gender"]
           primary_key?: string
+          recorded_as_child?: boolean | null
         }
         Relationships: [
           {

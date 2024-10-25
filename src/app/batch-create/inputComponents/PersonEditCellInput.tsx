@@ -72,7 +72,6 @@ const PersonEditCellInput: React.FC<PersonEditCellInputProps> = ({
                 personField === "adultInfo"
                     ? slicedPeople.push({
                           gender: "other",
-                          birthYear: +currentDate.subtract(16, "year").format("YYYY"),
                       })
                     : slicedPeople.push({
                           gender: "other",

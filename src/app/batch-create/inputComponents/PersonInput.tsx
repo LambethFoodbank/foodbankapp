@@ -68,7 +68,7 @@ const PersonInput: React.FC<PersonInputProps> = ({
             <UncontrolledSelect
                 selectLabelId="adult-birth-year-select-label"
                 labelsAndValues={yearLabelsAndValues}
-                listTitle="Year of Birth *"
+                listTitle="Year of Birth"
                 defaultValue={people[index].birthYear}
                 onChange={(event) => {
                     peopleCopy[index].birthYear = +(event.target.value as string);

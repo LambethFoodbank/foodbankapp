@@ -2,10 +2,10 @@ import { Person } from "@/components/Form/formFunctions";
 import { Schema } from "@/databaseUtils";
 import { displayList } from "@/common/format";
 import {
-    getAdultAgeUsingBirthYear,
-    getChildAgeUsingBirthYearAndMonth,
-    isAdultPerson,
-    isChildPerson,
+    getAdultAgeStringUsingBirthYear,
+    getChildAgeStringUsingBirthYearAndMonth,
+    isAdultFamilyMember,
+    isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
 import { getCurrentYear } from "@/common/date";
 
@@ -16,7 +16,7 @@ export interface HouseholdSummary {
     ageAndGenderOfChildren: string;
 }
 
-const getPerson = (person: Person, age: string): string => {
+const getPersonSummary = (person: Person, age: string): string => {
     let gender;
     switch (person.gender) {
         case "male":
@@ -46,13 +46,14 @@ export const getFormattedPeople = (
             gender: person.gender,
             birthMonth: person.birth_month,
             birthYear: person.birth_year,
+            recordedAsChild: person.recorded_as_child,
         };
     });
 };
 
 export const prepareHouseholdSummary = (familyData: Schema["families"][]): HouseholdSummary => {
-    const formattedChildren: Person[] = getFormattedPeople(familyData, isChildPerson);
-    const formattedAdults: Person[] = getFormattedPeople(familyData, isAdultPerson);
+    const formattedChildren: Person[] = getFormattedPeople(familyData, isChildFamilyMember);
+    const formattedAdults: Person[] = getFormattedPeople(familyData, isAdultFamilyMember);
     const householdSize = familyData.length;
     const numberBabies = familyData.filter(
         (member) => member.birth_year === getCurrentYear()
@@ -68,16 +69,19 @@ export const prepareHouseholdSummary = (familyData: Schema["families"][]): House
         householdSize: `${adultText} ${childText}`,
         ageAndGenderOfAdults: displayList(
             formattedAdults.map((adult) =>
-                getPerson(adult, getAdultAgeUsingBirthYear(adult.birthYear, true))
+                getPersonSummary(
+                    adult,
+                    getAdultAgeStringUsingBirthYear(adult.birthYear ?? null, true)
+                )
             )
         ),
         numberOfBabies: numberBabies.toString(),
         ageAndGenderOfChildren: displayList(
             formattedChildren.map((child) =>
-                getPerson(
+                getPersonSummary(
                     child,
-                    getChildAgeUsingBirthYearAndMonth(
-                        child.birthYear,
+                    getChildAgeStringUsingBirthYearAndMonth(
+                        child.birthYear ?? null,
                         child.birthMonth ?? null,
                         true
                     )
