@@ -32,7 +32,7 @@ const setAdultsFields = (
         const input = event.target.value;
         switch (subFieldName) {
             case "gender":
-                adults[index][subFieldName] = (input !== "Don't Know" ? input : "other") as Gender;
+                adults[index][subFieldName] = (input !== "Don't Know" ? input : "other") as Gender; // QQ: how to show in UI
                 break;
             case "birthYear":
                 adults[index][subFieldName] = parseInt(input);
@@ -82,7 +82,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                                     ["Prefer Not To Say", "other"],
                                 ]}
                                 listTitle="Gender"
-                                value={adult.gender}
+                                value={adult.gender ?? ""}
                                 onChange={setAdultsFields(
                                     fieldSetter,
                                     fields.adults,

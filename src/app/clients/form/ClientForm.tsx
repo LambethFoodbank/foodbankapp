@@ -128,7 +128,6 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
             .fill(0)
             .map((_item) => {
                 return {
-                    gender: "other",
                     recordedAsChild: true,
                 };
             });
@@ -145,7 +144,6 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
             .fill(0)
             .map((_item) => {
                 return {
-                    gender: "other",
                     recordedAsChild: false,
                 };
             });

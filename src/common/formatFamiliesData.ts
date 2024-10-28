@@ -1,4 +1,4 @@
-import { Person } from "@/components/Form/formFunctions";
+import { Gender, Person } from "@/components/Form/formFunctions";
 import { Schema } from "@/databaseUtils";
 import { displayList } from "@/common/format";
 import {
@@ -16,20 +16,26 @@ export interface HouseholdSummary {
     ageAndGenderOfChildren: string;
 }
 
-const getPersonSummary = (person: Person, age: string): string => {
-    let gender;
-    switch (person.gender) {
-        case "male":
-            gender = "M";
-            break;
-        case "female":
-            gender = "F";
-            break;
-        case "other":
-            gender = "O";
-            break;
+export const getGenderStringFromGenderField = (gender?: Gender | null): string => {
+    return gender ?? "unknown gender";
+};
+
+const getGenderShortStringFromGenderField = (gender?: Gender | null): string => {
+    if (gender === "male") {
+        return "M";
+    } else if (gender === "female") {
+        return "F";
+    } else if (gender === "other") {
+        return "O";
+    } else {
+        return "unknown gender";
     }
-    return `${age} ${gender}`;
+};
+
+const getPersonSummary = (person: Person, age: string): string => {
+    const genderString = getGenderShortStringFromGenderField(person.gender);
+
+    return `${age} ${genderString}`;
 };
 
 const convertPlural = (value: number, description: string): string => {

@@ -36,7 +36,7 @@ const setChildrenFields = (
             case "gender":
                 children[index][subFieldName] = (
                     input !== "Don't Know" ? input : "other"
-                ) as Gender;
+                ) as Gender; // QQ how to show in UI
                 break;
             case "birthYear":
                 children[index][subFieldName] = parseInt(input);
@@ -91,7 +91,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                     ["Prefer Not To Say", "other"],
                                 ]}
                                 listTitle="Gender"
-                                value={child.gender}
+                                value={child.gender ?? ""}
                                 onChange={setChildrenFields(
                                     fieldSetter,
                                     fields.children,

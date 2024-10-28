@@ -201,7 +201,7 @@ describe("Parcels Page", () => {
                         recorded_as_child: true,
                         gender: "female",
                     },
-                    { birth_year: 2020, birth_month: 4, recorded_as_child: true, gender: "other" },
+                    { birth_year: 2020, birth_month: 4, recorded_as_child: true, gender: null },
                 ])
             ).toEqual("Family of 4 Occupants (1 adult, 3 children)");
 
@@ -287,11 +287,11 @@ describe("Parcels Page", () => {
                         birth_year: 2009,
                         birth_month: null,
                         recorded_as_child: null,
-                        gender: "other",
+                        gender: null,
                     },
                 ])
             ).toEqual(
-                `${currentYear - 2019}-years-old male, ${currentYear - 2020}-years-old female, ${currentYear - 2009}-years-old other`
+                `${currentYear - 2019}-years-old male, ${currentYear - 2020}-years-old female, ${currentYear - 2009}-years-old unknown gender`
             );
 
             expect(

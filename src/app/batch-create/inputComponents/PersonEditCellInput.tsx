@@ -71,10 +71,10 @@ const PersonEditCellInput: React.FC<PersonEditCellInputProps> = ({
             for (let iterator = people.length; iterator < boundNumberOfPeople; iterator++) {
                 personField === "adultInfo"
                     ? slicedPeople.push({
-                          gender: "other",
+                          recordedAsChild: false,
                       })
                     : slicedPeople.push({
-                          gender: "other",
+                          recordedAsChild: true,
                           birthYear: +currentDate.format("YYYY"),
                       });
             }
