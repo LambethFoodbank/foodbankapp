@@ -10,7 +10,7 @@ import {
     isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
 import { ListType } from "@/common/databaseListTypes";
-import { getGenderStringFromGenderField } from "@/common/formatFamiliesData";
+import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);

@@ -1,4 +1,4 @@
-import { Gender, Person } from "@/components/Form/formFunctions";
+import { Person } from "@/components/Form/formFunctions";
 import { Schema } from "@/databaseUtils";
 import { displayList } from "@/common/format";
 import {
@@ -8,6 +8,7 @@ import {
     isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
 import { getCurrentYear } from "@/common/date";
+import { getGenderShortStringFromGenderField } from "./getGendersOfFamily";
 
 export interface HouseholdSummary {
     householdSize: string;
@@ -15,22 +16,6 @@ export interface HouseholdSummary {
     numberOfBabies: string;
     ageAndGenderOfChildren: string;
 }
-
-export const getGenderStringFromGenderField = (gender?: Gender | null): string => {
-    return gender ?? "unknown gender";
-};
-
-const getGenderShortStringFromGenderField = (gender?: Gender | null): string => {
-    if (gender === "male") {
-        return "M";
-    } else if (gender === "female") {
-        return "F";
-    } else if (gender === "other") {
-        return "O";
-    } else {
-        return "unknown gender";
-    }
-};
 
 const getPersonSummary = (person: Person, age: string): string => {
     const genderString = getGenderShortStringFromGenderField(person.gender);

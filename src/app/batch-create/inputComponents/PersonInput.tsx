@@ -11,6 +11,7 @@ import { PersonField } from "@/app/batch-create/inputComponents/PersonEditCell";
 import { Divider } from "@mui/material";
 import { BatchActionType } from "@/app/batch-create/types";
 import dayjs from "dayjs";
+import { getGenderSelectLabelsAndValues } from "@/common/getGendersOfFamily";
 
 interface PersonInputProps {
     people: Person[];
@@ -40,11 +41,7 @@ const PersonInput: React.FC<PersonInputProps> = ({
         personField === "adultInfo"
             ? getAdultBirthYears().map((year) => [`${year}`, `${year}`] as [string, string])
             : getChildBirthYears().map((year) => [`${year}`, `${year}`] as [string, string]);
-    const genderLabelsAndValues: [string, string][] = [
-        ["Male", "male"],
-        ["Female", "female"],
-        ["Prefer Not To Say", "other"],
-    ];
+    const genderLabelsAndValues: [string, string][] = getGenderSelectLabelsAndValues();
     const defaultMonthString: string = people[index].birthMonth
         ? `${dayjs(people[index].birthMonth + 1).month()}`
         : "";

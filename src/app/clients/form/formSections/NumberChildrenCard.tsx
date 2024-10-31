@@ -19,6 +19,10 @@ import {
     getCurrentYearChildBirthMonthList,
 } from "@/app/clients/form/birthYearDropdown";
 import { getCurrentYear } from "@/common/date";
+import {
+    genderSelectValueForUnknown,
+    getGenderSelectLabelsAndValues,
+} from "@/common/getGendersOfFamily";
 
 const maxNumberChildren = (value: string): boolean => {
     return parseInt(value) <= 20;
@@ -35,8 +39,8 @@ const setChildrenFields = (
         switch (subFieldName) {
             case "gender":
                 children[index][subFieldName] = (
-                    input !== "Don't Know" ? input : "other"
-                ) as Gender; // QQ how to show in UI
+                    input != genderSelectValueForUnknown ? input : null
+                ) as Gender | null;
                 break;
             case "birthYear":
                 children[index][subFieldName] = parseInt(input);
@@ -85,13 +89,9 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                             <FormText>Child {index + 1}</FormText>
                             <ControlledSelect
                                 selectLabelId="children-gender-select-label"
-                                labelsAndValues={[
-                                    ["Male", "male"],
-                                    ["Female", "female"],
-                                    ["Prefer Not To Say", "other"],
-                                ]}
+                                labelsAndValues={getGenderSelectLabelsAndValues()}
                                 listTitle="Gender"
-                                value={child.gender ?? ""}
+                                value={child.gender ?? genderSelectValueForUnknown}
                                 onChange={setChildrenFields(
                                     fieldSetter,
                                     fields.children,
@@ -105,7 +105,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                     `${year}`,
                                     `${year}`,
                                 ])}
-                                listTitle="Year of Birth (optional)"
+                                listTitle="Year of Birth"
                                 value={child.birthYear?.toString() ?? ""}
                                 onChange={setChildrenFields(
                                     fieldSetter,
@@ -121,7 +121,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                         ? getCurrentYearChildBirthMonthList()
                                         : childBirthMonthList
                                 }
-                                listTitle="Month of Birth (optional)"
+                                listTitle="Month of Birth"
                                 value={child.birthMonth?.toString() ?? ""}
                                 onChange={setChildrenFields(
                                     fieldSetter,
