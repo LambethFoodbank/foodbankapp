@@ -38,7 +38,10 @@ const autofill = (
         numberOfChildren: children.length,
         children: children,
         listType: clientData.default_list,
-        dietaryRequirements: arrayToBooleanGroup(clientData.dietary_requirements ?? []),
+        dietaryRequirements:
+            clientData.dietary_requirements !== null
+                ? arrayToBooleanGroup(clientData.dietary_requirements)
+                : null,
         feminineProducts: arrayToBooleanGroup(clientData.feminine_products ?? []),
         babyProducts: clientData.baby_food,
         nappySize: nappySize.replace("Nappy Size: ", ""),

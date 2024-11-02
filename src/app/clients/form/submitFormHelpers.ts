@@ -6,6 +6,10 @@ import { ClientFields } from "./ClientForm";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
 import { EXTRA_INFORMATION_LABEL, NAPPY_SIZE_LABEL } from "@/app/clients/form/labels";
+import { dietaryRequirementOptions } from "./formSections/DietaryRequirementCard";
+import { otherRequirementOptions } from "./formSections/OtherItemsCard";
+import { feminineProductOptions } from "./formSections/FeminineProductCard";
+import { petFoodOptions } from "./formSections/PetFoodCard";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
@@ -46,11 +50,14 @@ export const formatClientRecord = (
         address_county: fields.addressCounty,
         address_postcode: fields.addressPostcode,
         default_list: fields.listType as ListType,
-        dietary_requirements: checkboxGroupToArray(fields.dietaryRequirements),
-        feminine_products: checkboxGroupToArray(fields.feminineProducts),
+        dietary_requirements:
+            fields.dietaryRequirements !== null
+                ? checkboxGroupToArray(fields.dietaryRequirements, dietaryRequirementOptions)
+                : null,
+        feminine_products: checkboxGroupToArray(fields.feminineProducts, feminineProductOptions),
         baby_food: fields.babyProducts,
-        pet_food: checkboxGroupToArray(fields.petFood),
-        other_items: checkboxGroupToArray(fields.otherItems),
+        pet_food: checkboxGroupToArray(fields.petFood, petFoodOptions),
+        other_items: checkboxGroupToArray(fields.otherItems, otherRequirementOptions),
         delivery_instructions: fields.deliveryInstructions,
         extra_information: extraInformationWithNappy,
         signposting_call_required: fields.signpostingCall,

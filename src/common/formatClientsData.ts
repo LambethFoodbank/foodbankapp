@@ -1,5 +1,10 @@
 import { Schema } from "@/databaseUtils";
 import { displayList, displayPostcodeForHomelessClient } from "@/common/format";
+import { formatRequirementsByCanonicalOrder } from "@/app/clients/getExpandedClientDetails";
+import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
+import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
+import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
+import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 interface NappySizeAndExtraInformation {
     nappySize: string;
     extraInformation: string;
@@ -61,7 +66,10 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
 
     switch (clientData.baby_food) {
         case true:
-            babyProduct = `Yes (${nappySize})`;
+            babyProduct = "Yes";
+            if (nappySize.length > 0) {
+                babyProduct += ` (${nappySize})`;
+            }
             break;
         case false:
             babyProduct = "No";
@@ -72,10 +80,19 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
     }
 
     return {
-        feminineProductsRequired: displayList(clientData.feminine_products ?? []),
+        feminineProductsRequired: formatRequirementsByCanonicalOrder(
+            clientData.feminine_products,
+            feminineProductOptions
+        ),
         babyProductsRequired: babyProduct,
-        petFoodRequired: displayList(clientData.pet_food ?? []),
-        dietaryRequirements: displayList(clientData.dietary_requirements ?? []),
-        otherItems: displayList(clientData.other_items ?? []),
+        petFoodRequired: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),
+        dietaryRequirements: formatRequirementsByCanonicalOrder(
+            clientData.dietary_requirements,
+            dietaryRequirementOptions
+        ),
+        otherItems: formatRequirementsByCanonicalOrder(
+            clientData.other_items,
+            otherRequirementOptions
+        ),
     };
 };

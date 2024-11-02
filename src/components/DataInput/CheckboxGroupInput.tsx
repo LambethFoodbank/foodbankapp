@@ -8,12 +8,13 @@ interface Props {
     defaultCheckedKeys?: string[];
     labelsAndKeys: [string, string][];
     groupLabel?: string;
+    disabled?: boolean;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const CheckboxGroupInput: React.FC<Props> = (props) => {
     return (
-        <FormControl>
+        <FormControl disabled={!!props.disabled}>
             {props.groupLabel && <FormLabel>{props.groupLabel}</FormLabel>}
             <FormGroup>
                 {props.labelsAndKeys.map(([label, key]) => {

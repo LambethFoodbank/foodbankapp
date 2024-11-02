@@ -11,6 +11,11 @@ import {
 } from "@/common/getAgesOfFamily";
 import { ListType } from "@/common/databaseListTypes";
 import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
+import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
+import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
+import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
+import { feminineProductOptions } from "./form/formSections/FeminineProductCard";
+import { petFoodOptions } from "./form/formSections/PetFoodCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -104,11 +109,20 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         household: formatHouseholdFromFamilyDetails(client.family),
         adults: formatBreakdownOfAdultsFromFamilyDetails(client.family),
         children: formatBreakdownOfChildrenFromFamilyDetails(client.family),
-        dietaryRequirements: client.dietary_requirements?.join(", ") ?? "",
-        feminineProducts: client.feminine_products?.join(", ") ?? "",
+        dietaryRequirements: formatRequirementsByCanonicalOrder(
+            client.dietary_requirements,
+            dietaryRequirementOptions
+        ),
+        feminineProducts: formatRequirementsByCanonicalOrder(
+            client.feminine_products,
+            feminineProductOptions
+        ),
         babyProducts: client.baby_food,
-        petFood: client.pet_food?.join(", ") ?? "",
-        otherRequirements: client.other_items?.join(", ") ?? "",
+        petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
+        otherRequirements: formatRequirementsByCanonicalOrder(
+            client.other_items,
+            otherRequirementOptions
+        ),
         extraInformation: client.extra_information ?? "",
         notes: client.notes,
         isActive: client.is_active,
@@ -216,6 +230,19 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
     }
 
     return childDetails.join(", ");
+};
+
+export const formatRequirementsByCanonicalOrder = (
+    requirementsArray: string[] | null,
+    canonicalOrder: string[]
+): string => {
+    if (requirementsArray === null) {
+        return "Don't Know";
+    } else if (requirementsArray.length === 0) {
+        return "None";
+    }
+
+    return sortArrayByCanonicalOrder(requirementsArray, canonicalOrder).join(", ");
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";
