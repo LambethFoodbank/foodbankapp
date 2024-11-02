@@ -10,6 +10,7 @@ import {
     isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
 import { ListType } from "@/common/databaseListTypes";
+import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -178,7 +179,8 @@ export const formatBreakdownOfAdultsFromFamilyDetails = (
     for (const familyMember of family) {
         if (isAdultFamilyMember(familyMember)) {
             const age = getAdultAgeStringUsingBirthYear(familyMember.birth_year, false);
-            adultDetails.push(`${age} ${familyMember.gender}`);
+            const gender = getGenderStringFromGenderField(familyMember.gender);
+            adultDetails.push(`${age} ${gender}`);
         }
     }
 
@@ -204,7 +206,8 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
                 familyMember.birth_month,
                 false
             );
-            childDetails.push(`${age} ${familyMember.gender}`);
+            const gender = getGenderStringFromGenderField(familyMember.gender);
+            childDetails.push(`${age} ${gender}`);
         }
     }
 

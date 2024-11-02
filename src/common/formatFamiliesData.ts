@@ -8,6 +8,7 @@ import {
     isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
 import { getCurrentYear } from "@/common/date";
+import { getGenderShortStringFromGenderField } from "./getGendersOfFamily";
 
 export interface HouseholdSummary {
     householdSize: string;
@@ -17,19 +18,9 @@ export interface HouseholdSummary {
 }
 
 const getPersonSummary = (person: Person, age: string): string => {
-    let gender;
-    switch (person.gender) {
-        case "male":
-            gender = "M";
-            break;
-        case "female":
-            gender = "F";
-            break;
-        case "other":
-            gender = "O";
-            break;
-    }
-    return `${age} ${gender}`;
+    const genderString = getGenderShortStringFromGenderField(person.gender);
+
+    return `${age} ${genderString}`;
 };
 
 const convertPlural = (value: number, description: string): string => {

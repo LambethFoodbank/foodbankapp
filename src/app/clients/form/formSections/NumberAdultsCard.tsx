@@ -15,6 +15,10 @@ import { ClientCardProps, ClientSetter } from "@/app/clients/form/ClientForm";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { getAdultBirthYears } from "@/app/clients/form/birthYearDropdown";
 import { MAXIMUM_NUMBER_OF_ADULTS, MINIMUM_NUMBER_OF_ADULTS } from "@/app/clients/form/bounds";
+import {
+    genderSelectValueForUnknown,
+    getGenderSelectLabelsAndValues,
+} from "@/common/getGendersOfFamily";
 
 const numberOfAdultsRange = (value: string): boolean => {
     return (
@@ -32,7 +36,9 @@ const setAdultsFields = (
         const input = event.target.value;
         switch (subFieldName) {
             case "gender":
-                adults[index][subFieldName] = (input !== "Don't Know" ? input : "other") as Gender;
+                adults[index][subFieldName] = (
+                    input !== genderSelectValueForUnknown ? input : null
+                ) as Gender | null;
                 break;
             case "birthYear":
                 adults[index][subFieldName] = parseInt(input);
@@ -76,13 +82,9 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                             <FormText>Adult {index + 1}</FormText>
                             <ControlledSelect
                                 selectLabelId="adult-gender-select-label"
-                                labelsAndValues={[
-                                    ["Male", "male"],
-                                    ["Female", "female"],
-                                    ["Prefer Not To Say", "other"],
-                                ]}
+                                labelsAndValues={getGenderSelectLabelsAndValues()}
                                 listTitle="Gender"
-                                value={adult.gender}
+                                value={adult.gender ?? genderSelectValueForUnknown}
                                 onChange={setAdultsFields(
                                     fieldSetter,
                                     fields.adults,
@@ -96,7 +98,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                                     `${year}`,
                                     `${year}`,
                                 ])}
-                                listTitle="Year of Birth (optional)"
+                                listTitle="Year of Birth"
                                 value={adult.birthYear?.toString() ?? ""}
                                 onChange={setAdultsFields(
                                     fieldSetter,

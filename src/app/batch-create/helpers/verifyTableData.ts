@@ -14,8 +14,6 @@ const checkRequiredClientDataIsNotEmpty = (client: BatchClient): boolean => {
         client.adultInfo !== null &&
         client.listType !== null &&
         client.babyProducts !== null &&
-        client.deliveryInstructions !== null &&
-        client.extraInformation !== null &&
         client.attentionFlag !== null &&
         client.signpostingCall !== null
     );

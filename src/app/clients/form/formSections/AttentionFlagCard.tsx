@@ -9,7 +9,7 @@ const AttentionFlagCard: React.FC<ClientCardProps> = ({ fieldSetter, fields }) =
         <GenericFormCard
             title="Flag For Attention"
             required={true}
-            text="Click Yes if you'd like to flag this client for attention on the home page of the app. For example if someone is only home at certain times, needs a delivery to an alternative address, or have sensitive information (i.e. domestic violence)."
+            text="Click Yes if you'd like to flag this client for attention. For example, if someone is only home at certain times, needs a delivery to an alternative address, or have sensitive information (i.e. domestic violence)."
         >
             <RadioGroupInput
                 labelsAndValues={[

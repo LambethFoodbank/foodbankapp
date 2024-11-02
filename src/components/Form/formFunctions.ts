@@ -39,7 +39,7 @@ export interface CardProps<
 }
 
 export interface Person {
-    gender: Gender;
+    gender?: Gender | null;
     birthYear?: number | null;
     birthMonth?: number | null;
     recordedAsChild?: boolean | null;

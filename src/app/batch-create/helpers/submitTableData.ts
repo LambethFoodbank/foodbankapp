@@ -25,6 +25,8 @@ import { ListType } from "@/common/databaseListTypes";
 import { defaultTableState } from "@/app/batch-create/BatchParcelDataGrid";
 import { Json } from "@/databaseTypesFile";
 import { checkParcelDataIsNotEmpty } from "@/app/batch-create/helpers/verifyTableData";
+import dayjs from "dayjs";
+import { getDbDate } from "@/common/format";
 
 const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRecord => {
     const extraInformationWithNappy =
@@ -41,12 +43,15 @@ const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRec
         address_county: client.address && client.address.addressCounty,
         address_postcode: client.address && client.address.addressPostcode,
         default_list: client.listType || undefined,
-        dietary_requirements:
-            client.dietaryRequirements && checkboxGroupToArray(client.dietaryRequirements),
-        feminine_products: client.feminineProducts && checkboxGroupToArray(client.feminineProducts),
+        dietary_requirements: client.dietaryRequirements
+            ? checkboxGroupToArray(client.dietaryRequirements)
+            : [],
+        feminine_products: client.feminineProducts
+            ? checkboxGroupToArray(client.feminineProducts)
+            : [],
         baby_food: client.babyProducts === "Yes",
-        pet_food: client.petFood && checkboxGroupToArray(client.petFood),
-        other_items: client.otherItems && checkboxGroupToArray(client.otherItems),
+        pet_food: client.petFood ? checkboxGroupToArray(client.petFood) : [],
+        other_items: client.otherItems ? checkboxGroupToArray(client.otherItems) : [],
         delivery_instructions: client.deliveryInstructions,
         extra_information: extraInformationWithNappy,
         signposting_call_required: client.signpostingCall,
@@ -109,7 +114,7 @@ const batchParcelToParcelRecord = (
             collection_centre: collectionInfo.collectionCentreId,
             collection_datetime: collectionDateTime,
             list_type: listType,
-            packing_date: parcel.packingDate,
+            packing_date: getDbDate(dayjs(parcel.packingDate)),
             packing_slot: parcel.packingSlot,
             voucher_number: parcel.voucherNumber,
         };

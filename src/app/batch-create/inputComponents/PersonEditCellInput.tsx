@@ -2,7 +2,6 @@ import { PERSON_WIDTH } from "@/app/batch-create/columnWidths";
 import { BatchActionType } from "@/app/batch-create/types";
 import { PersonField } from "@/app/batch-create/inputComponents/PersonEditCell";
 import { Person } from "@/components/Form/formFunctions";
-import dayjs from "dayjs";
 import { MINIMUM_NUMBER_OF_ADULTS, MAXIMUM_NUMBER_OF_ADULTS } from "@/app/clients/form/bounds";
 import PersonInput from "@/app/batch-create/inputComponents/PersonInput";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -67,15 +66,13 @@ const PersonEditCellInput: React.FC<PersonEditCellInputProps> = ({
         );
         const slicedPeople = people.slice(0, boundNumberOfPeople);
         if (people.length < boundNumberOfPeople) {
-            const currentDate = dayjs().startOf("day");
             for (let iterator = people.length; iterator < boundNumberOfPeople; iterator++) {
                 personField === "adultInfo"
                     ? slicedPeople.push({
-                          gender: "other",
+                          recordedAsChild: false,
                       })
                     : slicedPeople.push({
-                          gender: "other",
-                          birthYear: +currentDate.format("YYYY"),
+                          recordedAsChild: true,
                       });
             }
         }
