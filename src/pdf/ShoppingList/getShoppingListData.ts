@@ -13,11 +13,7 @@ import {
     fetchListsComment,
     fetchFamily,
 } from "@/common/fetch";
-import {
-    prepareClientSummary,
-    prepareRequirementSummary,
-    processExtraInformation,
-} from "@/common/formatClientsData";
+import { prepareClientSummary, prepareRequirementSummary } from "@/common/formatClientsData";
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
 import { prepareParcelInfo } from "@/pdf/ShoppingList/getParcelsData";
 import {
@@ -132,9 +128,6 @@ const getShoppingListDataForSingleParcel = async (
     const clientSummary = prepareClientSummary(clientData);
     const householdSummary = prepareHouseholdSummary(familyData);
     const requirementSummary = prepareRequirementSummary(clientData);
-
-    const { nappySize } = processExtraInformation(clientData.extra_information ?? "");
-    requirementSummary.babyProductsRequired += ` (${nappySize})`;
 
     const { data: endNotes, error: listsCommentError } = await fetchListsComment(supabase);
     if (listsCommentError) {
