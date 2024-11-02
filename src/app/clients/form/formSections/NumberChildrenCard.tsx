@@ -39,7 +39,7 @@ const setChildrenFields = (
         switch (subFieldName) {
             case "gender":
                 children[index][subFieldName] = (
-                    input != genderSelectValueForUnknown ? input : null
+                    input !== genderSelectValueForUnknown ? input : null
                 ) as Gender | null;
                 break;
             case "birthYear":

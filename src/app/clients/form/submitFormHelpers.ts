@@ -14,7 +14,7 @@ export type ClientDatabaseUpdateRecord = UpdateSchema["clients"];
 const personToFamilyRecordWithoutFamilyId = (person: Person): FamilyDatabaseInsertRecord => {
     return {
         gender: person.gender,
-        birth_year: person.birthYear,
+        birth_year: person.birthYear ?? null,
         birth_month: person.birthMonth ?? null,
         recorded_as_child: person.recordedAsChild ?? null,
     };
