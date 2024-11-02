@@ -64,7 +64,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "fullName",
-            headerName: "Full Name",
+            headerName: "Full Name *",
             width: FULL_NAME_WIDTH,
             editable: true,
         },
@@ -96,7 +96,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "address",
-            headerName: "Address",
+            headerName: "Address *",
             type: "string",
             width: ADDRESS_WIDTH,
             editable: true,
@@ -112,7 +112,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "adults",
-            headerName: "Adults",
+            headerName: "Adults *",
             type: "number",
             width: PERSON_WIDTH,
             editable: true,
@@ -146,7 +146,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "listType",
-            headerName: "List Type",
+            headerName: "List Type *",
             width: LIST_TYPE_WIDTH,
             editable: true,
             renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
@@ -197,7 +197,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "babyProducts",
-            headerName: "Baby Products",
+            headerName: "Baby Products *",
             width: BABY_PRODUCTS_WIDTH,
             editable: true,
             renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
@@ -280,7 +280,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "attentionFlag",
-            headerName: "Attention Flag",
+            headerName: "Attention Flag *",
             width: BOOLEAN_CLIENT_WIDTH,
             editable: true,
             renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
@@ -296,7 +296,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "signpostingCall",
-            headerName: "Signposting Call",
+            headerName: "Signposting Call *",
             width: BOOLEAN_CLIENT_WIDTH,
             editable: true,
             renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
@@ -334,7 +334,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "packingDate",
-            headerName: "Packing Date",
+            headerName: "Packing Date *",
             width: PACKING_DATE_WIDTH,
             editable: true,
             renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
@@ -349,7 +349,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "packingSlot",
-            headerName: "Packing Slot",
+            headerName: "Packing Slot *",
             width: PACKING_SLOT_WIDTH,
             editable: true,
             renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
@@ -364,7 +364,7 @@ const getCenteredBatchGridDisplayColumns = (
         },
         {
             field: "shippingMethod",
-            headerName: "Shipping Method",
+            headerName: "Shipping Method *",
             width: SHIPPING_METHOD_WIDTH,
             editable: true,
             renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
