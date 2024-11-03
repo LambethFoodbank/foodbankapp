@@ -172,6 +172,7 @@ You can regenerate the types
 
 #### Useful links
 - [Local Development](https://supabase.com/docs/guides/cli/local-development)
+- [Migration commmands](https://supabase.com/docs/reference/cli/supabase-migration)
 - [Managing Environments](https://supabase.com/docs/guides/cli/managing-environments)
 - [Deploy a migration](https://supabase.com/docs/guides/cli/managing-environments?environment=ci#deploy-a-migration)
 

@@ -181,6 +181,7 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
                         );
                         break;
                 }
+                setSubmitDisabled(false);
                 return;
             }
             router.push(`/clients?clientId=${clientId}`);
@@ -194,6 +195,7 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
                         );
                         break;
                 }
+                setSubmitDisabled(false);
                 return;
             }
             router.push(`/parcels/add/${clientId}`);
