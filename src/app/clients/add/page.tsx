@@ -17,7 +17,7 @@ const AddClients: () => React.ReactElement = () => {
         numberOfChildren: 0,
         children: [],
         listType: null,
-        dietaryRequirements: {},
+        dietaryRequirements: null,
         feminineProducts: {},
         babyProducts: null,
         nappySize: "",

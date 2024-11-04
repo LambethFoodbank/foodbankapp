@@ -1,4 +1,17 @@
 export const possibleDietaryRequirements = [
+    "Fresh Fruit",
+    "Fresh Veg",
+    "Garlic",
+    "Ginger",
+    "Chillies",
+    "Spices",
+    "Bread",
+    "Tea",
+    "Coffee",
+    "Pasta",
+    "Rice",
+    "Meat (No Pork)",
+    "Meat & Pork",
     "Gluten Free",
     "Dairy Free",
     "Vegetarian",
@@ -8,25 +21,13 @@ export const possibleDietaryRequirements = [
     "Diabetic",
     "Nut Allergy",
     "Seafood Allergy",
-    "No Bread",
-    "No Pasta",
-    "No Rice",
-    "No Pork",
-    "No Beef",
 ];
 
 export const possibleFeminineProducts = ["Tampons", "Pads", "Incontinence Pads"];
 
 export const possiblePets = ["Cat", "Dog"];
 
-export const possibleOtherItems = [
-    "Garlic",
-    "Ginger",
-    "Chillies",
-    "Spices",
-    "Hot Water Bottles",
-    "Blankets",
-];
+export const possibleOtherItems = ["Hot Water Bottle", "Blanket"];
 
 export const possibleParcelPostCodes = [
     "E1 6AA",

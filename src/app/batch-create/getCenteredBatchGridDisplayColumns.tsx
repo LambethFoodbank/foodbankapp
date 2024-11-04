@@ -25,10 +25,10 @@ import {
 import AddressEditCell from "@/app/batch-create/inputComponents/AddressEditCell";
 import ListTypeEditCell from "@/app/batch-create/inputComponents/ListTypeEditCell";
 import BooleanGroupEditCell from "@/app/batch-create/inputComponents/BooleanGroupEditCell";
-import { DIETARY_REQS_LABELS_AND_KEYS } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { FEMININE_PRODUCTS_LABELS_AND_KEYS } from "@/app/clients/form/formSections/FeminineProductCard";
-import { PET_FOOD_LABELS_AND_KEYS } from "@/app/clients/form/formSections/PetFoodCard";
-import { OTHER_ITEMS_LABELS_AND_KEYS } from "@/app/clients/form/formSections/OtherItemsCard";
+import { dietaryRequirementLabelsAndKeys } from "@/app/clients/form/formSections/DietaryRequirementCard";
+import { feminineProductLabelsAndKeys } from "@/app/clients/form/formSections/FeminineProductCard";
+import { petFoodLabelsAndKeys } from "@/app/clients/form/formSections/PetFoodCard";
+import { otherItemsLabelsAndKeys } from "@/app/clients/form/formSections/OtherItemsCard";
 import BabyProductsEditCell from "@/app/batch-create/inputComponents/BabyProductsEditCell";
 import TextFieldEditCell from "@/app/batch-create/inputComponents/MultilinePopoverEditCell";
 import BooleanClientEditCell from "@/app/batch-create/inputComponents/BooleanClientEditCell";
@@ -172,7 +172,7 @@ const getCenteredBatchGridDisplayColumns = (
                         tableState={tableState}
                         clientField="dietaryRequirements"
                         fieldWidth={DIETARY_REQUIREMENTS_WIDTH}
-                        booleanGroupLabelAndKeys={DIETARY_REQS_LABELS_AND_KEYS}
+                        booleanGroupLabelAndKeys={dietaryRequirementLabelsAndKeys}
                     />
                 );
             },
@@ -190,7 +190,7 @@ const getCenteredBatchGridDisplayColumns = (
                         tableState={tableState}
                         clientField="feminineProducts"
                         fieldWidth={FEMININE_PRODUCTS_WIDTH}
-                        booleanGroupLabelAndKeys={FEMININE_PRODUCTS_LABELS_AND_KEYS}
+                        booleanGroupLabelAndKeys={feminineProductLabelsAndKeys}
                     />
                 );
             },
@@ -223,7 +223,7 @@ const getCenteredBatchGridDisplayColumns = (
                         tableState={tableState}
                         clientField="petFood"
                         fieldWidth={PET_FOOD_WIDTH}
-                        booleanGroupLabelAndKeys={PET_FOOD_LABELS_AND_KEYS}
+                        booleanGroupLabelAndKeys={petFoodLabelsAndKeys}
                     />
                 );
             },
@@ -241,7 +241,7 @@ const getCenteredBatchGridDisplayColumns = (
                         tableState={tableState}
                         clientField="otherItems"
                         fieldWidth={OTHER_ITEMS_WIDTH}
-                        booleanGroupLabelAndKeys={OTHER_ITEMS_LABELS_AND_KEYS}
+                        booleanGroupLabelAndKeys={otherItemsLabelsAndKeys}
                     />
                 );
             },

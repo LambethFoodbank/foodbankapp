@@ -40,7 +40,6 @@ export const StyledCard = styled(Paper)<{ $compact?: boolean }>`
         width: 100%;
         margin: 0.15em 0;
     }
-}
 `;
 
 export const RequiredAsterisk = styled.span`
@@ -86,17 +85,22 @@ export const ErrorText = styled.p`
 `;
 
 export const FormText = styled.p`
-    padding-bottom: 1em;
+    margin-bottom: 1em;
 `;
 
 export const FormSubheading = styled.h2`
-    padding-bottom: 1em;
+    margin-bottom: 1em;
 `;
 
 export const FormErrorText = styled(FormText)`
     color: ${(props) => props.theme.error};
     margin-bottom: 3em;
     text-align: center;
+`;
+
+export const FormElementWithSpacing = styled.div`
+    margin-top: 1em;
+    margin-bottom: 1em;
 `;
 
 export const GappedDiv = styled.div`

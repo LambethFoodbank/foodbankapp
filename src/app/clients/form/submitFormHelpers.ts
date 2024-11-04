@@ -46,7 +46,10 @@ export const formatClientRecord = (
         address_county: fields.addressCounty,
         address_postcode: fields.addressPostcode,
         default_list: fields.listType as ListType,
-        dietary_requirements: checkboxGroupToArray(fields.dietaryRequirements),
+        dietary_requirements:
+            fields.dietaryRequirements !== null
+                ? checkboxGroupToArray(fields.dietaryRequirements)
+                : null,
         feminine_products: checkboxGroupToArray(fields.feminineProducts),
         baby_food: fields.babyProducts,
         pet_food: checkboxGroupToArray(fields.petFood),

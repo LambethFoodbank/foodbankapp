@@ -256,6 +256,35 @@ export const getErrorText = (errorType: Errors, maxCharacters?: number): string 
     }
 };
 
+export const sortArrayByCanonicalOrder = (
+    listToSort: string[],
+    canonicalOrder: string[]
+): string[] => {
+    return listToSort.sort((firstKey, secondKey) => {
+        const firstIndex = canonicalOrder.indexOf(firstKey);
+        const secondIndex = canonicalOrder.indexOf(secondKey);
+
+        // Unrecognised strings to the end, in alphabetical order
+        if (firstIndex === -1) {
+            if (secondIndex === -1) {
+                if (firstKey < secondKey) {
+                    return -1;
+                } else if (firstKey > secondKey) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            } else {
+                return 1;
+            }
+        } else if (firstIndex !== -1 && secondIndex === -1) {
+            return -1;
+        }
+
+        return firstIndex - secondIndex;
+    });
+};
+
 export const checkboxGroupToArray = (checkedBoxes: BooleanGroup): string[] => {
     return Object.keys(checkedBoxes).filter((key) => checkedBoxes[key]);
 };

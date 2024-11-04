@@ -61,7 +61,7 @@ export interface ClientFields extends Fields {
     children: Person[];
     numberOfChildren: number;
     listType: ListType | null;
-    dietaryRequirements: BooleanGroup;
+    dietaryRequirements: BooleanGroup | null;
     feminineProducts: BooleanGroup;
     babyProducts: boolean | null;
     nappySize: string;
@@ -181,6 +181,7 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
                         );
                         break;
                 }
+                setSubmitDisabled(false);
                 return;
             }
             router.push(`/clients?clientId=${clientId}`);
@@ -194,6 +195,7 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
                         );
                         break;
                 }
+                setSubmitDisabled(false);
                 return;
             }
             router.push(`/parcels/add/${clientId}`);

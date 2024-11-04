@@ -4,20 +4,17 @@ import { checkboxGroupToArray, onChangeCheckbox } from "@/components/Form/formFu
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 
-export const OTHER_ITEMS_LABELS_AND_KEYS: [string, string][] = [
-    ["Garlic", "Garlic"],
-    ["Ginger", "Ginger"],
-    ["Chillies", "Chillies"],
-    ["Spices", "Spices"],
-    ["Hot Water Bottles", "Hot Water Bottles"],
-    ["Blankets", "Blankets"],
-];
+export const otherRequirementOptions: string[] = ["Hot Water Bottle", "Blanket"];
+
+export const otherItemsLabelsAndKeys: [string, string][] = otherRequirementOptions.map(
+    (optionName) => [optionName, optionName]
+);
 
 const OtherItemsCard: React.FC<ClientCardProps> = ({ fieldSetter, fields }) => {
     return (
         <GenericFormCard title="Other Items" required={false}>
             <CheckboxGroupInput
-                labelsAndKeys={OTHER_ITEMS_LABELS_AND_KEYS}
+                labelsAndKeys={otherItemsLabelsAndKeys}
                 onChange={onChangeCheckbox(fieldSetter, fields.otherItems, "otherItems")}
                 checkedKeys={checkboxGroupToArray(fields.otherItems)}
             />
