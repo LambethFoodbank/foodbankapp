@@ -285,13 +285,8 @@ export const sortArrayByCanonicalOrder = (
     });
 };
 
-export const checkboxGroupToArray = (
-    checkedBoxes: BooleanGroup,
-    canonicalOrder?: string[]
-): string[] => {
-    const selectedKeys = Object.keys(checkedBoxes).filter((key) => checkedBoxes[key]);
-
-    return canonicalOrder ? sortArrayByCanonicalOrder(selectedKeys, canonicalOrder) : selectedKeys;
+export const checkboxGroupToArray = (checkedBoxes: BooleanGroup): string[] => {
+    return Object.keys(checkedBoxes).filter((key) => checkedBoxes[key]);
 };
 
 export const checkErrorOnSubmit = <
