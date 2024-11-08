@@ -14,18 +14,14 @@ export const shouldBeInPackingManagerView = (
     if (areDaysIdentical(dayjs(parcel.packingDate), yesterday) && parcel.packingSlot !== "PM") {
         return false;
     }
-    if (!parcel.allStatuses) {
-        return false;
-    }
-    if (parcel.allStatuses.includes("Out for Delivery")) {
-        return false;
-    }
-    if (
-        parcel.allStatuses.includes("Shipping Labels Downloaded") &&
-        parcel.allStatuses.includes("Shopping List Downloaded") &&
-        parcel.allStatuses.includes("Called and Confirmed")
-    ) {
-        return true;
+    if (parcel.lastStatus) {
+        if (
+            parcel.lastStatus.name.includes("Shipping Labels Downloaded") ||
+            parcel.lastStatus.name.includes("Shopping List Downloaded") ||
+            parcel.lastStatus.name.includes("Called and Confirmed")
+        ) {
+            return true;
+        }
     }
     return false;
 };
