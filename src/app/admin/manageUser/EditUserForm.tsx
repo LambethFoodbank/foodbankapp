@@ -22,7 +22,7 @@ import {
 } from "@/components/Form/formFunctions";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import { InviteUserFields } from "@/app/admin/createUser/CreateUserForm";
-import { phoneNumberRegex } from "@/common/format";
+import { formatPhoneNumber, phoneNumberRegex } from "@/common/format";
 import Alert from "@mui/material/Alert/Alert";
 
 interface Props {
@@ -151,6 +151,7 @@ const EditUserForm: React.FC<Props> = (props) => {
                     onChange={onChangeText(fieldSetter, errorSetter, "telephoneNumber", {
                         required: true,
                         regex: phoneNumberRegex,
+                        formattingFunction: formatPhoneNumber,
                     })}
                     fullWidth={true}
                 />
