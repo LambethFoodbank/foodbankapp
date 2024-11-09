@@ -41,7 +41,7 @@ jobs:
         run: npm run cypress:e2e
 
       - name: Upload Screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: screenshots
@@ -49,7 +49,7 @@ jobs:
           retention-days: 1
 
       - name: Upload Videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: videos
