@@ -15,7 +15,7 @@ export const parcelTableHeaderKeysAndLabels: TableHeaders<ParcelsTableRow> = [
     ["createdAt", "Created At"],
 ];
 
-export const defaultShownHeaders: (keyof ParcelsTableRow)[] = [
+export const parcelTableDefaultShownHeaders: (keyof ParcelsTableRow)[] = [
     "iconsColumn",
     "fullName",
     "familyCategory",
@@ -26,7 +26,7 @@ export const defaultShownHeaders: (keyof ParcelsTableRow)[] = [
     "lastStatus",
 ];
 
-export const toggleableHeaders: (keyof ParcelsTableRow)[] = [
+export const parcelTableToggleableHeaders: (keyof ParcelsTableRow)[] = [
     "fullName",
     "familyCategory",
     "addressPostcode",

@@ -12,12 +12,17 @@ import { usersFilters } from "@/app/admin/usersTable/filters";
 import { getCurrentUser } from "@/server/getCurrentUser";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { defaultNumberOfUsersPerPage, numberOfUsersPerPageOptions } from "./constants";
-import { usersTableHeaderKeysAndLabels } from "./headers";
+import {
+    usersTableDefaultShownHeaders,
+    usersTableHeaderKeysAndLabels,
+    usersTableToggleableHeaders,
+} from "./headers";
 import { UserRow, UsersFilters, UsersSortState } from "./types";
 import { usersSortableColumns } from "./sortableColumns";
 import { userTableColumnDisplayFunctions } from "./format";
 import { Schema } from "@/databaseUtils";
 import FloatingToast from "@/components/FloatingToast";
+import { userTableColumnStyleOptions } from "./styles";
 
 const UsersTable: React.FC = () => {
     const [userToDelete, setUserToDelete] = useState<UserRow | null>(null);
@@ -139,16 +144,9 @@ const UsersTable: React.FC = () => {
                 dataPortion={users}
                 headerKeysAndLabels={usersTableHeaderKeysAndLabels}
                 columnDisplayFunctions={userTableColumnDisplayFunctions}
-                toggleableHeaders={["userId", "createdAt", "lastSignInAt", "updatedAt"]}
-                defaultShownHeaders={[
-                    "firstName",
-                    "lastName",
-                    "userRole",
-                    "email",
-                    "telephoneNumber",
-                    "createdAt",
-                    "lastSignInAt",
-                ]}
+                columnStyleOptions={userTableColumnStyleOptions}
+                toggleableHeaders={usersTableToggleableHeaders}
+                defaultShownHeaders={usersTableDefaultShownHeaders}
                 checkboxConfig={{ displayed: false }}
                 paginationConfig={{
                     enablePagination: true,
