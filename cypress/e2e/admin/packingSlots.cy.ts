@@ -18,7 +18,7 @@ describe("Packing slots on admins page", () => {
         movePackingSlot({ rowIndex: 1, direction: "up" });
 
         assertPackingSlotName({ rowIndex: 0, packingSlotName: "AM" });
-        assertPackingSlotName({ rowIndex: 1, packingSlotName: "Intentional Defect" });
+        assertPackingSlotName({ rowIndex: 1, packingSlotName: "PM" });
     });
 });
 
