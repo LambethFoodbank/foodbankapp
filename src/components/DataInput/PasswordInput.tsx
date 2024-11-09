@@ -6,7 +6,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 interface Props {
     label?: string;
-    defaultValue?: string;
+    value?: string;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     error?: boolean;
     helperText?: string;
@@ -21,17 +21,18 @@ const PasswordInput: React.FC<Props> = (props) => {
 
     return (
         <TextField
+            type={showPassword ? "text" : "password"}
+            label={props.label}
+            value={props.value}
+            onChange={props.onChange}
+            variant="outlined"
             error={props.error}
             helperText={props.helperText}
-            label={props.label}
-            defaultValue={props.defaultValue}
-            onChange={props.onChange}
-            type={showPassword ? "text" : "password"}
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">
                         <IconButton
-                            aria-label="toggle password visibility"
+                            aria-label="Toggle password visibility"
                             onClick={togglePasswordVisibility}
                         >
                             {showPassword ? <VisibilityOff /> : <Visibility />}

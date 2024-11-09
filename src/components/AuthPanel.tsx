@@ -5,6 +5,7 @@ import { NavBarHeight } from "@/components/NavigationBar/NavigationBar";
 import Paper from "@mui/material/Paper";
 import { Button, TextField } from "@mui/material";
 import Link from "next/link";
+import PasswordInput from "./DataInput/PasswordInput";
 
 export const AuthMain = styled.main`
     height: calc(100vh - ${NavBarHeight} * 2);
@@ -126,11 +127,8 @@ const AuthPanel: React.FC<AuthPanelProps> = ({
                 )}
 
                 {passwordField && (
-                    <TextField
-                        id="password"
-                        type="password"
+                    <PasswordInput
                         label="Your Password"
-                        variant="outlined"
                         value={passwordField.text}
                         onChange={(event) => passwordField.setText(event.target.value)}
                     />

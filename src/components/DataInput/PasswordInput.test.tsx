@@ -17,7 +17,7 @@ describe("PasswordInput component", () => {
         render(
             <PasswordInput
                 label="Password"
-                defaultValue="password"
+                value="password"
                 onChange={getFreeFormTextHandler(
                     () => void mockIDLogger("DataInput component test: Password Changed")
                 )}
@@ -34,10 +34,10 @@ describe("PasswordInput component", () => {
 
         expect(screen.getByLabelText("My Password")).toHaveAttribute("type", "password");
 
-        fireEvent.click(screen.getByLabelText("toggle password visibility"));
+        fireEvent.click(screen.getByLabelText("Toggle password visibility"));
         expect(screen.getByLabelText("My Password")).toHaveAttribute("type", "text");
 
-        fireEvent.click(screen.getByLabelText("toggle password visibility"));
+        fireEvent.click(screen.getByLabelText("Toggle password visibility"));
         expect(screen.getByLabelText("My Password")).toHaveAttribute("type", "password");
     });
 

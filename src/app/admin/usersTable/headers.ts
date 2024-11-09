@@ -7,8 +7,24 @@ export const usersTableHeaderKeysAndLabels: TableHeaders<UserRow> = [
     ["lastName", "Last Name"],
     ["email", "Email"],
     ["userRole", "Role"],
-    ["telephoneNumber", "Telephone Number"],
+    ["telephoneNumber", "Phone Number"],
     ["createdAt", "Created At"],
     ["updatedAt", "Updated At"],
     ["lastSignInAt", "Last Sign In"],
+];
+
+export const usersTableDefaultShownHeaders: (keyof UserRow)[] = [
+    "firstName",
+    "lastName",
+    "email",
+    "userRole",
+    "telephoneNumber",
+    "lastSignInAt",
+];
+
+export const usersTableToggleableHeaders: (keyof UserRow)[] = [
+    "userId",
+    "createdAt",
+    "lastSignInAt",
+    "updatedAt",
 ];

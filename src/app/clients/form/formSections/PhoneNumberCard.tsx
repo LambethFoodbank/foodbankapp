@@ -8,12 +8,7 @@ import {
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
-import { phoneNumberRegex } from "@/common/format";
-
-const formatPhoneNumber = (value: string): string => {
-    const numericInput = value.replace(/(\D)/g, "");
-    return numericInput[0] === "0" ? "+44" + numericInput.slice(1) : "+" + numericInput;
-};
+import { formatPhoneNumber, phoneNumberRegex } from "@/common/format";
 
 const PhoneNumberCard: React.FC<ClientCardProps> = ({
     formErrors,

@@ -55,7 +55,7 @@ const UserDetailsCard: React.FC<UserFormProps> = ({
             />
             <FreeFormTextInput
                 id="new-user-phone-number"
-                label="Telephone Number"
+                label="Phone Number"
                 error={errorExists(formErrors.telephoneNumber)}
                 helperText={getErrorText(formErrors.telephoneNumber)}
                 value={fields.telephoneNumber}

@@ -161,8 +161,9 @@ const SingleLabelCard: React.FC<LabelCardProps> = ({ data, index, quantity }) =>
                         {data.address_postcode ?? displayPostcodeForHomelessClient}
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "center", bottom: 0 }}>
-                        <Text style={styles.mediumText}>{data.packing_slot} </Text>
-                        <Text style={{ fontWeight: "bold", fontSize: "20pt" }}>|</Text>
+                        <Text style={[styles.mediumText, { marginRight: "10px" }]}>
+                            {data.packing_slot}
+                        </Text>
                         <Text style={styles.mediumText}>
                             {" "}
                             {data.collection_centre === "DLVR"

@@ -14,9 +14,9 @@ import {
     parcelIdParam,
 } from "@/app/parcels/parcelsTable/constants";
 import {
-    defaultShownHeaders,
+    parcelTableDefaultShownHeaders,
     parcelTableHeaderKeysAndLabels,
-    toggleableHeaders,
+    parcelTableToggleableHeaders,
 } from "@/app/parcels/parcelsTable/headers";
 import {
     getClientIdAndIsActiveErrorMessage,
@@ -360,8 +360,8 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     setPrimaryFilters: setPrimaryFilters,
                     setAdditionalFilters: setAdditionalFilters,
                 }}
-                defaultShownHeaders={defaultShownHeaders}
-                toggleableHeaders={toggleableHeaders}
+                defaultShownHeaders={parcelTableDefaultShownHeaders}
+                toggleableHeaders={parcelTableToggleableHeaders}
                 checkboxConfig={{
                     displayed: true,
                     selectedRowIds: checkedParcelIds,
