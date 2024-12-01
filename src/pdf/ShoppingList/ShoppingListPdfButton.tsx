@@ -4,11 +4,11 @@ import React from "react";
 import getShoppingListData, {
     ShoppingListPdfErrorType,
 } from "@/pdf/ShoppingList/getShoppingListData";
-import PdfButton from "@/components/PdfButton/PdfButton";
+import PdfButton from "@/components/FileGenerationButtons/PdfButton";
 import ShoppingListPdf from "@/pdf/ShoppingList/ShoppingListPdf";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { ShoppingListPdfData } from "./shoppingListPdfDataProps";
-import { PdfDataFetchResponse } from "../common";
+import { FileGenerationDataFetchResponse } from "../../components/FileGenerationButtons/common";
 
 interface Props {
     parcels: ParcelsTableRow[];
@@ -22,21 +22,21 @@ const ShoppingListPdfButton = ({
     onPdfCreationFailed,
 }: Props): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
-        PdfDataFetchResponse<ShoppingListPdfData[], ShoppingListPdfErrorType>
+        FileGenerationDataFetchResponse<ShoppingListPdfData[], ShoppingListPdfErrorType>
     > => {
         const parcelIds = parcels.map((parcel) => parcel.parcelId);
         const { data, error } = await getShoppingListData(parcelIds);
         if (error) {
             return { data: null, error: error };
         }
-        return { data: { pdfData: data, fileName: "ShoppingList.pdf" }, error: null };
+        return { data: { fileData: data, fileName: "ShoppingList.pdf" }, error: null };
     };
     return (
         <PdfButton
             fetchDataAndFileName={fetchDataAndFileName}
             pdfComponent={ShoppingListPdf}
-            onPdfCreationCompleted={onPdfCreationCompleted}
-            onPdfCreationFailed={onPdfCreationFailed}
+            onFileCreationCompleted={onPdfCreationCompleted}
+            onFileCreationFailed={onPdfCreationFailed}
             focusOnButton={true}
         />
     );

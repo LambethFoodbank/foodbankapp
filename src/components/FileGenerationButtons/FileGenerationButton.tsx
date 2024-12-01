@@ -1,18 +1,18 @@
 "use client";
 
 import { Button } from "@mui/material";
-import { pdf } from "@react-pdf/renderer";
 import React, { useEffect, useRef } from "react";
 import { saveAs } from "file-saver";
-import { PdfDataFetchResponse } from "@/pdf/common";
+import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 
-interface Props<Data, ErrorType extends string> {
-    fetchDataAndFileName: () => Promise<PdfDataFetchResponse<Data, ErrorType>>;
-    pdfComponent: React.FC<{ data: Data }>;
-    onPdfCreationCompleted: () => void;
+interface FileGenerationButtonProps<Data, ErrorType extends string> {
+    children: React.ReactNode;
+    fetchDataAndFileName: () => Promise<FileGenerationDataFetchResponse<Data, ErrorType>>;
+    blobGenerator: (data: Data) => Promise<Blob>;
+    onFileCreationCompleted: () => void;
+    onFileCreationFailed: (error: { type: ErrorType; logId: string }) => void;
     formatName?: boolean;
     disabled?: boolean;
-    onPdfCreationFailed: (error: { type: ErrorType; logId: string }) => void;
     focusOnButton?: boolean;
     formSubmitButton?: boolean;
 }
@@ -35,30 +35,40 @@ const filenameTimestampNow = (): string => {
 };
 
 const formatFileName = (fileName: string): string => {
-    const newFileName = fileName.endsWith(".pdf") ? fileName.slice(0, -4) : fileName;
-    return `${newFileName}_${filenameTimestampNow()}.pdf`;
+    const fileNamePartsRegEx = /^(.+)\.(.+)$/g;
+    const matchArray = fileNamePartsRegEx.exec(fileName);
+    if (matchArray != null) {
+        const rootFileName = matchArray[1];
+        const extension = matchArray[2];
+        return `${rootFileName}_${filenameTimestampNow()}.${extension}`;
+    } else {
+        return `${fileName}_${filenameTimestampNow()}`;
+    }
 };
 
-const PdfButton = <Data, ErrorType extends string>({
+const FileGenerationButton = <Data, ErrorType extends string>({
+    children,
     fetchDataAndFileName,
-    pdfComponent: PdfComponent,
-    onPdfCreationCompleted = () => undefined,
+    blobGenerator,
+    onFileCreationCompleted: onFileCreationCompleted = () => undefined,
+    onFileCreationFailed: onFileCreationFailed,
     formatName = true,
     disabled = false,
-    onPdfCreationFailed,
     focusOnButton = false,
     formSubmitButton = false,
-}: Props<Data, ErrorType>): React.ReactElement => {
+}: FileGenerationButtonProps<Data, ErrorType>): React.ReactElement => {
     const onClick = async (event: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
         event.preventDefault();
         const { data, error } = await fetchDataAndFileName();
         if (error) {
-            onPdfCreationFailed(error);
+            onFileCreationFailed(error);
             return;
         }
-        const blob = await pdf(<PdfComponent data={data.pdfData} />).toBlob();
+
+        const blob = await blobGenerator(data.fileData);
+
         saveAs(blob, formatName ? formatFileName(data.fileName) : data.fileName);
-        onPdfCreationCompleted();
+        onFileCreationCompleted();
     };
 
     const buttonToFocusRef = useRef<HTMLButtonElement>(null);
@@ -75,9 +85,9 @@ const PdfButton = <Data, ErrorType extends string>({
             ref={buttonToFocusRef}
             type={formSubmitButton ? "submit" : undefined}
         >
-            Download PDF
+            {children}
         </Button>
     );
 };
 
-export default PdfButton;
+export default FileGenerationButton;

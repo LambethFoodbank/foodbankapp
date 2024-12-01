@@ -2,10 +2,10 @@
 
 import React from "react";
 import supabase from "@/supabaseClient";
-import PdfButton from "@/components/PdfButton/PdfButton";
+import PdfButton from "@/components/FileGenerationButtons/PdfButton";
 import ShippingLabelsPdf, { ShippingLabelData } from "@/pdf/ShippingLabels/ShippingLabelsPdf";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import { PdfDataFetchResponse } from "@/pdf/common";
+import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { displayNameForDeletedClient } from "@/common/format";
@@ -162,23 +162,23 @@ const ShippingLabelsPdfButton = ({
     onPdfCreationFailed,
 }: Props): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
-        PdfDataFetchResponse<ShippingLabelData[], ShippingLabelErrorType>
+        FileGenerationDataFetchResponse<ShippingLabelData[], ShippingLabelErrorType>
     > => {
         const parcelIds = parcels.map((parcel) => parcel.parcelId);
         const { data: requiredData, error } = await getRequiredData(parcelIds, labelQuantity);
         if (error) {
             return { data: null, error };
         }
-        return { data: { pdfData: requiredData, fileName: "ShippingLabels.pdf" }, error: null };
+        return { data: { fileData: requiredData, fileName: "ShippingLabels.pdf" }, error: null };
     };
 
     return (
         <PdfButton
             fetchDataAndFileName={fetchDataAndFileName}
             pdfComponent={ShippingLabelsPdf}
-            onPdfCreationCompleted={onPdfCreationCompleted}
+            onFileCreationCompleted={onPdfCreationCompleted}
             disabled={disabled}
-            onPdfCreationFailed={onPdfCreationFailed}
+            onFileCreationFailed={onPdfCreationFailed}
             formSubmitButton={true}
         />
     );

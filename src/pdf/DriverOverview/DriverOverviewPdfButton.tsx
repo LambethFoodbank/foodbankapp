@@ -3,7 +3,7 @@
 import React from "react";
 import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
-import PdfButton from "@/components/PdfButton/PdfButton";
+import PdfButton from "@/components/FileGenerationButtons/PdfButton";
 import DriverOverviewPdf, {
     DriverOverviewTablesData,
     DriverOverviewRowData,
@@ -12,7 +12,7 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { displayNameForDeletedClient, formatDateToDate } from "@/common/format";
 import { Dayjs } from "dayjs";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import { PdfDataFetchResponse } from "../common";
+import { FileGenerationDataFetchResponse } from "../../components/FileGenerationButtons/common";
 
 interface DriverOverviewData {
     driverName: string | null;
@@ -164,7 +164,7 @@ const DriverOverviewPdfButton = ({
     disabled,
 }: Props): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
-        PdfDataFetchResponse<DriverOverviewData, DriverOverviewErrorType>
+        FileGenerationDataFetchResponse<DriverOverviewData, DriverOverviewErrorType>
     > => {
         const parcelIds = parcels.map((parcel) => {
             return parcel.parcelId;
@@ -186,7 +186,7 @@ const DriverOverviewPdfButton = ({
         }
         return {
             data: {
-                pdfData: {
+                fileData: {
                     driverName: driverName,
                     date: date.toDate(),
                     tableData: driverPdfData,
@@ -201,8 +201,8 @@ const DriverOverviewPdfButton = ({
         <PdfButton
             fetchDataAndFileName={fetchDataAndFileName}
             pdfComponent={DriverOverviewPdf}
-            onPdfCreationCompleted={onPdfCreationCompleted}
-            onPdfCreationFailed={onPdfCreationFailed}
+            onFileCreationCompleted={onPdfCreationCompleted}
+            onFileCreationFailed={onPdfCreationFailed}
             disabled={disabled}
             formSubmitButton={true}
         />
