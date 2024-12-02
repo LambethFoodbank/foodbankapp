@@ -13,7 +13,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { getStatusErrorMessageWithLogId } from "../Statuses";
 import DriverOverviewPdfButton, {
     DriverOverviewError,
-} from "@/pdf/DriverOverview/DriverOverviewPdfButton";
+} from "@/app/parcels/ActionBar/ActionButtons/DriverOverviewPdfButton";
 import { sendAuditLog } from "@/server/auditLog";
 import { displayNameForNullDriverName } from "@/common/format";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";

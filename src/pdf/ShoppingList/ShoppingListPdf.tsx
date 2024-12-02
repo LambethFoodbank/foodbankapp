@@ -7,8 +7,11 @@ import {
     displayPostcodeForHomelessClient,
     capitaliseWords,
 } from "@/common/format";
-import { ParcelInfo } from "@/pdf/ShoppingList/getParcelsData";
-import { Item, ShoppingListPdfData } from "@/pdf/ShoppingList/shoppingListPdfDataProps";
+import { ParcelInfo } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getParcelsData";
+import {
+    Item,
+    ShoppingListPdfData,
+} from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/shoppingListPdfDataProps";
 import { faTruck, faShoePrints } from "@fortawesome/free-solid-svg-icons";
 import FontAwesomeIconPdfComponent from "@/pdf/FontAwesomeIconPdfComponent";
 

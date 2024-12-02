@@ -15,13 +15,13 @@ import {
 } from "@/common/fetch";
 import { prepareClientSummary, prepareRequirementSummary } from "@/common/formatClientsData";
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
-import { prepareParcelInfo } from "@/pdf/ShoppingList/getParcelsData";
+import { prepareParcelInfo } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getParcelsData";
 import {
     GetQuantityAndNotesError,
     GetQuantityAndNotesErrorType,
     prepareItemsListForHousehold,
     ShoppingListPdfData,
-} from "@/pdf/ShoppingList/shoppingListPdfDataProps";
+} from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/shoppingListPdfDataProps";
 import { logErrorReturnLogId } from "@/logger/logger";
 
 interface ClientDataAndFamilyData {

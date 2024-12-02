@@ -3,12 +3,12 @@
 import React from "react";
 import getShoppingListData, {
     ShoppingListPdfErrorType,
-} from "@/pdf/ShoppingList/getShoppingListData";
+} from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getShoppingListData";
 import PdfButton from "@/components/FileGenerationButtons/PdfButton";
 import ShoppingListPdf from "@/pdf/ShoppingList/ShoppingListPdf";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { ShoppingListPdfData } from "./shoppingListPdfDataProps";
-import { FileGenerationDataFetchResponse } from "../../components/FileGenerationButtons/common";
+import { FileGenerationDataFetchResponse } from "../../../../../components/FileGenerationButtons/common";
 
 interface Props {
     parcels: ParcelsTableRow[];

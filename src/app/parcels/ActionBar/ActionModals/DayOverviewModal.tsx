@@ -2,7 +2,9 @@
 
 import React, { useState } from "react";
 import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./GeneralActionModal";
-import DayOverviewPdfButton, { DayOverviewPdfError } from "@/pdf/DayOverview/DayOverviewPdfButton";
+import DayOverviewPdfButton, {
+    DayOverviewPdfError,
+} from "@/app/parcels/ActionBar/ActionButtons/DayOverviewPdfButton";
 import { getStatusErrorMessageWithLogId } from "../Statuses";
 import { sendAuditLog } from "@/server/auditLog";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";

@@ -1,4 +1,4 @@
-import { ParcelInfo } from "@/pdf/ShoppingList/getParcelsData";
+import { ParcelInfo } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getParcelsData";
 import { ClientSummary, RequirementSummary } from "@/common/formatClientsData";
 import { HouseholdSummary } from "@/common/formatFamiliesData";
 import { fetchLists, FetchListsErrorType } from "@/common/fetch";

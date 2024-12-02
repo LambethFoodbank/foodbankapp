@@ -10,7 +10,7 @@ import SelectedParcelsOverview from "@/app/parcels/ActionBar/SelectedParcelsOver
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import ShippingLabelsPdfButton, {
     ShippingLabelError,
-} from "@/pdf/ShippingLabels/ShippingLabelsPdfButton";
+} from "@/app/parcels/ActionBar/ActionButtons/ShippingLabelsPdfButton";
 import { getStatusErrorMessageWithLogId } from "@/app/parcels/ActionBar/Statuses";
 import { sendAuditLog } from "@/server/auditLog";
 import DuplicateDownloadWarning from "@/app/parcels/ActionBar/DuplicateDownloadWarning";

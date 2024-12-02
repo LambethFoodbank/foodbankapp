@@ -12,7 +12,7 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { displayNameForDeletedClient, formatDateToDate } from "@/common/format";
 import { Dayjs } from "dayjs";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import { FileGenerationDataFetchResponse } from "../../components/FileGenerationButtons/common";
+import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 
 interface DriverOverviewData {
     driverName: string | null;

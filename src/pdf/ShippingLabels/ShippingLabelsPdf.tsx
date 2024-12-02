@@ -4,6 +4,7 @@ import { displayPostcodeForHomelessClient } from "@/common/format";
 import { faShoePrints, faTruck } from "@fortawesome/free-solid-svg-icons";
 import FontAwesomeIconPdfComponent from "@/pdf/FontAwesomeIconPdfComponent";
 import dayjs from "dayjs";
+
 export interface ShippingLabelData {
     label_quantity: number;
     parcel_id: string;
