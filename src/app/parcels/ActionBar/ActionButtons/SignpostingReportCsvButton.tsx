@@ -2,16 +2,19 @@
 
 import React from "react";
 import supabase from "@/supabaseClient";
-import CsvButton from "@/components/FileGenerationButtons/CsvButton";
+import CsvButton, {
+    formatNumberAsStringForCsv,
+} from "@/components/FileGenerationButtons/CsvButton";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { formatDateTime, formatDatetimeAsDate } from "@/common/format";
+import { formatDatetimeAsDate, getDbDate } from "@/common/format";
 import {
     formatAddressFromClientDetails,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
 } from "@/app/clients/getExpandedClientDetails";
+import { Dayjs } from "dayjs";
 
 type FetchSignpostingReportResult =
     | {
@@ -33,66 +36,69 @@ type FetchSignpostingReportErrorType = "failedToFetchSignpostingRows";
 type SignpostingReportRow = {
     voucherNumber: string;
     packingDate: string;
-    createdAt: string;
-    collectionDateTime: string;
-    method: string;
-    listType: string;
-    isActive: boolean;
     fullName: string;
+    signpostingCallRequired: boolean;
+    flaggedForAttention: boolean;
     phoneNumber: string;
     address: string;
+    deliveryOrCollection: string;
+    deliveryCollectionDate: string;
     deliveryInstructions: string;
     household: string;
     adults: string;
     children: string;
+    listType: string;
+    clientIsActive: boolean;
+    recordCreatedOn: string;
 };
 
 const getSignpostingReportData = async (
-    fromDate: Date,
-    toDate: Date
+    fromDate: Dayjs,
+    toDate: Dayjs
 ): Promise<FetchSignpostingReportResult> => {
     const { data: rawParcelList, error } = await supabase
         .from("parcels")
         .select(
             `
-    voucher_number,
-    packing_date,
-    created_at,
-    collection_datetime,
-    list_type,
-    collection_centre:collection_centres (
-        name,
-        is_shown
-     ),
-    client:clients(
-        primary_key,
-        full_name,
-        phone_number,
-        delivery_instructions,
-        address_1,
-        address_2,
-        address_town,
-        address_county,
-        address_postcode,
-        is_active,
-        flagged_for_attention,
-        signposting_call_required,
+            voucher_number,
+            packing_date,
+            created_at,
+            collection_datetime,
+            collection_centre:collection_centres (
+                name,
+                is_shown
+            ),
+            list_type,
+            client:clients(
+                primary_key,
+                full_name,
+                is_active,
+                signposting_call_required,
+                flagged_for_attention,
+                phone_number,
+                delivery_instructions,
+                address_1,
+                address_2,
+                address_town,
+                address_county,
+                address_postcode,
 
-        family:families(
-            birth_year,
-            birth_month,
-            gender,
-            recorded_as_child
+                family:families(
+                    birth_year,
+                    birth_month,
+                    gender,
+                    recorded_as_child
+                )
+            )
+            `
         )
-    )
-    `
-        )
+        .limit(1, { foreignTable: "clients" })
         .eq("client.is_active", true)
         .eq("client.signposting_call_required", true)
-        .gte("collection_datetime", fromDate)
-        .lte("collection_datetime", toDate)
-        .order("client_id")
-        .order("collection_datetime");
+        .gte("packing_date", getDbDate(fromDate))
+        .lte("packing_date", getDbDate(toDate))
+        .order("packing_date")
+        .order("client_id");
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to fetch signposting rows", {
@@ -109,38 +115,46 @@ const getSignpostingReportData = async (
 
     return {
         error: null,
-        data: rawParcelList.map((rawParcel) => {
-            return {
-                voucherNumber: rawParcel.voucher_number ?? "",
-                packingDate: formatDatetimeAsDate(rawParcel.packing_date),
-                createdAt: formatDateTime(rawParcel.created_at),
-                collectionDateTime: formatDateTime(rawParcel.collection_datetime),
-                method: rawParcel.collection_centre?.is_shown
-                    ? rawParcel.collection_centre?.name
-                    : `${rawParcel.collection_centre?.name} (inactive)`,
-                listType: rawParcel.list_type,
-                isActive: rawParcel.client?.is_active ?? true,
-                fullName: rawParcel.client?.full_name ?? "(error)",
-                phoneNumber: rawParcel.client?.phone_number ?? "",
-                address: rawParcel.client ? formatAddressFromClientDetails(rawParcel.client) : "",
-                deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
-                household: rawParcel.client
-                    ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
-                    : "",
-                adults: rawParcel.client
-                    ? formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family)
-                    : "",
-                children: rawParcel.client
-                    ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
-                    : "",
-            };
-        }),
+        data: rawParcelList
+            .filter((rawParcel) => !!rawParcel.client)
+            .map((rawParcel): SignpostingReportRow => {
+                return {
+                    voucherNumber: rawParcel.voucher_number ?? "",
+                    packingDate: formatDatetimeAsDate(rawParcel.packing_date),
+                    fullName: rawParcel.client?.full_name ?? "(error)",
+                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
+                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
+                    phoneNumber: rawParcel.client
+                        ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
+                        : "",
+                    address: rawParcel.client
+                        ? formatAddressFromClientDetails(rawParcel.client)
+                        : "",
+                    deliveryOrCollection: rawParcel.collection_centre?.is_shown
+                        ? rawParcel.collection_centre?.name
+                        : `${rawParcel.collection_centre?.name} (inactive)`,
+                    deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
+                    deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
+                    household: rawParcel.client
+                        ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
+                        : "",
+                    adults: rawParcel.client
+                        ? formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family)
+                        : "",
+                    children: rawParcel.client
+                        ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
+                        : "",
+                    listType: rawParcel.list_type,
+                    clientIsActive: rawParcel.client?.is_active ?? false,
+                    recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
+                };
+            }),
     };
 };
 
 interface ButtonProps {
-    fromDate: Date;
-    toDate: Date;
+    fromDate: Dayjs;
+    toDate: Dayjs;
     onFileCreationCompleted: () => void;
     onFileCreationFailed: (error: FetchSignpostingReportError) => void;
     disabled: boolean;
@@ -160,13 +174,13 @@ const SignpostingReportCsvButton = ({
         if (error) {
             return { data: null, error };
         }
-        return { data: { fileData: requiredData, fileName: "SignpostingReport.pdf" }, error: null };
+        return { data: { fileData: requiredData, fileName: "SignpostingReport.csv" }, error: null };
     };
 
     return (
         <CsvButton
             fetchDataAndFileName={fetchDataAndFileName}
-            csvConfig={{ useKeysAsHeaders: true }}
+            csvConfig={{ useKeysAsHeaders: true, quoteStrings: true }}
             onFileCreationCompleted={onFileCreationCompleted}
             onFileCreationFailed={onFileCreationFailed}
             disabled={disabled}

@@ -1,66 +1,60 @@
 "use client";
 
 import React, { useState } from "react";
-import GeneralActionModal, { Heading, ActionModalProps } from "./GeneralActionModal";
+import GeneralActionModal, { ActionModalProps } from "./GeneralActionModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import SignpostingReportCsvButton, {
     FetchSignpostingReportError,
 } from "../ActionButtons/SignpostingReportCsvButton";
+import dayjs from "dayjs";
+import DateRangeInputs, { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
+import { sendAuditLog } from "@/server/auditLog";
+import styled from "styled-components";
 
 interface SignpostingReportInputProps {
-    fakeProp: string;
-    // onDateChange: (newDate: Dayjs | null) => void;
-    // setDateValid: () => void;
-    // setDateInvalid: () => void;
+    dateRange: DateRangeState;
+    setRange: (range: DateRangeState) => void;
 }
 
 interface ContentProps {
+    dateRange: DateRangeState;
+    setRange: (range: DateRangeState) => void;
     isInputValid: boolean;
     onFileCreationCompleted: () => void;
     onFileCreationFailed: (csvError: FetchSignpostingReportError) => void;
-    // selectedParcels: ParcelsTableRow[];
-    // labelQuantity: number
-    // onLabelQuantityChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    // duplicateDownloadedPostcodes: (string | null)[];
 }
+
+const InputContainer = styled.div`
+    margin: 0.5rem;
+    display: flex;
+    gap: 1rem;
+`;
 
 const SignpostingReportInput: React.FC<SignpostingReportInputProps> = (props) => {
     return (
-        <>
-            <Heading>Signposting Report: {props.fakeProp}</Heading>
-            {/* QQ: Needs date range */}
-            {/* <DatePicker
-                defaultValue={dayjs()}
-                onChange={props.onDateChange}
-                onError={(error) => {
-                    if (error) {
-                        props.setDateInvalid();
-                    } else {
-                        props.setDateValid();
-                    }
-                }}
-                slotProps={{ textField: { fullWidth: true, margin: "normal" } }}
-                disablePast
-            /> */}
-        </>
+        <InputContainer>
+            <DateRangeInputs range={props.dateRange} setRange={props.setRange} />
+        </InputContainer>
     );
 };
 
 const SignpostingReportModalContent: React.FC<ContentProps> = ({
+    dateRange,
+    setRange,
     isInputValid,
     onFileCreationCompleted,
     onFileCreationFailed,
 }) => {
     return (
         <form>
-            <SignpostingReportInput fakeProp="fake" />
+            <SignpostingReportInput dateRange={dateRange} setRange={setRange} />
             <Centerer>
                 <SignpostingReportCsvButton
-                    fromDate={new Date("2024-12-01")} //QQ
-                    toDate={new Date("2024-12-03")} //QQ
+                    fromDate={dateRange.from}
+                    toDate={dateRange.to}
                     onFileCreationCompleted={onFileCreationCompleted}
                     onFileCreationFailed={onFileCreationFailed}
-                    disabled={isInputValid}
+                    disabled={!isInputValid}
                 />
             </Centerer>
         </form>
@@ -72,65 +66,41 @@ const SignPostingReportModal: React.FC<ActionModalProps> = (props) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // const [date, setDate] = useState(dayjs());
+    const [dateRange, setDateRange] = useState<DateRangeState>({ from: dayjs(), to: dayjs() });
 
-    // const [isDateValid, setIsDateValid] = useState(true);
-
-    const isInputValid = true; //    isDateValid; // date range
-
-    // const onDateChange = (newDate: Dayjs | null): void => {
-    //     if (newDate) {
-    //         setDate(newDate);
-    //     }
-    // };
+    const isInputValid = dateRange.from <= dateRange.to;
 
     const onClose = (): void => {
         props.onClose();
-        // setDate(dayjs());
-        // setErrorMessage(null);
+        setDateRange({ from: dayjs(), to: dayjs() });
+        setErrorMessage(null);
     };
 
     const onFileCreationCompleted = async (): Promise<void> => {
-        console.log("Csv Success");
-        //     const { error } = await props.updateParcelStatuses(
-        //         props.selectedParcels,
-        //         "Out for Delivery",
-        //         `with ${driverName ?? displayNameForNullDriverName}`,
-        //         undefined,
-        //         date
-        //     );
-        //     if (error) {
-        //         setErrorMessage(getStatusErrorMessageWithLogId(error));
-        //     }
         setSuccessMessage("Signposting Report Created");
         setActionCompleted(true);
-        //     void sendAuditLog({
-        //         action: "create driver overview pdf",
-        //         wasSuccess: true,
-        //         content: {
-        //             parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId),
-        //             date: date.toString(),
-        //             driverName: driverName,
-        //         },
-        //     });
+        void sendAuditLog({
+            action: "generate signposting report",
+            wasSuccess: true,
+            content: {
+                fromDate: dateRange.from.toString(),
+                toDate: dateRange.to.toString(),
+            },
+        });
     };
 
     const onFileCreationFailed = (csvError: FetchSignpostingReportError): void => {
-        console.log("CsvFailure");
-        setErrorMessage(
-            csvError.type === "failedToFetchSignpostingRows" ? "Couldn't fetch" : "Unknown"
-        ); // QQ
+        setErrorMessage("Failed to fetch signposting report data");
         setActionCompleted(true);
-        //     void sendAuditLog({
-        //         action: "create driver overview pdf",
-        //         wasSuccess: false,
-        //         content: {
-        //             parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId),
-        //             date: date.toString(),
-        //             driverName: driverName,
-        //         },
-        //         logId: pdfError.logId,
-        //     });
+        void sendAuditLog({
+            action: "generate signposting report",
+            wasSuccess: false,
+            content: {
+                fromDate: dateRange.from.toString(),
+                toDate: dateRange.to.toString(),
+            },
+            logId: csvError.logId,
+        });
     };
 
     return (
@@ -142,23 +112,12 @@ const SignPostingReportModal: React.FC<ActionModalProps> = (props) => {
         >
             {!actionCompleted && (
                 <SignpostingReportModalContent
+                    dateRange={dateRange}
+                    setRange={setDateRange}
                     isInputValid={isInputValid}
                     onFileCreationCompleted={onFileCreationCompleted}
                     onFileCreationFailed={onFileCreationFailed}
                 />
-
-                // <DriverOverviewModalContent
-                //     onDateChange={onDateChange}
-                //     onDriverNameChange={onDriverNameChange}
-                //     setIsDateValid={setIsDateValid}
-                //     selectedParcels={props.selectedParcels}
-                //     maxParcelsToShow={maxParcelsToShow}
-                //     date={date}
-                //     driverName={driverName}
-                //     onPdfCreationCompleted={onPdfCreationCompleted}
-                //     onPdfCreationFailed={onPdfCreationFailed}
-                //     isInputValid={isInputValid}
-                // />
             )}
         </GeneralActionModal>
     );
