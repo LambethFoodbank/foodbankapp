@@ -68,7 +68,7 @@ const CsvButton = <
             focusOnButton={focusOnButton}
             formSubmitButton={formSubmitButton}
         >
-            Download PDF
+            Download CSV
         </FileGenerationButton>
     );
 };

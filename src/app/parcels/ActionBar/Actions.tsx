@@ -5,6 +5,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { ParcelsTableRow } from "../parcelsTable/types";
 import { ActionModalProps } from "./ActionModals/GeneralActionModal";
+import { UpdateParcelStatuses } from "./ActionAndStatusBar";
+import { allRoles, organisationRoles, RoleUpdateContext } from "@/app/roles";
+import { UserRole } from "@/databaseUtils";
 import DayOverviewModal from "./ActionModals/DayOverviewModal";
 import DeleteParcelModal from "./ActionModals/DeleteParcelModal";
 import DriverOverviewModal from "./ActionModals/DriverOverviewModal";
@@ -13,9 +16,6 @@ import ShippingLabelModal from "./ActionModals/ShippingLabelModal";
 import ShoppingListModal from "./ActionModals/ShoppingListModal";
 import DateChangeModal from "./ActionModals/DateChangeModal";
 import SlotChangeModal from "./ActionModals/SlotChangeModal";
-import { UpdateParcelStatuses } from "./ActionAndStatusBar";
-import { allRoles, organisationRoles, RoleUpdateContext } from "@/app/roles";
-import { UserRole } from "@/databaseUtils";
 import SignPostingReportModal from "./ActionModals/SignpostingReportModal";
 
 const isNotAtLeastOne = (value: number): boolean => {
