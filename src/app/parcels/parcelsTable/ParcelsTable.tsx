@@ -92,6 +92,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [parcelsDataPortion, setParcelsDataPortion] = useState<ParcelsTableRow[]>([]);
+    const [filteredParcelCount, setFilteredParcelCount] = useState<number>(0);
 
     const [parcelRowBreakPointConfig, setParcelRowBreakPointConfig] = useState<BreakPointConfig[]>(
         []
@@ -189,6 +190,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 }
             } else {
                 setParcelsDataPortion(data.parcelTableRows);
+                setFilteredParcelCount(data.count);
                 if (sortState.sortEnabled && sortState.column.headerKey) {
                     setParcelRowBreakPointConfig(
                         searchForBreakPoints(sortState.column.headerKey, data.parcelTableRows)
@@ -231,10 +233,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             ),
         [parcelsDataPortion, today, yesterday]
     );
-
-    const filteredParcelCount = isPackingManagerView
-        ? packingManagerViewDataPortion.length
-        : parcelsDataPortion.length;
 
     const loadCountAndDataWithTimer = (): void => {
         if (fetchParcelsTimer.current) {
@@ -333,7 +331,9 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 isLoading={isLoading}
                 paginationConfig={{
                     enablePagination: true,
-                    filteredCount: filteredParcelCount,
+                    filteredCount: isPackingManagerView
+                        ? packingManagerViewDataPortion.length
+                        : filteredParcelCount,
                     onPageChange: setCurrentPage,
                     onPerPageChange: setParcelCountPerPage,
                     defaultRowsPerPage: defaultNumberOfParcelsPerPage,
