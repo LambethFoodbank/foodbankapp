@@ -3,10 +3,10 @@
 import React from "react";
 import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
-import PdfButton from "@/components/PdfButton/PdfButton";
-import DayOverviewPdf from "./DayOverviewPdf";
+import PdfButton from "@/components/FileGenerationButtons/PdfButton";
+import DayOverviewPdf from "@/pdf/DayOverview/DayOverviewPdf";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { PdfDataFetchResponse } from "../common";
+import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import { displayNameForDeletedClient } from "@/common/format";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { CongestionChargeError, checkForCongestionCharge } from "@/common/congestionCharges";
@@ -115,7 +115,7 @@ const DayOverviewPdfButton = ({
     parcels,
 }: Props): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
-        PdfDataFetchResponse<DayOverviewPdfData, DayOverviewPdfErrorType>
+        FileGenerationDataFetchResponse<DayOverviewPdfData, DayOverviewPdfErrorType>
     > => {
         const parcelIds = parcels.map((parcel) => {
             return parcel.parcelId;
@@ -138,7 +138,7 @@ const DayOverviewPdfButton = ({
         const fileName = "DayOverview.pdf";
         return {
             data: {
-                pdfData: {
+                fileData: {
                     parcels: parcelsForDayOverviewWithCongestionChargeDetails,
                 },
                 fileName: fileName,
@@ -151,8 +151,8 @@ const DayOverviewPdfButton = ({
         <PdfButton
             fetchDataAndFileName={fetchDataAndFileName}
             pdfComponent={DayOverviewPdf}
-            onPdfCreationCompleted={onPdfCreationCompleted}
-            onPdfCreationFailed={onPdfCreationFailed}
+            onFileCreationCompleted={onPdfCreationCompleted}
+            onFileCreationFailed={onPdfCreationFailed}
             focusOnButton={true}
         />
     );

@@ -3,8 +3,10 @@
 import React from "react";
 import { Svg, Document, Page, Text, View, StyleSheet, Path } from "@react-pdf/renderer";
 import { faFlag, faSquare, IconDefinition, faCopyright } from "@fortawesome/free-solid-svg-icons";
-
-import { DayOverviewPdfData, ParcelForDayOverview } from "@/pdf/DayOverview/DayOverviewPdfButton";
+import {
+    DayOverviewPdfData,
+    ParcelForDayOverview,
+} from "@/app/parcels/ActionBar/ActionButtons/DayOverviewPdfButton";
 import FontAwesomeIconPdfComponent from "../FontAwesomeIconPdfComponent";
 import { displayPostcodeForHomelessClient } from "@/common/format";
 
