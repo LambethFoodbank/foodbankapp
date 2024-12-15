@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { GoTrueAdminApi } from "@supabase/gotrue-js";
+import { logInfoReturnLogId } from "./logger/logger";
 
 export function getSupabaseAdminAuthClient(): GoTrueAdminApi {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -19,6 +20,10 @@ export function getSupabaseAdminAuthClient(): GoTrueAdminApi {
             persistSession: false,
         },
     });
+
+    logInfoReturnLogId(
+        `Created supabaseAdminAuthClient with URL ${supabaseUrl} and key length ${supabaseKey.length}`
+    );
 
     return supabase.auth.admin;
 }

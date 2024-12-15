@@ -56,6 +56,7 @@ export async function adminInviteUser(
         action: "send invite link to user by email",
         content: {
             email: userDetails.email,
+            redirectTo: redirectUrl,
         },
     } as const satisfies Partial<AuditLog>;
 

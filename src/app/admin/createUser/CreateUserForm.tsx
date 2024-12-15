@@ -105,7 +105,7 @@ const CreateUserForm: React.FC = () => {
 
         setInvitedUser(data);
         void logInfoReturnLogId(
-            `User ${fields.email} with role ${fields.role} invited successfully.`
+            `User ${fields.email} with role ${fields.role} invited successfully, given redirect URL ${redirectUrl}`
         );
         setFields(initialFieldValues);
     };
