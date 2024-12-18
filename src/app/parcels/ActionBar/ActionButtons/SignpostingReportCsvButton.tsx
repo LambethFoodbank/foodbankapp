@@ -13,7 +13,12 @@ import {
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
+    formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
+import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
+import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
+import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
+import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { Dayjs } from "dayjs";
 
 type FetchSignpostingReportResult =
@@ -48,10 +53,16 @@ type SignpostingReportRow = {
     deliveryCollectionDate: string;
     deliveryInstructions: string;
     extraInformation: string;
+    notes: string;
+    dietaryRequirements: string;
+    feminineProducts: string;
+    babyFoodRequired: boolean;
+    petFood: string;
+    otherItems: string;
     household: string;
     adults: string;
     children: string;
-    listType: string;
+    parcelListType: string;
     clientIsActive: boolean;
     recordCreatedOn: string;
 };
@@ -109,11 +120,17 @@ const getSignpostingReportData = async (
                 phone_number,
                 delivery_instructions,
                 extra_information,
+                notes,
                 address_1,
                 address_2,
                 address_town,
                 address_county,
                 address_postcode,
+                dietary_requirements,
+                feminine_products,
+                baby_food,
+                pet_food,
+                other_items,
 
                 family:families(
                     birth_year,
@@ -174,6 +191,24 @@ const getSignpostingReportData = async (
                     deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
                     deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
                     extraInformation: rawParcel.client?.extra_information ?? "",
+                    notes: rawParcel.client?.notes ?? "",
+                    dietaryRequirements: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.dietary_requirements ?? [],
+                        dietaryRequirementOptions
+                    ),
+                    feminineProducts: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.feminine_products ?? [],
+                        feminineProductOptions
+                    ),
+                    babyFoodRequired: rawParcel.client?.baby_food ?? false,
+                    petFood: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.pet_food ?? [],
+                        petFoodOptions
+                    ),
+                    otherItems: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.other_items ?? [],
+                        otherRequirementOptions
+                    ),
                     household: rawParcel.client
                         ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
                         : "",
@@ -183,7 +218,7 @@ const getSignpostingReportData = async (
                     children: rawParcel.client
                         ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
                         : "",
-                    listType: rawParcel.list_type,
+                    parcelListType: rawParcel.list_type,
                     clientIsActive: rawParcel.client?.is_active ?? false,
                     recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
                 };
