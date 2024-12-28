@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext, useState } from "react";
-import { AppBar, Button, SwipeableDrawer } from "@mui/material";
+import { Alert, AppBar, Button, SwipeableDrawer } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
@@ -146,6 +146,8 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
     const [islogOutModalOpen, setIslogOutModalOpen] = useState(false);
     const supabase = createClientComponentClient<DatabaseAutoType>();
 
+    const envLabel = process.env.NEXT_PUBLIC_ENV_VISIBLE_LABEL;
+
     const openDrawer = (): void => {
         setDrawer(true);
     };
@@ -208,6 +210,11 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
                         ))}
                     </DesktopButtonContainer>
                     <SignOutButtonContainer>
+                        {envLabel && (
+                            <Alert icon={false} color="warning">
+                                {envLabel}
+                            </Alert>
+                        )}
                         <LightDarkSlider />
                         <LoginDependent>
                             <SignOutButton onClick={handleLogOutClick} />
