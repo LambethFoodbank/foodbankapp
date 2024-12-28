@@ -15,12 +15,6 @@ describe("Rendering tests", () => {
         cy.get("h1").should("contain.text", "Lists");
     });
 
-    it("Renders calendar page", () => {
-        cy.visit("/calendar");
-
-        cy.get("h1").should("contain.text", "Collection Time for Parcels");
-    });
-
     it("Renders parcels page", () => {
         cy.visit("/parcels");
 

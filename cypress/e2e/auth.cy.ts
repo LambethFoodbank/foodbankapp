@@ -4,7 +4,7 @@ describe("Authentication tests", () => {
 
     const extendedTimeout = { timeout: 10000 };
 
-    const buttonReachablePaths = ["/", "/parcels", "/clients", "/lists", "/calendar", "/reports"];
+    const buttonReachablePaths = ["/", "/parcels", "/clients", "/lists", "/reports"];
     const allPaths = [...buttonReachablePaths, "/parcels/add"];
 
     it("Redirected to login page", () => {

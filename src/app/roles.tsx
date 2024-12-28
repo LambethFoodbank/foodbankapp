@@ -15,8 +15,6 @@ export const pathsNotRequiringLogin = [
 ] as const;
 
 const pathsShownToAllAuthenticatedUsers = [
-    "/batch-create",
-    "/calendar",
     "/clients",
     "/info",
     "/parcels",
