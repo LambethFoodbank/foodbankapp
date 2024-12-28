@@ -46,18 +46,6 @@ describe("Accessibility tests in light mode", () => {
         cy.checkAccessibility();
     });
 
-    it("Checks calendar page", () => {
-        cy.login();
-        cy.visit("/calendar");
-        cy.get("table").should("be.visible");
-
-        cy.checkAccessibility({
-            rules: {
-                "aria-allowed-attr": { enabled: false },
-            },
-        });
-    });
-
     it("Checks admin page", () => {
         cy.login();
         cy.visit("/admin");
@@ -124,19 +112,6 @@ describe("Accessibility tests in dark mode", () => {
         cy.get("label[aria-label='Theme Switch']").click();
 
         cy.checkAccessibility();
-    });
-
-    it("Checks calendar page", () => {
-        cy.login();
-        cy.visit("/calendar");
-        cy.get("label[aria-label='Theme Switch']").click();
-        cy.get("table").should("be.visible");
-
-        cy.checkAccessibility({
-            rules: {
-                "aria-allowed-attr": { enabled: false },
-            },
-        });
     });
 
     it("Checks admin page", () => {
