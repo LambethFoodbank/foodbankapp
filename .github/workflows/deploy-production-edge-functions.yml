@@ -1,0 +1,28 @@
+name: Deploy edge functions to production
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - supabase/functions/**
+    branches:
+      - production
+
+env:
+  SUPABASE_PRODUCTION_PROJECT_ID: ${{ secrets.SUPABASE_PRODUCTION_PROJECT_ID }}
+  SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_PRODUCTION_DATABASE_PASSWORD }}
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_PRODUCTION_ACCESS_TOKEN }}
+
+jobs:
+  deploy-production-edge-functions:
+    name: Deploy edge functions to production
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+
+      - name: Link to the project
+        run: npx supabase link --project-ref $SUPABASE_PRODUCTION_PROJECT_ID
+
+      - name: Deploy edge functions
+        run: npx supabase functions deploy
