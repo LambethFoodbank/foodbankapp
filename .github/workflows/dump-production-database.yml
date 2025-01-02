@@ -1,19 +1,19 @@
-name: Dump staging database every hour
+name: Dump production database every hour
 
 on:
   schedule:
     - cron: '0 * * * *' # Runs every hour
 
 env:
-  SUPABASE_STAGING_PROJECT_ID: ${{ secrets.SUPABASE_STAGING_PROJECT_ID }}
-  SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_STAGING_DATABASE_PASSWORD }}
-  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_STAGING_ACCESS_TOKEN }}
+  SUPABASE_PRODUCTION_PROJECT_ID: ${{ secrets.SUPABASE_PRODUCTION_PROJECT_ID }}
+  SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_PRODUCTION_DATABASE_PASSWORD }}
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_PRODUCTION_ACCESS_TOKEN }}
   BACKUP_ENCRYPTION_PASSPHRASE: ${{ secrets.BACKUP_ENCRYPTION_PASSPHRASE }}
 
 jobs:
-  dump-staging-database:
-    name: Dump staging database
-    environment: staging
+  dump-production-database:
+    name: Dump production database
+    environment: production
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Link to the project
-        run: npx supabase link --project-ref $SUPABASE_STAGING_PROJECT_ID
+        run: npx supabase link --project-ref $SUPABASE_PRODUCTION_PROJECT_ID
 
       - name: Create db-backup folder
         run: mkdir db-backup db-backup-unencrypted
