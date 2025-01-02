@@ -12,6 +12,7 @@ env:
 jobs:
   dump-dev-database:
     name: Dump dev database
+    environment: dev
     runs-on: ubuntu-latest
 
     steps:
