@@ -860,6 +860,7 @@ export type Database = {
         Row: {
           all_events: string[] | null
           client_address_postcode: string | null
+          client_delivery_instructions: string | null
           client_flagged_for_attention: boolean | null
           client_full_name: string | null
           client_id: string | null

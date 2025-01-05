@@ -69,10 +69,6 @@ const styles = StyleSheet.create({
     cellInstructions: { flex: 10 },
 });
 
-const dateTimeToAMPM = (datetime: string): string => {
-    return new Date(datetime).getHours() <= 11 ? "AM" : "PM";
-};
-
 const CustomSVG: React.FC<CustomSVGProps> = ({ icon, color, fill }) => {
     const svgPath = icon.icon[4];
     const formattedSvgPath = typeof svgPath === "string" ? svgPath : svgPath[0];
@@ -99,7 +95,7 @@ const DayOverviewHeader: React.FC = () => {
             <Text style={[styles.cellLogo, styles.cell]}></Text>
             <Text style={[styles.cellName, styles.cell]}>Name</Text>
             <Text style={[styles.cellPostcode, styles.cell]}>Postcode</Text>
-            <Text style={[styles.cellTime, styles.cell]}>Time</Text>
+            <Text style={[styles.cellTime, styles.cell]}>Slot</Text>
             <Text style={[styles.cellCollection, styles.cell]}>Collection</Text>
             <Text style={[styles.cellInstructions, styles.cell]}>Instructions</Text>
         </View>
@@ -111,35 +107,32 @@ const DayOverviewRow: React.FC<DayOverviewRowProps> = ({ parcel }) => {
         <View style={styles.row} wrap={false}>
             <View style={[styles.cellLogo, styles.cell, styles.row]}>
                 <CustomSVG icon={faSquare} color="black" fill={false} />
-                {parcel.client?.flagged_for_attention && (
+                {parcel.client_flagged_for_attention && (
                     <CustomSVG icon={faFlag} color="orange" fill={true} />
                 )}
             </View>
             <Text style={[styles.cellName, styles.cell]}>
-                {parcel.client?.full_name ?? "Client Name unknown"}
+                {parcel.client_full_name ?? "Client Name unknown"}
             </Text>
             <View style={[styles.cell, styles.cellPostcode, styles.row]}>
-                <Text>{parcel.client?.address_postcode ?? displayPostcodeForHomelessClient} </Text>
-                {parcel.collection_centre?.name === "Delivery" &&
-                    parcel.congestionChargeApplies && (
-                        <FontAwesomeIconPdfComponent
-                            faIcon={faCopyright}
-                            color="red"
-                            styleWidth="10px"
-                            marginTop="1px"
-                        />
-                    )}
+                <Text>{parcel.client_address_postcode ?? displayPostcodeForHomelessClient} </Text>
+                {parcel.is_delivery && parcel.congestionChargeApplies && (
+                    <FontAwesomeIconPdfComponent
+                        faIcon={faCopyright}
+                        color="red"
+                        styleWidth="10px"
+                        marginTop="1px"
+                    />
+                )}
             </View>
             <Text style={[styles.cellTime, styles.cell]}>
-                {parcel.collection_datetime
-                    ? dateTimeToAMPM(parcel.collection_datetime)
-                    : "collection time not specified"}
+                {parcel.packing_slot_name ?? "Unknown"}
             </Text>
             <Text style={[styles.cellCollection, styles.cell]}>
-                {parcel.collection_centre?.name ?? "Collection centre not specified"}
+                {parcel.collection_centre_acronym ?? "Unknown"}
             </Text>
             <Text style={[styles.cellInstructions, styles.cell]}>
-                {parcel.client?.delivery_instructions ?? "No instructions provided"}
+                {parcel.client_delivery_instructions ?? ""}
             </Text>
         </View>
     );
@@ -150,7 +143,7 @@ const DayOverviewContent: React.FC<DayOverviewContentProps> = ({ parcels }) => {
         <View style={{ borderLeft: "1 solid black" }}>
             <DayOverviewHeader />
             {parcels.map((parcel) => (
-                <DayOverviewRow key={parcel.primary_key} parcel={parcel} />
+                <DayOverviewRow key={parcel.parcel_id} parcel={parcel} />
             ))}
         </View>
     );
