@@ -48,6 +48,7 @@ const sampleProcessingData: DbParcelRow[] = [
         all_events: ["LAST_EVENT"],
         created_at: "2023-12-31T12:00:00+00:00",
         client_is_active: true,
+        client_delivery_instructions: "SOME_DELIVERY_INSTRUCTIONS",
     },
 ];
 

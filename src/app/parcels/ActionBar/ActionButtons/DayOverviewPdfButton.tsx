@@ -2,7 +2,7 @@
 
 import React from "react";
 import supabase from "@/supabaseClient";
-import { Schema } from "@/databaseUtils";
+import { ViewSchema } from "@/databaseUtils";
 import PdfButton from "@/components/FileGenerationButtons/PdfButton";
 import DayOverviewPdf from "@/pdf/DayOverview/DayOverviewPdf";
 import { logErrorReturnLogId } from "@/logger/logger";
@@ -18,14 +18,17 @@ interface Props {
 }
 
 export type ParcelForDayOverview = Pick<
-    Schema["parcels"],
-    "collection_datetime" | "primary_key"
+    ViewSchema["parcels_plus"],
+    | "parcel_id"
+    | "packing_slot_name"
+    | "is_delivery"
+    | "collection_centre_acronym"
+    | "client_flagged_for_attention"
+    | "client_full_name"
+    | "client_address_postcode"
+    | "client_delivery_instructions"
+    | "client_is_active"
 > & {
-    client: Pick<
-        Schema["clients"],
-        "flagged_for_attention" | "full_name" | "address_postcode" | "delivery_instructions"
-    > | null;
-    collection_centre: Pick<Schema["collection_centres"], "name"> | null;
     congestionChargeApplies?: boolean;
 };
 
@@ -45,20 +48,27 @@ const getParcelsForDayOverview = async (
     parcelIds: string[]
 ): Promise<ParcelForDayOverviewResponse> => {
     const { data, error } = await supabase
-        .from("parcels")
+        .from("parcels_plus")
         .select(
-            `collection_datetime, primary_key,
-            collection_centre:collection_centres(name),
-            client:clients ( 
-                flagged_for_attention, 
-                full_name, 
-                address_postcode, 
-                delivery_instructions,
-                is_active
-            )`
+            `
+            parcel_id,
+            packing_slot_name,
+            is_delivery,
+            collection_centre_acronym,
+            client_flagged_for_attention,
+            client_full_name,
+            client_address_postcode,
+            client_delivery_instructions,
+            client_is_active
+            `
         )
-        .in("primary_key", parcelIds)
-        .order("collection_datetime");
+        .in("parcel_id", parcelIds)
+        .order("packing_date")
+        .order("packing_slot_order")
+        .order("is_delivery", { ascending: false })
+        .order("collection_centre_acronym")
+        .order("client_address_postcode")
+        .order("parcel_id");
 
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Parcel", error);
@@ -66,17 +76,15 @@ const getParcelsForDayOverview = async (
     }
 
     const processedData = data.map((parcel) => {
-        if (parcel.client?.is_active) {
+        if (parcel.client_is_active) {
             return parcel;
         }
         return {
             ...parcel,
-            client: {
-                flagged_for_attention: false,
-                full_name: displayNameForDeletedClient,
-                address_postcode: "-",
-                delivery_instructions: "-",
-            },
+            client_flagged_for_attention: false,
+            client_full_name: displayNameForDeletedClient,
+            client_address_postcode: "-",
+            client_delivery_instructions: "-",
         };
     });
 
@@ -92,7 +100,7 @@ export type DayOverviewPdfError = { type: DayOverviewPdfErrorType; logId: string
 const addCongestionChargeDetailsForDayOverview = async (
     parcels: ParcelForDayOverview[]
 ): Promise<ParcelForDayOverviewResponse> => {
-    const postcodes = parcels.map((parcel) => parcel.client?.address_postcode);
+    const postcodes = parcels.map((parcel) => parcel.client_address_postcode);
 
     const { data: postcodesWithCongestionChargeDetails, error } =
         await checkForCongestionCharge(postcodes);
