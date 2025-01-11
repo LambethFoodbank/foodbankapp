@@ -86,7 +86,7 @@ BEGIN
 
     raise log 'inserted client id %', inserted_client_id;
 
-     IF inserted_client_id IS NULL THEN
+    IF inserted_client_id IS NULL THEN
         RETURN NULL;
     END IF;
      
