@@ -6,6 +6,7 @@ import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherIt
 import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
+
 interface NappySizeAndExtraInformation {
     nappySize: string;
     extraInformation: string;
