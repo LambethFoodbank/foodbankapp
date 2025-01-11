@@ -5,6 +5,7 @@ import { dietaryRequirementOptions } from "@/app/clients/form/formSections/Dieta
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
+import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 interface NappySizeAndExtraInformation {
     nappySize: string;
     extraInformation: string;
@@ -23,6 +24,7 @@ export interface RequirementSummary {
     petFoodRequired: string;
     dietaryRequirements: string;
     otherItems: string;
+    cookingFacilities: string;
 }
 
 export const processExtraInformation = (original: string): NappySizeAndExtraInformation => {
@@ -93,6 +95,10 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
         otherItems: formatRequirementsByCanonicalOrder(
             clientData.other_items,
             otherRequirementOptions
+        ),
+        cookingFacilities: formatRequirementsByCanonicalOrder(
+            clientData.cooking_facilities,
+            cookingFacilitiesOptions
         ),
     };
 };

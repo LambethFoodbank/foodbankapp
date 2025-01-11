@@ -8,6 +8,7 @@ import CsvButton, {
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { formatDatetimeAsDate, getDbDate } from "@/common/format";
+import { Dayjs } from "dayjs";
 import {
     formatAddressFromClientDetails,
     formatBreakdownOfAdultsFromFamilyDetails,
@@ -19,7 +20,7 @@ import { dietaryRequirementOptions } from "@/app/clients/form/formSections/Dieta
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
-import { Dayjs } from "dayjs";
+import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 
 type FetchSignpostingReportResult =
     | {
@@ -54,6 +55,7 @@ type SignpostingReportRow = {
     deliveryInstructions: string;
     extraInformation: string;
     notes: string;
+    cookingFacilities: string;
     dietaryRequirements: string;
     feminineProducts: string;
     babyFoodRequired: boolean;
@@ -126,6 +128,7 @@ const getSignpostingReportData = async (
                 address_town,
                 address_county,
                 address_postcode,
+                cooking_facilities,
                 dietary_requirements,
                 feminine_products,
                 baby_food,
@@ -192,6 +195,10 @@ const getSignpostingReportData = async (
                     deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
                     extraInformation: rawParcel.client?.extra_information ?? "",
                     notes: rawParcel.client?.notes ?? "",
+                    cookingFacilities: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.cooking_facilities ?? [],
+                        cookingFacilitiesOptions
+                    ),
                     dietaryRequirements: formatRequirementsByCanonicalOrder(
                         rawParcel.client?.dietary_requirements ?? [],
                         dietaryRequirementOptions

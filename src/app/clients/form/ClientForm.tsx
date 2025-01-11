@@ -39,6 +39,7 @@ import Title from "@/components/Title/Title";
 import ClientNotesCard from "@/app/clients/form/formSections/ClientNotes";
 import ListTypeCard from "@/app/clients/form/formSections/ListTypeCard";
 import { ListType } from "@/common/databaseListTypes";
+import CookingFacilitiesCard from "./formSections/CookingFacilitiesCard";
 
 interface Props {
     initialFields: ClientFields;
@@ -61,6 +62,7 @@ export interface ClientFields extends Fields {
     children: Person[];
     numberOfChildren: number;
     listType: ListType | null;
+    cookingFacilities: BooleanGroup;
     dietaryRequirements: BooleanGroup | null;
     feminineProducts: BooleanGroup;
     babyProducts: boolean | null;
@@ -98,6 +100,7 @@ const formSections = [
     NumberAdultsCard,
     NumberChildrenCard,
     ListTypeCard,
+    CookingFacilitiesCard,
     DietaryRequirementCard,
     FeminineProductCard,
     BabyProductCard,
