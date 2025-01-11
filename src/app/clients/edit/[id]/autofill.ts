@@ -38,6 +38,7 @@ const autofill = (
         numberOfChildren: children.length,
         children: children,
         listType: clientData.default_list,
+        cookingFacilities: arrayToBooleanGroup(clientData.cooking_facilities ?? []),
         dietaryRequirements:
             clientData.dietary_requirements !== null
                 ? arrayToBooleanGroup(clientData.dietary_requirements)

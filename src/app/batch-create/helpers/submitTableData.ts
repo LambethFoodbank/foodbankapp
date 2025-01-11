@@ -43,6 +43,9 @@ const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRec
         address_county: client.address && client.address.addressCounty,
         address_postcode: client.address && client.address.addressPostcode,
         default_list: client.listType || undefined,
+        cooking_facilities: client.cookingFacilities
+            ? checkboxGroupToArray(client.cookingFacilities)
+            : [],
         dietary_requirements: client.dietaryRequirements
             ? checkboxGroupToArray(client.dietaryRequirements)
             : [],

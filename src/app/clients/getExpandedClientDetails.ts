@@ -16,6 +16,7 @@ import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
 import { feminineProductOptions } from "./form/formSections/FeminineProductCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
+import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -46,7 +47,8 @@ const getRawClientDetails = async (clientId: string) => {
                 gender,
                 recorded_as_child
             ),
-    
+
+            cooking_facilities,
             dietary_requirements,
             feminine_products,
             baby_food,
@@ -88,6 +90,7 @@ export interface ExpandedClientData {
     household: string;
     adults: string;
     children: string;
+    cookingFacilities: string;
     dietaryRequirements: string;
     feminineProducts: string;
     babyProducts: boolean | null;
@@ -109,6 +112,10 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         household: formatHouseholdFromFamilyDetails(client.family),
         adults: formatBreakdownOfAdultsFromFamilyDetails(client.family),
         children: formatBreakdownOfChildrenFromFamilyDetails(client.family),
+        cookingFacilities: formatRequirementsByCanonicalOrder(
+            client.cooking_facilities,
+            cookingFacilitiesOptions
+        ),
         dietaryRequirements: formatRequirementsByCanonicalOrder(
             client.dietary_requirements,
             dietaryRequirementOptions
