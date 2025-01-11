@@ -33,39 +33,45 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         padding: "0 30pt 15pt",
-        fontSize: "11pt",
+        fontSize: "8.5pt",
+    },
+    margin: { height: "30pt" },
+    titleRow: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: "5px",
     },
     title: {
         fontFamily: "Helvetica-Bold",
         textTransform: "uppercase",
-        fontSize: "30px",
-        textAlign: "center",
-        margin: "0 22.5pt 22.5pt",
+        fontSize: "20pt",
     },
     svg: {
         margin: "0 0.75pt",
         padding: "0 0.75pt",
     },
+    row: { display: "flex", flexDirection: "row" },
+    bold: { fontFamily: "Helvetica-Bold" },
     cell: {
         borderStyle: "solid",
         borderRightWidth: 1,
         borderBottomWidth: 1,
-        padding: "2.25pt",
+        padding: "1.5pt",
     },
-    margin: { height: "37.5pt" },
-    row: { display: "flex", flexDirection: "row" },
-    bold: { fontFamily: "Helvetica-Bold" },
 
     cellLogo: { flex: 1 },
-    cellName: { flex: 4 },
+    cellName: { flex: 5.2 },
     cellPostcode: {
-        flex: 4,
+        flex: 2.3,
+    },
+    cellSlot: { flex: 1.2 },
+    cellCollection: {
+        flex: 2.5,
         display: "flex",
         flexDirection: "row",
         alignItems: "flex-start",
     },
-    cellTime: { flex: 2 },
-    cellCollection: { flex: 4 },
     cellInstructions: { flex: 10 },
 });
 
@@ -95,7 +101,7 @@ const DayOverviewHeader: React.FC = () => {
             <Text style={[styles.cellLogo, styles.cell]}></Text>
             <Text style={[styles.cellName, styles.cell]}>Name</Text>
             <Text style={[styles.cellPostcode, styles.cell]}>Postcode</Text>
-            <Text style={[styles.cellTime, styles.cell]}>Slot</Text>
+            <Text style={[styles.cellSlot, styles.cell]}>Slot</Text>
             <Text style={[styles.cellCollection, styles.cell]}>Collection</Text>
             <Text style={[styles.cellInstructions, styles.cell]}>Instructions</Text>
         </View>
@@ -112,25 +118,22 @@ const DayOverviewRow: React.FC<DayOverviewRowProps> = ({ parcel }) => {
                 )}
             </View>
             <Text style={[styles.cellName, styles.cell]}>
-                {parcel.client_full_name ?? "Client Name unknown"}
+                {parcel.client_full_name ?? "Name unknown"}
             </Text>
-            <View style={[styles.cell, styles.cellPostcode, styles.row]}>
-                <Text>{parcel.client_address_postcode ?? displayPostcodeForHomelessClient} </Text>
+            <Text style={[styles.cellPostcode, styles.cell]}>
+                {parcel.client_address_postcode ?? displayPostcodeForHomelessClient}
+            </Text>
+            <Text style={[styles.cellSlot, styles.cell]}>{parcel.packing_slot_name ?? ""}</Text>
+            <View style={[styles.cellCollection, styles.cell]}>
+                <Text>{parcel.collection_centre_acronym ?? ""} </Text>
                 {parcel.is_delivery && parcel.congestionChargeApplies && (
                     <FontAwesomeIconPdfComponent
                         faIcon={faCopyright}
                         color="red"
                         styleWidth="10px"
-                        marginTop="1px"
                     />
                 )}
             </View>
-            <Text style={[styles.cellTime, styles.cell]}>
-                {parcel.packing_slot_name ?? "Unknown"}
-            </Text>
-            <Text style={[styles.cellCollection, styles.cell]}>
-                {parcel.collection_centre_acronym ?? "Unknown"}
-            </Text>
             <Text style={[styles.cellInstructions, styles.cell]}>
                 {parcel.client_delivery_instructions ?? ""}
             </Text>
@@ -149,12 +152,20 @@ const DayOverviewContent: React.FC<DayOverviewContentProps> = ({ parcels }) => {
     );
 };
 
+const dateStringForToday = (): string => {
+    const today = new Date();
+    return today.toLocaleDateString();
+};
+
 const DayOverviewPdf: React.FC<DayOverviewPdfProps> = ({ data }) => {
     return (
         <Document>
-            <Page size="A4" style={styles.page}>
+            <Page size="A4" orientation="portrait" style={styles.page}>
                 <DayOverviewMargin />
-                <Text style={styles.title}>Day Overview</Text>
+                <View style={styles.titleRow}>
+                    <Text style={styles.title}>Day Overview</Text>
+                    <Text style={styles.title}>{dateStringForToday()}</Text>
+                </View>
                 <DayOverviewContent parcels={data.parcels} />
                 <DayOverviewMargin />
             </Page>
