@@ -5,7 +5,6 @@ import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./Genera
 import DayOverviewPdfButton, {
     DayOverviewPdfError,
 } from "@/app/parcels/ActionBar/ActionButtons/DayOverviewPdfButton";
-import { getStatusErrorMessageWithLogId } from "../Statuses";
 import { sendAuditLog } from "@/server/auditLog";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
@@ -62,13 +61,6 @@ const DayOverviewModal: React.FC<ActionModalProps> = (props) => {
     };
 
     const onPdfCreationCompleted = async (): Promise<void> => {
-        const { error } = await props.updateParcelStatuses(
-            props.selectedParcels,
-            "Day Overview Downloaded"
-        );
-        if (error) {
-            setErrorMessage(getStatusErrorMessageWithLogId(error));
-        }
         setSuccessMessage("Day Overview Created");
         setActionShown(false);
         void sendAuditLog({
