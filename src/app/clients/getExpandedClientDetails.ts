@@ -17,6 +17,7 @@ import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
 import { feminineProductOptions } from "./form/formSections/FeminineProductCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
+import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -55,6 +56,8 @@ const getRawClientDetails = async (clientId: string) => {
             pet_food,
             other_items,
             extra_information,
+            signposting_call_required,
+            signposting_call_reasons,
             notes,
             is_active,
             default_list
@@ -97,6 +100,8 @@ export interface ExpandedClientData {
     petFood: string;
     otherRequirements: string;
     extraInformation: string;
+    signpostingCallRequired: boolean;
+    signpostingCallReasons: string;
     notes: string | null;
     isActive: boolean;
     defaultList: ListType;
@@ -131,6 +136,14 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             otherRequirementOptions
         ),
         extraInformation: client.extra_information ?? "",
+        signpostingCallRequired: client.signposting_call_required ?? false,
+        signpostingCallReasons:
+            client.signposting_call_required === true
+                ? formatRequirementsByCanonicalOrder(
+                      client.signposting_call_reasons,
+                      signpostingCallOptions
+                  )
+                : "",
         notes: client.notes,
         isActive: client.is_active,
     };

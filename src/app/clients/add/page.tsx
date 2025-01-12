@@ -28,6 +28,7 @@ const AddClients: () => React.ReactElement = () => {
         extraInformation: "",
         attentionFlag: false,
         signpostingCall: false,
+        signpostingCallReasons: {},
         notes: "",
         lastUpdated: undefined,
     };

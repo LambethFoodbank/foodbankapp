@@ -58,6 +58,9 @@ const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRec
         delivery_instructions: client.deliveryInstructions,
         extra_information: extraInformationWithNappy,
         signposting_call_required: client.signpostingCall,
+        signposting_call_reasons: client.signpostingCallReasons
+            ? checkboxGroupToArray(client.signpostingCallReasons)
+            : [],
         flagged_for_attention: client.attentionFlag,
         notes: client.notes,
     };

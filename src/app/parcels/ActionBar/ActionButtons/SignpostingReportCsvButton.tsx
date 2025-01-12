@@ -21,6 +21,7 @@ import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherIt
 import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
+import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 
 type FetchSignpostingReportResult =
     | {
@@ -48,6 +49,7 @@ type SignpostingReportRow = {
     signpostingCallRequired: boolean;
     flaggedForAttention: boolean;
     phoneNumber: string;
+    signpostingCallReasons: string;
     address: string;
     parcelStatus: string;
     deliveryOrCollection: string;
@@ -120,6 +122,7 @@ const getSignpostingReportData = async (
                 signposting_call_required,
                 flagged_for_attention,
                 phone_number,
+                signposting_call_reasons,
                 delivery_instructions,
                 extra_information,
                 notes,
@@ -181,6 +184,10 @@ const getSignpostingReportData = async (
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
+                    signpostingCallReasons: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.signposting_call_reasons ?? [],
+                        signpostingCallOptions
+                    ),
                     address: rawParcel.client
                         ? formatAddressFromClientDetails(rawParcel.client)
                         : "",

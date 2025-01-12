@@ -73,6 +73,7 @@ export interface ClientFields extends Fields {
     extraInformation: string;
     attentionFlag: boolean;
     signpostingCall: boolean;
+    signpostingCallReasons: BooleanGroup;
     lastUpdated: string | undefined;
     notes: string | null;
 }

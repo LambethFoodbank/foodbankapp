@@ -56,6 +56,7 @@ export interface OverrideClient {
     extraInformation: string | null;
     attentionFlag: boolean | null;
     signpostingCall: boolean | null;
+    signpostingCallReasons: BooleanGroup | null;
     notes: string | null;
 }
 
