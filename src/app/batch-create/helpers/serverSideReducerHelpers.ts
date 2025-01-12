@@ -102,6 +102,7 @@ export const getClientDataForBatchParcels = async (
         extraInformation: parseExtraInfo(data.extra_information),
         attentionFlag: data.flagged_for_attention ?? false,
         signpostingCall: data.signposting_call_required ?? false,
+        signpostingCallReasons: createBooleanGroupFromStrings(data.signposting_call_reasons),
         notes: data.notes,
     };
 };

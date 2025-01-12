@@ -58,6 +58,10 @@ export const formatClientRecord = (
         delivery_instructions: fields.deliveryInstructions,
         extra_information: extraInformationWithNappy,
         signposting_call_required: fields.signpostingCall,
+        signposting_call_reasons:
+            fields.signpostingCall && fields.signpostingCallReasons !== null
+                ? checkboxGroupToArray(fields.signpostingCallReasons)
+                : null,
         flagged_for_attention: fields.attentionFlag,
         last_updated: fields.lastUpdated,
         notes: fields.notes,

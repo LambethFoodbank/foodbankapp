@@ -103,6 +103,7 @@ describe("reducer", () => {
                         extraInformation: null,
                         attentionFlag: null,
                         signpostingCall: null,
+                        signpostingCallReasons: null,
                         notes: null,
                     },
                     parcel: {
@@ -169,6 +170,7 @@ describe("reducer", () => {
                             extraInformation: null,
                             attentionFlag: null,
                             signpostingCall: null,
+                            signpostingCallReasons: null,
                             notes: null,
                         },
                         parcel: {
@@ -227,6 +229,7 @@ describe("reducer", () => {
                             extraInformation: null,
                             attentionFlag: null,
                             signpostingCall: null,
+                            signpostingCallReasons: null,
                             notes: null,
                         },
                         parcel: {
@@ -312,6 +315,7 @@ describe("reducer", () => {
                             extraInformation: null,
                             attentionFlag: null,
                             signpostingCall: null,
+                            signpostingCallReasons: null,
                             notes: "test override notes",
                         },
                         parcel: {

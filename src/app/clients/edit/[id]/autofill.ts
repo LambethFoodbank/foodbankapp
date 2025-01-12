@@ -52,6 +52,7 @@ const autofill = (
         extraInformation: extraInformation,
         attentionFlag: clientData.flagged_for_attention ?? false,
         signpostingCall: clientData.signposting_call_required ?? false,
+        signpostingCallReasons: arrayToBooleanGroup(clientData.signposting_call_reasons ?? []),
         lastUpdated: clientData.last_updated,
         notes: clientData.notes,
     };

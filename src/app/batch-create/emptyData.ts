@@ -20,6 +20,7 @@ export const getEmptyBatchEditData = (): BatchEditData => {
             extraInformation: null,
             attentionFlag: null,
             signpostingCall: null,
+            signpostingCallReasons: null,
             notes: null,
         },
         clientReadOnly: false,
@@ -53,6 +54,7 @@ export const getEmptyOverrideData = (): OverrideData => {
             extraInformation: null,
             attentionFlag: null,
             signpostingCall: null,
+            signpostingCallReasons: null,
             notes: null,
         },
         parcel: {
