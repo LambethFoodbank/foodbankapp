@@ -199,6 +199,7 @@ export type Database = {
           pet_food: string[] | null
           phone_number: string | null
           primary_key: string
+          signposting_call_reasons: string[] | null
           signposting_call_required: boolean | null
         }
         Insert: {
@@ -224,6 +225,7 @@ export type Database = {
           pet_food?: string[] | null
           phone_number?: string | null
           primary_key?: string
+          signposting_call_reasons?: string[] | null
           signposting_call_required?: boolean | null
         }
         Update: {
@@ -249,6 +251,7 @@ export type Database = {
           pet_food?: string[] | null
           phone_number?: string | null
           primary_key?: string
+          signposting_call_reasons?: string[] | null
           signposting_call_required?: boolean | null
         }
         Relationships: []
