@@ -28,6 +28,14 @@ export const displayList = (data: string[]): string => {
     return data.length === 0 ? "None" : data.join(", ");
 };
 
+export const formatTodayAsDate = (): string => {
+    return new Date().toLocaleString(localeCode, {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+    });
+};
+
 export const formatDateToDate = (dateString: string | null): string => {
     if (dateString === null) {
         return "";
