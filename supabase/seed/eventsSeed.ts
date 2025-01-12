@@ -9,7 +9,6 @@ export const eventNamesWithNoData = [
     "Called and Confirmed",
     "Called and No Response",
     "Shopping List Downloaded",
-    "Day Overview Downloaded",
     "Ready to Dispatch",
     "Received by Centre",
     "Collection Failed",

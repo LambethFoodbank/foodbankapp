@@ -8,7 +8,7 @@ import {
     ParcelForDayOverview,
 } from "@/app/parcels/ActionBar/ActionButtons/DayOverviewPdfButton";
 import FontAwesomeIconPdfComponent from "../FontAwesomeIconPdfComponent";
-import { displayPostcodeForHomelessClient } from "@/common/format";
+import { displayPostcodeForHomelessClient, formatTodayAsDate } from "@/common/format";
 
 interface DayOverviewRowProps {
     parcel: ParcelForDayOverview;
@@ -152,11 +152,6 @@ const DayOverviewContent: React.FC<DayOverviewContentProps> = ({ parcels }) => {
     );
 };
 
-const dateStringForToday = (): string => {
-    const today = new Date();
-    return today.toLocaleDateString();
-};
-
 const DayOverviewPdf: React.FC<DayOverviewPdfProps> = ({ data }) => {
     return (
         <Document>
@@ -164,7 +159,7 @@ const DayOverviewPdf: React.FC<DayOverviewPdfProps> = ({ data }) => {
                 <DayOverviewMargin />
                 <View style={styles.titleRow}>
                     <Text style={styles.title}>Day Overview</Text>
-                    <Text style={styles.title}>{dateStringForToday()}</Text>
+                    <Text style={styles.title}>{formatTodayAsDate()}</Text>
                 </View>
                 <DayOverviewContent parcels={data.parcels} />
                 <DayOverviewMargin />
