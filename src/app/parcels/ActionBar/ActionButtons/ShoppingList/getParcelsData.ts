@@ -1,7 +1,7 @@
 import { FetchParcelError, fetchParcel } from "@/common/fetch";
 import { ListType } from "@/common/databaseListTypes";
 import supabase from "@/supabaseClient";
-import { formatDateToDate } from "@/common/format";
+import { formatDateStringAsDate } from "@/common/format";
 
 export interface ParcelInfo {
     voucherNumber: string;
@@ -49,7 +49,7 @@ export const prepareParcelInfo = async (
     }
     const parcelInfo: ParcelInfo = {
         voucherNumber: data.voucher_number ?? "",
-        packingDate: formatDateToDate(data.packing_date) ?? "",
+        packingDate: formatDateStringAsDate(data.packing_date) ?? "",
         packingSlot: data.packing_slot?.name ?? "",
         collectionDate: formatDateToDateTime(data.collection_datetime),
         collectionSite: data.collection_centre?.name ?? "",

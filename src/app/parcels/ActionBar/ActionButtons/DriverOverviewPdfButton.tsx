@@ -9,7 +9,7 @@ import DriverOverviewPdf, {
     DriverOverviewRowData,
 } from "@/pdf/DriverOverview/DriverOverviewPdf";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { displayNameForDeletedClient, formatDateToDate } from "@/common/format";
+import { displayNameForDeletedClient, formatDateStringAsDate } from "@/common/format";
 import { Dayjs } from "dayjs";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
@@ -24,7 +24,7 @@ interface DriverOverviewData {
 type ParcelForDelivery = Schema["parcels"] & {
     client: Schema["clients"];
     collection_centre: Schema["collection_centres"];
-    labelCount: number;
+    labelCount: number | null;
 };
 
 type ParcelsForDeliveryResponse =
@@ -73,14 +73,15 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
             return { data: null, error: { type: "noCollectionCentre", logId: logId } };
         }
 
-        const event_data = parcel.events?.[parcel.events.length - 1].event_data;
-        const labelCount = event_data !== null ? Number.parseInt(event_data) : 0;
+        const event_data =
+            parcel.events.length > 0 ? parcel.events[parcel.events.length - 1].event_data : null;
+        const labelCount = event_data !== null ? Number.parseInt(event_data) : null;
 
         dataWithNonNullClients.push({
             ...parcel,
             client: parcel.client,
             collection_centre: parcel.collection_centre,
-            labelCount: labelCount,
+            labelCount: Number.isNaN(labelCount) ? null : labelCount,
         });
     }
 
@@ -114,7 +115,7 @@ const transformRowToDriverOverviewTableData = (
             postcode: client?.address_postcode,
         },
         contact: clientIsActive ? client?.phone_number ?? "" : "-",
-        packingDate: formatDateToDate(parcel.packing_date) ?? null,
+        packingDate: formatDateStringAsDate(parcel.packing_date) ?? null,
         instructions: clientIsActive ? client?.delivery_instructions ?? "" : "-",
         clientIsActive: clientIsActive,
         numberOfLabels: parcel.labelCount,

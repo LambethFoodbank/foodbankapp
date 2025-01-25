@@ -2,7 +2,11 @@
 
 import React from "react";
 import { Text, Document, Page, View, StyleSheet, Image } from "@react-pdf/renderer";
-import { displayNameForNullDriverName, displayPostcodeForHomelessClient } from "@/common/format";
+import {
+    displayNameForNullDriverName,
+    displayPostcodeForHomelessClient,
+    formatDate,
+} from "@/common/format";
 import { faTruck, faShoePrints, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import FontAwesomeIconPdfComponent from "@/pdf/FontAwesomeIconPdfComponent";
 
@@ -19,7 +23,7 @@ export interface DriverOverviewRowData {
     packingDate: string | null;
     instructions?: string;
     clientIsActive: boolean;
-    numberOfLabels: number;
+    numberOfLabels: number | null;
     collectionCentre: string;
     isDelivery: boolean;
 }
@@ -221,7 +225,7 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                     <Text>{rowData.packingDate || "No recorded date"}</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.numberOfLabelsColumnWidth]}>
-                    <Text>{rowData.numberOfLabels || "No labels downloaded"}</Text>
+                    <Text>{rowData.numberOfLabels || "Unknown"}</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.instructionsColumnWidth]}>
                     <Text>{rowData.instructions}</Text>
@@ -277,14 +281,14 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
             <Page size="A4" orientation="landscape" style={[styles.container, styles.flexColumn]}>
                 <View style={styles.DriverOverviewBoard}>
                     <View style={{ flexDirection: "column", fontFamily: "Helvetica-Bold" }}>
-                        <Text style={[styles.h1text, { marginBottom: "20px" }]}>
+                        <Text style={[styles.h1text, { marginBottom: "10px" }]}>
                             Driver Overview
                         </Text>
-                        <Text style={[styles.h2text, { marginBottom: "20px" }]}>
+                        <Text style={[styles.h2text, { marginBottom: "10px" }]}>
                             Driver Name: {data.driverName ?? displayNameForNullDriverName}
                         </Text>
-                        <Text style={[styles.h3text, { marginBottom: "20px" }]}>
-                            Date: {data.date.toLocaleDateString()}{" "}
+                        <Text style={[styles.h3text, { marginBottom: "10px" }]}>
+                            Date: {formatDate(data.date)}{" "}
                         </Text>
                     </View>
                     {/* eslint-disable-next-line -- needed to remove the need for alt text on the logo */}
