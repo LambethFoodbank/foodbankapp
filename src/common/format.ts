@@ -28,23 +28,23 @@ export const displayList = (data: string[]): string => {
     return data.length === 0 ? "None" : data.join(", ");
 };
 
-export const formatTodayAsDate = (): string => {
-    return new Date().toLocaleString(localeCode, {
+export const formatDate = (date: Date): string => {
+    return date.toLocaleString(localeCode, {
         year: "numeric",
         month: "numeric",
         day: "numeric",
     });
 };
 
-export const formatDateToDate = (dateString: string | null): string => {
+export const formatTodayAsDate = (): string => {
+    return formatDate(new Date());
+};
+
+export const formatDateStringAsDate = (dateString: string | null): string => {
     if (dateString === null) {
         return "";
     }
-    return new Date(dateString).toLocaleString(localeCode, {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-    });
+    return formatDate(new Date(dateString));
 };
 
 export const formatTimestampAsDatetime = (timestamp: number): string => {
