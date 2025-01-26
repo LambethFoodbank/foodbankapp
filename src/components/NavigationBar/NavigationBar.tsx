@@ -144,14 +144,18 @@ const PAGES = [
 const NavigationBar: React.FC<Props> = ({ children }) => {
     const [drawer, setDrawer] = useState(false);
     const [islogOutModalOpen, setIslogOutModalOpen] = useState(false);
+    const [isUserLogOutInProgress, setIsUserLogOutInProgress] = useState(false);
     const [sessionErrorMessage, setSessionErrorMessage] = useState<string | null>(null);
     const supabase = createClientComponentClient<DatabaseAutoType>();
 
     const envLabel = process.env.NEXT_PUBLIC_ENV_VISIBLE_LABEL;
 
+    const isLoggedInPage = !roleCanAccessPage(null, usePathname());
+
     useSessionHeartbeat(
         useRouter(),
-        !roleCanAccessPage(null, usePathname()),
+        isLoggedInPage,
+        isUserLogOutInProgress,
         setSessionErrorMessage
     );
 
@@ -168,6 +172,7 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
     };
 
     const handleLogOutConfirm = async (): Promise<void> => {
+        setIsUserLogOutInProgress(true);
         setIslogOutModalOpen(false);
         await supabase.auth.signOut();
     };

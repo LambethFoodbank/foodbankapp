@@ -10,6 +10,7 @@ import { faBoxArchive } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "styled-components";
 import { SelectedClientDetails } from "./types";
 import { useRouter } from "next/navigation";
+import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 
 interface ParcelsModalProps {
     modalIsOpen: boolean;
@@ -44,23 +45,27 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
             headerId="expandedParcelDetailsModal"
             footer={
                 <Centerer>
-                    <LinkButton link={`/parcels/edit/${selectedParcelId}`}>Edit Parcel</LinkButton>
-                    {selectedClientDetails && (
-                        <>
-                            <LinkButton
-                                link={`/clients?clientId=${selectedClientDetails.clientId}`}
-                                disabled={!selectedClientDetails.isClientActive}
-                            >
-                                See Client Details
-                            </LinkButton>
-                            <LinkButton
-                                link={`/clients/edit/${selectedClientDetails.clientId}`}
-                                disabled={!selectedClientDetails.isClientActive}
-                            >
-                                Edit Client Details
-                            </LinkButton>
-                        </>
-                    )}
+                    <ConfirmButtons>
+                        <LinkButton link={`/parcels/edit/${selectedParcelId}`}>
+                            Edit Parcel
+                        </LinkButton>
+                        {selectedClientDetails && (
+                            <>
+                                <LinkButton
+                                    link={`/clients?clientId=${selectedClientDetails.clientId}`}
+                                    disabled={!selectedClientDetails.isClientActive}
+                                >
+                                    See Client Details
+                                </LinkButton>
+                                <LinkButton
+                                    link={`/clients/edit/${selectedClientDetails.clientId}`}
+                                    disabled={!selectedClientDetails.isClientActive}
+                                >
+                                    Edit Client Details
+                                </LinkButton>
+                            </>
+                        )}
+                    </ConfirmButtons>
                 </Centerer>
             }
         >
