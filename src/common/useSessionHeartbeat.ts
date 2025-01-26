@@ -10,6 +10,7 @@ type sessionCheckResult = "Logged in" | "No session" | "User missing" | "Failed 
 export const useSessionHeartbeat = (
     router: AppRouterInstance,
     pageRequiresSession: boolean,
+    isUserLogOutInProgress: boolean,
     setSessionErrorMessage: (message: string | null) => void
 ): void => {
     const heartbeatMs = 20000;
@@ -21,16 +22,8 @@ export const useSessionHeartbeat = (
                 .getSession()
                 .then((response) => response.data.session?.user ?? null);
 
-            console.log("--> user: " + JSON.stringify(sessionUser));
-
             if (sessionUser) {
                 const { role, error, userMissing } = await fetchUserRole(sessionUser.id);
-
-                // QQ
-                console.log("--> role & error: " + JSON.stringify([role, error]));
-                if (error) {
-                    console.dir(error);
-                }
 
                 if (role !== null && !error) {
                     return "Logged in";
@@ -45,31 +38,28 @@ export const useSessionHeartbeat = (
         };
 
         const redirectToLoginIfNoSession = async (): Promise<void> => {
-            console.log("--> in redirectToLoginIfNoSession");
-
             if (pageRequiresSession) {
                 // One final check before redirect
                 const sessionCheckResult = await checkSession();
                 setSessionErrorMessage(null);
                 if (sessionCheckResult !== "Logged in") {
-                    console.log("--> router.push(/login)");
-
                     router.push("/login");
                 }
             }
         };
 
         const heartbeatSessionCheck = async (): Promise<void> => {
-            console.log("QQ useSessionHeartbeat: start");
-
             const sessionCheckResult = await checkSession();
 
-            if (sessionCheckResult === "No session" || sessionCheckResult === "User missing") {
-                console.log("--> rerouting");
+            if (isUserLogOutInProgress) {
+                setSessionErrorMessage(null);
+                return;
+            }
 
+            if (sessionCheckResult === "No session" || sessionCheckResult === "User missing") {
                 if (pageRequiresSession) {
                     setSessionErrorMessage(
-                        "Your session has expired, so you are about to be logged out"
+                        "Your session has expired. You are about to be logged out."
                     );
 
                     setTimeout(redirectToLoginIfNoSession, delayBeforeRedirectMs);

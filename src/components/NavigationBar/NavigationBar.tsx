@@ -111,10 +111,12 @@ const CenteredDiv = styled.div`
     margin: 2rem 4rem 1rem 4rem;
 `;
 
-const LoginDependent: React.FC<Props> = (props) => {
-    const isLoggedInPage = !roleCanAccessPage(null, usePathname());
+const isLoggedInPage = (): boolean => {
+    return !roleCanAccessPage(null, usePathname());
+};
 
-    return <>{isLoggedInPage && props.children}</>;
+const LoginDependent: React.FC<Props> = (props) => {
+    return <>{isLoggedInPage() && props.children}</>;
 };
 
 interface Props {
@@ -144,6 +146,7 @@ const PAGES = [
 const NavigationBar: React.FC<Props> = ({ children }) => {
     const [drawer, setDrawer] = useState(false);
     const [islogOutModalOpen, setIslogOutModalOpen] = useState(false);
+    const [isUserLogOutInProgress, setIsUserLogOutInProgress] = useState(false);
     const [sessionErrorMessage, setSessionErrorMessage] = useState<string | null>(null);
     const supabase = createClientComponentClient<DatabaseAutoType>();
 
@@ -151,7 +154,8 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
 
     useSessionHeartbeat(
         useRouter(),
-        !roleCanAccessPage(null, usePathname()),
+        isLoggedInPage(),
+        isUserLogOutInProgress,
         setSessionErrorMessage
     );
 
@@ -168,6 +172,7 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
     };
 
     const handleLogOutConfirm = async (): Promise<void> => {
+        setIsUserLogOutInProgress(true);
         setIslogOutModalOpen(false);
         await supabase.auth.signOut();
     };
