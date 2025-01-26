@@ -76,5 +76,5 @@ export const useSessionHeartbeat = (
             const intervalId = setInterval(heartbeatSessionCheck, heartbeatMs);
             return () => clearInterval(intervalId);
         }
-    }, [pageRequiresSession, router, setSessionErrorMessage]);
+    }, [isUserLogOutInProgress, pageRequiresSession, router, setSessionErrorMessage]);
 };

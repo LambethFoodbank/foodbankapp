@@ -111,12 +111,10 @@ const CenteredDiv = styled.div`
     margin: 2rem 4rem 1rem 4rem;
 `;
 
-const isLoggedInPage = (): boolean => {
-    return !roleCanAccessPage(null, usePathname());
-};
-
 const LoginDependent: React.FC<Props> = (props) => {
-    return <>{isLoggedInPage() && props.children}</>;
+    const isLoggedInPage = !roleCanAccessPage(null, usePathname());
+
+    return <>{isLoggedInPage && props.children}</>;
 };
 
 interface Props {
@@ -152,9 +150,11 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
 
     const envLabel = process.env.NEXT_PUBLIC_ENV_VISIBLE_LABEL;
 
+    const isLoggedInPage = !roleCanAccessPage(null, usePathname());
+
     useSessionHeartbeat(
         useRouter(),
-        isLoggedInPage(),
+        isLoggedInPage,
         isUserLogOutInProgress,
         setSessionErrorMessage
     );
