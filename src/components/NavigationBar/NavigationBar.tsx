@@ -9,11 +9,13 @@ import styled from "styled-components";
 import LightDarkSlider from "@/components/NavigationBar/LightDarkSlider";
 import SignOutButton from "@/components/NavigationBar/SignOutButton";
 import NavBarButton from "@/components/Buttons/NavBarButton";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { RoleUpdateContext, roleCanAccessPage } from "@/app/roles";
 import Modal from "@/components/Modal/Modal";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { DatabaseAutoType } from "@/databaseUtils";
+import { useSessionHeartbeat } from "@/common/useSessionHeartbeat";
+import FixedToast from "../FixedToast";
 
 export const NavBarHeight = "3.5rem";
 
@@ -110,11 +112,9 @@ const CenteredDiv = styled.div`
 `;
 
 const LoginDependent: React.FC<Props> = (props) => {
-    const pathname = usePathname();
-    if (pathname === "/login" || pathname === "/forgot-password") {
-        return <></>;
-    }
-    return <>{props.children}</>;
+    const isLoggedInPage = !roleCanAccessPage(null, usePathname());
+
+    return <>{isLoggedInPage && props.children}</>;
 };
 
 interface Props {
@@ -144,9 +144,16 @@ const PAGES = [
 const NavigationBar: React.FC<Props> = ({ children }) => {
     const [drawer, setDrawer] = useState(false);
     const [islogOutModalOpen, setIslogOutModalOpen] = useState(false);
+    const [sessionErrorMessage, setSessionErrorMessage] = useState<string | null>(null);
     const supabase = createClientComponentClient<DatabaseAutoType>();
 
     const envLabel = process.env.NEXT_PUBLIC_ENV_VISIBLE_LABEL;
+
+    useSessionHeartbeat(
+        useRouter(),
+        !roleCanAccessPage(null, usePathname()),
+        setSessionErrorMessage
+    );
 
     const openDrawer = (): void => {
         setDrawer(true);
@@ -187,6 +194,13 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
                 </StyledSwipeableDrawer>
             </LoginDependent>
             <AppBar>
+                {sessionErrorMessage && (
+                    <FixedToast
+                        message={sessionErrorMessage}
+                        severity="error"
+                        variant="filled"
+                    ></FixedToast>
+                )}
                 <AppBarInner>
                     <MobileNavMenuContainer>
                         <Button
