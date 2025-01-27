@@ -13,8 +13,10 @@ export const useSessionHeartbeat = (
     isUserLogOutInProgress: boolean,
     setSessionErrorMessage: (message: string | null) => void
 ): void => {
-    const heartbeatMs = 20000;
-    const delayBeforeRedirectMs = 10000;
+    const heartbeatMs = Number.parseInt(process.env.NEXT_PUBLIC_HEARTBEAT_MS ?? "20000");
+    const delayBeforeRedirectMs = Number.parseInt(
+        process.env.NEXT_PUBLIC_REDIRECT_DELAY_MS ?? "10000"
+    );
 
     useEffect(() => {
         const checkSession = async (): Promise<sessionCheckResult> => {
@@ -76,5 +78,12 @@ export const useSessionHeartbeat = (
             const intervalId = setInterval(heartbeatSessionCheck, heartbeatMs);
             return () => clearInterval(intervalId);
         }
-    }, [isUserLogOutInProgress, pageRequiresSession, router, setSessionErrorMessage]);
+    }, [
+        delayBeforeRedirectMs,
+        heartbeatMs,
+        isUserLogOutInProgress,
+        pageRequiresSession,
+        router,
+        setSessionErrorMessage,
+    ]);
 };
