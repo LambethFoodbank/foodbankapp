@@ -2,8 +2,9 @@ import Button from "@mui/material/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPen } from "@fortawesome/free-solid-svg-icons/faUserPen";
 import { faKey } from "@fortawesome/free-solid-svg-icons/faKey";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
-import { EditHeader, ManageMode } from "@/app/admin/manageUser/ManageUserModal";
+import { EditSubheading, ManageMode } from "@/app/admin/manageUser/ManageUserModal";
 import styled from "styled-components";
 
 const OptionsSection = styled.div`
@@ -13,14 +14,15 @@ const OptionsSection = styled.div`
 `;
 
 interface Props {
+    userHasSignedIn: boolean;
     setManageMode: (mode: ManageMode) => void;
     onCancel: () => void;
 }
 
-const ManageUserOptions: React.FC<Props> = ({ setManageMode, onCancel }) => {
+const ManageUserOptions: React.FC<Props> = ({ userHasSignedIn, setManageMode, onCancel }) => {
     return (
         <>
-            <EditHeader>Options</EditHeader>
+            <EditSubheading>Options</EditSubheading>
             <OptionsSection>
                 <Button
                     variant="outlined"
@@ -29,13 +31,23 @@ const ManageUserOptions: React.FC<Props> = ({ setManageMode, onCancel }) => {
                 >
                     Edit Details
                 </Button>
-                <Button
-                    variant="outlined"
-                    startIcon={<FontAwesomeIcon icon={faKey} />}
-                    onClick={() => setManageMode("resetPassword")}
-                >
-                    Reset Password
-                </Button>
+                {userHasSignedIn ? (
+                    <Button
+                        variant="outlined"
+                        startIcon={<FontAwesomeIcon icon={faKey} />}
+                        onClick={() => setManageMode("resetPassword")}
+                    >
+                        Reset Password
+                    </Button>
+                ) : (
+                    <Button
+                        variant="outlined"
+                        startIcon={<FontAwesomeIcon icon={faEnvelope} />}
+                        onClick={() => setManageMode("resendInvitation")}
+                    >
+                        Resend Invitation
+                    </Button>
+                )}
                 <Button variant="outlined" color="secondary" onClick={onCancel}>
                     Cancel
                 </Button>

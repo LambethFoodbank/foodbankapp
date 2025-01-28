@@ -59,7 +59,7 @@ export const getUsersDataAndCount = async (
             profileId: user.primary_key ?? "",
             firstName: user.first_name ?? "",
             lastName: user.last_name ?? "",
-            userRole: user.role ?? "UNKNOWN",
+            userRole: user.role ?? null,
             email: user.email ?? "",
             telephoneNumber: user.telephone_number ?? "-",
             createdAt: user.created_at ? Date.parse(user.created_at) : null,

@@ -86,6 +86,24 @@ export async function adminInviteUser(
         },
     });
 
+    return {
+        data: newUserData.user,
+        error: null,
+    };
+}
+
+export async function adminInviteAndCreateUser(
+    userDetails: InviteUserFields,
+    redirectUrl: string
+): Promise<InviteUsersDataAndErrorType> {
+    const inviteUserResponse = await adminInviteUser(userDetails, redirectUrl);
+
+    if (inviteUserResponse.error) {
+        return inviteUserResponse;
+    }
+
+    const newUser = inviteUserResponse.data;
+
     const { data: profileData, error: createProfileError } = await supabase
         .from("profiles")
         .insert({
@@ -93,9 +111,9 @@ export async function adminInviteUser(
             first_name: userDetails.firstName,
             last_name: userDetails.lastName,
             telephone_number: userDetails.telephoneNumber,
-            email: newUserData.user.email,
-            user_id: newUserData.user.id,
-            created_at: newUserData.user.created_at,
+            email: newUser.email,
+            user_id: newUser.id,
+            created_at: newUser.created_at,
         })
         .select()
         .single();
@@ -104,13 +122,13 @@ export async function adminInviteUser(
         action: "add a profile for user",
         content: {
             email: userDetails.email,
-            newUserId: newUserData.user.id,
+            newUserId: newUser.id,
         },
     } as const satisfies Partial<AuditLog>;
 
     if (createProfileError) {
         const logId = await logErrorReturnLogId(
-            `failed to create profile for user with id ${newUserData.user.id}`,
+            `failed to create profile for user with id ${newUser.id}`,
             {
                 error: createProfileError,
             }
@@ -136,7 +154,7 @@ export async function adminInviteUser(
     void logInfoReturnLogId(`Created a profile for ${userDetails.role} user: ${userDetails.email}`);
 
     return {
-        data: newUserData.user,
+        data: newUser,
         error: null,
     };
 }
