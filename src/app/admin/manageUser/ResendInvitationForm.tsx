@@ -3,15 +3,15 @@
 import React, { useCallback, useState } from "react";
 import { EditOption, EditSubheading } from "@/app/admin/manageUser/ManageUserModal";
 import Button from "@mui/material/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import OptionButtonsDiv from "@/app/admin/common/OptionButtonsDiv";
-import PasswordInput from "@/components/DataInput/PasswordInput";
 import { UserRow } from "../usersTable/types";
-import { faKey } from "@fortawesome/free-solid-svg-icons/faKey";
 import { AlertOptions } from "@/app/admin/common/SuccessFailureAlert";
-import { adminUpdateUserEmailAndPassword } from "@/server/adminUpdateUser";
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import styled, { DefaultTheme } from "styled-components";
+import { adminInviteUser } from "@/server/adminInviteUser";
+import { InviteUserFields } from "../createUser/CreateUserForm";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
     userToEdit: UserRow;
@@ -27,70 +27,71 @@ const ErrorMessage = styled.span<{ theme: DefaultTheme }>`
     color: ${(props) => props.theme.error};
 `;
 
-const updatePassword = async (
-    userId: string,
-    newPassword: string
-): Promise<UpdatePasswordResponse> => {
-    const response = await adminUpdateUserEmailAndPassword({
-        userId: userId,
-        attributes: { password: newPassword },
-    });
+const sendInvitation = async (userToInvite: UserRow): Promise<UpdatePasswordResponse> => {
+    const invitableUser: InviteUserFields = {
+        email: userToInvite.email,
+        role: userToInvite.userRole,
+        firstName: userToInvite.firstName,
+        lastName: userToInvite.lastName,
+        telephoneNumber: userToInvite.telephoneNumber,
+    };
+
+    const redirectUrl = `${window.location.origin}/set-password`;
+
+    const response = await adminInviteUser(invitableUser, redirectUrl);
 
     if (response.error) {
-        void logErrorReturnLogId(`Error resetting password userId: ${userId}`, {
+        void logErrorReturnLogId(`Error inviting userId: ${userToInvite.userId}`, {
             response,
         });
-        return { errorMessage: response.error["Failed to update user"] };
+        return { errorMessage: "Failed to send invitation." };
     }
     return { errorMessage: null };
 };
 
-const ResetPasswordForm: React.FC<Props> = ({ userToEdit, onCancel, onConfirm }) => {
-    const [password, setPassword] = useState("");
+const ResendInvitationForm: React.FC<Props> = ({ userToEdit, onCancel, onConfirm }) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const onConfirmPassword = useCallback(
+    const onOk = useCallback(
         (event: React.MouseEvent<HTMLButtonElement>): void => {
             event.preventDefault();
-            updatePassword(userToEdit.userId, password).then(({ errorMessage }) => {
+
+            sendInvitation(userToEdit).then(({ errorMessage }) => {
                 setErrorMessage(errorMessage);
                 if (!errorMessage) {
                     onConfirm({
                         success: true,
                         message: (
                             <>
-                                Password for <b>{userToEdit.email}</b> updated successfully.
+                                Invitation successfully resent to <b>{userToEdit.email}</b>.
                             </>
                         ),
                     });
                     void logInfoReturnLogId(
-                        `Password for ${userToEdit.email} updated successfully`
+                        `Invitation successfully resent to ${userToEdit.email}`
                     );
                 }
             });
         },
-        [onConfirm, password, userToEdit.email, userToEdit.userId]
+        [onConfirm, userToEdit]
     );
-
-    const onChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
-    }, []);
 
     return (
         <form>
             <EditOption>
-                <EditSubheading>Password </EditSubheading>
-                <PasswordInput label="New Password" onChange={onChange} />
+                <EditSubheading>
+                    Are you sure you want to send a new invitation to this user?
+                </EditSubheading>
             </EditOption>
             {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
             <OptionButtonsDiv>
                 <Button
                     variant="outlined"
-                    startIcon={<FontAwesomeIcon icon={faKey} />}
-                    onClick={onConfirmPassword}
+                    startIcon={<FontAwesomeIcon icon={faEnvelope} />}
+                    onClick={onOk}
                     type="submit"
                 >
-                    Confirm Password
+                    OK
                 </Button>
                 <Button variant="outlined" color="secondary" onClick={onCancel}>
                     Cancel
@@ -100,4 +101,4 @@ const ResetPasswordForm: React.FC<Props> = ({ userToEdit, onCancel, onConfirm })
     );
 };
 
-export default ResetPasswordForm;
+export default ResendInvitationForm;

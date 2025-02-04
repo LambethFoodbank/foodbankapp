@@ -6,6 +6,7 @@ import ResetPasswordForm from "@/app/admin/manageUser/ResetPasswordForm";
 import EditUserForm from "@/app/admin/manageUser/EditUserForm";
 import ManageUserOptions from "@/app/admin/manageUser/ManageUserOptions";
 import { AlertOptions, SetAlertOptions } from "@/app/admin/common/SuccessFailureAlert";
+import ResendInvitationForm from "./ResendInvitationForm";
 
 const ManageModalContent = styled.div`
     padding: 0 0.5rem;
@@ -19,7 +20,11 @@ export const EditHeader = styled.h2`
     margin-bottom: 0.5rem;
 `;
 
-export type ManageMode = "editDetails" | "resetPassword" | "options";
+export const EditSubheading = styled.h3`
+    margin-bottom: 0.5rem;
+`;
+
+export type ManageMode = "editDetails" | "resetPassword" | "resendInvitation" | "options";
 
 interface Props {
     userToEdit: UserRow | null;
@@ -66,9 +71,25 @@ const ManageUserModal: React.FC<Props> = (props) => {
                 />
             ),
         },
+        resendInvitation: {
+            header: "Resend Invitation",
+            content: (
+                <ResendInvitationForm
+                    userToEdit={props.userToEdit}
+                    onConfirm={onEditConfirm}
+                    onCancel={onCancel}
+                />
+            ),
+        },
         options: {
             header: "Manage User",
-            content: <ManageUserOptions setManageMode={setManageMode} onCancel={onCancel} />,
+            content: (
+                <ManageUserOptions
+                    userHasSignedIn={props.userToEdit.lastSignInAt !== null}
+                    setManageMode={setManageMode}
+                    onCancel={onCancel}
+                />
+            ),
         },
     };
 
