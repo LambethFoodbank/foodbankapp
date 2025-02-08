@@ -9,26 +9,12 @@ import {
 } from "@/common/format";
 import { faTruck, faShoePrints, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import FontAwesomeIconPdfComponent from "@/pdf/FontAwesomeIconPdfComponent";
+import {
+    DriverOverviewRowData,
+    DriverOverviewTablesData,
+} from "@/app/parcels/ActionBar/ActionButtons/DriverOverview/getDriverOverviewData";
 
-export interface DriverOverviewRowData {
-    name: string;
-    address: {
-        line1: string;
-        line2: string | null;
-        town: string | null;
-        county: string | null;
-        postcode: string | null;
-    };
-    contact?: string;
-    packingDate: string | null;
-    instructions?: string;
-    clientIsActive: boolean;
-    numberOfLabels: number | null;
-    collectionCentre: string;
-    isDelivery: boolean;
-}
-
-export interface DriverOverviewCardDataProps {
+export interface DriverOverviewPdfData {
     driverName: string | null;
     date: Date;
     tableData: DriverOverviewTablesData;
@@ -36,18 +22,8 @@ export interface DriverOverviewCardDataProps {
 }
 
 interface DriverOverviewCardProps {
-    data: DriverOverviewCardDataProps;
+    data: DriverOverviewPdfData;
 }
-
-export type DriverOverviewCollectionCentreData = {
-    collectionCentreName: string;
-    rowData: DriverOverviewRowData[];
-};
-
-export type DriverOverviewTablesData = {
-    collections: DriverOverviewCollectionCentreData[];
-    deliveries: DriverOverviewRowData[];
-};
 
 const styles = StyleSheet.create({
     container: {
@@ -120,7 +96,7 @@ const styles = StyleSheet.create({
         borderLeft: "1px solid black",
         borderBottom: "1px solid black",
         borderTop: "1px solid black",
-        height: 40,
+        height: 30,
     },
     nameColumnWidth: {
         width: "15%",
@@ -168,7 +144,6 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                     {
                         textDecoration: "underline",
                         fontFamily: "Helvetica-Bold",
-                        fontSize: 13,
                     },
                 ]}
             >
