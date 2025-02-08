@@ -1,9 +1,9 @@
 import { UserRole } from "@/databaseUtils";
 import React, { useState } from "react";
-import { EditHeader, EditOption } from "@/app/admin/manageUser/ManageUserModal";
+import { EditOption, EditSubheading } from "@/app/admin/manageUser/ManageUserModal";
 import UserRoleSelect from "@/app/admin/common/UserRoleSelect";
 import { getDropdownListHandler } from "@/components/DataInput/inputHandlerFactories";
-import { DisplayedUserRole, UserRow } from "@/app/admin/usersTable/types";
+import { UserRow } from "@/app/admin/usersTable/types";
 import Button from "@mui/material/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import OptionButtonsDiv from "@/app/admin/common/OptionButtonsDiv";
@@ -31,10 +31,6 @@ interface Props {
     onConfirm: (alertOptions: AlertOptions) => void;
 }
 
-function isValidUserRole(userRole: DisplayedUserRole): userRole is UserRole {
-    return userRole !== "UNKNOWN";
-}
-
 const initialFormErrors: InviteUserErrors = {
     email: Errors.none,
     role: Errors.none,
@@ -46,9 +42,7 @@ const initialFormErrors: InviteUserErrors = {
 type InviteUserErrors = Required<FormErrors<InviteUserFields>>;
 
 const EditUserForm: React.FC<Props> = (props) => {
-    const initialRole: UserRole = isValidUserRole(props.userToEdit.userRole)
-        ? props.userToEdit.userRole
-        : "volunteer";
+    const initialRole: UserRole = props.userToEdit.userRole ?? "volunteer";
 
     const initialFirstName: string = props.userToEdit.firstName ?? "";
 
@@ -113,7 +107,7 @@ const EditUserForm: React.FC<Props> = (props) => {
     return (
         <>
             <EditOption>
-                <EditHeader>First Name</EditHeader>
+                <EditSubheading>First Name</EditSubheading>
                 <FreeFormTextInput
                     id="edit-user-first-name"
                     label="First Name"
@@ -127,7 +121,7 @@ const EditUserForm: React.FC<Props> = (props) => {
                 />
             </EditOption>
             <EditOption>
-                <EditHeader>Last Name</EditHeader>
+                <EditSubheading>Last Name</EditSubheading>
                 <FreeFormTextInput
                     id="edit-user-last-name"
                     label="Last Name"
@@ -141,7 +135,7 @@ const EditUserForm: React.FC<Props> = (props) => {
                 />
             </EditOption>
             <EditOption>
-                <EditHeader>Phone Number</EditHeader>
+                <EditSubheading>Phone Number</EditSubheading>
                 <FreeFormTextInput
                     id="edit-user-phone-number"
                     label="Phone Number"
@@ -157,7 +151,7 @@ const EditUserForm: React.FC<Props> = (props) => {
                 />
             </EditOption>
             <EditOption>
-                <EditHeader>Role</EditHeader>
+                <EditSubheading>Role</EditSubheading>
                 <UserRoleSelect
                     value={initialRole}
                     onChange={getDropdownListHandler<UserRole>(
@@ -177,7 +171,7 @@ const EditUserForm: React.FC<Props> = (props) => {
                 >
                     Confirm Edit
                 </Button>
-                <Button color="secondary" onClick={props.onCancel}>
+                <Button variant="outlined" color="secondary" onClick={props.onCancel}>
                     Cancel
                 </Button>
             </OptionButtonsDiv>

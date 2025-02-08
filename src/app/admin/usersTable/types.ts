@@ -39,13 +39,12 @@ export type GetUserCountReturnType =
           error: { type: GetUserDataAndCountErrorType; logId: string };
       };
 
-export type DisplayedUserRole = UserRole | "UNKNOWN";
 export interface UserRow {
     userId: string;
     profileId: string;
     firstName: string;
     lastName: string;
-    userRole: DisplayedUserRole;
+    userRole: UserRole;
     email: string;
     telephoneNumber: string;
     createdAt: number | null;

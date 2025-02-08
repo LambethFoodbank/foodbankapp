@@ -18,7 +18,7 @@ import Alert from "@mui/material/Alert/Alert";
 import { User } from "@supabase/gotrue-js";
 import { logInfoReturnLogId } from "@/logger/logger";
 import UserDetailsCard from "@/app/admin/createUser/UserDetailsCard";
-import { InviteUserError, adminInviteUser } from "@/server/adminInviteUser";
+import { InviteUserError, adminInviteAndCreateUser } from "@/server/adminInviteUser";
 import { UserRole } from "@/databaseUtils";
 
 export interface InviteUserFields extends Record<string, UserRole | string> {
@@ -91,7 +91,7 @@ const CreateUserForm: React.FC = () => {
 
         const redirectUrl = `${window.location.origin}/set-password`;
 
-        const { data, error } = await adminInviteUser(fields, redirectUrl);
+        const { data, error } = await adminInviteAndCreateUser(fields, redirectUrl);
 
         if (error) {
             setServerError(error);
