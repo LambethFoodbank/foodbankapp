@@ -13,7 +13,6 @@ env:
 jobs:
   dump-staging-database:
     name: Dump staging database
-    environment: staging
     runs-on: ubuntu-latest
 
     steps:
