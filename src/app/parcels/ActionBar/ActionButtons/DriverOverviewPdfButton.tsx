@@ -7,6 +7,7 @@ import PdfButton from "@/components/FileGenerationButtons/PdfButton";
 import DriverOverviewPdf, {
     DriverOverviewTablesData,
     DriverOverviewRowData,
+    DriverOverviewCollectionCentreData,
 } from "@/pdf/DriverOverview/DriverOverviewPdf";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { displayNameForDeletedClient, formatDateStringAsDate } from "@/common/format";
@@ -125,12 +126,29 @@ const transformRowToDriverOverviewTableData = (
 };
 
 const transformParcelDataToTableData = (parcels: ParcelForDelivery[]): DriverOverviewTablesData => {
-    const transformedParcels = parcels.map((parcel) =>
-        transformRowToDriverOverviewTableData(parcel)
+    const transformedParcels = parcels
+        .map((parcel) => transformRowToDriverOverviewTableData(parcel))
+        .filter((parcel) => parcel.clientIsActive);
+
+    const collectionCentreNames = Array.from(
+        new Set(
+            transformedParcels
+                .filter((parcel) => !parcel.isDelivery)
+                .map((parcel) => parcel.collectionCentre)
+        )
+    ).sort();
+
+    const collectionCentreData: DriverOverviewCollectionCentreData[] = collectionCentreNames.map(
+        (ccName) => {
+            return {
+                collectionCentreName: ccName,
+                rowData: transformedParcels.filter((parcel) => parcel.collectionCentre === ccName),
+            };
+        }
     );
 
     return {
-        collections: transformedParcels.filter((parcel) => !parcel.isDelivery),
+        collections: collectionCentreData,
         deliveries: transformedParcels.filter((parcel) => parcel.isDelivery),
     };
 };
