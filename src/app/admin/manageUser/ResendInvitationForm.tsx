@@ -4,12 +4,12 @@ import React, { useCallback, useState } from "react";
 import { EditOption, EditSubheading } from "@/app/admin/manageUser/ManageUserModal";
 import Button from "@mui/material/Button";
 import OptionButtonsDiv from "@/app/admin/common/OptionButtonsDiv";
-import { UserRow } from "../usersTable/types";
+import { UserRow } from "@/app/admin/usersTable/types";
 import { AlertOptions } from "@/app/admin/common/SuccessFailureAlert";
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import styled, { DefaultTheme } from "styled-components";
 import { adminInviteUser } from "@/server/adminInviteUser";
-import { InviteUserFields } from "../createUser/CreateUserForm";
+import { InviteUserFields } from "@/app/admin/createUser/CreateUserForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 
@@ -19,7 +19,7 @@ interface Props {
     onConfirm: (alertOptions: AlertOptions) => void;
 }
 
-interface UpdatePasswordResponse {
+interface ResendInvitationResponse {
     errorMessage: string | null;
 }
 
@@ -27,7 +27,7 @@ const ErrorMessage = styled.span<{ theme: DefaultTheme }>`
     color: ${(props) => props.theme.error};
 `;
 
-const sendInvitation = async (userToInvite: UserRow): Promise<UpdatePasswordResponse> => {
+const sendInvitation = async (userToInvite: UserRow): Promise<ResendInvitationResponse> => {
     const invitableUser: InviteUserFields = {
         email: userToInvite.email,
         role: userToInvite.userRole,

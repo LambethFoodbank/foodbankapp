@@ -6,7 +6,7 @@ import ResetPasswordForm from "@/app/admin/manageUser/ResetPasswordForm";
 import EditUserForm from "@/app/admin/manageUser/EditUserForm";
 import ManageUserOptions from "@/app/admin/manageUser/ManageUserOptions";
 import { AlertOptions, SetAlertOptions } from "@/app/admin/common/SuccessFailureAlert";
-import ResendInvitationForm from "./ResendInvitationForm";
+import ResendInvitationForm from "@/app/admin/manageUser/ResendInvitationForm";
 
 const ManageModalContent = styled.div`
     padding: 0 0.5rem;
