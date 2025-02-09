@@ -28,6 +28,25 @@ export const displayList = (data: string[]): string => {
     return data.length === 0 ? "None" : data.join(", ");
 };
 
+export const formatAddress = (
+    addressLine1: string | null,
+    addressLine2: string | null,
+    addressTown: string | null,
+    addressCounty: string | null,
+    addressPostcode: string | null,
+    useNewlines = true
+): string => {
+    if (!addressPostcode) {
+        return displayPostcodeForHomelessClient;
+    }
+
+    const delimiter = useNewlines ? "\n" : ", ";
+
+    return [addressLine1, addressLine2, addressTown, addressCounty, addressPostcode]
+        .filter((value) => value !== null && value !== "")
+        .join(delimiter);
+};
+
 export const formatDate = (date: Date): string => {
     return date.toLocaleString(localeCode, {
         year: "numeric",

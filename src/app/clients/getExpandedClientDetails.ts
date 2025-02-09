@@ -2,7 +2,7 @@ import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { displayPostcodeForHomelessClient } from "@/common/format";
+import { formatAddress } from "@/common/format";
 import {
     getAdultAgeStringUsingBirthYear,
     getChildAgeStringUsingBirthYearAndMonth,
@@ -155,18 +155,14 @@ export const formatAddressFromClientDetails = (
         "address_1" | "address_2" | "address_town" | "address_county" | "address_postcode"
     >
 ): string => {
-    if (!client.address_postcode) {
-        return displayPostcodeForHomelessClient;
-    }
-    return [
+    return formatAddress(
         client.address_1,
         client.address_2,
         client.address_town,
         client.address_county,
         client.address_postcode,
-    ]
-        .filter((field) => field)
-        .join(", ");
+        false
+    );
 };
 
 export const formatHouseholdFromFamilyDetails = (
