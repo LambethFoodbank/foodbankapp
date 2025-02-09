@@ -1,5 +1,5 @@
 import { Schema } from "@/databaseUtils";
-import { displayPostcodeForHomelessClient } from "@/common/format";
+import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
@@ -51,9 +51,13 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
         extra_information,
     } = clientData;
 
-    const formattedAddress = [address_1, address_2, address_town, address_county, address_postcode]
-        .filter((value) => value !== "")
-        .join("\n");
+    const formattedAddress = formatAddress(
+        address_1,
+        address_2,
+        address_town,
+        address_county,
+        address_postcode
+    );
 
     const { extraInformation } = processExtraInformation(extra_information ?? "");
 

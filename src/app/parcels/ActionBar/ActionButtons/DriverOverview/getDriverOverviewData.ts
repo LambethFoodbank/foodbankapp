@@ -1,25 +1,33 @@
-"use client";
-
-import React from "react";
-import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
-import PdfButton from "@/components/FileGenerationButtons/PdfButton";
-import DriverOverviewPdf, {
-    DriverOverviewTablesData,
-    DriverOverviewRowData,
-} from "@/pdf/DriverOverview/DriverOverviewPdf";
+import supabase from "@/supabaseClient";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { displayNameForDeletedClient, formatDateStringAsDate } from "@/common/format";
-import { Dayjs } from "dayjs";
-import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
+import {
+    displayNameForDeletedClient,
+    formatAddress,
+    formatDateStringAsDate,
+} from "@/common/format";
 
-interface DriverOverviewData {
-    driverName: string | null;
-    date: Date;
-    tableData: DriverOverviewTablesData;
-    message: string;
+export interface DriverOverviewRowData {
+    name: string;
+    address: string;
+    contact?: string;
+    packingDate: string | null;
+    instructions?: string;
+    clientIsActive: boolean;
+    numberOfLabels: number | null;
+    collectionCentre: string;
+    isDelivery: boolean;
 }
+
+export type DriverOverviewTablesData = {
+    collections: DriverOverviewCollectionCentreData[];
+    deliveries: DriverOverviewRowData[];
+};
+
+export type DriverOverviewCollectionCentreData = {
+    collectionCentreName: string;
+    rowData: DriverOverviewRowData[];
+};
 
 type ParcelForDelivery = Schema["parcels"] & {
     client: Schema["clients"];
@@ -38,6 +46,21 @@ type ParcelsForDeliveryResponse =
       };
 
 type ParcelsForDeliveryErrorType = "parcelFetchFailed" | "noMatchingClient" | "noCollectionCentre";
+
+type DriverPdfResponse =
+    | {
+          data: DriverOverviewTablesData;
+          error: null;
+      }
+    | {
+          data: null;
+          error: { type: DriverPdfErrorType; logId: string };
+      };
+
+type DriverPdfErrorType = ParcelsForDeliveryErrorType;
+
+export type DriverOverviewErrorType = DriverPdfErrorType | "driverMessageFetchFailed";
+export type DriverOverviewError = { type: DriverOverviewErrorType; logId: string };
 
 const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDeliveryResponse> => {
     const { data, error } = await supabase
@@ -88,18 +111,6 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
     return { data: dataWithNonNullClients, error: null };
 };
 
-type DriverPdfResponse =
-    | {
-          data: DriverOverviewTablesData;
-          error: null;
-      }
-    | {
-          data: null;
-          error: { type: DriverPdfErrorType; logId: string };
-      };
-
-type DriverPdfErrorType = ParcelsForDeliveryErrorType;
-
 const transformRowToDriverOverviewTableData = (
     parcel: ParcelForDelivery
 ): DriverOverviewRowData => {
@@ -107,13 +118,14 @@ const transformRowToDriverOverviewTableData = (
     const clientIsActive = parcel.client.is_active;
     return {
         name: clientIsActive ? client?.full_name ?? "" : displayNameForDeletedClient,
-        address: {
-            line1: client?.address_1 ?? "",
-            line2: client?.address_2 ?? null,
-            town: client?.address_town ?? null,
-            county: client?.address_county ?? null,
-            postcode: client?.address_postcode,
-        },
+        address: formatAddress(
+            client?.address_1,
+            client?.address_2,
+            client?.address_town,
+            client?.address_county,
+            client?.address_postcode,
+            false
+        ),
         contact: clientIsActive ? client?.phone_number ?? "" : "-",
         packingDate: formatDateStringAsDate(parcel.packing_date) ?? null,
         instructions: clientIsActive ? client?.delivery_instructions ?? "" : "-",
@@ -125,12 +137,29 @@ const transformRowToDriverOverviewTableData = (
 };
 
 const transformParcelDataToTableData = (parcels: ParcelForDelivery[]): DriverOverviewTablesData => {
-    const transformedParcels = parcels.map((parcel) =>
-        transformRowToDriverOverviewTableData(parcel)
+    const transformedParcels = parcels
+        .map((parcel) => transformRowToDriverOverviewTableData(parcel))
+        .filter((parcel) => parcel.clientIsActive);
+
+    const collectionCentreNames = Array.from(
+        new Set(
+            transformedParcels
+                .filter((parcel) => !parcel.isDelivery)
+                .map((parcel) => parcel.collectionCentre)
+        )
+    ).sort();
+
+    const collectionCentreData: DriverOverviewCollectionCentreData[] = collectionCentreNames.map(
+        (ccName) => {
+            return {
+                collectionCentreName: ccName,
+                rowData: transformedParcels.filter((parcel) => parcel.collectionCentre === ccName),
+            };
+        }
     );
 
     return {
-        collections: transformedParcels.filter((parcel) => !parcel.isDelivery),
+        collections: collectionCentreData,
         deliveries: transformedParcels.filter((parcel) => parcel.isDelivery),
     };
 };
@@ -144,70 +173,4 @@ const getDriverPdfData = async (parcelIds: string[]): Promise<DriverPdfResponse>
     return { data: tableData, error: null };
 };
 
-interface Props {
-    parcels: ParcelsTableRow[];
-    driverName: string | null;
-    date: Dayjs;
-    onPdfCreationCompleted: () => void;
-    onPdfCreationFailed: (error: DriverOverviewError) => void;
-    disabled: boolean;
-}
-
-export type DriverOverviewErrorType = DriverPdfErrorType | "driverMessageFetchFailed";
-export type DriverOverviewError = { type: DriverOverviewErrorType; logId: string };
-
-const DriverOverviewPdfButton = ({
-    parcels,
-    driverName,
-    date,
-    onPdfCreationCompleted,
-    onPdfCreationFailed,
-    disabled,
-}: Props): React.ReactElement => {
-    const fetchDataAndFileName = async (): Promise<
-        FileGenerationDataFetchResponse<DriverOverviewData, DriverOverviewErrorType>
-    > => {
-        const parcelIds = parcels.map((parcel) => {
-            return parcel.parcelId;
-        });
-        const { data: driverPdfData, error: driverPdfError } = await getDriverPdfData(parcelIds);
-        if (driverPdfError) {
-            return { data: null, error: driverPdfError };
-        }
-        const { data: driverMessageData, error: driverMessageError } = await supabase
-            .from("website_data")
-            .select("name, value")
-            .eq("name", "driver_overview_message")
-            .single();
-        if (driverMessageError) {
-            const logId = await logErrorReturnLogId("Error with fetch: Driver overview message", {
-                error: driverMessageError,
-            });
-            return { data: null, error: { type: "driverMessageFetchFailed", logId: logId } };
-        }
-        return {
-            data: {
-                fileData: {
-                    driverName: driverName,
-                    date: date.toDate(),
-                    tableData: driverPdfData,
-                    message: driverMessageData.value,
-                },
-                fileName: "DriverOverview.pdf",
-            },
-            error: null,
-        };
-    };
-    return (
-        <PdfButton
-            fetchDataAndFileName={fetchDataAndFileName}
-            pdfComponent={DriverOverviewPdf}
-            onFileCreationCompleted={onPdfCreationCompleted}
-            onFileCreationFailed={onPdfCreationFailed}
-            disabled={disabled}
-            formSubmitButton={true}
-        />
-    );
-};
-
-export default DriverOverviewPdfButton;
+export default getDriverPdfData;
