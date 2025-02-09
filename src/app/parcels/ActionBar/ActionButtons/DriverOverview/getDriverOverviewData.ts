@@ -1,17 +1,15 @@
 import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { displayNameForDeletedClient, formatDateStringAsDate } from "@/common/format";
+import {
+    displayNameForDeletedClient,
+    formatAddress,
+    formatDateStringAsDate,
+} from "@/common/format";
 
 export interface DriverOverviewRowData {
     name: string;
-    address: {
-        line1: string;
-        line2: string | null;
-        town: string | null;
-        county: string | null;
-        postcode: string | null;
-    };
+    address: string;
     contact?: string;
     packingDate: string | null;
     instructions?: string;
@@ -120,13 +118,14 @@ const transformRowToDriverOverviewTableData = (
     const clientIsActive = parcel.client.is_active;
     return {
         name: clientIsActive ? client?.full_name ?? "" : displayNameForDeletedClient,
-        address: {
-            line1: client?.address_1 ?? "",
-            line2: client?.address_2 ?? null,
-            town: client?.address_town ?? null,
-            county: client?.address_county ?? null,
-            postcode: client?.address_postcode,
-        },
+        address: formatAddress(
+            client?.address_1,
+            client?.address_2,
+            client?.address_town,
+            client?.address_county,
+            client?.address_postcode,
+            false
+        ),
         contact: clientIsActive ? client?.phone_number ?? "" : "-",
         packingDate: formatDateStringAsDate(parcel.packing_date) ?? null,
         instructions: clientIsActive ? client?.delivery_instructions ?? "" : "-",
