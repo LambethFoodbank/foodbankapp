@@ -149,7 +149,7 @@ export const onChangeTextDeferredError = <SpecificFields extends Fields>(
     };
 };
 
-export const onChangeCheckbox = <SpecificFields extends Fields>(
+export const onChangeCheckboxInGroup = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     currentObject: BooleanGroup,
     key: string
@@ -160,7 +160,7 @@ export const onChangeCheckbox = <SpecificFields extends Fields>(
     };
 };
 
-export const onChangeSingleCheckbox = <SpecificFields extends Fields>( // QQ: Make the other one "InGroup"
+export const onChangeSingleCheckbox = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     key: string
 ): ChangeEventHandler => {

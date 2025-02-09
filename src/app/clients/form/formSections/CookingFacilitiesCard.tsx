@@ -1,6 +1,6 @@
 import React from "react";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
-import { checkboxGroupToArray, onChangeCheckbox } from "@/components/Form/formFunctions";
+import { checkboxGroupToArray, onChangeCheckboxInGroup } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 
@@ -27,7 +27,7 @@ const CookingFacilitiesCard: React.FC<ClientCardProps> = ({ fieldSetter, fields 
         >
             <CheckboxGroupInput
                 labelsAndKeys={cookingFacilitiesLabelsAndKeys}
-                onChange={onChangeCheckbox(
+                onChange={onChangeCheckboxInGroup(
                     fieldSetter,
                     fields.cookingFacilities,
                     "cookingFacilities"
