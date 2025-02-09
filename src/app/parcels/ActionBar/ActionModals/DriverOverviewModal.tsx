@@ -11,9 +11,8 @@ import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import dayjs, { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 import { getStatusErrorMessageWithLogId } from "../Statuses";
-import DriverOverviewPdfButton, {
-    DriverOverviewError,
-} from "@/app/parcels/ActionBar/ActionButtons/DriverOverviewPdfButton";
+import DriverOverviewPdfButton from "@/app/parcels/ActionBar/ActionButtons/DriverOverview/DriverOverviewPdfButton";
+import { DriverOverviewError } from "../ActionButtons/DriverOverview/getDriverOverviewData";
 import { sendAuditLog } from "@/server/auditLog";
 import { displayNameForNullDriverName } from "@/common/format";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";

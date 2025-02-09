@@ -2,33 +2,15 @@
 
 import React from "react";
 import { Text, Document, Page, View, StyleSheet, Image } from "@react-pdf/renderer";
-import {
-    displayNameForNullDriverName,
-    displayPostcodeForHomelessClient,
-    formatDate,
-} from "@/common/format";
+import { displayNameForNullDriverName, formatDate } from "@/common/format";
 import { faTruck, faShoePrints, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import FontAwesomeIconPdfComponent from "@/pdf/FontAwesomeIconPdfComponent";
+import {
+    DriverOverviewRowData,
+    DriverOverviewTablesData,
+} from "@/app/parcels/ActionBar/ActionButtons/DriverOverview/getDriverOverviewData";
 
-export interface DriverOverviewRowData {
-    name: string;
-    address: {
-        line1: string;
-        line2: string | null;
-        town: string | null;
-        county: string | null;
-        postcode: string | null;
-    };
-    contact?: string;
-    packingDate: string | null;
-    instructions?: string;
-    clientIsActive: boolean;
-    numberOfLabels: number | null;
-    collectionCentre: string;
-    isDelivery: boolean;
-}
-
-export interface DriverOverviewCardDataProps {
+export interface DriverOverviewPdfData {
     driverName: string | null;
     date: Date;
     tableData: DriverOverviewTablesData;
@@ -36,18 +18,8 @@ export interface DriverOverviewCardDataProps {
 }
 
 interface DriverOverviewCardProps {
-    data: DriverOverviewCardDataProps;
+    data: DriverOverviewPdfData;
 }
-
-enum Method {
-    Delivery = "Delivery",
-    Collection = "Collection",
-}
-
-export type DriverOverviewTablesData = {
-    collections: DriverOverviewRowData[];
-    deliveries: DriverOverviewRowData[];
-};
 
 const styles = StyleSheet.create({
     container: {
@@ -120,7 +92,7 @@ const styles = StyleSheet.create({
         borderLeft: "1px solid black",
         borderBottom: "1px solid black",
         borderTop: "1px solid black",
-        height: 40,
+        height: 30,
     },
     nameColumnWidth: {
         width: "15%",
@@ -140,6 +112,10 @@ const styles = StyleSheet.create({
     instructionsColumnWidth: {
         width: "40%",
     },
+    tableTitle: {
+        marginBottom: "5px",
+        fontSize: 12,
+    },
     collectionOrDeliveryHeader: {
         marginRight: "5px",
         marginBottom: "5px",
@@ -155,7 +131,7 @@ const styles = StyleSheet.create({
 });
 
 const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
-    const createHeader = (category: Method): React.JSX.Element => {
+    const createTableHeader = (): React.JSX.Element => {
         return (
             <View
                 style={[
@@ -164,7 +140,6 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                     {
                         textDecoration: "underline",
                         fontFamily: "Helvetica-Bold",
-                        fontSize: 13,
                     },
                 ]}
             >
@@ -172,7 +147,7 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                     <Text>Name</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.addressColumnWidth]}>
-                    <Text>{category === Method.Collection ? "Collection Centre" : "Address"}</Text>
+                    <Text>Address</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.contactColumnWidth]}>
                     <Text>Contact</Text>
@@ -198,25 +173,7 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                     <Text>{rowData.name}</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.addressColumnWidth]}>
-                    {rowData.isDelivery ? (
-                        rowData.address.postcode || rowData.clientIsActive ? (
-                            <>
-                                <Text>{rowData.address.line1}</Text>
-                                <Text>{rowData.address.line2}</Text>
-                                <Text>{rowData.address.town}</Text>
-                                <Text>{rowData.address.county}</Text>
-                                <Text>{rowData.address.postcode}</Text>
-                            </>
-                        ) : (
-                            <Text>
-                                {rowData.clientIsActive ? displayPostcodeForHomelessClient : "-"}
-                            </Text>
-                        )
-                    ) : (
-                        <>
-                            <Text>{rowData.collectionCentre}</Text>
-                        </>
-                    )}
+                    <Text>{rowData.address}</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.contactColumnWidth]}>
                     <Text>{rowData.contact}</Text>
@@ -235,10 +192,26 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
     };
 
     const createTable = (
-        name: string,
-        header: React.JSX.Element,
-        tableRows: React.JSX.Element[],
-        icon: IconDefinition
+        tableName: string | null,
+        rows: DriverOverviewRowData[]
+    ): React.JSX.Element => {
+        return (
+            <View style={styles.tableContainer}>
+                {tableName && (
+                    <View style={styles.tableTitle}>
+                        <Text>{tableName}</Text>
+                    </View>
+                )}
+                <View style={[styles.flexColumn, { width: "100%" }]}>{createTableHeader()}</View>
+                <View style={[styles.tableSection, styles.flexColumn]}>{rows.map(createRow)}</View>
+            </View>
+        );
+    };
+
+    const createSection = (
+        sectionName: string,
+        icon: IconDefinition,
+        sectionTables: React.JSX.Element[]
     ): React.JSX.Element => {
         return (
             <View style={styles.tableContainer}>
@@ -249,32 +222,26 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                             { fontFamily: "Helvetica-Bold" },
                         ]}
                     >
-                        {name}
+                        {sectionName}
                     </Text>
                     <FontAwesomeIconPdfComponent faIcon={icon}></FontAwesomeIconPdfComponent>
                 </View>
-                <View style={[styles.flexColumn, { width: "100%" }]}>{header}</View>
-                <View style={[styles.tableSection, styles.flexColumn]}>{tableRows}</View>
+                {sectionTables}
             </View>
         );
     };
 
-    const deliveriesHeader: React.JSX.Element = createHeader(Method.Delivery);
-    const collectionsHeader: React.JSX.Element = createHeader(Method.Collection);
-    const collections: React.JSX.Element[] = data.tableData.collections
-        .filter((row) => row.name !== "Deleted Client")
-        .map(createRow);
-    const deliveries: React.JSX.Element[] = data.tableData.deliveries
-        .filter((row) => row.name !== "Deleted Client")
-        .map(createRow);
+    const deliveriesSection = createSection("Deliveries", faTruck, [
+        createTable(null, data.tableData.deliveries),
+    ]);
 
-    const collectionsTable = createTable(
+    const collectionsSection = createSection(
         "Collections",
-        collectionsHeader,
-        collections,
-        faShoePrints
+        faShoePrints,
+        data.tableData.collections.map((ccData) =>
+            createTable(ccData.collectionCentreName, ccData.rowData)
+        )
     );
-    const deliveriesTable = createTable("Deliveries", deliveriesHeader, deliveries, faTruck);
 
     return (
         <Document>
@@ -294,8 +261,8 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                     {/* eslint-disable-next-line -- needed to remove the need for alt text on the logo */}
                     <Image src="/logo.png" style={styles.logoStyling}></Image>
                 </View>
-                {deliveries.length && deliveriesTable}
-                {collections.length && collectionsTable}
+                {data.tableData.deliveries.length && deliveriesSection}
+                {data.tableData.collections.length && collectionsSection}
                 <View style={[styles.informationContainer, { alignSelf: "center" }]}>
                     <Text style={[styles.h3text, { textAlign: "center", marginBottom: "5px" }]}>
                         {data.message}
