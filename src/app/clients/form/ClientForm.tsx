@@ -25,7 +25,7 @@ import AddressCard from "@/app/clients/form/formSections/AddressCard";
 import NumberAdultsCard from "@/app/clients/form/formSections/NumberAdultsCard";
 import NumberChildrenCard from "@/app/clients/form/formSections/NumberChildrenCard";
 import DietaryRequirementCard from "@/app/clients/form/formSections/DietaryRequirementCard";
-import FeminineProductCard from "@/app/clients/form/formSections/FeminineProductCard";
+import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
 import BabyProductCard from "@/app/clients/form/formSections/BabyProductCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
@@ -64,7 +64,10 @@ export interface ClientFields extends Fields {
     listType: ListType | null;
     cookingFacilities: BooleanGroup;
     dietaryRequirements: BooleanGroup | null;
-    feminineProducts: BooleanGroup;
+    hygieneProductsTampons: string | null;
+    hygieneProductsPads: string | null;
+    hygieneProductsFemaleIncontinence: boolean;
+    hygieneProductsMaleIncontinence: boolean;
     babyProducts: boolean | null;
     nappySize: string;
     petFood: BooleanGroup;
@@ -103,7 +106,7 @@ const formSections = [
     ListTypeCard,
     CookingFacilitiesCard,
     DietaryRequirementCard,
-    FeminineProductCard,
+    HygieneProductsCard,
     BabyProductCard,
     PetFoodCard,
     OtherItemsCard,

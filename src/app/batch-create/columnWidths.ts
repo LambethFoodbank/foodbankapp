@@ -1,7 +1,6 @@
 export const ADDRESS_WIDTH = 300;
 export const LIST_TYPE_WIDTH = 150;
 export const DIETARY_REQUIREMENTS_WIDTH = 200;
-export const FEMININE_PRODUCTS_WIDTH = 200;
 export const PET_FOOD_WIDTH = 150;
 export const OTHER_ITEMS_WIDTH = 200;
 export const BABY_PRODUCTS_WIDTH = 200;

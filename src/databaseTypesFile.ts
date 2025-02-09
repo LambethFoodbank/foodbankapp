@@ -189,9 +189,12 @@ export type Database = {
           dietary_requirements: string[] | null
           extra_information: string | null
           family_id: string
-          feminine_products: string[] | null
           flagged_for_attention: boolean | null
           full_name: string | null
+          hygiene_female_incontinence: boolean | null
+          hygiene_male_incontinence: boolean | null
+          hygiene_pads: string | null
+          hygiene_tampons: string | null
           is_active: boolean
           last_updated: string
           notes: string | null
@@ -215,9 +218,12 @@ export type Database = {
           dietary_requirements?: string[] | null
           extra_information?: string | null
           family_id?: string
-          feminine_products?: string[] | null
           flagged_for_attention?: boolean | null
           full_name?: string | null
+          hygiene_female_incontinence?: boolean | null
+          hygiene_male_incontinence?: boolean | null
+          hygiene_pads?: string | null
+          hygiene_tampons?: string | null
           is_active?: boolean
           last_updated?: string
           notes?: string | null
@@ -241,9 +247,12 @@ export type Database = {
           dietary_requirements?: string[] | null
           extra_information?: string | null
           family_id?: string
-          feminine_products?: string[] | null
           flagged_for_attention?: boolean | null
           full_name?: string | null
+          hygiene_female_incontinence?: boolean | null
+          hygiene_male_incontinence?: boolean | null
+          hygiene_pads?: string | null
+          hygiene_tampons?: string | null
           is_active?: boolean
           last_updated?: string
           notes?: string | null
@@ -598,15 +607,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       status_order: {
         Row: {
@@ -728,13 +729,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lists"
             referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "profiles_user_id_fkey"
-            columns: ["actor_user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_audit_log_collection_centre_id_fkey"
@@ -1068,5 +1062,20 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 

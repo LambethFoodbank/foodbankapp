@@ -51,7 +51,10 @@ export const formatClientRecord = (
             fields.dietaryRequirements !== null
                 ? checkboxGroupToArray(fields.dietaryRequirements)
                 : null,
-        feminine_products: checkboxGroupToArray(fields.feminineProducts),
+        hygiene_tampons: fields.hygieneProductsTampons,
+        hygiene_pads: fields.hygieneProductsPads,
+        hygiene_female_incontinence: fields.hygieneProductsFemaleIncontinence,
+        hygiene_male_incontinence: fields.hygieneProductsMaleIncontinence,
         baby_food: fields.babyProducts,
         pet_food: checkboxGroupToArray(fields.petFood),
         other_items: checkboxGroupToArray(fields.otherItems),

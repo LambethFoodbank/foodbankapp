@@ -47,7 +47,6 @@ export interface OverrideClient {
     listType: ListType | null;
     cookingFacilities: BooleanGroup | null;
     dietaryRequirements: BooleanGroup | null;
-    feminineProducts: BooleanGroup | null;
     babyProducts: BabyProductsType | null;
     nappySize: string | null;
     petFood: BooleanGroup | null;

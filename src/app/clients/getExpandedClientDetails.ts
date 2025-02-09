@@ -14,7 +14,6 @@ import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
 import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
 import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
-import { feminineProductOptions } from "./form/formSections/FeminineProductCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
@@ -51,7 +50,10 @@ const getRawClientDetails = async (clientId: string) => {
 
             cooking_facilities,
             dietary_requirements,
-            feminine_products,
+            hygiene_tampons,
+            hygiene_pads,
+            hygiene_female_incontinence,
+            hygiene_male_incontinence,
             baby_food,
             pet_food,
             other_items,
@@ -95,7 +97,7 @@ export interface ExpandedClientData {
     children: string;
     cookingFacilities: string;
     dietaryRequirements: string;
-    feminineProducts: string;
+    hygieneProducts: string;
     babyProducts: boolean | null;
     petFood: string;
     otherRequirements: string;
@@ -125,9 +127,11 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.dietary_requirements,
             dietaryRequirementOptions
         ),
-        feminineProducts: formatRequirementsByCanonicalOrder(
-            client.feminine_products,
-            feminineProductOptions
+        hygieneProducts: formatHygieneProducts(
+            client.hygiene_tampons,
+            client.hygiene_pads,
+            client.hygiene_female_incontinence,
+            client.hygiene_male_incontinence
         ),
         babyProducts: client.baby_food,
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
@@ -263,6 +267,33 @@ export const formatRequirementsByCanonicalOrder = (
     }
 
     return sortArrayByCanonicalOrder(requirementsArray, canonicalOrder).join(", ");
+};
+
+export const formatHygieneProducts = (
+    tampons: string | null,
+    pads: string | null,
+    femaleIncontinence: boolean | null,
+    maleIncontinence: boolean | null
+): string => {
+    const items = [];
+
+    if (tampons !== null) {
+        items.push("Tampons" + (tampons.length > 0 ? ` (${tampons})` : ""));
+    }
+
+    if (pads !== null) {
+        items.push("Pads" + (pads.length > 0 ? ` (${pads})` : ""));
+    }
+
+    if (femaleIncontinence) {
+        items.push("Female incontinence pads");
+    }
+
+    if (maleIncontinence) {
+        items.push("Male incontinence pads");
+    }
+
+    return items.length > 0 ? items.join(", ") : "None";
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";

@@ -21,7 +21,6 @@ export interface BatchGridDisplayRow {
     children: number | null;
     listType: string;
     dietaryRequirements: string;
-    feminineProducts: string;
     babyProducts: string;
     petFood: string;
     otherItems: string;

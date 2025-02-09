@@ -43,7 +43,10 @@ const autofill = (
             clientData.dietary_requirements !== null
                 ? arrayToBooleanGroup(clientData.dietary_requirements)
                 : null,
-        feminineProducts: arrayToBooleanGroup(clientData.feminine_products ?? []),
+        hygieneProductsTampons: clientData.hygiene_tampons,
+        hygieneProductsPads: clientData.hygiene_pads,
+        hygieneProductsFemaleIncontinence: clientData.hygiene_female_incontinence ?? false,
+        hygieneProductsMaleIncontinence: clientData.hygiene_male_incontinence ?? false,
         babyProducts: clientData.baby_food,
         nappySize: nappySize.replace("Nappy Size: ", ""),
         petFood: arrayToBooleanGroup(clientData.pet_food ?? []),

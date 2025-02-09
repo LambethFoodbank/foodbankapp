@@ -49,9 +49,6 @@ const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRec
         dietary_requirements: client.dietaryRequirements
             ? checkboxGroupToArray(client.dietaryRequirements)
             : [],
-        feminine_products: client.feminineProducts
-            ? checkboxGroupToArray(client.feminineProducts)
-            : [],
         baby_food: client.babyProducts === "Yes",
         pet_food: client.petFood ? checkboxGroupToArray(client.petFood) : [],
         other_items: client.otherItems ? checkboxGroupToArray(client.otherItems) : [],

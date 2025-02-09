@@ -1,9 +1,11 @@
 import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient } from "@/common/format";
-import { formatRequirementsByCanonicalOrder } from "@/app/clients/getExpandedClientDetails";
+import {
+    formatHygieneProducts,
+    formatRequirementsByCanonicalOrder,
+} from "@/app/clients/getExpandedClientDetails";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
-import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 
@@ -20,9 +22,9 @@ export interface ClientSummary {
 }
 
 export interface RequirementSummary {
-    feminineProductsRequired: string;
-    babyProductsRequired: string;
-    petFoodRequired: string;
+    hygieneProducts: string;
+    babyProducts: string;
+    petFood: string;
     dietaryRequirements: string;
     otherItems: string;
     cookingFacilities: string;
@@ -83,12 +85,14 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
     }
 
     return {
-        feminineProductsRequired: formatRequirementsByCanonicalOrder(
-            clientData.feminine_products,
-            feminineProductOptions
+        hygieneProducts: formatHygieneProducts(
+            clientData.hygiene_tampons,
+            clientData.hygiene_pads,
+            clientData.hygiene_female_incontinence,
+            clientData.hygiene_male_incontinence
         ),
-        babyProductsRequired: babyProduct,
-        petFoodRequired: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),
+        babyProducts: babyProduct,
+        petFood: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),
         dietaryRequirements: formatRequirementsByCanonicalOrder(
             clientData.dietary_requirements,
             dietaryRequirementOptions

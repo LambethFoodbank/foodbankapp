@@ -160,6 +160,17 @@ export const onChangeCheckbox = <SpecificFields extends Fields>(
     };
 };
 
+export const onChangeSingleCheckbox = <SpecificFields extends Fields>( // QQ: Make the other one "InGroup"
+    fieldSetter: Setter<SpecificFields>,
+    key: string
+): ChangeEventHandler => {
+    return (event) => {
+        fieldSetter({ [key]: event.target.checked } as {
+            [key in keyof SpecificFields]: SpecificFields[key];
+        });
+    };
+};
+
 export const onChangeRadioGroup = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     key: string

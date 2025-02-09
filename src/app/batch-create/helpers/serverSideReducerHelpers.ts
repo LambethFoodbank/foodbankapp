@@ -93,7 +93,6 @@ export const getClientDataForBatchParcels = async (
         listType: data.default_list ?? "regular",
         cookingFacilities: createBooleanGroupFromStrings(data.cooking_facilities),
         dietaryRequirements: createBooleanGroupFromStrings(data.dietary_requirements),
-        feminineProducts: createBooleanGroupFromStrings(data.feminine_products),
         babyProducts: data.baby_food === true ? "Yes" : data.baby_food === false ? "No" : null,
         nappySize: getNappySize(data.extra_information),
         petFood: createBooleanGroupFromStrings(data.pet_food),
