@@ -66,7 +66,7 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
     const { data, error } = await supabase
         .from("parcels")
         .select(
-            "*, client:clients(*), events(event_data), collection_centre:collection_centres(*), collection_centres(name), clients(address_postcode)"
+            "*, client:clients(*), events(*), collection_centre:collection_centres(*), collection_centres(name), clients(address_postcode)"
         )
         .in("primary_key", parcelIds)
         .limit(1, { foreignTable: "clients" })
@@ -96,9 +96,21 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
             return { data: null, error: { type: "noCollectionCentre", logId: logId } };
         }
 
-        const event_data =
-            parcel.events.length > 0 ? parcel.events[parcel.events.length - 1].event_data : null;
-        const labelCount = event_data !== null ? Number.parseInt(event_data) : null;
+        const sortedParcelEvents = parcel.events.sort((event1, event2) => {
+            if (event1.timestamp > event2.timestamp) {
+                return 1;
+            }
+            if (event1.timestamp < event2.timestamp) {
+                return -1;
+            }
+            return 0;
+        });
+        const mostRecentEventData =
+            sortedParcelEvents.length > 0
+                ? sortedParcelEvents[sortedParcelEvents.length - 1].event_data
+                : null;
+        const labelCount =
+            mostRecentEventData !== null ? Number.parseInt(mostRecentEventData) : null;
 
         dataWithNonNullClients.push({
             ...parcel,
