@@ -18,6 +18,7 @@ import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
 import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
+import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -55,6 +56,9 @@ const getRawClientDetails = async (clientId: string) => {
             hygiene_pads,
             hygiene_other_items,
             baby_food,
+            baby_formula,
+            baby_nappies,
+            baby_other_items,
             pet_food,
             other_items,
             extra_information,
@@ -98,7 +102,7 @@ export interface ExpandedClientData {
     cookingFacilities: string;
     dietaryRequirements: string;
     hygieneProducts: string;
-    babyProducts: boolean | null;
+    babyProducts: string;
     petFood: string;
     otherRequirements: string;
     extraInformation: string;
@@ -132,7 +136,12 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.hygiene_pads,
             client.hygiene_other_items
         ),
-        babyProducts: client.baby_food,
+        babyProducts: formatBabyProducts(
+            client.baby_food,
+            client.baby_formula,
+            client.baby_nappies,
+            client.baby_other_items
+        ),
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
         otherRequirements: formatRequirementsByCanonicalOrder(
             client.other_items,
@@ -281,6 +290,33 @@ export const formatHygieneProducts = (
 
     if (hygieneOtherItems !== null && hygieneOtherItems.length > 0) {
         items.push(formatRequirementsByCanonicalOrder(hygieneOtherItems, hygieneOtherItemsOptions));
+    }
+
+    return items.length > 0 ? items.join(", ") : "None";
+};
+
+export const formatBabyProducts = (
+    babyFood: string | null,
+    babyFormula: string | null,
+    babyNappySize: string | null,
+    babyOtherItems: string[] | null
+): string => {
+    const items = [];
+
+    if (babyNappySize !== null) {
+        items.push("Nappies" + (babyNappySize.length > 0 ? ` (Size ${babyNappySize})` : ""));
+    }
+
+    if (babyFormula !== null) {
+        items.push("Formula" + (babyFormula.length > 0 ? ` (${babyFormula})` : ""));
+    }
+
+    if (babyFood !== null) {
+        items.push("Baby Food" + (babyFood.length > 0 ? ` (${babyFood})` : ""));
+    }
+
+    if (babyOtherItems !== null && babyOtherItems.length > 0) {
+        items.push(formatRequirementsByCanonicalOrder(babyOtherItems, babyOtherItemsOptions));
     }
 
     return items.length > 0 ? items.join(", ") : "None";

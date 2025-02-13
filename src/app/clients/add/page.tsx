@@ -22,8 +22,10 @@ const AddClients: () => React.ReactElement = () => {
         hygieneProductsTampons: null,
         hygieneProductsPads: null,
         hygieneOtherItems: {},
-        babyProducts: null,
-        nappySize: "",
+        babyFood: null,
+        babyFormula: null,
+        babyNappies: null,
+        babyOtherItems: {},
         petFood: {},
         otherItems: {},
         deliveryInstructions: "",
@@ -43,7 +45,6 @@ const AddClients: () => React.ReactElement = () => {
         numberOfAdults: Errors.initial,
         numberOfChildren: Errors.initial,
         listType: Errors.initial,
-        nappySize: Errors.none,
         deliveryInstructions: Errors.none,
     };
 

@@ -11,7 +11,6 @@ import {
     FamilyDatabaseInsertRecord,
     getFamilyMembersForDatabase,
 } from "@/app/clients/form/submitFormHelpers";
-import { EXTRA_INFORMATION_LABEL, NAPPY_SIZE_LABEL } from "@/app/clients/form/labels";
 import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import supabase from "@/supabaseClient";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
@@ -29,11 +28,6 @@ import dayjs from "dayjs";
 import { getDbDate } from "@/common/format";
 
 const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRecord => {
-    const extraInformationWithNappy =
-        client.nappySize === ""
-            ? client.extraInformation
-            : `${NAPPY_SIZE_LABEL}${client.nappySize}, ${EXTRA_INFORMATION_LABEL}${client.extraInformation}`;
-
     return {
         full_name: client.fullName,
         phone_number: client.phoneNumber,
@@ -49,11 +43,10 @@ const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRec
         dietary_requirements: client.dietaryRequirements
             ? checkboxGroupToArray(client.dietaryRequirements)
             : [],
-        baby_food: client.babyProducts === "Yes",
         pet_food: client.petFood ? checkboxGroupToArray(client.petFood) : [],
         other_items: client.otherItems ? checkboxGroupToArray(client.otherItems) : [],
         delivery_instructions: client.deliveryInstructions,
-        extra_information: extraInformationWithNappy,
+        extra_information: client.extraInformation,
         signposting_call_required: client.signpostingCall,
         signposting_call_reasons: client.signpostingCallReasons
             ? checkboxGroupToArray(client.signpostingCallReasons)

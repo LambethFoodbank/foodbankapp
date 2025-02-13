@@ -11,6 +11,7 @@ import { formatDatetimeAsDate, getDbDate } from "@/common/format";
 import { Dayjs } from "dayjs";
 import {
     formatAddressFromClientDetails,
+    formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
@@ -60,7 +61,7 @@ type SignpostingReportRow = {
     cookingFacilities: string;
     dietaryRequirements: string;
     hygieneProducts: string;
-    babyFoodRequired: boolean;
+    babyProducts: string;
     petFood: string;
     otherItems: string;
     household: string;
@@ -137,6 +138,9 @@ const getSignpostingReportData = async (
                 hygiene_pads,
                 hygiene_other_items,
                 baby_food,
+                baby_formula,
+                baby_nappies,
+                baby_other_items,
                 pet_food,
                 other_items,
 
@@ -217,7 +221,12 @@ const getSignpostingReportData = async (
                         rawParcel.client?.hygiene_pads ?? null,
                         rawParcel.client?.hygiene_other_items ?? []
                     ),
-                    babyFoodRequired: rawParcel.client?.baby_food ?? false,
+                    babyProducts: formatBabyProducts(
+                        rawParcel.client?.baby_food ?? null,
+                        rawParcel.client?.baby_formula ?? null,
+                        rawParcel.client?.baby_nappies ?? null,
+                        rawParcel.client?.baby_other_items ?? []
+                    ),
                     petFood: formatRequirementsByCanonicalOrder(
                         rawParcel.client?.pet_food ?? [],
                         petFoodOptions

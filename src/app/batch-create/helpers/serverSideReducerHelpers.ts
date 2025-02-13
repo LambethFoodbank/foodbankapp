@@ -6,11 +6,7 @@ import {
 import dayjs from "dayjs";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { BatchClient } from "@/app/batch-create/types";
-import {
-    createBooleanGroupFromStrings,
-    getNappySize,
-    parseExtraInfo,
-} from "@/app/batch-create/helpers/clientSideReducerHelpers";
+import { createBooleanGroupFromStrings } from "@/app/batch-create/helpers/clientSideReducerHelpers";
 
 const getChildrenAndAdults = async (
     familyId: string
@@ -93,12 +89,10 @@ export const getClientDataForBatchParcels = async (
         listType: data.default_list ?? "regular",
         cookingFacilities: createBooleanGroupFromStrings(data.cooking_facilities),
         dietaryRequirements: createBooleanGroupFromStrings(data.dietary_requirements),
-        babyProducts: data.baby_food === true ? "Yes" : data.baby_food === false ? "No" : null,
-        nappySize: getNappySize(data.extra_information),
         petFood: createBooleanGroupFromStrings(data.pet_food),
         otherItems: createBooleanGroupFromStrings(data.other_items),
         deliveryInstructions: data.delivery_instructions,
-        extraInformation: parseExtraInfo(data.extra_information),
+        extraInformation: data.extra_information,
         attentionFlag: data.flagged_for_attention ?? false,
         signpostingCall: data.signposting_call_required ?? false,
         signpostingCallReasons: createBooleanGroupFromStrings(data.signposting_call_reasons),

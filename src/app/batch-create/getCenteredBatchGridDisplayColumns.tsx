@@ -4,7 +4,6 @@ import { Button } from "@mui/material";
 import { isPhoneNumberValid } from "@/app/batch-create/helpers/fieldValidationFunctions";
 import {
     ADDRESS_WIDTH,
-    BABY_PRODUCTS_WIDTH,
     MULTILINE_POPOVER_WIDTH,
     DIETARY_REQUIREMENTS_WIDTH,
     LIST_TYPE_WIDTH,
@@ -27,7 +26,6 @@ import BooleanGroupEditCell from "@/app/batch-create/inputComponents/BooleanGrou
 import { dietaryRequirementLabelsAndKeys } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { petFoodLabelsAndKeys } from "@/app/clients/form/formSections/PetFoodCard";
 import { otherItemsLabelsAndKeys } from "@/app/clients/form/formSections/OtherItemsCard";
-import BabyProductsEditCell from "@/app/batch-create/inputComponents/BabyProductsEditCell";
 import TextFieldEditCell from "@/app/batch-create/inputComponents/MultilinePopoverEditCell";
 import BooleanClientEditCell from "@/app/batch-create/inputComponents/BooleanClientEditCell";
 import ShippingMethodEditCell from "@/app/batch-create/inputComponents/ShippingMethodEditCell";
@@ -171,21 +169,6 @@ const getCenteredBatchGridDisplayColumns = (
                         clientField="dietaryRequirements"
                         fieldWidth={DIETARY_REQUIREMENTS_WIDTH}
                         booleanGroupLabelAndKeys={dietaryRequirementLabelsAndKeys}
-                    />
-                );
-            },
-        },
-        {
-            field: "babyProducts",
-            headerName: "Baby Products *",
-            width: BABY_PRODUCTS_WIDTH,
-            editable: true,
-            renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
-                return (
-                    <BabyProductsEditCell
-                        gridRenderCellParams={gridRenderCellParams}
-                        dispatchBatchTableAction={dispatch}
-                        tableState={tableState}
                     />
                 );
             },

@@ -26,7 +26,7 @@ import NumberAdultsCard from "@/app/clients/form/formSections/NumberAdultsCard";
 import NumberChildrenCard from "@/app/clients/form/formSections/NumberChildrenCard";
 import DietaryRequirementCard from "@/app/clients/form/formSections/DietaryRequirementCard";
 import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
-import BabyProductCard from "@/app/clients/form/formSections/BabyProductCard";
+import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
 import DeliveryInstructionsCard from "@/app/clients/form/formSections/DeliveryInstructionsCard";
@@ -67,8 +67,10 @@ export interface ClientFields extends Fields {
     hygieneProductsTampons: string | null;
     hygieneProductsPads: string | null;
     hygieneOtherItems: BooleanGroup;
-    babyProducts: boolean | null;
-    nappySize: string;
+    babyFood: string | null;
+    babyFormula: string | null;
+    babyNappies: string | null;
+    babyOtherItems: BooleanGroup;
     petFood: BooleanGroup;
     otherItems: BooleanGroup;
     deliveryInstructions: string;
@@ -88,7 +90,6 @@ export interface ClientErrors extends FormErrors<ClientFields> {
     numberOfAdults: Errors;
     numberOfChildren: Errors;
     listType: Errors;
-    nappySize: Errors;
     deliveryInstructions: Errors;
 }
 
@@ -106,7 +107,7 @@ const formSections = [
     CookingFacilitiesCard,
     DietaryRequirementCard,
     HygieneProductsCard,
-    BabyProductCard,
+    BabyProductsCard,
     PetFoodCard,
     OtherItemsCard,
     DeliveryInstructionsCard,

@@ -5,7 +5,6 @@ import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { ClientFields } from "./ClientForm";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
-import { EXTRA_INFORMATION_LABEL, NAPPY_SIZE_LABEL } from "@/app/clients/form/labels";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
@@ -32,11 +31,6 @@ export const getFamilyMembersForDatabase = (
 export const formatClientRecord = (
     fields: ClientFields
 ): ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord => {
-    const extraInformationWithNappy =
-        fields.nappySize === ""
-            ? fields.extraInformation
-            : `${NAPPY_SIZE_LABEL}${fields.nappySize}, ${EXTRA_INFORMATION_LABEL}${fields.extraInformation}`;
-
     return {
         full_name: fields.fullName,
         phone_number: fields.phoneNumber,
@@ -54,11 +48,14 @@ export const formatClientRecord = (
         hygiene_tampons: fields.hygieneProductsTampons,
         hygiene_pads: fields.hygieneProductsPads,
         hygiene_other_items: checkboxGroupToArray(fields.hygieneOtherItems),
-        baby_food: fields.babyProducts,
+        baby_food: fields.babyFood,
+        baby_formula: fields.babyFormula,
+        baby_nappies: fields.babyNappies,
+        baby_other_items: checkboxGroupToArray(fields.babyOtherItems),
         pet_food: checkboxGroupToArray(fields.petFood),
         other_items: checkboxGroupToArray(fields.otherItems),
         delivery_instructions: fields.deliveryInstructions,
-        extra_information: extraInformationWithNappy,
+        extra_information: fields.extraInformation,
         signposting_call_required: fields.signpostingCall,
         signposting_call_reasons:
             fields.signpostingCall && fields.signpostingCallReasons !== null

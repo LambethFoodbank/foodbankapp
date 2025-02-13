@@ -65,7 +65,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
         addressPostcode: Errors.none,
         numberOfAdults: Errors.none,
         numberOfChildren: Errors.none,
-        nappySize: Errors.none,
+        babyNappies: Errors.none,
         listType: Errors.none,
         deliveryInstructions: Errors.none,
     };

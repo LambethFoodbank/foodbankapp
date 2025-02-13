@@ -28,8 +28,6 @@ export interface CollectionInfo {
     collectionCentreAcronymn: string;
 }
 
-type BabyProductsType = "Yes" | "No" | "Don't Know";
-
 export interface OverrideClient {
     [key: string]:
         | string
@@ -47,8 +45,6 @@ export interface OverrideClient {
     listType: ListType | null;
     cookingFacilities: BooleanGroup | null;
     dietaryRequirements: BooleanGroup | null;
-    babyProducts: BabyProductsType | null;
-    nappySize: string | null;
     petFood: BooleanGroup | null;
     otherItems: BooleanGroup | null;
     deliveryInstructions: string | null;

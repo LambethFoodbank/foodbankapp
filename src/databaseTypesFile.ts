@@ -182,7 +182,10 @@ export type Database = {
           address_county: string | null
           address_postcode: string | null
           address_town: string | null
-          baby_food: boolean | null
+          baby_food: string | null
+          baby_formula: string | null
+          baby_nappies: string | null
+          baby_other_items: string[] | null
           cooking_facilities: string[] | null
           default_list: Database["public"]["Enums"]["list_type"]
           delivery_instructions: string | null
@@ -210,7 +213,10 @@ export type Database = {
           address_county?: string | null
           address_postcode?: string | null
           address_town?: string | null
-          baby_food?: boolean | null
+          baby_food?: string | null
+          baby_formula?: string | null
+          baby_nappies?: string | null
+          baby_other_items?: string[] | null
           cooking_facilities?: string[] | null
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
@@ -238,7 +244,10 @@ export type Database = {
           address_county?: string | null
           address_postcode?: string | null
           address_town?: string | null
-          baby_food?: boolean | null
+          baby_food?: string | null
+          baby_formula?: string | null
+          baby_nappies?: string | null
+          baby_other_items?: string[] | null
           cooking_facilities?: string[] | null
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
