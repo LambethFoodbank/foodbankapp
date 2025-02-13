@@ -17,6 +17,7 @@ import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
+import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -52,8 +53,7 @@ const getRawClientDetails = async (clientId: string) => {
             dietary_requirements,
             hygiene_tampons,
             hygiene_pads,
-            hygiene_female_incontinence,
-            hygiene_male_incontinence,
+            hygiene_other_items,
             baby_food,
             pet_food,
             other_items,
@@ -130,8 +130,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         hygieneProducts: formatHygieneProducts(
             client.hygiene_tampons,
             client.hygiene_pads,
-            client.hygiene_female_incontinence,
-            client.hygiene_male_incontinence
+            client.hygiene_other_items
         ),
         babyProducts: client.baby_food,
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
@@ -268,8 +267,7 @@ export const formatRequirementsByCanonicalOrder = (
 export const formatHygieneProducts = (
     tampons: string | null,
     pads: string | null,
-    femaleIncontinence: boolean | null,
-    maleIncontinence: boolean | null
+    hygieneOtherItems: string[] | null
 ): string => {
     const items = [];
 
@@ -281,12 +279,8 @@ export const formatHygieneProducts = (
         items.push("Pads" + (pads.length > 0 ? ` (${pads})` : ""));
     }
 
-    if (femaleIncontinence) {
-        items.push("Female incontinence pads");
-    }
-
-    if (maleIncontinence) {
-        items.push("Male incontinence pads");
+    if (hygieneOtherItems !== null && hygieneOtherItems.length > 0) {
+        items.push(formatRequirementsByCanonicalOrder(hygieneOtherItems, hygieneOtherItemsOptions));
     }
 
     return items.length > 0 ? items.join(", ") : "None";

@@ -191,8 +191,7 @@ export type Database = {
           family_id: string
           flagged_for_attention: boolean | null
           full_name: string | null
-          hygiene_female_incontinence: boolean | null
-          hygiene_male_incontinence: boolean | null
+          hygiene_other_items: string[] | null
           hygiene_pads: string | null
           hygiene_tampons: string | null
           is_active: boolean
@@ -220,8 +219,7 @@ export type Database = {
           family_id?: string
           flagged_for_attention?: boolean | null
           full_name?: string | null
-          hygiene_female_incontinence?: boolean | null
-          hygiene_male_incontinence?: boolean | null
+          hygiene_other_items?: string[] | null
           hygiene_pads?: string | null
           hygiene_tampons?: string | null
           is_active?: boolean
@@ -249,8 +247,7 @@ export type Database = {
           family_id?: string
           flagged_for_attention?: boolean | null
           full_name?: string | null
-          hygiene_female_incontinence?: boolean | null
-          hygiene_male_incontinence?: boolean | null
+          hygiene_other_items?: string[] | null
           hygiene_pads?: string | null
           hygiene_tampons?: string | null
           is_active?: boolean

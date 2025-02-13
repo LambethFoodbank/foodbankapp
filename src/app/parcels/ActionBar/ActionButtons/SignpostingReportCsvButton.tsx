@@ -135,8 +135,7 @@ const getSignpostingReportData = async (
                 dietary_requirements,
                 hygiene_tampons,
                 hygiene_pads,
-                hygiene_female_incontinence,
-                hygiene_male_incontinence,
+                hygiene_other_items,
                 baby_food,
                 pet_food,
                 other_items,
@@ -216,8 +215,7 @@ const getSignpostingReportData = async (
                     hygieneProducts: formatHygieneProducts(
                         rawParcel.client?.hygiene_tampons ?? null,
                         rawParcel.client?.hygiene_pads ?? null,
-                        rawParcel.client?.hygiene_female_incontinence ?? null,
-                        rawParcel.client?.hygiene_male_incontinence ?? null
+                        rawParcel.client?.hygiene_other_items ?? []
                     ),
                     babyFoodRequired: rawParcel.client?.baby_food ?? false,
                     petFood: formatRequirementsByCanonicalOrder(

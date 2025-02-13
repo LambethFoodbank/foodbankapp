@@ -92,8 +92,7 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
         hygieneProducts: formatHygieneProducts(
             clientData.hygiene_tampons,
             clientData.hygiene_pads,
-            clientData.hygiene_female_incontinence,
-            clientData.hygiene_male_incontinence
+            clientData.hygiene_other_items
         ),
         babyProducts: babyProduct,
         petFood: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),

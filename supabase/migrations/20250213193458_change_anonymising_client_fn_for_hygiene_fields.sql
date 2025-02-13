@@ -29,8 +29,7 @@ BEGIN
         signposting_call_reasons = null,
         hygiene_tampons = null,
         hygiene_pads = null,
-        hygiene_female_incontinence = null,
-        hygiene_male_incontinence = null
+        hygiene_other_items = null
     WHERE
         primary_key = clientId;
 

@@ -1,13 +1,24 @@
 import React, { useState } from "react";
 import {
+    checkboxGroupToArray,
     getDefaultTextValue,
-    onChangeSingleCheckbox,
+    onChangeCheckboxInGroup,
     onChangeText,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
+import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
+
+export const hygieneOtherItemsOptions: string[] = [
+    "Female Incontinence Pads",
+    "Male Incontinence Pads",
+];
+
+export const hygieneOtherItemsLabelsAndKeys: [string, string][] = hygieneOtherItemsOptions.map(
+    (optionName) => [optionName, optionName]
+);
 
 const HygieneProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter, fields }) => {
     const [tamponsRequired, setTamponsRequired] = useState(
@@ -64,30 +75,14 @@ const HygieneProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSett
                     />
                 )}
 
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={fields.hygieneProductsFemaleIncontinence}
-                            onChange={onChangeSingleCheckbox(
-                                fieldSetter,
-                                "hygieneProductsFemaleIncontinence"
-                            )}
-                        />
-                    }
-                    label="Female Incontinence Pads"
-                />
-
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={fields.hygieneProductsMaleIncontinence}
-                            onChange={onChangeSingleCheckbox(
-                                fieldSetter,
-                                "hygieneProductsMaleIncontinence"
-                            )}
-                        />
-                    }
-                    label="Male Incontinence Pads"
+                <CheckboxGroupInput
+                    labelsAndKeys={hygieneOtherItemsLabelsAndKeys}
+                    onChange={onChangeCheckboxInGroup(
+                        fieldSetter,
+                        fields.hygieneOtherItems,
+                        "hygieneOtherItems"
+                    )}
+                    checkedKeys={checkboxGroupToArray(fields.hygieneOtherItems)}
                 />
             </FormGroup>
         </GenericFormCard>

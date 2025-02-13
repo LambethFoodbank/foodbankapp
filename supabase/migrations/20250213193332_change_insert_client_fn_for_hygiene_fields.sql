@@ -30,8 +30,7 @@ BEGIN
         signposting_call_reasons,
         hygiene_tampons,
         hygiene_pads,
-        hygiene_female_incontinence,
-        hygiene_male_incontinence
+        hygiene_other_items
     )
     VALUES (
         clientRecord->>'full_name',
@@ -88,13 +87,8 @@ BEGIN
         clientRecord->>'hygiene_tampons',
         clientRecord->>'hygiene_pads',
         CASE
-            WHEN clientRecord->>'hygiene_female_incontinence' = 'true' THEN TRUE
-            WHEN clientRecord->>'hygiene_female_incontinence' = 'false' THEN FALSE
-            ELSE NULL
-        END,
-        CASE
-            WHEN clientRecord->>'hygiene_male_incontinence' = 'true' THEN TRUE
-            WHEN clientRecord->>'hygiene_male_incontinence' = 'false' THEN FALSE
+            WHEN jsonb_typeof(clientRecord->'hygiene_other_items') = 'array'
+                THEN array(select * from jsonb_array_elements_text(clientRecord->'hygiene_other_items'))
             ELSE NULL
         END
     )

@@ -66,8 +66,7 @@ export interface ClientFields extends Fields {
     dietaryRequirements: BooleanGroup | null;
     hygieneProductsTampons: string | null;
     hygieneProductsPads: string | null;
-    hygieneProductsFemaleIncontinence: boolean;
-    hygieneProductsMaleIncontinence: boolean;
+    hygieneOtherItems: BooleanGroup;
     babyProducts: boolean | null;
     nappySize: string;
     petFood: BooleanGroup;
