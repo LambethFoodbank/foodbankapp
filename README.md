@@ -136,6 +136,11 @@ You can either
   ```
   and write sql queries yourself (not recommended)
 
+Note that the `db diff` command doesn't register that the generated migration has already been applied to your local table, which is indicated if you run `npx supabase migration up --local` and it fails due to the changes in your new migration having already happened in your local db. In that case, you need to run:
+```shell
+npx supabase migration repair <timestamp_of_migration> --local --status applied
+```
+
 *WARNING*: If you're recreating a view in your migration, make sure you create it `with(security_invoker = true)`, or the view is publicly available.
 
 #### Update the TypeScript database type definition

@@ -20,8 +20,6 @@ const getEmptyRow = (id: number): BatchGridDisplayRow => {
         children: null,
         listType: "",
         dietaryRequirements: "",
-        feminineProducts: "",
-        babyProducts: "",
         petFood: "",
         otherItems: "",
         deliveryInstructions: "",
@@ -77,9 +75,6 @@ const overrideDataToOverrideDisplayRow = (dataRow: OverrideDataRow): BatchGridDi
         childrenInfo,
         listType,
         dietaryRequirements,
-        feminineProducts,
-        babyProducts,
-        nappySize,
         petFood,
         otherItems,
         deliveryInstructions,
@@ -103,11 +98,6 @@ const overrideDataToOverrideDisplayRow = (dataRow: OverrideDataRow): BatchGridDi
             : null,
         listType: listType ? capitaliseWords(listType) : "",
         dietaryRequirements: dietaryRequirements ? booleanGroupToString(dietaryRequirements) : "",
-        feminineProducts: feminineProducts ? booleanGroupToString(feminineProducts) : "",
-        babyProducts:
-            babyProducts === "Yes"
-                ? `Yes${nappySize ? ", Nappy Size: " + nappySize : ""}`
-                : babyProducts ?? "",
         petFood: petFood ? booleanGroupToString(petFood) : "",
         otherItems: otherItems ? booleanGroupToString(otherItems) : "",
         deliveryInstructions: deliveryInstructions ?? "",
@@ -135,9 +125,6 @@ const batchDataToBatchDisplayRow = (dataRow: BatchDataRow): BatchGridDisplayRow 
         childrenInfo,
         listType,
         dietaryRequirements,
-        feminineProducts,
-        babyProducts,
-        nappySize,
         petFood,
         otherItems,
         deliveryInstructions,
@@ -167,11 +154,6 @@ const batchDataToBatchDisplayRow = (dataRow: BatchDataRow): BatchGridDisplayRow 
             : null,
         listType: listType ? capitaliseWords(listType) : "",
         dietaryRequirements: dietaryRequirements ? booleanGroupToString(dietaryRequirements) : "",
-        feminineProducts: feminineProducts ? booleanGroupToString(feminineProducts) : "",
-        babyProducts:
-            babyProducts === "Yes"
-                ? `Yes${nappySize ? ", Nappy Size: " + nappySize : ""}`
-                : babyProducts ?? "",
         petFood: petFood ? booleanGroupToString(petFood) : "",
         otherItems: otherItems ? booleanGroupToString(otherItems) : "",
         deliveryInstructions: deliveryInstructions ?? "",

@@ -6,11 +6,7 @@ import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import EditCellPopover from "@/app/batch-create/inputComponents/EditCellPopover";
 import BooleanGroupEditCellInput from "@/app/batch-create/inputComponents/BooleanGroupEditCellInput";
 
-export type clientBooleanGroupFields =
-    | "dietaryRequirements"
-    | "feminineProducts"
-    | "petFood"
-    | "otherItems";
+export type clientBooleanGroupFields = "dietaryRequirements" | "petFood" | "otherItems";
 
 interface BooleanGroupEditCellProps {
     gridRenderCellParams: GridRenderCellParams;

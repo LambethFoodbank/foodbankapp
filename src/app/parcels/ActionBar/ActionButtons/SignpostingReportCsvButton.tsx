@@ -11,14 +11,15 @@ import { formatDatetimeAsDate, getDbDate } from "@/common/format";
 import { Dayjs } from "dayjs";
 import {
     formatAddressFromClientDetails,
+    formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
+    formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
-import { feminineProductOptions } from "@/app/clients/form/formSections/FeminineProductCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
@@ -59,8 +60,8 @@ type SignpostingReportRow = {
     notes: string;
     cookingFacilities: string;
     dietaryRequirements: string;
-    feminineProducts: string;
-    babyFoodRequired: boolean;
+    hygieneProducts: string;
+    babyProducts: string;
     petFood: string;
     otherItems: string;
     household: string;
@@ -133,8 +134,13 @@ const getSignpostingReportData = async (
                 address_postcode,
                 cooking_facilities,
                 dietary_requirements,
-                feminine_products,
+                hygiene_tampons,
+                hygiene_pads,
+                hygiene_other_items,
                 baby_food,
+                baby_formula,
+                baby_nappies,
+                baby_other_items,
                 pet_food,
                 other_items,
 
@@ -210,11 +216,17 @@ const getSignpostingReportData = async (
                         rawParcel.client?.dietary_requirements ?? [],
                         dietaryRequirementOptions
                     ),
-                    feminineProducts: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.feminine_products ?? [],
-                        feminineProductOptions
+                    hygieneProducts: formatHygieneProducts(
+                        rawParcel.client?.hygiene_tampons ?? null,
+                        rawParcel.client?.hygiene_pads ?? null,
+                        rawParcel.client?.hygiene_other_items ?? []
                     ),
-                    babyFoodRequired: rawParcel.client?.baby_food ?? false,
+                    babyProducts: formatBabyProducts(
+                        rawParcel.client?.baby_food ?? null,
+                        rawParcel.client?.baby_formula ?? null,
+                        rawParcel.client?.baby_nappies ?? null,
+                        rawParcel.client?.baby_other_items ?? []
+                    ),
                     petFood: formatRequirementsByCanonicalOrder(
                         rawParcel.client?.pet_food ?? [],
                         petFoodOptions

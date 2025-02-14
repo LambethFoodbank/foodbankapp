@@ -14,10 +14,11 @@ import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
 import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
 import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
-import { feminineProductOptions } from "./form/formSections/FeminineProductCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
+import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
+import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -51,8 +52,13 @@ const getRawClientDetails = async (clientId: string) => {
 
             cooking_facilities,
             dietary_requirements,
-            feminine_products,
+            hygiene_tampons,
+            hygiene_pads,
+            hygiene_other_items,
             baby_food,
+            baby_formula,
+            baby_nappies,
+            baby_other_items,
             pet_food,
             other_items,
             extra_information,
@@ -95,8 +101,8 @@ export interface ExpandedClientData {
     children: string;
     cookingFacilities: string;
     dietaryRequirements: string;
-    feminineProducts: string;
-    babyProducts: boolean | null;
+    hygieneProducts: string;
+    babyProducts: string;
     petFood: string;
     otherRequirements: string;
     extraInformation: string;
@@ -125,11 +131,17 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.dietary_requirements,
             dietaryRequirementOptions
         ),
-        feminineProducts: formatRequirementsByCanonicalOrder(
-            client.feminine_products,
-            feminineProductOptions
+        hygieneProducts: formatHygieneProducts(
+            client.hygiene_tampons,
+            client.hygiene_pads,
+            client.hygiene_other_items
         ),
-        babyProducts: client.baby_food,
+        babyProducts: formatBabyProducts(
+            client.baby_food,
+            client.baby_formula,
+            client.baby_nappies,
+            client.baby_other_items
+        ),
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
         otherRequirements: formatRequirementsByCanonicalOrder(
             client.other_items,
@@ -259,6 +271,55 @@ export const formatRequirementsByCanonicalOrder = (
     }
 
     return sortArrayByCanonicalOrder(requirementsArray, canonicalOrder).join(", ");
+};
+
+export const formatHygieneProducts = (
+    tampons: string | null,
+    pads: string | null,
+    hygieneOtherItems: string[] | null
+): string => {
+    const items = [];
+
+    if (tampons !== null) {
+        items.push("Tampons" + (tampons.length > 0 ? ` (${tampons})` : ""));
+    }
+
+    if (pads !== null) {
+        items.push("Pads" + (pads.length > 0 ? ` (${pads})` : ""));
+    }
+
+    if (hygieneOtherItems !== null && hygieneOtherItems.length > 0) {
+        items.push(formatRequirementsByCanonicalOrder(hygieneOtherItems, hygieneOtherItemsOptions));
+    }
+
+    return items.length > 0 ? items.join(", ") : "None";
+};
+
+export const formatBabyProducts = (
+    babyFood: string | null,
+    babyFormula: string | null,
+    babyNappySize: string | null,
+    babyOtherItems: string[] | null
+): string => {
+    const items = [];
+
+    if (babyNappySize !== null) {
+        items.push("Nappies" + (babyNappySize.length > 0 ? ` (Size ${babyNappySize})` : ""));
+    }
+
+    if (babyFormula !== null) {
+        items.push("Formula" + (babyFormula.length > 0 ? ` (${babyFormula})` : ""));
+    }
+
+    if (babyFood !== null) {
+        items.push("Baby Food" + (babyFood.length > 0 ? ` (${babyFood})` : ""));
+    }
+
+    if (babyOtherItems !== null && babyOtherItems.length > 0) {
+        items.push(formatRequirementsByCanonicalOrder(babyOtherItems, babyOtherItemsOptions));
+    }
+
+    return items.length > 0 ? items.join(", ") : "None";
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";

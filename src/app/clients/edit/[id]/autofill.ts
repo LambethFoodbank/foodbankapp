@@ -1,7 +1,6 @@
 import { Schema } from "@/databaseUtils";
 import { ClientFields } from "@/app/clients/form/ClientForm";
 import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
-import { processExtraInformation } from "@/common/formatClientsData";
 import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
 import { getFormattedPeople } from "@/common/formatFamiliesData";
 
@@ -18,10 +17,6 @@ const autofill = (
     const children = getFormattedPeople(familyData, isChildFamilyMember);
 
     const adults = getFormattedPeople(familyData, isAdultFamilyMember);
-
-    const { nappySize, extraInformation } = processExtraInformation(
-        clientData.extra_information ?? ""
-    );
 
     const noPostcode = clientData.address_postcode === null;
 
@@ -43,13 +38,17 @@ const autofill = (
             clientData.dietary_requirements !== null
                 ? arrayToBooleanGroup(clientData.dietary_requirements)
                 : null,
-        feminineProducts: arrayToBooleanGroup(clientData.feminine_products ?? []),
-        babyProducts: clientData.baby_food,
-        nappySize: nappySize.replace("Nappy Size: ", ""),
+        hygieneProductsTampons: clientData.hygiene_tampons,
+        hygieneProductsPads: clientData.hygiene_pads,
+        hygieneOtherItems: arrayToBooleanGroup(clientData.hygiene_other_items ?? []),
+        babyFood: clientData.baby_food,
+        babyFormula: clientData.baby_formula,
+        babyNappies: clientData.baby_nappies,
+        babyOtherItems: arrayToBooleanGroup(clientData.baby_other_items ?? []),
         petFood: arrayToBooleanGroup(clientData.pet_food ?? []),
         otherItems: arrayToBooleanGroup(clientData.other_items ?? []),
         deliveryInstructions: clientData.delivery_instructions ?? "",
-        extraInformation: extraInformation,
+        extraInformation: clientData.extra_information ?? "",
         attentionFlag: clientData.flagged_for_attention ?? false,
         signpostingCall: clientData.signposting_call_required ?? false,
         signpostingCallReasons: arrayToBooleanGroup(clientData.signposting_call_reasons ?? []),

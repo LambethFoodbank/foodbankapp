@@ -1,7 +1,7 @@
 import React from "react";
 import {
     checkboxGroupToArray,
-    onChangeCheckbox,
+    onChangeCheckboxInGroup,
     onChangeRadioGroup,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
@@ -43,7 +43,7 @@ const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields })
                 <CheckboxGroupInput
                     groupLabel="What do they need help with? Tick all that apply. For 'Other', put details in the 'Extra Information' section."
                     labelsAndKeys={signpostingCallLabelsAndKeys}
-                    onChange={onChangeCheckbox(
+                    onChange={onChangeCheckboxInGroup(
                         fieldSetter,
                         fields.signpostingCallReasons ?? {},
                         "signpostingCallReasons"

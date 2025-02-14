@@ -4,10 +4,8 @@ import { Button } from "@mui/material";
 import { isPhoneNumberValid } from "@/app/batch-create/helpers/fieldValidationFunctions";
 import {
     ADDRESS_WIDTH,
-    BABY_PRODUCTS_WIDTH,
     MULTILINE_POPOVER_WIDTH,
     DIETARY_REQUIREMENTS_WIDTH,
-    FEMININE_PRODUCTS_WIDTH,
     LIST_TYPE_WIDTH,
     OTHER_ITEMS_WIDTH,
     PET_FOOD_WIDTH,
@@ -26,10 +24,8 @@ import AddressEditCell from "@/app/batch-create/inputComponents/AddressEditCell"
 import ListTypeEditCell from "@/app/batch-create/inputComponents/ListTypeEditCell";
 import BooleanGroupEditCell from "@/app/batch-create/inputComponents/BooleanGroupEditCell";
 import { dietaryRequirementLabelsAndKeys } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { feminineProductLabelsAndKeys } from "@/app/clients/form/formSections/FeminineProductCard";
 import { petFoodLabelsAndKeys } from "@/app/clients/form/formSections/PetFoodCard";
 import { otherItemsLabelsAndKeys } from "@/app/clients/form/formSections/OtherItemsCard";
-import BabyProductsEditCell from "@/app/batch-create/inputComponents/BabyProductsEditCell";
 import TextFieldEditCell from "@/app/batch-create/inputComponents/MultilinePopoverEditCell";
 import BooleanClientEditCell from "@/app/batch-create/inputComponents/BooleanClientEditCell";
 import ShippingMethodEditCell from "@/app/batch-create/inputComponents/ShippingMethodEditCell";
@@ -173,39 +169,6 @@ const getCenteredBatchGridDisplayColumns = (
                         clientField="dietaryRequirements"
                         fieldWidth={DIETARY_REQUIREMENTS_WIDTH}
                         booleanGroupLabelAndKeys={dietaryRequirementLabelsAndKeys}
-                    />
-                );
-            },
-        },
-        {
-            field: "feminineProducts",
-            headerName: "Feminine Products",
-            width: FEMININE_PRODUCTS_WIDTH,
-            editable: true,
-            renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
-                return (
-                    <BooleanGroupEditCell
-                        gridRenderCellParams={gridRenderCellParams}
-                        dispatchBatchTableAction={dispatch}
-                        tableState={tableState}
-                        clientField="feminineProducts"
-                        fieldWidth={FEMININE_PRODUCTS_WIDTH}
-                        booleanGroupLabelAndKeys={feminineProductLabelsAndKeys}
-                    />
-                );
-            },
-        },
-        {
-            field: "babyProducts",
-            headerName: "Baby Products *",
-            width: BABY_PRODUCTS_WIDTH,
-            editable: true,
-            renderEditCell: (gridRenderCellParams: GridRenderCellParams): React.ReactNode => {
-                return (
-                    <BabyProductsEditCell
-                        gridRenderCellParams={gridRenderCellParams}
-                        dispatchBatchTableAction={dispatch}
-                        tableState={tableState}
                     />
                 );
             },

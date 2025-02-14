@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
-import { checkboxGroupToArray, onChangeCheckbox } from "@/components/Form/formFunctions";
+import { checkboxGroupToArray, onChangeCheckboxInGroup } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 import { Checkbox, FormControlLabel } from "@mui/material";
@@ -61,7 +61,7 @@ const DietaryRequirementCard: React.FC<ClientCardProps> = ({ fieldSetter, fields
                 <CheckboxGroupInput
                     groupLabel="Tick all that apply"
                     labelsAndKeys={dietaryRequirementLabelsAndKeys}
-                    onChange={onChangeCheckbox(
+                    onChange={onChangeCheckboxInGroup(
                         fieldSetter,
                         fields.dietaryRequirements ?? {},
                         "dietaryRequirements"

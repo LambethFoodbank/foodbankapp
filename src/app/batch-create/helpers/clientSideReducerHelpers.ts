@@ -1,4 +1,3 @@
-import { NAPPY_SIZE_LABEL, EXTRA_INFORMATION_LABEL } from "@/app/clients/form/labels";
 import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import {
     BatchDataRow,
@@ -38,28 +37,6 @@ export function createBooleanGroupFromStrings(strings: string[] | null): Boolean
     }
     return result;
 }
-
-export const getNappySize = (info: string | null): string | null => {
-    if (info) {
-        const match = info.match(new RegExp(`${NAPPY_SIZE_LABEL}(\\d+)`));
-        if (match) {
-            return match[1];
-        }
-    }
-    return null;
-};
-
-export const parseExtraInfo = (info: string | null): string | null => {
-    if (info) {
-        const match = info.match(
-            new RegExp(`${NAPPY_SIZE_LABEL}\\d+,\\s*${EXTRA_INFORMATION_LABEL}(.*)`)
-        );
-        if (match) {
-            return match[1];
-        }
-    }
-    return info;
-};
 
 export const getRowToBeUpdated = (
     rowId: number,

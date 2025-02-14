@@ -149,7 +149,7 @@ export const onChangeTextDeferredError = <SpecificFields extends Fields>(
     };
 };
 
-export const onChangeCheckbox = <SpecificFields extends Fields>(
+export const onChangeCheckboxInGroup = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     currentObject: BooleanGroup,
     key: string
@@ -157,6 +157,17 @@ export const onChangeCheckbox = <SpecificFields extends Fields>(
     return (event) => {
         const newObject = { ...currentObject, [event.target.name]: event.target.checked };
         fieldSetter({ [key]: newObject } as { [key in keyof SpecificFields]: SpecificFields[key] });
+    };
+};
+
+export const onChangeSingleCheckbox = <SpecificFields extends Fields>(
+    fieldSetter: Setter<SpecificFields>,
+    key: string
+): ChangeEventHandler => {
+    return (event) => {
+        fieldSetter({ [key]: event.target.checked } as {
+            [key in keyof SpecificFields]: SpecificFields[key];
+        });
     };
 };
 

@@ -25,8 +25,8 @@ import AddressCard from "@/app/clients/form/formSections/AddressCard";
 import NumberAdultsCard from "@/app/clients/form/formSections/NumberAdultsCard";
 import NumberChildrenCard from "@/app/clients/form/formSections/NumberChildrenCard";
 import DietaryRequirementCard from "@/app/clients/form/formSections/DietaryRequirementCard";
-import FeminineProductCard from "@/app/clients/form/formSections/FeminineProductCard";
-import BabyProductCard from "@/app/clients/form/formSections/BabyProductCard";
+import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
+import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
 import DeliveryInstructionsCard from "@/app/clients/form/formSections/DeliveryInstructionsCard";
@@ -64,9 +64,13 @@ export interface ClientFields extends Fields {
     listType: ListType | null;
     cookingFacilities: BooleanGroup;
     dietaryRequirements: BooleanGroup | null;
-    feminineProducts: BooleanGroup;
-    babyProducts: boolean | null;
-    nappySize: string;
+    hygieneProductsTampons: string | null;
+    hygieneProductsPads: string | null;
+    hygieneOtherItems: BooleanGroup;
+    babyFood: string | null;
+    babyFormula: string | null;
+    babyNappies: string | null;
+    babyOtherItems: BooleanGroup;
     petFood: BooleanGroup;
     otherItems: BooleanGroup;
     deliveryInstructions: string;
@@ -86,7 +90,6 @@ export interface ClientErrors extends FormErrors<ClientFields> {
     numberOfAdults: Errors;
     numberOfChildren: Errors;
     listType: Errors;
-    nappySize: Errors;
     deliveryInstructions: Errors;
 }
 
@@ -103,8 +106,8 @@ const formSections = [
     ListTypeCard,
     CookingFacilitiesCard,
     DietaryRequirementCard,
-    FeminineProductCard,
-    BabyProductCard,
+    HygieneProductsCard,
+    BabyProductsCard,
     PetFoodCard,
     OtherItemsCard,
     DeliveryInstructionsCard,
