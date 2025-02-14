@@ -16,6 +16,6 @@ export const eventNamesWithNoData = [
     "Delivered",
     "Delivery Failed",
     "Delivery Cancelled",
-    "Fulfilled with Trussell Trust",
+    "Fulfilled with Trussell",
     "Parcel Deleted",
 ];
