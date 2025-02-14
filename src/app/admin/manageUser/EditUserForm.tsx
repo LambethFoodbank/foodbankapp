@@ -153,7 +153,7 @@ const EditUserForm: React.FC<Props> = (props) => {
             <EditOption>
                 <EditSubheading>Role</EditSubheading>
                 <UserRoleSelect
-                    value={initialRole}
+                    value={fields.role}
                     onChange={getDropdownListHandler<UserRole>(
                         (userRole: UserRole) => fieldSetter({ role: userRole }),
                         (value: UserRole | string): value is UserRole =>
