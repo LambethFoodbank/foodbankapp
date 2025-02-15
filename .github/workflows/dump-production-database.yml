@@ -13,7 +13,6 @@ env:
 jobs:
   dump-production-database:
     name: Dump production database
-    environment: production
     runs-on: ubuntu-latest
 
     steps:
