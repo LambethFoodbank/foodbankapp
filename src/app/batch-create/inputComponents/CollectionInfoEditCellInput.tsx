@@ -4,8 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { BatchActionType, BatchTableDataState, CollectionInfo } from "@/app/batch-create/types";
 import { COLLECTION_INFO_WIDTH } from "@/app/batch-create/columnWidths";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import { fetchCollectionCentresForTable } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
-import { CollectionCentresTableRow } from "@/app/admin/collectionCentresTable/CollectionCentresTable";
+import {
+    CollectionCentresTableRow,
+    fetchCollectionCentresForTable,
+} from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";

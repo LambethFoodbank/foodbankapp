@@ -2,12 +2,27 @@ import supabase from "@/supabaseClient";
 import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
-import {
-    CollectionCentresTableRow,
-    FormattedTimeSlot,
-    FormattedTimeSlotsWithPrimaryKey,
-} from "@/app/admin/collectionCentresTable/CollectionCentresTable";
 import { Schema } from "@/databaseUtils";
+
+export interface CollectionCentresTableRow {
+    acronym: Schema["collection_centres"]["acronym"];
+    name: Schema["collection_centres"]["name"];
+    id: Schema["collection_centres"]["primary_key"];
+    isDelivery: Schema["collection_centres"]["is_delivery"];
+    isShown: Schema["collection_centres"]["is_shown"];
+    timeSlots: Schema["collection_centres"]["time_slots"];
+    isNew: boolean;
+}
+
+export interface FormattedTimeSlot {
+    time: string;
+    isActive: boolean;
+}
+
+export interface FormattedTimeSlotsWithPrimaryKey {
+    primaryKey: Schema["collection_centres"]["primary_key"];
+    timeSlots: FormattedTimeSlot[];
+}
 
 type DbCollectionCentre = Tables<"collection_centres">;
 type NewDbCollectionCentre = Omit<DbCollectionCentre, "primary_key">;
