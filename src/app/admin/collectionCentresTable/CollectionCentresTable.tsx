@@ -21,7 +21,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
-import { Checkbox, FormControlLabel, FormGroup, LinearProgress } from "@mui/material";
+import { FormGroup, LinearProgress } from "@mui/material";
 import {
     fetchCollectionCentresForTable,
     InsertCollectionCentreResult,
@@ -33,7 +33,7 @@ import {
 import { EditToolbar } from "@/app/admin/collectionCentresTable/CollectionCentresTableToolbar";
 import Button from "@mui/material/Button";
 import Icon from "@/components/Icons/Icon";
-import { faShoePrints } from "@fortawesome/free-solid-svg-icons";
+import { faShoePrints, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import {
     ButtonsDiv,
     Centerer,
@@ -42,11 +42,14 @@ import {
     SpaceBetween,
 } from "@/components/Modal/ModalFormStyles";
 import Modal from "@/components/Modal/Modal";
-import { useTheme } from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { formatDayjsToHoursAndMinutes, formatTimeStringToHoursAndMinutes } from "@/common/format";
 import { DesktopTimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import FloatingToast from "@/components/FloatingToast";
+import CheckboxInput from "@/components/DataInput/CheckboxInput";
+import { StyledIcon, StyledIconButton } from "@/components/Icons/IconButton";
+import { Heading } from "@/app/parcels/ActionBar/ActionModals/GeneralActionModal";
 
 export interface CollectionCentresTableRow {
     acronym: Schema["collection_centres"]["acronym"];
@@ -67,6 +70,15 @@ export interface FormattedTimeSlotsWithPrimaryKey {
     primaryKey: Schema["collection_centres"]["primary_key"];
     timeSlots: FormattedTimeSlot[];
 }
+
+const ModalTimeSlotsContainer = styled.div`
+    max-height: 40vh;
+    overflow-y: auto;
+`;
+
+const ModalTimeSlotRow = styled.div`
+    width: 15rem;
+`;
 
 function getBaseAuditLogForCollectionCentreAction(
     action: string,
@@ -134,6 +146,7 @@ const CollectionCentresTable: React.FC = () => {
     const [existingRowData, setExistingRowData] = useState<CollectionCentresTableRow | null>(null);
     const [timeSlotModalIsOpen, setTimeSlotModalIsOpen] = useState<boolean>(false);
     const [timeSlotModalErrorMessage, setTimeSlotModalErrorMessage] = useState<string | null>(null);
+    const [timeSlotModalCentreName, setTimeSlotModalCentreName] = useState<string | null>(null);
     const [timeSlotModalData, setTimeSlotModalData] =
         useState<FormattedTimeSlotsWithPrimaryKey | null>(null);
     const [editableIsShown, setEditableIsShown] = useState<boolean>(false);
@@ -254,14 +267,13 @@ const CollectionCentresTable: React.FC = () => {
         setEditableIsShown(false);
     };
 
-    const handleTimeSlotCheckBoxChange = (event: React.SyntheticEvent<Element, Event>): void => {
+    const toggleTimeSlotInModalData = (timeLabel: string): void => {
         if (!timeSlotModalData) {
             return;
         }
 
-        const updatedTime = event.currentTarget.parentElement?.parentElement?.innerText;
         const timeSlotIndex = timeSlotModalData.timeSlots.findIndex(
-            (slot) => slot.time === updatedTime
+            (slot) => slot.time === timeLabel
         );
         const timeSlot = timeSlotModalData.timeSlots[timeSlotIndex];
         if (!timeSlot) {
@@ -273,6 +285,21 @@ const CollectionCentresTable: React.FC = () => {
         const updatedTimeSlotData: FormattedTimeSlotsWithPrimaryKey = {
             ...timeSlotModalData,
             timeSlots: timeSlotModalData.timeSlots,
+        };
+
+        setTimeSlotModalData(updatedTimeSlotData);
+    };
+
+    const deleteTimeSlotFromModalData = (timeLabel: string): void => {
+        if (!timeSlotModalData) {
+            return;
+        }
+
+        const updatedTimeSlotData: FormattedTimeSlotsWithPrimaryKey = {
+            ...timeSlotModalData,
+            timeSlots: timeSlotModalData.timeSlots.filter(
+                (timeSlot) => timeSlot.time !== timeLabel
+            ),
         };
 
         setTimeSlotModalData(updatedTimeSlotData);
@@ -439,8 +466,10 @@ const CollectionCentresTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             renderCell: (params) => {
                 const handleEditCollectionCentreTimeSlot = (): void => {
-                    const formattedTimeSlotData = formatCollectionCentreTimeSlotDbData(params.row);
+                    const row = params.row as CollectionCentresTableRow;
+                    const formattedTimeSlotData = formatCollectionCentreTimeSlotDbData(row);
                     setTimeSlotModalData(formattedTimeSlotData);
+                    setTimeSlotModalCentreName(row.name);
                     setTimeSlotModalIsOpen(true);
                 };
 
@@ -449,7 +478,7 @@ const CollectionCentresTable: React.FC = () => {
                         variant="outlined"
                         size="small"
                         onClick={handleEditCollectionCentreTimeSlot}
-                        disabled={params.row.isNew}
+                        disabled={params.row.isNew || params.row.isDelivery}
                     >
                         Edit Collection Slots
                     </Button>
@@ -588,19 +617,46 @@ const CollectionCentresTable: React.FC = () => {
                 >
                     <OutsideDiv>
                         <ContentDiv>
-                            <FormGroup>
-                                {timeSlotModalData &&
-                                    timeSlotModalData.timeSlots.map((timeSlot) => {
-                                        return (
-                                            <FormControlLabel
-                                                control={<Checkbox checked={timeSlot.isActive} />}
-                                                label={timeSlot.time}
-                                                onChange={handleTimeSlotCheckBoxChange}
-                                                key={timeSlot.time}
-                                            />
-                                        );
-                                    })}
-                            </FormGroup>
+                            <Centerer>
+                                <Heading>{timeSlotModalCentreName}</Heading>
+                            </Centerer>
+                            <Centerer>
+                                <ModalTimeSlotsContainer>
+                                    <FormGroup>
+                                        {timeSlotModalData &&
+                                            timeSlotModalData.timeSlots.map((timeSlot) => {
+                                                return (
+                                                    <ModalTimeSlotRow key={timeSlot.time}>
+                                                        <SpaceBetween>
+                                                            <CheckboxInput
+                                                                label={timeSlot.time}
+                                                                checked={timeSlot.isActive}
+                                                                onChange={() =>
+                                                                    toggleTimeSlotInModalData(
+                                                                        timeSlot.time
+                                                                    )
+                                                                }
+                                                            />
+                                                            <StyledIconButton
+                                                                onClick={() =>
+                                                                    deleteTimeSlotFromModalData(
+                                                                        timeSlot.time
+                                                                    )
+                                                                }
+                                                                aria-label="delete"
+                                                            >
+                                                                <StyledIcon
+                                                                    icon={faTrashAlt}
+                                                                    onHoverText={`Delete timeslot ${timeSlot.time}`}
+                                                                />
+                                                            </StyledIconButton>
+                                                        </SpaceBetween>
+                                                    </ModalTimeSlotRow>
+                                                );
+                                            })}
+                                    </FormGroup>
+                                </ModalTimeSlotsContainer>
+                            </Centerer>
                         </ContentDiv>
                         <ButtonsDiv>
                             {timeSlotModalErrorMessage && (

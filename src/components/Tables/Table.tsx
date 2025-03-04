@@ -1,6 +1,5 @@
 "use client";
 
-import Icon from "@/components/Icons/Icon";
 import {
     DistributeClientFilter,
     DistributeServerFilter,
@@ -13,7 +12,8 @@ import {
     faPenToSquare,
     faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { Checkbox, CircularProgress, IconButton, NoSsr } from "@mui/material";
+import { StyledIcon, StyledIconButton } from "../Icons/IconButton";
+import { Checkbox, CircularProgress, NoSsr } from "@mui/material";
 import React, { useState } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import styled, { useTheme } from "styled-components";
@@ -209,11 +209,6 @@ const CustomCell = <Data,>({
 
     return element;
 };
-
-const StyledIconButton = styled(IconButton)`
-    padding: 0.1rem;
-    margin: 0.1rem;
-`;
 
 const defaultColumnStyleOptions = {
     grow: 1,
@@ -526,12 +521,6 @@ const EditAndReorderArrowDiv = styled.div`
     width: 100%;
     // this transform is necessary to make the buttons visually consistent with the rest of the table without redesigning the layout
     transform: translateX(-1.2rem);
-`;
-
-const StyledIcon = styled(Icon)`
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
 `;
 
 const TableStyling = styled.div<{
