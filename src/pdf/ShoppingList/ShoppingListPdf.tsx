@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     },
     pdfInfoSection: {
         flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: "5px",
     },
     pdfInfoLeftColumn: {
@@ -52,7 +53,8 @@ const styles = StyleSheet.create({
     },
     logoStyling: {
         maxWidth: "20%",
-        alignSelf: "flex-start",
+        height: "1in",
+        objectFit: "contain",
     },
     infoCellNoBorder: {
         width: "100%",
