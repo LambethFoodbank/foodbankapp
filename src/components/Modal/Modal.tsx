@@ -85,6 +85,7 @@ export interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     headerId: string;
+    testId?: string;
     className?: string;
     footer?: ReactNode;
     maxWidth?: Breakpoint;
@@ -101,6 +102,7 @@ const Modal: React.FC<ModalProps> = (props) => {
             open={props.isOpen}
             onClose={props.onClose}
             aria-labelledby={props.headerId}
+            data-testid={props.testId}
             className={props.className}
             fullWidth
             maxWidth={props.maxWidth ? props.maxWidth : "md"}

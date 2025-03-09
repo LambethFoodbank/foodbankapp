@@ -7,7 +7,7 @@ import {
 import React from "react";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import { CollectionCentresTableRow } from "@/app/admin/collectionCentresTable/CollectionCentresTable";
+import { CollectionCentresTableRow } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
