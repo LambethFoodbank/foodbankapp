@@ -3,8 +3,6 @@
 import React from "react";
 import { Text, Document, Page, View, StyleSheet, Image } from "@react-pdf/renderer";
 import { displayNameForNullDriverName, formatDate } from "@/common/format";
-import { faTruck, faShoePrints, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import FontAwesomeIconPdfComponent from "@/pdf/FontAwesomeIconPdfComponent";
 import {
     DriverOverviewRowData,
     DriverOverviewTablesData,
@@ -24,12 +22,13 @@ interface DriverOverviewCardProps {
 const styles = StyleSheet.create({
     container: {
         padding: 25,
+        paddingBottom: 40,
         alignItems: "center",
         fontFamily: "Helvetica",
     },
     fixedFooter: {
         position: "absolute",
-        bottom: "5px",
+        bottom: "20px",
         fontSize: "10px",
         textAlign: "center",
     },
@@ -199,18 +198,17 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
 
     const createTable = (
         tableName: string | null,
-        icon: IconDefinition,
         rows: DriverOverviewRowData[]
     ): React.JSX.Element => {
         return (
             <View style={styles.tableContainer}>
                 <View fixed>
+                    {/* react-pdf has a bug rendering SVGs that are on a page break, so the delivery/collection icon has been removed
+                     * https://github.com/diegomura/react-pdf/issues/1853#issuecomment-2573870127 (although that issue is closed, the bug still occurs)
+                     */}
                     {tableName && (
                         <View style={[styles.tableTitle, styles.flexRow]}>
                             <Text>{tableName} </Text>
-                            <FontAwesomeIconPdfComponent
-                                faIcon={icon}
-                            ></FontAwesomeIconPdfComponent>
                         </View>
                     )}
                     <View style={[styles.flexColumn, { width: "100%" }]}>
@@ -226,13 +224,11 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
         return <View style={styles.tableContainer}>{sectionTables}</View>;
     };
 
-    const deliveriesSection = createSection([
-        createTable("Deliveries", faTruck, data.tableData.deliveries),
-    ]);
+    const deliveriesSection = createSection([createTable("Deliveries", data.tableData.deliveries)]);
 
     const collectionsSection = createSection(
         data.tableData.collections.map((ccData) =>
-            createTable(ccData.collectionCentreName, faShoePrints, ccData.rowData)
+            createTable(ccData.collectionCentreName, ccData.rowData)
         )
     );
 
