@@ -143,7 +143,7 @@ describe("Edit a collection centre on admins page", () => {
         // Wait for background save to complete, then table update
         cy.wait("@patchCollectionCentreRequest");
         cy.wait("@getCollectionCentresRequest");
-        cy.wait(1000);
+        cy.wait(1000); // eslint-disable-line cypress/no-unnecessary-waiting
 
         // Open modal for same collection centre
         clickEditSlotsButtonForCentre(newCollectionCentreName);
