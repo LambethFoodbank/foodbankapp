@@ -117,25 +117,26 @@ const getActionModal = (
     actionName: ActionName,
     actionModalProps: ActionModalProps
 ): React.ReactElement => {
+    const elementKey = `${actionName}_modal`;
     switch (actionName) {
         case "Change Packing Date":
-            return <DateChangeModal {...actionModalProps} />;
+            return <DateChangeModal key={elementKey} {...actionModalProps} />;
         case "Change Packing Slot":
-            return <SlotChangeModal {...actionModalProps} />;
+            return <SlotChangeModal key={elementKey} {...actionModalProps} />;
         case "Download Shipping Labels":
-            return <ShippingLabelModal {...actionModalProps} />;
+            return <ShippingLabelModal key={elementKey} {...actionModalProps} />;
         case "Download Shopping Lists":
-            return <ShoppingListModal {...actionModalProps} />;
+            return <ShoppingListModal key={elementKey} {...actionModalProps} />;
         case "Download Driver Overview":
-            return <DriverOverviewModal {...actionModalProps} />;
+            return <DriverOverviewModal key={elementKey} {...actionModalProps} />;
         case "Generate Map":
-            return <GenerateMapModal {...actionModalProps} />;
+            return <GenerateMapModal key={elementKey} {...actionModalProps} />;
         case "Download Day Overview":
-            return <DayOverviewModal {...actionModalProps} />;
+            return <DayOverviewModal key={elementKey} {...actionModalProps} />;
         case "Delete Parcel":
-            return <DeleteParcelModal {...actionModalProps} />;
+            return <DeleteParcelModal key={elementKey} {...actionModalProps} />;
         case "Download Signposting Report":
-            return <SignPostingReportModal {...actionModalProps} />;
+            return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
     }
 };
 
