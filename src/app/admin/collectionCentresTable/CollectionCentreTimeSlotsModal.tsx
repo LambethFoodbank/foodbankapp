@@ -10,6 +10,7 @@ import {
     ButtonsDiv,
     Centerer,
     ContentDiv,
+    InputContainer,
     OutsideDiv,
     SpaceBetween,
 } from "@/components/Modal/ModalFormStyles";
@@ -41,7 +42,17 @@ const ModalTimeSlotsContainer = styled.div`
 `;
 
 const ModalTimeSlotRow = styled.div`
-    width: 15rem;
+    width: 20rem;
+`;
+
+const ColumnContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const RowContainer = styled.div`
+    display: flex;
+    flex-direction: row;
 `;
 
 function getBaseAuditLogForCollectionCentreTimeSlots(
@@ -221,8 +232,8 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
         <Modal
             header={
                 <>
-                    <Icon icon={faShoePrints} color={theme.primary.largeForeground[2]} /> Edit
-                    Collection Centre Time Slots
+                    <Icon icon={faShoePrints} color={theme.primary.largeForeground[2]} />
+                    Edit Collection Time Slots
                 </>
             }
             isOpen={props.isOpen}
@@ -230,37 +241,55 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                 props.onClose();
             }}
             headerId="expandedCollectionCentreTimeSlotsModal"
+            testId="CollectionCentreTimeSlotsModal"
+            maxWidth="xs"
             footer={
                 <SpaceBetween>
                     {!timeSlotEditIsShown && (
-                        <Button onClick={handleAddNewSlotClick} variant="contained">
-                            Add a new slot
+                        <Button
+                            onClick={handleAddNewSlotClick}
+                            variant="contained"
+                            data-testid="DefineNewSlot"
+                        >
+                            Define a new slot
                         </Button>
                     )}
                     {timeSlotEditIsShown && (
-                        <>
-                            <Centerer>
-                                <DesktopTimePicker
-                                    label="New Collection Slot"
-                                    views={["hours", "minutes"]}
-                                    format="HH:mm"
-                                    value={dayjs(collectionTimeSlotValue)}
-                                    onChange={(value) =>
-                                        value !== null && setCollectionTimeSlotValue(value)
-                                    }
-                                />
-                                <Button onClick={handleAddSlotClick} variant="contained">
+                        <ColumnContainer>
+                            <RowContainer>
+                                <InputContainer>
+                                    <DesktopTimePicker
+                                        label="New Collection Slot"
+                                        views={["hours", "minutes"]}
+                                        format="HH:mm"
+                                        value={dayjs(collectionTimeSlotValue)}
+                                        onChange={(value) =>
+                                            value !== null && setCollectionTimeSlotValue(value)
+                                        }
+                                    />
+                                </InputContainer>
+                                <Button
+                                    onClick={handleAddSlotClick}
+                                    variant="contained"
+                                    data-testid="AddSlot"
+                                >
                                     Add slot
                                 </Button>
-                            </Centerer>
+                            </RowContainer>
                             {addCollectionTimeSlotError && (
-                                <ErrorTextModalFooter>
-                                    {addCollectionTimeSlotError}
-                                </ErrorTextModalFooter>
+                                <div>
+                                    <ErrorTextModalFooter>
+                                        {addCollectionTimeSlotError}
+                                    </ErrorTextModalFooter>
+                                </div>
                             )}
-                        </>
+                        </ColumnContainer>
                     )}
-                    <Button onClick={handleModalSaveClick} variant="contained">
+                    <Button
+                        onClick={handleModalSaveClick}
+                        variant="contained"
+                        data-testid="SaveSlotsCloseModal"
+                    >
                         Save
                     </Button>
                 </SpaceBetween>
@@ -272,7 +301,7 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                         <Heading>{props.selectedCollectionCentreInfo?.name}</Heading>
                     </Centerer>
                     <Centerer>
-                        <ModalTimeSlotsContainer>
+                        <ModalTimeSlotsContainer aria-label="List of defined time slots">
                             <FormGroup>
                                 {timeSlotModalData &&
                                     timeSlotModalData.timeSlots.map((timeSlot) => {
@@ -285,6 +314,7 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                                                         onChange={() =>
                                                             toggleTimeSlotInModalData(timeSlot.time)
                                                         }
+                                                        ariaLabel="Time slot"
                                                     />
                                                     <StyledIconButton
                                                         onClick={() =>
@@ -292,7 +322,7 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                                                                 timeSlot.time
                                                             )
                                                         }
-                                                        aria-label="delete"
+                                                        aria-label="Delete"
                                                     >
                                                         <StyledIcon
                                                             icon={faTrashAlt}

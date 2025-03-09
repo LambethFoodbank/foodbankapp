@@ -25,3 +25,7 @@ export const ContentDiv = styled.div`
 export const ButtonsDiv = styled.div`
     flex: 0 0 10%;
 `;
+
+export const InputContainer = styled.div`
+    max-width: 10rem;
+`;

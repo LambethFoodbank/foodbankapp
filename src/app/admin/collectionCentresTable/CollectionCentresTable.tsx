@@ -268,6 +268,7 @@ const CollectionCentresTable: React.FC = () => {
                         size="small"
                         onClick={handleEditCollectionCentreTimeSlot}
                         disabled={params.row.isNew || params.row.isDelivery}
+                        aria-label={`Edit collection slots for ${params.row.name}`}
                     >
                         Edit Collection Slots
                     </Button>
