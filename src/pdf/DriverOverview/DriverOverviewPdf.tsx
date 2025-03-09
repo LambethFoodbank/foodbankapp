@@ -248,10 +248,10 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                             <Text style={styles.h1text}>
                                 {data.driverName ?? displayNameForNullDriverName}
                             </Text>
-                        </View>{" "}
+                        </View>
                         <View style={styles.infoColumn}>
                             <Text style={styles.h1text}>{formatDate(data.date)}</Text>
-                        </View>{" "}
+                        </View>
                     </View>
                     {/* eslint-disable-next-line -- needed to remove the need for alt text on the logo */}
                     <Image src="/logo.png" style={styles.logoStyling}></Image>
