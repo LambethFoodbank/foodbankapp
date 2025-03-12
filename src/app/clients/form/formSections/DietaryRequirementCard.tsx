@@ -20,6 +20,7 @@ export const dietaryRequirementOptions: string[] = [
     "Rice",
     "Meat (No Pork)",
     "Meat & Pork",
+    "Fish",
     "Gluten Free",
     "Dairy Free",
     "Vegetarian",
