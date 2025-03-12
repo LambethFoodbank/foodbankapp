@@ -223,7 +223,7 @@ const buildFilters = async (): Promise<{
     const additionalFilters: ParcelsFilters = [
         buildServerSideTextFilter({
             key: "familyCategory",
-            label: "Family",
+            label: "Family Size",
             headers: parcelTableHeaderKeysAndLabels,
             method: parcelsFamilySearch,
         }),
