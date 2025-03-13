@@ -9,7 +9,7 @@ const ExtraInformationCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSet
         <GenericFormCard
             title="Extra Information"
             required={false}
-            text="Is there anything else you need to tell us about the client? Comments relating to Food / Packing only. This info will be shown on the Shopping List. (Delivery Instructions section can be found in Edit Parcel)"
+            text="Is there anything else you need to tell us about the client? Comments relating to Food / Packing only. This info will be shown on the Shopping List."
         >
             <FreeFormTextInput
                 label="For example, Tea allergy"
