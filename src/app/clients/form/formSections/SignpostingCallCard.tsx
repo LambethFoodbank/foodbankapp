@@ -41,7 +41,7 @@ const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields })
 
             <FormElementWithSpacing>
                 <CheckboxGroupInput
-                    groupLabel="What do they need help with? Tick all that apply. For 'Other', put details in the 'Extra Information' section."
+                    groupLabel="What do they need help with? Tick all that apply. For 'Other', put details in the 'Notes' section."
                     labelsAndKeys={signpostingCallLabelsAndKeys}
                     onChange={onChangeCheckboxInGroup(
                         fieldSetter,

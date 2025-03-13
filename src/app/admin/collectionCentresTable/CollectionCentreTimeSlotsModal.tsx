@@ -76,7 +76,7 @@ const formatCollectionCentreTimeSlotDbData = (
 ): FormattedTimeSlotsWithPrimaryKey => {
     let formattedTimeSlots: FormattedTimeSlot[];
 
-    if (row.timeSlots === null) {
+    if (row.timeSlots === null || row.timeSlots === undefined) {
         formattedTimeSlots = [];
     } else {
         formattedTimeSlots = row.timeSlots.map((timeSlot) => {

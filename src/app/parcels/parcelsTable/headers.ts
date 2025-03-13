@@ -4,7 +4,7 @@ import { ParcelsTableRow } from "./types";
 export const parcelTableHeaderKeysAndLabels: TableHeaders<ParcelsTableRow> = [
     ["iconsColumn", ""],
     ["fullName", "Name"],
-    ["familyCategory", "Family"],
+    ["familyCategory", "Family Size"],
     ["addressPostcode", "Postcode"],
     ["phoneNumber", "Phone"],
     ["voucherNumber", "Voucher"],

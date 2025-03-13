@@ -9,12 +9,14 @@ const ExtraInformationCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSet
         <GenericFormCard
             title="Extra Information"
             required={false}
-            text="Is there anything else you need to tell us about the client? Comments relating to food or anything else. Please add any delivery instructions to the 'Delivery Instructions' section above."
+            text="Is there anything else you need to tell us about the client? Comments relating to Food / Packing only. This info will be shown on the Shopping List. (Delivery Instructions section can be found in Edit Parcel)"
         >
             <FreeFormTextInput
                 label="For example, Tea allergy"
                 defaultValue={getDefaultTextValue(fields, "extraInformation")}
                 onChange={onChangeText(fieldSetter, errorSetter, "extraInformation")}
+                minRows={5}
+                multiline={true}
             />
         </GenericFormCard>
     );

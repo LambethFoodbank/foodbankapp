@@ -35,7 +35,7 @@ const clientsFilters: ClientsFilter[] = [
     }),
     buildServerSideTextFilter({
         key: "familyCategory",
-        label: "Family",
+        label: "Family Size",
         headers: clientsHeaders,
         method: clientsFamilySearch,
     }),
