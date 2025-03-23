@@ -5,23 +5,14 @@ import styled from "styled-components";
 import Button from "@mui/material/Button";
 import { ParcelsTableRow } from "../parcelsTable/types";
 import Alert from "@mui/material/Alert";
-import Statuses, { StatusType, SaveParcelStatusResult } from "@/app/parcels/ActionBar/Statuses";
+import Statuses from "@/app/parcels/ActionBar/Statuses";
 import Actions from "@/app/parcels/ActionBar/Actions";
 import { ArrowDropDown } from "@mui/icons-material";
-import { Dayjs } from "dayjs";
 
 export interface ActionAndStatusBarProps {
     fetchSelectedParcels: () => Promise<ParcelsTableRow[]>;
-    updateParcelStatuses: UpdateParcelStatuses;
+    postCheckedParcelActivity: () => void;
 }
-
-export type UpdateParcelStatuses = (
-    parcels: ParcelsTableRow[],
-    newStatus: StatusType,
-    statusEventData?: string,
-    action?: string,
-    date?: Dayjs
-) => Promise<SaveParcelStatusResult>;
 
 const AlertBox = styled.div`
     display: block;
@@ -39,13 +30,14 @@ const ActionAndStatusBar: React.FC<ActionAndStatusBarProps> = (props) => {
         <>
             <Statuses
                 fetchSelectedParcels={props.fetchSelectedParcels}
+                postSuccessCallback={props.postCheckedParcelActivity}
                 statusAnchorElement={statusAnchorElement}
                 setStatusAnchorElement={setStatusAnchorElement}
                 setModalError={setModalError}
             />
             <Actions
                 fetchSelectedParcels={props.fetchSelectedParcels}
-                updateParcelStatuses={props.updateParcelStatuses}
+                postSuccessCallback={props.postCheckedParcelActivity}
                 actionAnchorElement={actionAnchorElement}
                 setActionAnchorElement={setActionAnchorElement}
                 setModalError={setModalError}

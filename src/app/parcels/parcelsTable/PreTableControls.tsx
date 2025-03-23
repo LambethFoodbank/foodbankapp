@@ -2,21 +2,13 @@ import { ActionsContainer, PreTableControlsContainer } from "@/components/Form/f
 import { Button } from "@mui/material";
 import ActionAndStatusBar from "../ActionBar/ActionAndStatusBar";
 import { ParcelsTableRow } from "./types";
-import { Dayjs } from "dayjs";
-import { SaveParcelStatusResult, StatusType } from "../ActionBar/Statuses";
 
 interface PreTableControlsProps {
     isPackingManagerView: boolean;
     setIsPackingManagerView: (isPackingManagerView: boolean) => void;
     selectedParcelMessage: string | null;
     getCheckedParcelsData: () => Promise<ParcelsTableRow[]>;
-    updateParcelStatuses: (
-        parcels: ParcelsTableRow[],
-        newStatus: StatusType,
-        statusEventData?: string,
-        action?: string,
-        date?: Dayjs
-    ) => Promise<SaveParcelStatusResult>;
+    postCheckedParcelActivity: () => void;
 }
 
 const PreTableControls: React.FC<PreTableControlsProps> = (props) => {
@@ -38,7 +30,7 @@ const PreTableControls: React.FC<PreTableControlsProps> = (props) => {
             <ActionsContainer>
                 <ActionAndStatusBar
                     fetchSelectedParcels={props.getCheckedParcelsData}
-                    updateParcelStatuses={props.updateParcelStatuses}
+                    postCheckedParcelActivity={props.postCheckedParcelActivity}
                 />
             </ActionsContainer>
         </PreTableControlsContainer>

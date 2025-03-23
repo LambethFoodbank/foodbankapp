@@ -3,13 +3,12 @@ import { ParcelsTableRow } from "../../parcelsTable/types";
 import Modal from "@/components/Modal/Modal";
 import { ActionName } from "../Actions";
 import React from "react";
-import { UpdateParcelStatuses } from "../ActionAndStatusBar";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 
 export interface ActionModalProps extends Omit<React.ComponentProps<typeof Modal>, "children"> {
     selectedParcels: ParcelsTableRow[];
-    updateParcelStatuses: UpdateParcelStatuses;
+    postSuccessCallback: () => void;
     actionName: ActionName;
 }
 

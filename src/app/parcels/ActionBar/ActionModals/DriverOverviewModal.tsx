@@ -17,6 +17,7 @@ import { sendAuditLog } from "@/server/auditLog";
 import { displayNameForNullDriverName } from "@/common/format";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
+import { saveParcelTableRowsStatus } from "../saveStatus";
 
 interface DriverOverviewInputProps {
     onDateChange: (newDate: Dayjs | null) => void;
@@ -164,7 +165,7 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
     };
 
     const onPdfCreationCompleted = async (): Promise<void> => {
-        const { error } = await props.updateParcelStatuses(
+        const { error } = await saveParcelTableRowsStatus(
             props.selectedParcels,
             "Out for Delivery",
             `with ${driverName ?? displayNameForNullDriverName}`,
@@ -185,6 +186,7 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
                 driverName: driverName,
             },
         });
+        props.postSuccessCallback();
     };
 
     const onPdfCreationFailed = (pdfError: DriverOverviewError): void => {

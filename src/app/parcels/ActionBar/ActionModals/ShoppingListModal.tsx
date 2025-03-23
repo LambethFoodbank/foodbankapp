@@ -10,6 +10,7 @@ import { sendAuditLog } from "@/server/auditLog";
 import DuplicateDownloadWarning from "@/app/parcels/ActionBar/DuplicateDownloadWarning";
 import { getDuplicateDownloadedPostcodes } from "@/app/parcels/ActionBar/ActionModals/getDuplicateDownloadedPostcodes";
 import { ParcelsTableRow } from "../../parcelsTable/types";
+import { saveParcelTableRowsStatus } from "../saveStatus";
 
 interface ContentProps {
     selectedParcels: ParcelsTableRow[];
@@ -93,7 +94,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
     const parcelIds = props.selectedParcels.map((parcel) => parcel.parcelId);
 
     const onPdfCreationCompleted = async (): Promise<void> => {
-        const { error } = await props.updateParcelStatuses(
+        const { error } = await saveParcelTableRowsStatus(
             props.selectedParcels,
             "Shopping List Downloaded"
         );
@@ -107,6 +108,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
             wasSuccess: true,
             content: { parcelIds: parcelIds },
         });
+        props.postSuccessCallback();
     };
 
     const onPdfCreationFailed = (pdfError: ShoppingListPdfError): void => {

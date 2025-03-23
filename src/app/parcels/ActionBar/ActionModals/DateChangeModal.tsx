@@ -9,7 +9,6 @@ import { Button } from "@mui/material";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import SingleDateInput, { DateInputProps } from "@/components/DateInputs/SingleDateInput";
 import dayjs, { Dayjs } from "dayjs";
-import { getStatusErrorMessageWithLogId } from "../Statuses";
 import { getDbDate } from "@/common/format";
 import { getUpdateErrorMessage, packingDateOrSlotUpdate } from "./CommonDateAndSlot";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
@@ -93,12 +92,6 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
             })
         );
 
-        const { error: statusUpdateError } = await props.updateParcelStatuses(
-            props.selectedParcels,
-            "Packing Date Changed",
-            `new packing date: ${newPackingDate}`,
-            "change packing date"
-        );
         if (
             !packingDateUpdateErrors.every(
                 (packingDateUpdateError) => packingDateUpdateError.error === null
@@ -109,10 +102,9 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
                     .map((packingDateUpdateError) => getUpdateErrorMessage(packingDateUpdateError))
                     .join("")
             );
-        } else if (statusUpdateError) {
-            setErrorMessage(getStatusErrorMessageWithLogId(statusUpdateError));
         } else {
             setSuccessMessage(`Packing Date Changed to ${newPackingDate}`);
+            props.postSuccessCallback();
         }
         setActionCompleted(true);
     };

@@ -5,7 +5,6 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { ParcelsTableRow } from "../parcelsTable/types";
 import { ActionModalProps } from "./ActionModals/GeneralActionModal";
-import { UpdateParcelStatuses } from "./ActionAndStatusBar";
 import { allRoles, organisationRoles, RoleUpdateContext } from "@/app/roles";
 import { UserRole } from "@/databaseUtils";
 import DayOverviewModal from "./ActionModals/DayOverviewModal";
@@ -107,7 +106,7 @@ const availableActions: ActionTypes[] = [
 
 interface Props {
     fetchSelectedParcels: () => Promise<ParcelsTableRow[]>;
-    updateParcelStatuses: UpdateParcelStatuses;
+    postSuccessCallback: () => void;
     actionAnchorElement: HTMLElement | null;
     setActionAnchorElement: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
     setModalError: React.Dispatch<React.SetStateAction<string | null>>;
@@ -142,7 +141,7 @@ const getActionModal = (
 
 const Actions: React.FC<Props> = ({
     fetchSelectedParcels,
-    updateParcelStatuses,
+    postSuccessCallback,
     actionAnchorElement,
     setActionAnchorElement,
     setModalError,
@@ -204,7 +203,7 @@ const Actions: React.FC<Props> = ({
                         header: modalToDisplay,
                         headerId: "action-modal-header",
                         actionName: modalToDisplay,
-                        updateParcelStatuses: updateParcelStatuses,
+                        postSuccessCallback: postSuccessCallback,
                     })
                 );
             })}

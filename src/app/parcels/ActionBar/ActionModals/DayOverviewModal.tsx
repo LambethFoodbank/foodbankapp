@@ -68,6 +68,7 @@ const DayOverviewModal: React.FC<ActionModalProps> = (props) => {
             wasSuccess: true,
             content: { parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId) },
         });
+        props.postSuccessCallback();
     };
 
     const onPdfCreationFailed = (pdfError: DayOverviewPdfError): void => {

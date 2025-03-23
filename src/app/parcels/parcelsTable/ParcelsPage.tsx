@@ -9,14 +9,8 @@ import {
 } from "@/app/parcels/parcelsTable/types";
 import supabase from "@/supabaseClient";
 import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
-import {
-    StatusType,
-    saveParcelStatus,
-    SaveParcelStatusResult,
-} from "@/app/parcels/ActionBar/Statuses";
 import buildFilters from "@/app/parcels/parcelsTable/filters";
 import { getSelectedParcelCountMessage } from "@/app/parcels/parcelsTable/format";
-import { Dayjs } from "dayjs";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import PreTableControls from "@/app/parcels/parcelsTable/PreTableControls";
 import ParcelsTable from "@/app/parcels/parcelsTable/ParcelsTable";
@@ -64,24 +58,6 @@ const ParcelsPage: React.FC = () => {
         })();
     }, []);
 
-    const updateParcelStatuses = async (
-        parcels: ParcelsTableRow[],
-        newStatus: StatusType,
-        statusEventData?: string,
-        action?: string,
-        date?: Dayjs
-    ): Promise<SaveParcelStatusResult> => {
-        const { error } = await saveParcelStatus(
-            parcels.map((parcel) => parcel.parcelId),
-            newStatus,
-            statusEventData,
-            action,
-            date
-        );
-        setCheckedParcelIds([]);
-        return { error: error };
-    };
-
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
         if (checkedParcelIds.length === 0) {
             return [];
@@ -95,6 +71,10 @@ const ParcelsPage: React.FC = () => {
         );
     };
 
+    const postCheckedParcelActivity = (): void => {
+        setCheckedParcelIds([]);
+    };
+
     return (
         <>
             <PreTableControls
@@ -102,7 +82,7 @@ const ParcelsPage: React.FC = () => {
                 setIsPackingManagerView={setIsPackingManagerView}
                 selectedParcelMessage={selectedParcelMessage}
                 getCheckedParcelsData={getCheckedParcelsData}
-                updateParcelStatuses={updateParcelStatuses}
+                postCheckedParcelActivity={postCheckedParcelActivity}
             />
             {areFiltersLoadingForFirstTime ? (
                 <Centerer>
