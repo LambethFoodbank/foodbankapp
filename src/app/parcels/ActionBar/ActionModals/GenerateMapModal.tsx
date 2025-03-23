@@ -10,6 +10,7 @@ interface ContentProps {
     setActionCompleted: (completed: boolean) => void;
     mapsLinkForSelectedParcels: string;
     setSuccessMessage: (message: string) => void;
+    postSuccessCallback: () => void;
 }
 
 const GenerateMapModalContent: React.FC<ContentProps> = ({
@@ -18,6 +19,7 @@ const GenerateMapModalContent: React.FC<ContentProps> = ({
     setActionCompleted,
     mapsLinkForSelectedParcels,
     setSuccessMessage,
+    postSuccessCallback,
 }) => {
     const generateMapButtonFocusRef = useRef<HTMLButtonElement>(null);
 
@@ -40,6 +42,7 @@ const GenerateMapModalContent: React.FC<ContentProps> = ({
                 openInNewTab(mapsLinkForSelectedParcels);
                 setSuccessMessage("Map Generated");
                 setActionCompleted(true);
+                postSuccessCallback();
             }}
             ref={generateMapButtonFocusRef}
         >
@@ -86,6 +89,7 @@ const GenerateMapModal: React.FC<ActionModalProps> = (props) => {
                     setActionCompleted={setActionCompleted}
                     mapsLinkForSelectedParcels={mapsLinkForSelectedParcels}
                     setSuccessMessage={setSuccessMessage}
+                    postSuccessCallback={props.postSuccessCallback}
                 />
             )}
         </GeneralActionModal>

@@ -6,7 +6,6 @@ import ActionAndStatusBar from "@/app/parcels/ActionBar/ActionAndStatusBar";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import StyleManager from "@/app/themes";
 import Localization from "@/app/Localization";
-import { SaveParcelStatusResult } from "@/app/parcels/ActionBar/Statuses";
 
 jest.mock("@/supabaseClient", () => {
     return { default: jest.fn() };
@@ -104,9 +103,8 @@ export const mockData: ParcelsTableRow[] = [
 
 describe("Parcels - Action and Status Bar", () => {
     let parcelIds: string[] = ["123456789", "123456aaaa789"];
-    const onDeleteParcels = async (): Promise<SaveParcelStatusResult> => {
+    const postActivityCallback = (): void => {
         parcelIds = [];
-        return { error: null };
     };
 
     beforeEach(() => {
@@ -118,7 +116,7 @@ describe("Parcels - Action and Status Bar", () => {
                         fetchSelectedParcels={async () =>
                             await mockData.filter((parcel) => parcelIds.includes(parcel.parcelId))
                         }
-                        updateParcelStatuses={onDeleteParcels}
+                        postCheckedParcelActivity={postActivityCallback}
                     />
                 </StyleManager>
             </Localization>

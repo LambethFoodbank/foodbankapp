@@ -30,7 +30,7 @@ import { DbClientRow } from "@/databaseUtils";
 import { clientIdParam } from "./constants";
 import { getIsClientActiveErrorMessage, getDeleteClientErrorMessage } from "./format";
 import { getClientParcelsDetails } from "../getClientParcelsData";
-import { saveParcelStatus } from "@/app/parcels/ActionBar/Statuses";
+import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
 

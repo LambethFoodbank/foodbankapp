@@ -17,7 +17,7 @@ import {
 } from "./types";
 import { checkForCongestionCharge, CongestionChargeReturnType } from "@/common/congestionCharges";
 import convertParcelDbtoParcelRow from "./convertParcelDBtoParcelRow";
-import { StatusType } from "@/app/parcels/ActionBar/Statuses";
+import { StatusType } from "@/app/parcels/ActionBar/saveStatus";
 import { defaultParcelsSort, defaultParcelsSortConfig } from "./sortableColumns";
 import { DbQuery } from "@/components/Tables/Filters";
 

@@ -87,6 +87,7 @@ const SignPostingReportModal: React.FC<ActionModalProps> = (props) => {
                 toDate: dateRange.to.toString(),
             },
         });
+        props.postSuccessCallback();
     };
 
     const onFileCreationFailed = (csvError: FetchSignpostingReportError): void => {

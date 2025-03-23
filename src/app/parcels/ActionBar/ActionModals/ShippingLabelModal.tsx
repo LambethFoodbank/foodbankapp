@@ -17,6 +17,7 @@ import DuplicateDownloadWarning from "@/app/parcels/ActionBar/DuplicateDownloadW
 import { getDuplicateDownloadedPostcodes } from "@/app/parcels/ActionBar/ActionModals/getDuplicateDownloadedPostcodes";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
+import { saveDbParcelStatus } from "../saveStatus";
 
 interface ShippingLabelsInputProps {
     onLabelQuantityChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -141,7 +142,7 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
     );
 
     const onPdfCreationCompleted = async (): Promise<void> => {
-        const { error } = await props.updateParcelStatuses(
+        const { error } = await saveDbParcelStatus(
             props.selectedParcels,
             "Shipping Labels Downloaded",
             labelQuantity.toString()
@@ -159,6 +160,7 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
                 labelQuantity: labelQuantity,
             },
         });
+        props.postSuccessCallback();
     };
 
     const onPdfCreationFailed = (pdfError: ShippingLabelError): void => {

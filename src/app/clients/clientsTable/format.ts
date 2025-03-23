@@ -1,6 +1,6 @@
 import { DeleteClientError } from "../deleteClient";
 import { IsClientActiveError } from "../getExpandedClientDetails";
-import { SaveParcelStatusError } from "@/app/parcels/ActionBar/Statuses";
+import { SaveParcelStatusError } from "@/app/parcels/ActionBar/saveStatus";
 
 export const getIsClientActiveErrorMessage = (error: IsClientActiveError): string => {
     switch (error.type) {
