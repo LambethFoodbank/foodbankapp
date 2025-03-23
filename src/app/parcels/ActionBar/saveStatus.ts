@@ -72,7 +72,7 @@ export const saveParcelStatus = async (
     return { error: null };
 };
 
-export const saveDbParcelStatus = async (
+export const saveParcelTableRowsStatus = async (
     parcelRows: ParcelsTableRow[],
     statusName: StatusType,
     statusEventData?: string | null,

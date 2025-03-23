@@ -9,7 +9,7 @@ import StatusesModal from "@/app/parcels/ActionBar/StatusesModal";
 import { ParcelStatus } from "@/databaseUtils";
 import { fetchParcelStatuses } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import {
-    saveDbParcelStatus,
+    saveParcelTableRowsStatus,
     SaveParcelStatusError,
     StatusType,
 } from "@/app/parcels/ActionBar/saveStatus";
@@ -83,7 +83,7 @@ const Statuses: React.FC<Props> = ({
             setServerErrorMessage("Chosen status was not found.");
             return;
         }
-        const { error } = await saveDbParcelStatus(
+        const { error } = await saveParcelTableRowsStatus(
             selectedParcels,
             selectedStatus,
             null,

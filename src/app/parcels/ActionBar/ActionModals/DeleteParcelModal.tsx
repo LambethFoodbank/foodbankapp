@@ -13,7 +13,7 @@ import { ParcelsTableRow } from "../../parcelsTable/types";
 import DeleteButton from "@/components/Buttons/DeleteButton";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
-import { saveDbParcelStatus } from "../saveStatus";
+import { saveParcelTableRowsStatus } from "../saveStatus";
 
 interface ContentProps {
     onClose: () => void;
@@ -81,7 +81,7 @@ const DeleteParcelModal: React.FC<ActionModalProps> = (props) => {
     const numberOfParcelsToDelete = props.selectedParcels.length;
 
     const onDeleteParcels = async (): Promise<void> => {
-        const { error } = await saveDbParcelStatus(props.selectedParcels, "Parcel Deleted");
+        const { error } = await saveParcelTableRowsStatus(props.selectedParcels, "Parcel Deleted");
         if (error) {
             setErrorMessage(getStatusErrorMessageWithLogId(error));
         } else {
