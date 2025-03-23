@@ -13,6 +13,7 @@ export const dietaryRequirementOptions: string[] = [
     "Ginger",
     "Chillies",
     "Spices",
+    "Eggs",
     "Bread",
     "Tea",
     "Coffee",
