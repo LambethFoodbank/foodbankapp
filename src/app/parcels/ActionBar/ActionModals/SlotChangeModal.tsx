@@ -7,7 +7,6 @@ import GeneralActionModal, {
 } from "./GeneralActionModal";
 import { Button } from "@mui/material";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
-import { getStatusErrorMessageWithLogId } from "../Statuses";
 import supabase from "@/supabaseClient";
 import { PackingSlotsLabelsAndValues, fetchPackingSlotsInfo } from "@/common/fetch";
 import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
@@ -112,12 +111,6 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
         const newPackingSlotText: string =
             packingSlots.find((packingSlot) => packingSlot[1] === slot)?.at(0) ?? "";
 
-        const { error: statusUpdateError } = await props.updateParcelStatuses(
-            props.selectedParcels,
-            "Packing Slot Changed",
-            `new packing slot: ${newPackingSlotText}`,
-            "change packing slot"
-        );
         if (
             !packingSlotUpdateErrors.every(
                 (packingSlotUpdateError) => packingSlotUpdateError.error === null
@@ -128,10 +121,9 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
                     .map((packingSlotUpdateError) => getUpdateErrorMessage(packingSlotUpdateError))
                     .join("")
             );
-        } else if (statusUpdateError) {
-            setErrorMessage(getStatusErrorMessageWithLogId(statusUpdateError));
         } else {
             setSuccessMessage(`Packing Slot Changed to ${newPackingSlotText}`);
+            props.postSuccessCallback();
         }
         setActionCompleted(true);
     };
