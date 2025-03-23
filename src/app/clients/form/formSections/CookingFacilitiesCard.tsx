@@ -7,6 +7,7 @@ import { Checkbox, FormControlLabel } from "@mui/material";
 import { FormElementWithSpacing } from "@/components/Form/formStyling";
 
 export const cookingFacilitiesOptions: string[] = [
+    "None",
     "Microwave",
     "Kettle",
     "Hob",
