@@ -145,7 +145,6 @@
     "react-router-dom": "^6.25.1",
     "react-test-renderer": "^18.3.1",
     "seedrandom": "^3.0.5",
-    "snaplet": "^0.88.2",
     "supabase": "^2.9.6",
     "text-encoding": "^0.7.0",
     "ts-jest": "^29.2.2",
