@@ -20,6 +20,7 @@ const DeletedText = styled.div`
 
 interface Props {
     parcelId: string | null;
+    refreshCallback?: (refreshFunction: () => void) => void;
 }
 
 const sortByTimestampWithMostRecentFirst = (events: EventTableRow[]): EventTableRow[] => {
@@ -37,9 +38,10 @@ function getErrorMessageForExpandedParcelDetailsError(
     }
 }
 
-const ExpandedParcelDetailsView = ({ parcelId }: Props): ReactElement => {
+const ExpandedParcelDetailsView = ({ parcelId, refreshCallback }: Props): ReactElement => {
     const [parcelDetails, setParcelDetails] = useState<ExpandedParcelDetails | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const fetchAndSetParcelDetails = useCallback(async (): Promise<void> => {
         if (!parcelId) {
@@ -60,7 +62,17 @@ const ExpandedParcelDetailsView = ({ parcelId }: Props): ReactElement => {
 
     useEffect(() => {
         void fetchAndSetParcelDetails();
-    }, [fetchAndSetParcelDetails]);
+    }, [fetchAndSetParcelDetails, refreshTrigger]);
+
+    const refreshParcelDetails = (): void => {
+        setRefreshTrigger((prev) => prev + 1);
+    };
+
+    useEffect(() => {
+        if (refreshCallback) {
+            refreshCallback(refreshParcelDetails);
+        }
+    }, [refreshCallback]);
 
     return (
         <>

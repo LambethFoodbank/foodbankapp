@@ -232,6 +232,18 @@ export const getParcelIds = async (
 
 export const getParcelsByIds = async (
     supabase: Supabase,
+    parcelIds: string[]
+): Promise<ParcelsTableRow[]> => {
+    const query = supabase
+        .from("parcels_plus")
+        .select("*")
+        .in("parcel_id", parcelIds) as DbQuery<DbParcelRow>;
+
+    return runParcelsQueryAndConvertToParcelTableRows(query);
+};
+
+export const getParcelsByIdsWithFiltersAndSorting = async (
+    supabase: Supabase,
     filters: ParcelsFilters,
     sortState: ParcelsSortState,
     parcelIds: string[]
@@ -241,6 +253,12 @@ export const getParcelsByIds = async (
         query.in("parcel_id", parcelIds);
     }
 
+    return runParcelsQueryAndConvertToParcelTableRows(query);
+};
+
+const runParcelsQueryAndConvertToParcelTableRows = async (
+    query: DbQuery<DbParcelRow>
+): Promise<ParcelsTableRow[]> => {
     const { data, error } = (await query) as {
         data: DbParcelRow[];
         error: Error | null;
