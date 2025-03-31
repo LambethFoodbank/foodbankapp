@@ -8,7 +8,7 @@ import {
     SelectedClientDetails,
 } from "@/app/parcels/parcelsTable/types";
 import supabase from "@/supabaseClient";
-import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
+import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import buildFilters from "@/app/parcels/parcelsTable/filters";
 import { getSelectedParcelCountMessage } from "@/app/parcels/parcelsTable/format";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
@@ -63,7 +63,7 @@ const ParcelsPage: React.FC = () => {
             return [];
         }
 
-        return await getParcelsByIds(
+        return await getParcelsByIdsWithFiltersAndSorting(
             supabase,
             primaryFilters.concat(additionalFilters),
             sortState,
@@ -120,6 +120,7 @@ const ParcelsPage: React.FC = () => {
                         selectedParcelId={selectedParcelId}
                         selectedClientDetails={selectedClientDetails}
                         modalErrorMessage={modalErrorMessage}
+                        setModalErrorMessage={setModalErrorMessage}
                     />
                 </>
             )}
