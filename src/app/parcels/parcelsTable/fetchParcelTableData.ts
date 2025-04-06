@@ -195,7 +195,7 @@ const getParcelsCount = async (
             ? await logInfoReturnLogId("Aborted fetch: parcel table count", error)
             : await logErrorReturnLogId("Error with fetch: parcel table count", error);
         if (abortSignal.aborted) {
-            throw new AbortError("fetch", "parcel table", "logId");
+            throw new AbortError("fetch", "parcel table", logId);
         }
 
         throw new DatabaseError("fetch", "parcel table", logId);

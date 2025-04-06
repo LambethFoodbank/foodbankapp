@@ -5,7 +5,7 @@ import {
     DistributeServerFilter,
     PaginationType as PaginationTypeEnum,
 } from "@/components/Tables/Filters";
-import TableFilterAndExtraColumnsBar from "@/components/Tables/TableFilterAndExtraColumnsBar";
+import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import {
     faAnglesDown,
     faAnglesUp,
@@ -26,6 +26,7 @@ import {
 } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import { Database } from "@/databaseTypesFile";
+import ColumnTogglePopup from "./ColumnTogglePopup";
 
 export type TableHeaders<Data> = readonly (readonly [keyof Data, string])[];
 
@@ -430,30 +431,43 @@ const Table = <
 
     return (
         <div aria-live="polite">
-            <TableFilterAndExtraColumnsBar<
-                Data,
-                PaginationType extends PaginationTypeEnum.Client
-                    ? DistributeClientFilter<Data, FilterState>
-                    : DistributeServerFilter<Data, FilterState, DbData>,
-                FilterState
-            >
-                setFilters={
-                    filterConfig.primaryFiltersShown ? filterConfig.setPrimaryFilters : undefined
-                }
-                toggleableHeaders={toggleableHeaders}
-                filters={filterConfig.primaryFiltersShown ? filterConfig.primaryFilters : undefined}
-                additionalFilters={
-                    filterConfig.additionalFiltersShown ? filterConfig.additionalFilters : undefined
-                }
-                setAdditionalFilters={
-                    filterConfig.additionalFiltersShown
-                        ? filterConfig.setAdditionalFilters
-                        : undefined
-                }
-                headers={headerKeysAndLabels}
-                setShownHeaderKeys={setShownHeaderKeys}
-                shownHeaderKeys={shownHeaderKeys}
-            />
+            {(filterConfig.primaryFiltersShown || filterConfig.additionalFiltersShown) && (
+                <TableFiltersBar<
+                    Data,
+                    PaginationType extends PaginationTypeEnum.Client
+                        ? DistributeClientFilter<Data, FilterState>
+                        : DistributeServerFilter<Data, FilterState, DbData>,
+                    FilterState
+                >
+                    setFilters={
+                        filterConfig.primaryFiltersShown
+                            ? filterConfig.setPrimaryFilters
+                            : undefined
+                    }
+                    filters={
+                        filterConfig.primaryFiltersShown ? filterConfig.primaryFilters : undefined
+                    }
+                    additionalFilters={
+                        filterConfig.additionalFiltersShown
+                            ? filterConfig.additionalFilters
+                            : undefined
+                    }
+                    setAdditionalFilters={
+                        filterConfig.additionalFiltersShown
+                            ? filterConfig.setAdditionalFilters
+                            : undefined
+                    }
+                />
+            )}
+            {/* QQ temporarily put Select Columns just above table header - needs nicer UI */}
+            {toggleableHeaders.length > 0 && (
+                <ColumnTogglePopup
+                    toggleableHeaders={toggleableHeaders}
+                    shownHeaderKeys={shownHeaderKeys}
+                    setShownHeaderKeys={setShownHeaderKeys}
+                    headers={headerKeysAndLabels}
+                />
+            )}
             <TableStyling
                 $rowBreakPointConfigs={rowBreakPointConfigs ?? []}
                 $dividingLineStyleOptions={getDividingLineStyleOptions(theme)}

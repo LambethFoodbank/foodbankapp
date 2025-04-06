@@ -2,25 +2,19 @@
 
 import React, { Fragment, useState } from "react";
 import Button from "@mui/material/Button";
-import { TableHeaders } from "@/components/Tables/Table";
 import styled from "styled-components";
 import { FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
-import ColumnTogglePopup from "@/components/Tables/ColumnTogglePopup";
 import { DistributeClientFilter, DistributeServerFilter } from "@/components/Tables/Filters";
 
 type FilterBase<Data, State> =
     | DistributeClientFilter<Data, State>
     | DistributeServerFilter<Data, State, Record<string, unknown>>;
 
-interface Props<Data, Filter extends FilterBase<Data, State>, State> {
+export interface TableFiltersBarProps<Data, Filter extends FilterBase<Data, State>, State> {
     setFilters?: (filters: Filter[]) => void;
     setAdditionalFilters?: (filters: Filter[]) => void;
-    headers: TableHeaders<Data>;
     filters?: Filter[];
     additionalFilters?: Filter[];
-    toggleableHeaders: readonly (keyof Data)[];
-    setShownHeaderKeys: (headers: (keyof Data)[]) => void;
-    shownHeaderKeys: readonly (keyof Data)[];
 }
 
 const StyledButton = styled(Button)`
@@ -73,8 +67,8 @@ export function filtersToComponents<Data, Filter extends FilterBase<Data, State>
     });
 }
 
-function TableFilterAndExtraColumnsBar<Data, Filter extends FilterBase<Data, State>, State>(
-    props: Props<Data, Filter, State>
+function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
+    props: TableFiltersBarProps<Data, Filter, State>
 ): React.ReactElement {
     const handleClear = (): void => {
         if (props.setFilters && props.filters) {
@@ -103,20 +97,18 @@ function TableFilterAndExtraColumnsBar<Data, Filter extends FilterBase<Data, Sta
         }
     };
 
-    const [showMoreFiltersAndHeaders, setShowMoreFiltersAndHeaders] = useState(false);
+    const [showMoreFilters, setShowMoreFilters] = useState(false);
 
     const hasPrimaryFilters = props.filters?.length !== 0 && props.setFilters;
 
     const hasAdditionalFilters =
         props.additionalFilters?.length !== 0 && props.setAdditionalFilters;
 
-    const hasToggleableHeaders = props.toggleableHeaders.length !== 0;
-
     const handleToggleAdditional = (): void => {
-        setShowMoreFiltersAndHeaders((prev) => !prev);
+        setShowMoreFilters((prev) => !prev);
     };
 
-    if (!hasPrimaryFilters && !hasAdditionalFilters && !hasToggleableHeaders) {
+    if (!hasPrimaryFilters && !hasAdditionalFilters) {
         return <></>;
     }
 
@@ -134,14 +126,14 @@ function TableFilterAndExtraColumnsBar<Data, Filter extends FilterBase<Data, Sta
                                 props.setFilters
                             )}
                         <Grow />
-                        {(hasAdditionalFilters || hasToggleableHeaders) && (
+                        {hasAdditionalFilters && (
                             <StyledButton
                                 variant="outlined"
                                 onClick={handleToggleAdditional}
                                 color="inherit"
                                 startIcon={<FilterAltOutlined />}
                             >
-                                {showMoreFiltersAndHeaders ? "Less" : "More"}
+                                {showMoreFilters ? "Less" : "More"}
                             </StyledButton>
                         )}
                         {(hasPrimaryFilters || hasAdditionalFilters) && (
@@ -157,10 +149,10 @@ function TableFilterAndExtraColumnsBar<Data, Filter extends FilterBase<Data, Sta
                     </>
                 </FilterContainer>
             </FiltersAndIconContainer>
-            {(hasAdditionalFilters || hasToggleableHeaders) && showMoreFiltersAndHeaders && (
+            {hasAdditionalFilters && showMoreFilters && (
                 <>
                     <FiltersAndIconContainer>
-                        {hasAdditionalFilters && <FilterAltOutlined />}
+                        <FilterAltOutlined />
                         <FilterContainer>
                             {props.additionalFilters &&
                                 props.additionalFilters.length !== 0 &&
@@ -173,14 +165,6 @@ function TableFilterAndExtraColumnsBar<Data, Filter extends FilterBase<Data, Sta
                                     </>
                                 )}
                             <Grow />
-                            {props.toggleableHeaders.length > 0 && (
-                                <ColumnTogglePopup
-                                    toggleableHeaders={props.toggleableHeaders}
-                                    shownHeaderKeys={props.shownHeaderKeys}
-                                    setShownHeaderKeys={props.setShownHeaderKeys}
-                                    headers={props.headers}
-                                />
-                            )}
                         </FilterContainer>
                     </FiltersAndIconContainer>
                 </>
@@ -189,4 +173,4 @@ function TableFilterAndExtraColumnsBar<Data, Filter extends FilterBase<Data, Sta
     );
 }
 
-export default TableFilterAndExtraColumnsBar;
+export default TableFiltersBar;
