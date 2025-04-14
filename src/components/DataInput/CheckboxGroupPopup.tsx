@@ -10,6 +10,7 @@ interface Props {
     labelsAndKeys: [string, string][];
     checkedKeys?: string[];
     groupLabel?: string;
+    buttonIcon?: React.ReactNode;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     anySelected?: () => boolean;
     isDisabled?: boolean;
@@ -46,6 +47,7 @@ const CheckboxGroupPopup: React.FC<Props> = (props) => {
                 onClick={(event) => setPopoverAnchorElement(event.currentTarget)}
                 disabled={!props.labelsAndKeys.length || props.isDisabled}
                 type="button"
+                startIcon={props.buttonIcon}
                 endIcon={
                     props.anySelected && props.anySelected() ? <FilterAlt /> : <ArrowDropDown />
                 }

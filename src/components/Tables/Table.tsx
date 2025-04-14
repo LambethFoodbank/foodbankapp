@@ -459,72 +459,79 @@ const Table = <
                     }
                 />
             )}
-            {/* QQ temporarily put Select Columns just above table header - needs nicer UI */}
-            {toggleableHeaders.length > 0 && (
-                <ColumnTogglePopup
-                    toggleableHeaders={toggleableHeaders}
-                    shownHeaderKeys={shownHeaderKeys}
-                    setShownHeaderKeys={setShownHeaderKeys}
-                    headers={headerKeysAndLabels}
-                />
-            )}
-            <TableStyling
-                $rowBreakPointConfigs={rowBreakPointConfigs ?? []}
-                $dividingLineStyleOptions={getDividingLineStyleOptions(theme)}
-            >
-                <NoSsr>
-                    <DataTable
-                        columns={columns}
-                        data={rows}
-                        keyField="rowId"
-                        pagination={paginationConfig.enablePagination}
-                        persistTableHead
-                        onRowClicked={onRowClick}
-                        paginationServer={paginationConfig.enablePagination}
-                        paginationTotalRows={
-                            paginationConfig.enablePagination
-                                ? paginationConfig.filteredCount
-                                : undefined
-                        }
-                        paginationPerPage={
-                            paginationConfig.enablePagination
-                                ? paginationConfig.defaultRowsPerPage
-                                : undefined
-                        }
-                        paginationRowsPerPageOptions={
-                            paginationConfig.enablePagination
-                                ? paginationConfig.rowsPerPageOptions
-                                : undefined
-                        }
-                        paginationDefaultPage={paginationConfig.enablePagination ? 1 : undefined}
-                        onChangePage={
-                            paginationConfig.enablePagination
-                                ? paginationConfig.onPageChange
-                                : () => undefined
-                        }
-                        onChangeRowsPerPage={
-                            paginationConfig.enablePagination
-                                ? paginationConfig.onPerPageChange
-                                : () => undefined
-                        }
-                        sortServer={sortConfig.sortPossible}
-                        onSort={handleSort}
-                        defaultSortFieldId={defaultSortConfig?.defaultColumnHeaderKey}
-                        progressComponent={
-                            <Centerer role="rowgroup">
-                                <CircularProgress
-                                    role="row"
-                                    aria-label="table-progress-bar"
-                                    aria-busy={true}
-                                />
-                            </Centerer>
-                        }
-                        progressPending={isLoading}
-                        pointerOnHover={pointerOnHover}
-                        striped
-                    />
-                </NoSsr>
-            </TableStyling>
+
+            <RelativeContainerForTable>
+                {toggleableHeaders.length > 0 && (
+                    <ColumnSelectorContainer>
+                        <ColumnTogglePopup
+                            toggleableHeaders={toggleableHeaders}
+                            shownHeaderKeys={shownHeaderKeys}
+                            setShownHeaderKeys={setShownHeaderKeys}
+                            headers={headerKeysAndLabels}
+                        />
+                    </ColumnSelectorContainer>
+                )}
+
+                <TableStyling
+                    $rowBreakPointConfigs={rowBreakPointConfigs ?? []}
+                    $dividingLineStyleOptions={getDividingLineStyleOptions(theme)}
+                >
+                    <NoSsr>
+                        <DataTable
+                            columns={columns}
+                            data={rows}
+                            keyField="rowId"
+                            pagination={paginationConfig.enablePagination}
+                            persistTableHead
+                            onRowClicked={onRowClick}
+                            paginationServer={paginationConfig.enablePagination}
+                            paginationTotalRows={
+                                paginationConfig.enablePagination
+                                    ? paginationConfig.filteredCount
+                                    : undefined
+                            }
+                            paginationPerPage={
+                                paginationConfig.enablePagination
+                                    ? paginationConfig.defaultRowsPerPage
+                                    : undefined
+                            }
+                            paginationRowsPerPageOptions={
+                                paginationConfig.enablePagination
+                                    ? paginationConfig.rowsPerPageOptions
+                                    : undefined
+                            }
+                            paginationDefaultPage={
+                                paginationConfig.enablePagination ? 1 : undefined
+                            }
+                            onChangePage={
+                                paginationConfig.enablePagination
+                                    ? paginationConfig.onPageChange
+                                    : () => undefined
+                            }
+                            onChangeRowsPerPage={
+                                paginationConfig.enablePagination
+                                    ? paginationConfig.onPerPageChange
+                                    : () => undefined
+                            }
+                            sortServer={sortConfig.sortPossible}
+                            onSort={handleSort}
+                            defaultSortFieldId={defaultSortConfig?.defaultColumnHeaderKey}
+                            progressComponent={
+                                <Centerer role="rowgroup">
+                                    <CircularProgress
+                                        role="row"
+                                        aria-label="table-progress-bar"
+                                        aria-busy={true}
+                                    />
+                                </Centerer>
+                            }
+                            progressPending={isLoading}
+                            pointerOnHover={pointerOnHover}
+                            striped
+                        />
+                    </NoSsr>
+                </TableStyling>
+            </RelativeContainerForTable>
         </div>
     );
 };
@@ -535,6 +542,17 @@ const EditAndReorderArrowDiv = styled.div`
     width: 100%;
     // this transform is necessary to make the buttons visually consistent with the rest of the table without redesigning the layout
     transform: translateX(-1.2rem);
+`;
+
+const RelativeContainerForTable = styled.div`
+    position: relative;
+`;
+
+const ColumnSelectorContainer = styled.div`
+    position: absolute;
+    top: 0.25rem;
+    right: 0.5rem;
+    z-index: 900;
 `;
 
 const TableStyling = styled.div<{

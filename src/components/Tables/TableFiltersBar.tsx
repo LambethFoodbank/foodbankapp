@@ -144,7 +144,9 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                                 onClick={handleClear}
                                 color="inherit"
                                 startIcon={<FilterAltOffOutlined />}
-                            ></StyledButton>
+                            >
+                                Clear
+                            </StyledButton>
                         )}
                     </>
                 </FiltersSingleRowContainer>
