@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import styled from "styled-components";
 import { FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
 import { FilterBase } from "@/components/Tables/Filters";
+import { MENU_BREAKPOINT } from "../NavigationBar/NavigationBar";
 
 export interface TableFiltersBarProps<Data, Filter extends FilterBase<Data, State>, State> {
     setFilters?: (filters: Filter[]) => void;
@@ -29,12 +30,16 @@ const FiltersAndIconContainer = styled.div`
 
 const FiltersSingleRowContainer = styled.div`
     display: flex;
-    flex-wrap: nowrap;
     align-items: center;
     padding: 0.5rem 0;
     gap: 1rem;
     overflow: visible;
     width: 100%;
+    flex-wrap: wrap;
+
+    @media (min-width: ${MENU_BREAKPOINT}) {
+        flex-wrap: nowrap;
+    }
 `;
 
 const Grow = styled.div`

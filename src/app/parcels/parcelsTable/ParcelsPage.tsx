@@ -23,7 +23,7 @@ import { DistributeServerFilter } from "@/components/Tables/Filters";
 import { DbParcelRow } from "@/databaseUtils";
 import { shouldFilterBeDisabled } from "./packingManagerHelpers";
 import dayjs from "dayjs";
-import { PreTableControlsContainer } from "@/components/Form/formStyling";
+import { PreTableControlsContainer } from "@/components/controlsStyling";
 
 type ParcelTableFilterState = string | DateRangeState | string[];
 

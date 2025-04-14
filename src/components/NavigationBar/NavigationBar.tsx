@@ -19,7 +19,7 @@ import FixedToast from "../FixedToast";
 
 export const NavBarHeight = "3.5rem";
 
-const MENU_BREAKPOINT = "1024px";
+export const MENU_BREAKPOINT = "1024px";
 
 const StyledSwipeableDrawer = styled(SwipeableDrawer)`
     & .MuiPaper-root {

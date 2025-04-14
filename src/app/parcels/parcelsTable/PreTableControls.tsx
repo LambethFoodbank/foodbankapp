@@ -1,7 +1,7 @@
-import { ActionsContainer, PreTableControlsContainer } from "@/components/Form/formStyling";
 import { Button } from "@mui/material";
 import ActionAndStatusBar from "../ActionBar/ActionAndStatusBar";
 import { ParcelsTableRow } from "./types";
+import { ActionsContainer } from "@/components/controlsStyling";
 
 interface PreTableControlsProps {
     isPackingManagerView: boolean;
