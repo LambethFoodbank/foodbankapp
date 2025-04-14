@@ -466,7 +466,7 @@ describe("Generic Table component", () => {
         });
 
         it("should render the table with toggleable headers", () => {
-            expect(screen.getByText("Select Columns")).toBeInTheDocument();
+            expect(screen.getByTestId("select-columns-button")).toBeInTheDocument();
         });
 
         it("should render with only default shown headers", () => {
@@ -476,7 +476,7 @@ describe("Generic Table component", () => {
                     : expect(screen.queryByText(header[1])).toBeNull();
             });
 
-            const selectColumnsButton = screen.getByText("Select Columns");
+            const selectColumnsButton = screen.getByTestId("select-columns-button");
             fireEvent.click(selectColumnsButton);
 
             fakeDataHeaders.forEach((header, index) => {
@@ -498,7 +498,7 @@ describe("Generic Table component", () => {
         });
 
         it("should only have toggleable headers in the select columns dropdown", () => {
-            const selectColumnsButton = screen.getByText("Select Columns");
+            const selectColumnsButton = screen.getByTestId("select-columns-button");
             fireEvent.click(selectColumnsButton);
             fakeDataHeaders.forEach((header, index) => {
                 index === 0
@@ -513,7 +513,8 @@ describe("Generic Table component", () => {
             expect(screen.queryByText(last_header[1])).toBeNull();
             expect(screen.queryByTestId("checkbox-group-popup")).toBeFalsy();
 
-            fireEvent.click(screen.getByText("Select Columns"));
+            const selectColumnsButton = screen.getByTestId("select-columns-button");
+            fireEvent.click(selectColumnsButton);
             expect(screen.queryByTestId("checkbox-group-popup")).toBeTruthy();
 
             expect(
@@ -530,7 +531,7 @@ describe("Generic Table component", () => {
 
             expect(screen.getByText(last_header[1])).toBeInTheDocument();
 
-            fireEvent.click(screen.getByText("Select Columns"));
+            fireEvent.click(selectColumnsButton);
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).toBeChecked();

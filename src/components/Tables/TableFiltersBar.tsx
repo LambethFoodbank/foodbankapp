@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import styled from "styled-components";
 import { FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
 import { FilterBase } from "@/components/Tables/Filters";
-import { MENU_BREAKPOINT } from "../NavigationBar/NavigationBar";
+import { MENU_BREAKPOINT } from "@/common/sharedConstants";
 
 export interface TableFiltersBarProps<Data, Filter extends FilterBase<Data, State>, State> {
     setFilters?: (filters: Filter[]) => void;

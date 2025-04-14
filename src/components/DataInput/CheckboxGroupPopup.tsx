@@ -11,6 +11,7 @@ interface Props {
     checkedKeys?: string[];
     groupLabel?: string;
     buttonIcon?: React.ReactNode;
+    buttonTestId?: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     anySelected?: () => boolean;
     isDisabled?: boolean;
@@ -51,6 +52,7 @@ const CheckboxGroupPopup: React.FC<Props> = (props) => {
                 endIcon={
                     props.anySelected && props.anySelected() ? <FilterAlt /> : <ArrowDropDown />
                 }
+                data-testid={props.buttonTestId}
             >
                 {props.groupLabel}
             </Button>

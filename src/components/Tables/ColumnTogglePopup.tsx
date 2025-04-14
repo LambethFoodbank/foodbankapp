@@ -14,7 +14,7 @@ interface ColumnTogglePopupProps<Data> {
     headers: TableHeaders<Data>;
 }
 
-const ThemedContainer = styled(Button)`
+const ThemedContainer = styled.div`
     color: ${(props) => props.theme.main.foreground[2]};
     background-color: ${(props) => props.theme.main.background[2]};
 `;
@@ -43,8 +43,9 @@ const ColumnTogglePopup = <Data,>({
                     return [headerLabel, key as string];
                 })}
                 checkedKeys={shownHeaderKeys.map((key) => key as string)}
-                buttonIcon={<ViewColumnOutlined />}
                 onChange={onChangeCheckbox}
+                buttonIcon={<ViewColumnOutlined />}
+                buttonTestId="select-columns-button"
             />
         </ThemedContainer>
     );

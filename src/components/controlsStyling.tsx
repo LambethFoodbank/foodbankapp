@@ -2,7 +2,7 @@
 
 import styled from "styled-components";
 import { Paper } from "@mui/material";
-import { MENU_BREAKPOINT, NavBarHeight } from "./NavigationBar/NavigationBar";
+import { MENU_BREAKPOINT, NavBarHeight } from "@/common/sharedConstants";
 
 export const PreTableControlsContainer = styled(Paper)`
     margin: 0 1rem 1rem;

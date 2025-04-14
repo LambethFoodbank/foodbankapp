@@ -16,10 +16,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { DatabaseAutoType } from "@/databaseUtils";
 import { useSessionHeartbeat } from "@/common/useSessionHeartbeat";
 import FixedToast from "../FixedToast";
-
-export const NavBarHeight = "3.5rem";
-
-export const MENU_BREAKPOINT = "1024px";
+import { MENU_BREAKPOINT, NavBarHeight } from "@/common/sharedConstants";
 
 const StyledSwipeableDrawer = styled(SwipeableDrawer)`
     & .MuiPaper-root {
