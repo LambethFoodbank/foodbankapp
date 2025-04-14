@@ -466,8 +466,6 @@ describe("Generic Table component", () => {
         });
 
         it("should render the table with toggleable headers", () => {
-            const moreButton = screen.getByText("More");
-            fireEvent.click(moreButton);
             expect(screen.getByText("Select Columns")).toBeInTheDocument();
         });
 
@@ -478,7 +476,6 @@ describe("Generic Table component", () => {
                     : expect(screen.queryByText(header[1])).toBeNull();
             });
 
-            fireEvent.click(screen.getByText("More"));
             const selectColumnsButton = screen.getByText("Select Columns");
             fireEvent.click(selectColumnsButton);
 
@@ -501,8 +498,6 @@ describe("Generic Table component", () => {
         });
 
         it("should only have toggleable headers in the select columns dropdown", () => {
-            const moreButton = screen.getByText("More");
-            fireEvent.click(moreButton);
             const selectColumnsButton = screen.getByText("Select Columns");
             fireEvent.click(selectColumnsButton);
             fakeDataHeaders.forEach((header, index) => {
@@ -512,37 +507,40 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should have headers be toggled on and off", () => {
+        it("should have headers be toggled on and off", async () => {
             const last_header = fakeDataHeaders[fakeDataHeaders.length - 1];
 
             expect(screen.queryByText(last_header[1])).toBeNull();
+            expect(screen.queryByTestId("checkbox-group-popup")).toBeFalsy();
 
-            fireEvent.click(screen.getByText("More"));
             fireEvent.click(screen.getByText("Select Columns"));
+            expect(screen.queryByTestId("checkbox-group-popup")).toBeTruthy();
 
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).not.toBeChecked();
+
             fireEvent.click(screen.getByTestId(`option-${last_header[0]}`));
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).toBeChecked();
-            fireEvent.click(screen.getByText("Select Columns"));
-            fireEvent.click(screen.getByText("Less"));
+
+            await userEvent.keyboard("{Escape}");
+            expect(screen.queryByTestId("checkbox-group-popup")).toBeFalsy();
 
             expect(screen.getByText(last_header[1])).toBeInTheDocument();
 
-            fireEvent.click(screen.getByText("More"));
             fireEvent.click(screen.getByText("Select Columns"));
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).toBeChecked();
+
             fireEvent.click(screen.getByTestId(`option-${last_header[0]}`));
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).not.toBeChecked();
-            fireEvent.click(screen.getByText("Select Columns"));
-            fireEvent.click(screen.getByText("Less"));
+
+            await userEvent.keyboard("{Escape}");
 
             expect(screen.queryByText(last_header[1])).toBeNull();
         });

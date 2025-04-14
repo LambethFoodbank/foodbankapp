@@ -29,10 +29,7 @@ import parcelsSortableColumns, {
 } from "@/app/parcels/parcelsTable/sortableColumns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
-import {
-    shouldFilterBeDisabled,
-    shouldBeInPackingManagerView,
-} from "@/app/parcels/parcelsTable/packingManagerHelpers";
+import { shouldBeInPackingManagerView } from "@/app/parcels/parcelsTable/packingManagerHelpers";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     getClientIdAndIsActive,
@@ -173,7 +170,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             parcelsTableFetchAbortController.current = null;
             setIsLoading(false);
         }
-    }, [appliedFilters, endPoint, sortState, startPoint, isPackingManagerView, setErrorMessage]);
+    }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
 
     useEffect(() => {
         if (!areFiltersLoadingForFirstTime) {

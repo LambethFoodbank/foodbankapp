@@ -30,6 +30,7 @@ const CheckboxGroupPopup: React.FC<Props> = (props) => {
                     onClose={() => setPopoverAnchorElement(null)}
                     anchorEl={popoverAnchorElement}
                     anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                    data-testid="checkbox-group-popup"
                 >
                     <ContainerDiv>
                         <CheckboxGroupInput
