@@ -5,7 +5,6 @@ import { TableHeaders } from "@/components/Tables/Table";
 import CheckboxGroupPopup from "../DataInput/CheckboxGroupPopup";
 import { ViewColumnOutlined } from "@mui/icons-material";
 import styled from "styled-components";
-import { Button } from "@mui/material";
 
 interface ColumnTogglePopupProps<Data> {
     toggleableHeaders?: readonly (keyof Data)[];
