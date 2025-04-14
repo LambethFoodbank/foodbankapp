@@ -114,7 +114,6 @@ export const PreTableControlsContainer = styled(Paper)`
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;
     padding: 1rem;
     gap: 0.5rem;
     align-items: center;

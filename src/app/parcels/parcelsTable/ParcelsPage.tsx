@@ -112,15 +112,14 @@ const ParcelsPage: React.FC = () => {
 
     return (
         <>
-            <PreTableControls
-                isPackingManagerView={isPackingManagerView}
-                setIsPackingManagerView={setIsPackingManagerView}
-                selectedParcelMessage={selectedParcelMessage}
-                getCheckedParcelsData={getCheckedParcelsData}
-                postCheckedParcelActivity={postCheckedParcelActivity}
-            />
             <PreTableControlsContainer>
-                {/* QQ: this isn't the right container - see right alignment of additional */}
+                <PreTableControls
+                    isPackingManagerView={isPackingManagerView}
+                    setIsPackingManagerView={setIsPackingManagerView}
+                    selectedParcelMessage={selectedParcelMessage}
+                    getCheckedParcelsData={getCheckedParcelsData}
+                    postCheckedParcelActivity={postCheckedParcelActivity}
+                />
                 <TableFiltersBar<
                     ParcelsTableRow,
                     DistributeServerFilter<ParcelsTableRow, ParcelTableFilterState, DbParcelRow>,
@@ -134,6 +133,7 @@ const ParcelsPage: React.FC = () => {
                     setAdditionalFilters={setAdditionalFilters}
                 />
             </PreTableControlsContainer>
+
             {areFiltersLoadingForFirstTime ? (
                 <Centerer>
                     <CircularProgress aria-label="table-initial-progress-bar" />

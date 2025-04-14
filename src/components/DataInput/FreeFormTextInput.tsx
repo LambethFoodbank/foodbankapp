@@ -17,6 +17,7 @@ interface Props {
     className?: string;
     fullWidth?: boolean;
     margin?: "dense" | "normal" | "none";
+    size?: "medium" | "small";
     disabled?: boolean;
     tabIndex?: number;
 }

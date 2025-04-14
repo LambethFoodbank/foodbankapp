@@ -4,11 +4,7 @@ import React, { Fragment, useState } from "react";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
 import { FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
-import { DistributeClientFilter, DistributeServerFilter } from "@/components/Tables/Filters";
-
-type FilterBase<Data, State> =
-    | DistributeClientFilter<Data, State>
-    | DistributeServerFilter<Data, State, Record<string, unknown>>;
+import { FilterBase } from "@/components/Tables/Filters";
 
 export interface TableFiltersBarProps<Data, Filter extends FilterBase<Data, State>, State> {
     setFilters?: (filters: Filter[]) => void;
@@ -25,14 +21,15 @@ const StyledButton = styled(Button)`
 const FiltersAndIconContainer = styled.div`
     display: flex;
     align-items: center;
+    width: 100%;
     gap: 1rem;
     background-color: transparent;
     padding: 0;
 `;
 
-const FilterContainer = styled.div`
+const FiltersSingleRowContainer = styled.div`
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     padding: 0.5rem 0;
     gap: 1rem;
@@ -116,7 +113,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
         <>
             <FiltersAndIconContainer>
                 {hasPrimaryFilters && <FilterAltOutlined />}
-                <FilterContainer>
+                <FiltersSingleRowContainer>
                     <>
                         {props.filters &&
                             props.filters?.length !== 0 &&
@@ -142,18 +139,16 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                                 onClick={handleClear}
                                 color="inherit"
                                 startIcon={<FilterAltOffOutlined />}
-                            >
-                                Clear
-                            </StyledButton>
+                            ></StyledButton>
                         )}
                     </>
-                </FilterContainer>
+                </FiltersSingleRowContainer>
             </FiltersAndIconContainer>
             {hasAdditionalFilters && showMoreFilters && (
                 <>
                     <FiltersAndIconContainer>
                         <FilterAltOutlined />
-                        <FilterContainer>
+                        <FiltersSingleRowContainer>
                             {props.additionalFilters &&
                                 props.additionalFilters.length !== 0 &&
                                 props.setAdditionalFilters && (
@@ -165,7 +160,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                                     </>
                                 )}
                             <Grow />
-                        </FilterContainer>
+                        </FiltersSingleRowContainer>
                     </FiltersAndIconContainer>
                 </>
             )}

@@ -61,6 +61,10 @@ export type DistributeServerFilter<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 > = State extends any ? ServerSideFilter<Data, State, DbData> : never;
 
+export type FilterBase<Data, State> =
+    | DistributeClientFilter<Data, State>
+    | DistributeServerFilter<Data, State, Record<string, unknown>>;
+
 export const headerLabelFromKey = <Data, Key extends keyof Data>(
     headers: TableHeaders<Data>,
     key: Key
