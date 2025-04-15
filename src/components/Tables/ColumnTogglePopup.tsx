@@ -44,6 +44,7 @@ const ColumnTogglePopup = <Data,>({
                 checkedKeys={shownHeaderKeys.map((key) => key as string)}
                 onChange={onChangeCheckbox}
                 buttonIcon={<ViewColumnOutlined />}
+                accessibleLabel="Select Columns"
                 buttonTestId="select-columns-button"
             />
         </ThemedContainer>

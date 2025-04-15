@@ -9,9 +9,10 @@ import styled from "styled-components";
 interface Props {
     labelsAndKeys: [string, string][];
     checkedKeys?: string[];
-    groupLabel?: string;
+    buttonLabel?: string;
     buttonIcon?: React.ReactNode;
     buttonTestId?: string;
+    accessibleLabel?: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     anySelected?: () => boolean;
     isDisabled?: boolean;
@@ -52,9 +53,10 @@ const CheckboxGroupPopup: React.FC<Props> = (props) => {
                 endIcon={
                     props.anySelected && props.anySelected() ? <FilterAlt /> : <ArrowDropDown />
                 }
+                aria-label={props.accessibleLabel}
                 data-testid={props.buttonTestId}
             >
-                {props.groupLabel}
+                {props.buttonLabel}
             </Button>
         </>
     );
