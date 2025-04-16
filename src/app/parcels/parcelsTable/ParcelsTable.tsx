@@ -29,10 +29,7 @@ import parcelsSortableColumns, {
 } from "@/app/parcels/parcelsTable/sortableColumns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
-import {
-    shouldFilterBeDisabled,
-    shouldBeInPackingManagerView,
-} from "@/app/parcels/parcelsTable/packingManagerHelpers";
+import { shouldBeInPackingManagerView } from "@/app/parcels/parcelsTable/packingManagerHelpers";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     getClientIdAndIsActive,
@@ -51,22 +48,11 @@ interface ParcelsTableProps {
     setModalIsOpen: (isOpen: boolean) => void;
     sortState: ParcelsSortState;
     setSortState: (sortState: ParcelsSortState) => void;
-    primaryFilters: (
+    appliedFilters: (
         | ParcelsFilter<string>
         | ParcelsFilter<DateRangeState>
         | ParcelsFilter<string[]>
     )[];
-    setPrimaryFilters: (
-        filters: (ParcelsFilter<string> | ParcelsFilter<DateRangeState> | ParcelsFilter<string[]>)[]
-    ) => void;
-    additionalFilters: (
-        | ParcelsFilter<string>
-        | ParcelsFilter<DateRangeState>
-        | ParcelsFilter<string[]>
-    )[];
-    setAdditionalFilters: (
-        filters: (ParcelsFilter<string> | ParcelsFilter<DateRangeState> | ParcelsFilter<string[]>)[]
-    ) => void;
     areFiltersLoadingForFirstTime: boolean;
     setErrorMessage: (errorMessage: string | null) => void;
     setModalErrorMessage: (errorMessage: string | null) => void;
@@ -81,10 +67,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     setModalIsOpen,
     sortState,
     setSortState,
-    primaryFilters,
-    setPrimaryFilters,
-    additionalFilters,
-    setAdditionalFilters,
+    appliedFilters,
     areFiltersLoadingForFirstTime,
     setErrorMessage,
     setModalErrorMessage,
@@ -141,29 +124,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         void fetchAndSetClientDetailsForSelectedParcel();
     }, [fetchAndSetClientDetailsForSelectedParcel, setSelectedClientDetails]);
 
-    const packingManagerViewPrimaryFilters = useMemo(
-        () =>
-            primaryFilters.map((filter) => {
-                if (filter.key === "packingDate") {
-                    return {
-                        ...filter,
-                        state: { from: yesterday, to: today },
-                        isDisabled: true,
-                    } as ParcelsFilter<DateRangeState>;
-                }
-                if (shouldFilterBeDisabled(filter)) {
-                    return { ...filter, isDisabled: true };
-                }
-                return filter;
-            }),
-        [primaryFilters, today, yesterday]
-    );
-
     const fetchAndDisplayParcelsData = useCallback(async (): Promise<void> => {
-        const allFilters = isPackingManagerView
-            ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
-            : [...primaryFilters, ...additionalFilters];
-
         if (parcelsTableFetchAbortController.current) {
             parcelsTableFetchAbortController.current.abort("stale request");
         }
@@ -176,7 +137,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
 
             const { data, error } = await getParcelsDataAndCount(
                 supabase,
-                allFilters,
+                appliedFilters,
                 sortState,
                 parcelsTableFetchAbortController.current.signal,
                 startPoint,
@@ -209,16 +170,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             parcelsTableFetchAbortController.current = null;
             setIsLoading(false);
         }
-    }, [
-        additionalFilters,
-        endPoint,
-        primaryFilters,
-        sortState,
-        startPoint,
-        isPackingManagerView,
-        packingManagerViewPrimaryFilters,
-        setErrorMessage,
-    ]);
+    }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
 
     useEffect(() => {
         if (!areFiltersLoadingForFirstTime) {
@@ -303,9 +255,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             setCheckedParcelIds([]);
             setAllCheckBoxSelected(false);
         } else {
-            setCheckedParcelIds(
-                await getParcelIds(supabase, primaryFilters.concat(additionalFilters), sortState)
-            );
+            setCheckedParcelIds(await getParcelIds(supabase, appliedFilters, sortState));
             setAllCheckBoxSelected(true);
         }
     };
@@ -351,14 +301,8 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 defaultSortConfig={defaultParcelsSortConfig}
                 rowBreakPointConfigs={isPackingManagerView ? undefined : parcelRowBreakPointConfig}
                 filterConfig={{
-                    primaryFiltersShown: true,
-                    additionalFiltersShown: true,
-                    primaryFilters: isPackingManagerView
-                        ? packingManagerViewPrimaryFilters
-                        : primaryFilters,
-                    additionalFilters: additionalFilters,
-                    setPrimaryFilters: setPrimaryFilters,
-                    setAdditionalFilters: setAdditionalFilters,
+                    primaryFiltersShown: false,
+                    additionalFiltersShown: false,
                 }}
                 defaultShownHeaders={parcelTableDefaultShownHeaders}
                 toggleableHeaders={parcelTableToggleableHeaders}

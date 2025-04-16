@@ -9,7 +9,10 @@ import styled from "styled-components";
 interface Props {
     labelsAndKeys: [string, string][];
     checkedKeys?: string[];
-    groupLabel?: string;
+    buttonLabel?: string;
+    buttonIcon?: React.ReactNode;
+    buttonTestId?: string;
+    accessibleLabel?: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     anySelected?: () => boolean;
     isDisabled?: boolean;
@@ -30,6 +33,7 @@ const CheckboxGroupPopup: React.FC<Props> = (props) => {
                     onClose={() => setPopoverAnchorElement(null)}
                     anchorEl={popoverAnchorElement}
                     anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                    data-testid="checkbox-group-popup"
                 >
                     <ContainerDiv>
                         <CheckboxGroupInput
@@ -45,11 +49,14 @@ const CheckboxGroupPopup: React.FC<Props> = (props) => {
                 onClick={(event) => setPopoverAnchorElement(event.currentTarget)}
                 disabled={!props.labelsAndKeys.length || props.isDisabled}
                 type="button"
+                startIcon={props.buttonIcon}
                 endIcon={
                     props.anySelected && props.anySelected() ? <FilterAlt /> : <ArrowDropDown />
                 }
+                aria-label={props.accessibleLabel}
+                data-testid={props.buttonTestId}
             >
-                {props.groupLabel}
+                {props.buttonLabel}
             </Button>
         </>
     );

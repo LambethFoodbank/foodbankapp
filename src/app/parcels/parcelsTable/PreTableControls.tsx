@@ -1,7 +1,7 @@
-import { ActionsContainer, PreTableControlsContainer } from "@/components/Form/formStyling";
 import { Button } from "@mui/material";
 import ActionAndStatusBar from "../ActionBar/ActionAndStatusBar";
 import { ParcelsTableRow } from "./types";
+import { ActionsContainer } from "@/components/controlsStyling";
 
 interface PreTableControlsProps {
     isPackingManagerView: boolean;
@@ -13,7 +13,7 @@ interface PreTableControlsProps {
 
 const PreTableControls: React.FC<PreTableControlsProps> = (props) => {
     return (
-        <PreTableControlsContainer>
+        <>
             <Button
                 variant={props.isPackingManagerView ? "outlined" : "contained"}
                 onClick={() => props.setIsPackingManagerView(false)}
@@ -33,7 +33,7 @@ const PreTableControls: React.FC<PreTableControlsProps> = (props) => {
                     postCheckedParcelActivity={props.postCheckedParcelActivity}
                 />
             </ActionsContainer>
-        </PreTableControlsContainer>
+        </>
     );
 };
 

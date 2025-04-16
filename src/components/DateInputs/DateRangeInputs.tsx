@@ -75,6 +75,7 @@ const DateRangeInputs: React.FC<Props> = (props) => {
                 slotProps={{
                     textField: {
                         error: hasErrorState,
+                        size: "small",
                     },
                 }}
                 disabled={props.isDisabled}
@@ -87,6 +88,7 @@ const DateRangeInputs: React.FC<Props> = (props) => {
                 slotProps={{
                     textField: {
                         error: hasErrorState,
+                        size: "small",
                     },
                 }}
                 disabled={props.isDisabled}

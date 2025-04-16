@@ -137,7 +137,7 @@ const buildLastStatusFilter = async (): Promise<ParcelsFilter<string[]>> => {
 
     return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
         key: "lastStatus",
-        filterLabel: "Last Status",
+        filterLabel: "Status",
         itemLabelsAndKeys: optionsSet.map((value) => [value, value]),
         initialCheckedKeys: [],
         method: lastStatusSearch,
@@ -185,7 +185,7 @@ const buildPackingSlotFilter = async (): Promise<ParcelsFilter<string[]>> => {
 
     return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
         key: "packingSlot",
-        filterLabel: "Packing Slot",
+        filterLabel: "Slot",
         itemLabelsAndKeys: optionsSet.map((option) => [option.value, option.key]),
         initialCheckedKeys: [],
         method: packingSlotSearch,

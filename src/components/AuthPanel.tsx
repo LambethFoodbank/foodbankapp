@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import styled, { DefaultTheme } from "styled-components";
 import Title from "@/components/Title/Title";
-import { NavBarHeight } from "@/components/NavigationBar/NavigationBar";
+import { NavBarHeight } from "@/common/sharedConstants";
 import Paper from "@mui/material/Paper";
 import { Button, TextField } from "@mui/material";
 import Link from "next/link";

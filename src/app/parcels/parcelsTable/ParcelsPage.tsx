@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     ParcelsTableRow,
     ParcelsSortState,
@@ -18,6 +18,14 @@ import ParcelsModal from "@/app/parcels/parcelsTable/ParcelsModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { CircularProgress } from "@mui/material";
 import FloatingToast from "@/components/FloatingToast";
+import TableFiltersBar from "@/components/Tables/TableFiltersBar";
+import { DistributeServerFilter } from "@/components/Tables/Filters";
+import { DbParcelRow } from "@/databaseUtils";
+import { shouldFilterBeDisabled } from "./packingManagerHelpers";
+import dayjs from "dayjs";
+import { PreTableControlsContainer } from "@/components/controlsStyling";
+
+type ParcelTableFilterState = string | DateRangeState | string[];
 
 const ParcelsPage: React.FC = () => {
     const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
@@ -48,6 +56,9 @@ const ParcelsPage: React.FC = () => {
 
     const [isPackingManagerView, setIsPackingManagerView] = useState<boolean>(false);
 
+    const today = useMemo(() => dayjs().startOf("day"), []);
+    const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
+
     useEffect(() => {
         (async () => {
             setAreFiltersLoadingForFirstTime(true);
@@ -57,6 +68,30 @@ const ParcelsPage: React.FC = () => {
             setAreFiltersLoadingForFirstTime(false);
         })();
     }, []);
+
+    const packingManagerViewPrimaryFilters = useMemo(
+        () =>
+            primaryFilters.map((filter) => {
+                if (filter.key === "packingDate") {
+                    return {
+                        ...filter,
+                        state: { from: yesterday, to: today },
+                        isDisabled: true,
+                    } as ParcelsFilter<DateRangeState>;
+                }
+                if (shouldFilterBeDisabled(filter)) {
+                    return { ...filter, isDisabled: true };
+                }
+                return filter;
+            }),
+        [primaryFilters, today, yesterday]
+    );
+
+    const allFilters = useMemo(() => {
+        return isPackingManagerView
+            ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
+            : [...primaryFilters, ...additionalFilters];
+    }, [isPackingManagerView, packingManagerViewPrimaryFilters, additionalFilters, primaryFilters]);
 
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
         if (checkedParcelIds.length === 0) {
@@ -77,13 +112,28 @@ const ParcelsPage: React.FC = () => {
 
     return (
         <>
-            <PreTableControls
-                isPackingManagerView={isPackingManagerView}
-                setIsPackingManagerView={setIsPackingManagerView}
-                selectedParcelMessage={selectedParcelMessage}
-                getCheckedParcelsData={getCheckedParcelsData}
-                postCheckedParcelActivity={postCheckedParcelActivity}
-            />
+            <PreTableControlsContainer>
+                <PreTableControls
+                    isPackingManagerView={isPackingManagerView}
+                    setIsPackingManagerView={setIsPackingManagerView}
+                    selectedParcelMessage={selectedParcelMessage}
+                    getCheckedParcelsData={getCheckedParcelsData}
+                    postCheckedParcelActivity={postCheckedParcelActivity}
+                />
+                <TableFiltersBar<
+                    ParcelsTableRow,
+                    DistributeServerFilter<ParcelsTableRow, ParcelTableFilterState, DbParcelRow>,
+                    ParcelTableFilterState
+                >
+                    filters={
+                        isPackingManagerView ? packingManagerViewPrimaryFilters : primaryFilters
+                    }
+                    setFilters={setPrimaryFilters}
+                    additionalFilters={additionalFilters}
+                    setAdditionalFilters={setAdditionalFilters}
+                />
+            </PreTableControlsContainer>
+
             {areFiltersLoadingForFirstTime ? (
                 <Centerer>
                     <CircularProgress aria-label="table-initial-progress-bar" />
@@ -105,10 +155,7 @@ const ParcelsPage: React.FC = () => {
                         setModalIsOpen={setModalIsOpen}
                         sortState={sortState}
                         setSortState={setSortState}
-                        primaryFilters={primaryFilters}
-                        setPrimaryFilters={setPrimaryFilters}
-                        additionalFilters={additionalFilters}
-                        setAdditionalFilters={setAdditionalFilters}
+                        appliedFilters={allFilters}
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
                         setModalErrorMessage={setModalErrorMessage}
