@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     checkboxGroupToArray,
     onChangeCheckboxInGroup,
@@ -9,6 +9,7 @@ import RadioGroupInput from "@/components/DataInput/RadioGroupInput";
 import { ClientCardProps } from "../ClientForm";
 import { FormElementWithSpacing } from "@/components/Form/formStyling";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
+import { Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
 
 export const signpostingCallOptions: string[] = [
     "Benefits",
@@ -24,6 +25,16 @@ export const signpostingCallLabelsAndKeys: [string, string][] = signpostingCallO
 );
 
 const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields }) => {
+    const [unknownSignpostingReasons, setUnknownSignpostingReasons] = useState(
+        fields["signpostingCallReasons"] === null
+    );
+
+    const handleCheckCheckboxForUnknown = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setUnknownSignpostingReasons(event.target.checked);
+
+        fieldSetter({ signpostingCallReasons: null });
+    };
+
     return (
         <GenericFormCard
             title="Signposting Call"
@@ -40,8 +51,26 @@ const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields })
             ></RadioGroupInput>
 
             <FormElementWithSpacing>
+                <FormControl disabled={fields["signpostingCall"] !== true}>
+                    <FormLabel>What do they need help with?</FormLabel>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={unknownSignpostingReasons}
+                                    onChange={handleCheckCheckboxForUnknown}
+                                    disabled={fields["signpostingCall"] !== true}
+                                />
+                            }
+                            label="Don't Know"
+                        />
+                    </FormGroup>
+                </FormControl>
+            </FormElementWithSpacing>
+
+            <FormElementWithSpacing>
                 <CheckboxGroupInput
-                    groupLabel="What do they need help with? Tick all that apply. For 'Other', put details in the 'Notes' section."
+                    groupLabel="Tick all that apply. For 'Other', put details in the 'Notes' section."
                     labelsAndKeys={signpostingCallLabelsAndKeys}
                     onChange={onChangeCheckboxInGroup(
                         fieldSetter,
@@ -53,7 +82,7 @@ const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields })
                             ? checkboxGroupToArray(fields.signpostingCallReasons)
                             : []
                     }
-                    disabled={fields["signpostingCall"] !== true}
+                    disabled={unknownSignpostingReasons || fields["signpostingCall"] !== true}
                 />
             </FormElementWithSpacing>
         </GenericFormCard>

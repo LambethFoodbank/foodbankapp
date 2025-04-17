@@ -32,7 +32,7 @@ const AddClients: () => React.ReactElement = () => {
         extraInformation: "",
         attentionFlag: false,
         signpostingCall: false,
-        signpostingCallReasons: {},
+        signpostingCallReasons: null,
         notes: "",
         lastUpdated: undefined,
     };
