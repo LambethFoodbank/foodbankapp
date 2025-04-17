@@ -191,7 +191,7 @@ const getSignpostingReportData = async (
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
                     signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? [],
+                        rawParcel.client?.signposting_call_reasons ?? null,
                         signpostingCallOptions
                     ),
                     address: rawParcel.client
@@ -209,11 +209,11 @@ const getSignpostingReportData = async (
                     extraInformation: rawParcel.client?.extra_information ?? "",
                     notes: rawParcel.client?.notes ?? "",
                     cookingFacilities: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.cooking_facilities ?? [],
+                        rawParcel.client?.cooking_facilities ?? null,
                         cookingFacilitiesOptions
                     ),
                     dietaryRequirements: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.dietary_requirements ?? [],
+                        rawParcel.client?.dietary_requirements ?? null,
                         dietaryRequirementOptions
                     ),
                     hygieneProducts: formatHygieneProducts(
@@ -228,11 +228,11 @@ const getSignpostingReportData = async (
                         rawParcel.client?.baby_other_items ?? []
                     ),
                     petFood: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.pet_food ?? [],
+                        rawParcel.client?.pet_food ?? null,
                         petFoodOptions
                     ),
                     otherItems: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.other_items ?? [],
+                        rawParcel.client?.other_items ?? null,
                         otherRequirementOptions
                     ),
                     household: rawParcel.client
