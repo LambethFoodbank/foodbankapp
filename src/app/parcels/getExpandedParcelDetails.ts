@@ -4,9 +4,12 @@ import { EventTableRow } from "./EventTable";
 import { logErrorReturnLogId } from "@/logger/logger";
 import {
     formatAddressFromClientDetails,
+    formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
+    formatHygieneProducts,
+    formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
 import { capitaliseWords, formatDateTime, formatDatetimeAsDate } from "@/common/format";
 import {
@@ -16,6 +19,10 @@ import {
 } from "@/components/DataViewer/DataViewer";
 import { formatEventName } from "./format";
 import { ListType } from "@/common/databaseListTypes";
+import { cookingFacilitiesOptions } from "../clients/form/formSections/CookingFacilitiesCard";
+import { dietaryRequirementOptions } from "../clients/form/formSections/DietaryRequirementCard";
+import { otherRequirementOptions } from "../clients/form/formSections/OtherItemsCard";
+import { petFoodOptions } from "../clients/form/formSections/PetFoodCard";
 
 type FetchExpandedParcelDetailsResult =
     | {
@@ -53,6 +60,7 @@ const getExpandedParcelDetails = async (
          ),
         collection_centre:collection_centres (
             name,
+            is_delivery,
             is_shown
          ),
         client:clients(
@@ -66,6 +74,18 @@ const getExpandedParcelDetails = async (
             address_county,
             address_postcode,
             is_active,
+            cooking_facilities,
+            dietary_requirements,
+            hygiene_tampons,
+            hygiene_pads,
+            hygiene_other_items,
+            baby_food,
+            baby_formula,
+            baby_nappies,
+            baby_other_items,
+            pet_food,
+            other_items,
+            extra_information,
 
             family:families(
                 birth_year,
@@ -125,17 +145,46 @@ const getExpandedParcelDetails = async (
                     fullName: client.full_name ?? "",
                     listType: rawParcelDetails.list_type,
                     address: formatAddressFromClientDetails(client),
+                    packingDateAndSlot: formatPackingDateAndSlot(
+                        rawParcelDetails.packing_date,
+                        rawParcelDetails.packing_slot?.name
+                    ),
+                    deliveryOrCollection: formatDeliveryOrCollection(
+                        rawParcelDetails.collection_centre?.name,
+                        rawParcelDetails.collection_centre?.is_delivery,
+                        rawParcelDetails.collection_centre?.is_shown,
+                        rawParcelDetails.collection_datetime
+                    ),
                     deliveryInstructions: client.delivery_instructions ?? "",
                     phoneNumber: client.phone_number ?? "",
                     household: formatHouseholdFromFamilyDetails(client.family),
                     adults: formatBreakdownOfAdultsFromFamilyDetails(client.family),
                     children: formatBreakdownOfChildrenFromFamilyDetails(client.family),
-                    packingDate: formatDatetimeAsDate(rawParcelDetails.packing_date),
-                    packingSlot: rawParcelDetails.packing_slot?.name ?? "",
-                    method: rawParcelDetails.collection_centre?.is_shown
-                        ? rawParcelDetails.collection_centre?.name
-                        : `${rawParcelDetails.collection_centre?.name} (inactive)`,
-                    collectionDateTime: formatDateTime(rawParcelDetails.collection_datetime),
+                    cookingFacilities: formatRequirementsByCanonicalOrder(
+                        client.cooking_facilities,
+                        cookingFacilitiesOptions
+                    ),
+                    dietaryRequirements: formatRequirementsByCanonicalOrder(
+                        client.dietary_requirements,
+                        dietaryRequirementOptions
+                    ),
+                    hygieneProducts: formatHygieneProducts(
+                        client.hygiene_tampons,
+                        client.hygiene_pads,
+                        client.hygiene_other_items
+                    ),
+                    babyProducts: formatBabyProducts(
+                        client.baby_food,
+                        client.baby_formula,
+                        client.baby_nappies,
+                        client.baby_other_items
+                    ),
+                    petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
+                    otherRequirements: formatRequirementsByCanonicalOrder(
+                        client.other_items,
+                        otherRequirementOptions
+                    ),
+                    extraInformation: client.extra_information ?? "",
                     createdAt: formatDateTime(rawParcelDetails.created_at),
                 },
                 events: processEventsDetails(rawParcelDetails.events),
@@ -149,12 +198,16 @@ const getExpandedParcelDetails = async (
                 isActive: false,
                 voucherNumber: rawParcelDetails.voucher_number ?? "",
                 listType: rawParcelDetails.list_type,
-                packingDate: formatDatetimeAsDate(rawParcelDetails.packing_date),
-                packingSlot: rawParcelDetails.packing_slot?.name ?? "",
-                method: rawParcelDetails.collection_centre?.is_shown
-                    ? rawParcelDetails.collection_centre?.name
-                    : `${rawParcelDetails.collection_centre?.name} (inactive)`,
-                collectionDateTime: formatDateTime(rawParcelDetails.collection_datetime),
+                packingDateAndSlot: formatPackingDateAndSlot(
+                    rawParcelDetails.packing_date,
+                    rawParcelDetails.packing_slot?.name
+                ),
+                deliveryOrCollection: formatDeliveryOrCollection(
+                    rawParcelDetails.collection_centre?.name,
+                    rawParcelDetails.collection_centre?.is_delivery,
+                    rawParcelDetails.collection_centre?.is_shown,
+                    rawParcelDetails.collection_datetime
+                ),
                 createdAt: formatDateTime(rawParcelDetails.created_at),
             },
             events: processEventsDetails(rawParcelDetails.events),
@@ -165,10 +218,8 @@ const getExpandedParcelDetails = async (
 
 interface ParcelDataIndependentOfClient extends Data {
     voucherNumber: string;
-    packingDate: string;
-    packingSlot: string;
-    method: string;
-    collectionDateTime: string;
+    packingDateAndSlot: string;
+    deliveryOrCollection: string;
     createdAt: string;
     listType: ListType;
 }
@@ -186,6 +237,13 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     household: string;
     adults: string;
     children: string;
+    cookingFacilities: string;
+    dietaryRequirements: string;
+    hygieneProducts: string;
+    babyProducts: string;
+    petFood: string;
+    otherRequirements: string;
+    extraInformation: string;
 }
 
 type ExpandedParcelData = ParcelDataForActiveClient | ParcelDataForInactiveClient;
@@ -203,6 +261,24 @@ export const formatDatetimeAsTime = (datetime: string | null): string => {
     return new Date(datetime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 };
 
+const formatPackingDateAndSlot = (
+    packingDatetime: string | null,
+    slotName: string | undefined
+): string => {
+    return formatDatetimeAsDate(packingDatetime) + " " + (slotName ?? "");
+};
+
+const formatDeliveryOrCollection = (
+    collectionCentreName: string | undefined,
+    isDelivery: boolean | undefined,
+    isShown: boolean | undefined,
+    collectionDatetime: string | null
+): string => {
+    const methodString = isShown ? collectionCentreName : `${collectionCentreName} (inactive)`;
+    const collectionDateTimeString = isDelivery ? "" : formatDateTime(collectionDatetime);
+    return methodString + " " + collectionDateTimeString;
+};
+
 export const processEventsDetails = (
     events: Pick<Schema["events"], "event_data" | "new_parcel_status" | "timestamp">[]
 ): EventTableRow[] => {
@@ -211,8 +287,6 @@ export const processEventsDetails = (
         timestamp: new Date(event.timestamp),
     }));
 };
-
-export default getExpandedParcelDetails;
 
 export const getExpandedParcelDataForDataViewer = (
     parcelDetails: ExpandedParcelData
@@ -229,3 +303,5 @@ export const getExpandedParcelDataForDataViewer = (
     };
     return parcelDetailsForDataViewer;
 };
+
+export default getExpandedParcelDetails;
