@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import queryString from "query-string";
 import {
     ParcelsTableRow,
     ParcelsSortState,
@@ -9,7 +11,10 @@ import {
 } from "@/app/parcels/parcelsTable/types";
 import supabase from "@/supabaseClient";
 import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
-import buildFilters from "@/app/parcels/parcelsTable/filters";
+import buildFilters, {
+    buildQueryParamsFromFilters,
+    updateFiltersFromQueryParams,
+} from "@/app/parcels/parcelsTable/filters";
 import { getSelectedParcelCountMessage } from "@/app/parcels/parcelsTable/format";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import PreTableControls from "@/app/parcels/parcelsTable/PreTableControls";
@@ -28,6 +33,9 @@ import { PreTableControlsContainer } from "@/components/controlsStyling";
 type ParcelTableFilterState = string | DateRangeState | string[];
 
 const ParcelsPage: React.FC = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
     const [selectedClientDetails, setSelectedClientDetails] =
         useState<SelectedClientDetails | null>(null);
@@ -62,12 +70,68 @@ const ParcelsPage: React.FC = () => {
     useEffect(() => {
         (async () => {
             setAreFiltersLoadingForFirstTime(true);
-            const filtersObject = await buildFilters();
+            let filtersObject = await buildFilters();
+
+            const params = queryString.parse(searchParams.toString());
+            filtersObject = updateFiltersFromQueryParams(
+                params,
+                filtersObject.primaryFilters,
+                filtersObject.additionalFilters
+            );
+
             setPrimaryFilters(filtersObject.primaryFilters);
             setAdditionalFilters(filtersObject.additionalFilters);
             setAreFiltersLoadingForFirstTime(false);
+
+            console.log("QQ Filters loaded:");
         })();
     }, []);
+
+    // QQ utility function
+    const areRecordsEqual = (obj1: Record<string, any>, obj2: Record<string, any>): boolean => {
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+
+        if (keys1.length !== keys2.length) {
+            return false;
+        }
+
+        return keys1.every((key) => obj1[key] === obj2[key]);
+    };
+
+    // QQ utility function
+    const mergeParamsIntoURL = (
+        searchParams: URLSearchParams,
+        paramsToUpdate: Record<string, any>
+    ) => {
+        const paramsInURL = queryString.parse(searchParams.toString());
+        let mergedParams = {
+            ...paramsInURL,
+            ...paramsToUpdate,
+        };
+        mergedParams = Object.fromEntries(
+            Object.entries(mergedParams).filter(([key, value]) => value)
+        );
+
+        if (!areRecordsEqual(paramsInURL, mergedParams)) {
+            console.log("QQ updating URL");
+
+            // App Router doesn't support shallow routing, so router.push would reload the page
+            const queryStringified = queryString.stringify(mergedParams);
+            window.history.pushState({}, "", `${window.location.pathname}?${queryStringified}`);
+        }
+    };
+
+    useEffect(() => {
+        if (areFiltersLoadingForFirstTime) {
+            return;
+        }
+
+        const filterParams = buildQueryParamsFromFilters(primaryFilters, additionalFilters);
+        mergeParamsIntoURL(searchParams, filterParams);
+    }, [primaryFilters, additionalFilters]);
+
+    // QQ TODO: make filter URL params work with Packing Manager view
 
     const packingManagerViewPrimaryFilters = useMemo(
         () =>

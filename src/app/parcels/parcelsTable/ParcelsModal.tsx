@@ -73,7 +73,7 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                 isOpen={modalIsOpen}
                 onClose={() => {
                     setModalIsOpen(false);
-                    router.push("/parcels");
+                    router.push("/parcels"); // QQ this needs to set the shared URL params wrapped object, not overwrite
                 }}
                 headerId="expandedParcelDetailsModal"
                 footer={

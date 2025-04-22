@@ -17,6 +17,8 @@ import {
 } from "./types";
 import { buildServerSideTextFilter } from "@/components/Tables/TextFilter";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import { ParsedQuery } from "query-string";
 import { parcelTableHeaderKeysAndLabels } from "./headers";
 import { DbParcelRow } from "@/databaseUtils";
 import {
@@ -241,6 +243,210 @@ const buildFilters = async (): Promise<{
         }),
     ];
     return { primaryFilters: primaryFilters, additionalFilters: additionalFilters };
+};
+
+// QQ utility function
+const readArrayParamFromQuery = (params: ParsedQuery, paramName: string): string[] | null => {
+    const paramValue = params[paramName];
+
+    if (paramValue) {
+        if (typeof paramValue === "string") {
+            return [paramValue];
+        } else if (Array.isArray(paramValue)) {
+            return paramValue.filter((method): method is string => method !== null);
+        }
+    }
+    return null;
+};
+
+export const updateFiltersFromQueryParams = (
+    params: ParsedQuery,
+    primaryFilters: ParcelsFilters,
+    additionalFilters: ParcelsFilters
+): {
+    primaryFilters: ParcelsFilters;
+    additionalFilters: ParcelsFilters;
+} => {
+    dayjs.extend(customParseFormat);
+
+    if (params.packingDateFrom && params.packingDateTo) {
+        const from = dayjs(params.packingDateFrom as string, "YYYY-MM-DD");
+        const to = dayjs(params.packingDateTo as string, "YYYY-MM-DD");
+
+        if (from.isValid() && to.isValid()) {
+            primaryFilters = primaryFilters.map((filter) => {
+                if (filter.key === "packingDate") {
+                    return {
+                        ...filter,
+                        state: { from: from, to: to },
+                    } as ParcelsFilter<DateRangeState>;
+                }
+                return filter;
+            });
+        }
+    }
+
+    if (params.name) {
+        primaryFilters = primaryFilters.map((filter) => {
+            if (filter.key === "fullName") {
+                return {
+                    ...filter,
+                    state: params.name,
+                } as ParcelsFilter<string>;
+            }
+            return filter;
+        });
+    }
+
+    if (params.postcode) {
+        primaryFilters = primaryFilters.map((filter) => {
+            if (filter.key === "addressPostcode") {
+                return {
+                    ...filter,
+                    state: params.postcode,
+                } as ParcelsFilter<string>;
+            }
+            return filter;
+        });
+    }
+
+    const methodParamValues = readArrayParamFromQuery(params, "method");
+    if (methodParamValues) {
+        primaryFilters = primaryFilters.map((filter) => {
+            if (filter.key === "deliveryCollection") {
+                return {
+                    ...filter,
+                    state: methodParamValues,
+                } as ParcelsFilter<string[]>;
+            }
+            return filter;
+        });
+    }
+
+    const packingSlotParamValues = readArrayParamFromQuery(params, "packingSlot");
+    if (packingSlotParamValues) {
+        primaryFilters = primaryFilters.map((filter) => {
+            if (filter.key === "packingSlot") {
+                return {
+                    ...filter,
+                    state: packingSlotParamValues,
+                } as ParcelsFilter<string[]>;
+            }
+            return filter;
+        });
+    }
+
+    const lastStatusParamValues = readArrayParamFromQuery(params, "lastStatus");
+    if (lastStatusParamValues) {
+        primaryFilters = primaryFilters.map((filter) => {
+            if (filter.key === "lastStatus") {
+                return {
+                    ...filter,
+                    state: lastStatusParamValues,
+                } as ParcelsFilter<string[]>;
+            }
+            return filter;
+        });
+    }
+
+    if (params.familySize) {
+        additionalFilters = additionalFilters.map((filter) => {
+            if (filter.key === "familyCategory") {
+                return {
+                    ...filter,
+                    state: params.familySize,
+                } as ParcelsFilter<string>;
+            }
+            return filter;
+        });
+    }
+
+    if (params.phone) {
+        additionalFilters = additionalFilters.map((filter) => {
+            if (filter.key === "phoneNumber") {
+                return {
+                    ...filter,
+                    state: params.phone,
+                } as ParcelsFilter<string>;
+            }
+            return filter;
+        });
+    }
+
+    if (params.voucher) {
+        additionalFilters = additionalFilters.map((filter) => {
+            if (filter.key === "voucherNumber") {
+                return {
+                    ...filter,
+                    state: params.voucher,
+                } as ParcelsFilter<string>;
+            }
+            return filter;
+        });
+    }
+
+    return { primaryFilters, additionalFilters };
+};
+
+export const buildQueryParamsFromFilters = (
+    primaryFilters: ParcelsFilters,
+    additionalFilters: ParcelsFilters
+): Record<string, string | string[]> => {
+    const params: Record<string, string | string[]> = {};
+
+    const packingDateFilter = primaryFilters.find((filter) => filter.key === "packingDate");
+    if (packingDateFilter) {
+        const { from, to } = packingDateFilter.state as DateRangeState;
+        params.packingDateFrom = from.format("YYYY-MM-DD");
+        params.packingDateTo = to.format("YYYY-MM-DD");
+    }
+
+    const fullNameFilter = primaryFilters.find((filter) => filter.key === "fullName");
+    if (fullNameFilter) {
+        params.name = fullNameFilter.state as string;
+    }
+
+    const postcodeFilter = primaryFilters.find((filter) => filter.key === "addressPostcode");
+    if (postcodeFilter) {
+        params.postcode = postcodeFilter.state as string;
+    }
+
+    const deliveryCollectionFilter = primaryFilters.find(
+        (filter) => filter.key === "deliveryCollection"
+    );
+    if (deliveryCollectionFilter) {
+        const deliveryCollectionState = deliveryCollectionFilter.state as string[];
+        params.method = deliveryCollectionState;
+    }
+
+    const packingSlotFilter = primaryFilters.find((filter) => filter.key === "packingSlot");
+    if (packingSlotFilter) {
+        const packingSlotState = packingSlotFilter.state as string[];
+        params.packingSlot = packingSlotState;
+    }
+
+    const lastStatusFilter = primaryFilters.find((filter) => filter.key === "lastStatus");
+    if (lastStatusFilter) {
+        const lastStatusState = lastStatusFilter.state as string[];
+        params.lastStatus = lastStatusState;
+    }
+
+    const familySizeFilter = additionalFilters.find((filter) => filter.key === "familyCategory");
+    if (familySizeFilter) {
+        params.familySize = familySizeFilter.state as string;
+    }
+
+    const phoneNumberFilter = additionalFilters.find((filter) => filter.key === "phoneNumber");
+    if (phoneNumberFilter) {
+        params.phone = phoneNumberFilter.state as string;
+    }
+
+    const voucherFilter = additionalFilters.find((filter) => filter.key === "voucherNumber");
+    if (voucherFilter) {
+        params.voucher = voucherFilter.state as string;
+    }
+
+    return params;
 };
 
 export default buildFilters;
