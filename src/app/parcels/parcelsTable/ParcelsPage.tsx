@@ -1,15 +1,11 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import queryString from "query-string";
-import {
-    ParcelsTableRow,
-    ParcelsSortState,
-    ParcelsFilter,
-    SelectedClientDetails,
-} from "@/app/parcels/parcelsTable/types";
 import supabase from "@/supabaseClient";
+import { ParcelsTableRow, ParcelsSortState, ParcelsFilter } from "@/app/parcels/parcelsTable/types";
+import { useSearchParams } from "next/navigation";
+import { mergeParamsIntoURL, parseQueryParams } from "@/common/urlQueryParams";
+import { parcelIdParam } from "@/app/parcels/parcelsTable/constants";
 import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import buildFilters, {
     buildQueryParamsFromFilters,
@@ -33,12 +29,9 @@ import { PreTableControlsContainer } from "@/components/controlsStyling";
 type ParcelTableFilterState = string | DateRangeState | string[];
 
 const ParcelsPage: React.FC = () => {
-    const router = useRouter();
     const searchParams = useSearchParams();
 
     const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
-    const [selectedClientDetails, setSelectedClientDetails] =
-        useState<SelectedClientDetails | null>(null);
 
     const [checkedParcelIds, setCheckedParcelIds] = useState<string[]>([]);
 
@@ -58,8 +51,6 @@ const ParcelsPage: React.FC = () => {
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const [modalErrorMessage, setModalErrorMessage] = useState<string | null>(null);
-
     const selectedParcelMessage = getSelectedParcelCountMessage(checkedParcelIds.length);
 
     const [isPackingManagerView, setIsPackingManagerView] = useState<boolean>(false);
@@ -69,69 +60,27 @@ const ParcelsPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            setAreFiltersLoadingForFirstTime(true);
-            let filtersObject = await buildFilters();
+            if (primaryFilters.length === 0 && additionalFilters.length === 0) {
+                setAreFiltersLoadingForFirstTime(true);
+                let filtersObject = await buildFilters();
 
-            const params = queryString.parse(searchParams.toString());
-            filtersObject = updateFiltersFromQueryParams(
-                params,
-                filtersObject.primaryFilters,
-                filtersObject.additionalFilters
-            );
+                const params = parseQueryParams(searchParams);
+                filtersObject = updateFiltersFromQueryParams(
+                    params,
+                    filtersObject.primaryFilters,
+                    filtersObject.additionalFilters
+                );
 
-            setPrimaryFilters(filtersObject.primaryFilters);
-            setAdditionalFilters(filtersObject.additionalFilters);
-            setAreFiltersLoadingForFirstTime(false);
+                setPrimaryFilters(filtersObject.primaryFilters);
+                setAdditionalFilters(filtersObject.additionalFilters);
+                setAreFiltersLoadingForFirstTime(false);
 
-            console.log("QQ Filters loaded:");
+                if (params[parcelIdParam]) {
+                    openParcelModal(params[parcelIdParam] as string);
+                }
+            }
         })();
-    }, []);
-
-    // QQ utility function
-    const areRecordsEqual = (obj1: Record<string, any>, obj2: Record<string, any>): boolean => {
-        const keys1 = Object.keys(obj1);
-        const keys2 = Object.keys(obj2);
-
-        if (keys1.length !== keys2.length) {
-            return false;
-        }
-
-        return keys1.every((key) => obj1[key] === obj2[key]);
-    };
-
-    // QQ utility function
-    const mergeParamsIntoURL = (
-        searchParams: URLSearchParams,
-        paramsToUpdate: Record<string, any>
-    ) => {
-        const paramsInURL = queryString.parse(searchParams.toString());
-        let mergedParams = {
-            ...paramsInURL,
-            ...paramsToUpdate,
-        };
-        mergedParams = Object.fromEntries(
-            Object.entries(mergedParams).filter(([key, value]) => value)
-        );
-
-        if (!areRecordsEqual(paramsInURL, mergedParams)) {
-            console.log("QQ updating URL");
-
-            // App Router doesn't support shallow routing, so router.push would reload the page
-            const queryStringified = queryString.stringify(mergedParams);
-            window.history.pushState({}, "", `${window.location.pathname}?${queryStringified}`);
-        }
-    };
-
-    useEffect(() => {
-        if (areFiltersLoadingForFirstTime) {
-            return;
-        }
-
-        const filterParams = buildQueryParamsFromFilters(primaryFilters, additionalFilters);
-        mergeParamsIntoURL(searchParams, filterParams);
-    }, [primaryFilters, additionalFilters]);
-
-    // QQ TODO: make filter URL params work with Packing Manager view
+    }, [searchParams]);
 
     const packingManagerViewPrimaryFilters = useMemo(
         () =>
@@ -157,6 +106,15 @@ const ParcelsPage: React.FC = () => {
             : [...primaryFilters, ...additionalFilters];
     }, [isPackingManagerView, packingManagerViewPrimaryFilters, additionalFilters, primaryFilters]);
 
+    useEffect(() => {
+        if (areFiltersLoadingForFirstTime) {
+            return;
+        }
+
+        const filterParams = buildQueryParamsFromFilters(allFilters);
+        mergeParamsIntoURL(searchParams, filterParams);
+    }, [allFilters, areFiltersLoadingForFirstTime, searchParams]);
+
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
         if (checkedParcelIds.length === 0) {
             return [];
@@ -172,6 +130,19 @@ const ParcelsPage: React.FC = () => {
 
     const postCheckedParcelActivity = (): void => {
         setCheckedParcelIds([]);
+    };
+
+    const openParcelModal = (parcelId: string): void => {
+        setSelectedParcelId(parcelId);
+        setModalIsOpen(true);
+    };
+
+    const openParcelModalAndUpdateURL = (parcelId: string): void => {
+        openParcelModal(parcelId);
+
+        const paramsRecord: Record<string, string> = {};
+        paramsRecord[parcelIdParam] = parcelId;
+        mergeParamsIntoURL(searchParams, paramsRecord);
     };
 
     return (
@@ -212,26 +183,21 @@ const ParcelsPage: React.FC = () => {
                         ></FloatingToast>
                     )}
                     <ParcelsTable
-                        setSelectedParcelId={setSelectedParcelId}
-                        setSelectedClientDetails={setSelectedClientDetails}
                         checkedParcelIds={checkedParcelIds}
                         setCheckedParcelIds={setCheckedParcelIds}
-                        setModalIsOpen={setModalIsOpen}
+                        openParcelModal={openParcelModalAndUpdateURL}
                         sortState={sortState}
                         setSortState={setSortState}
                         appliedFilters={allFilters}
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
-                        setModalErrorMessage={setModalErrorMessage}
                         isPackingManagerView={isPackingManagerView}
                     />
                     <ParcelsModal
                         modalIsOpen={modalIsOpen}
                         setModalIsOpen={setModalIsOpen}
                         selectedParcelId={selectedParcelId}
-                        selectedClientDetails={selectedClientDetails}
-                        modalErrorMessage={modalErrorMessage}
-                        setModalErrorMessage={setModalErrorMessage}
+                        setSelectedParcelId={setSelectedParcelId}
                     />
                 </>
             )}

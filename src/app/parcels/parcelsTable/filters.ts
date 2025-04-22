@@ -28,6 +28,7 @@ import {
     phoneSearch,
     postcodeSearch,
 } from "@/common/databaseFilters";
+import { readArrayParamFromQuery } from "@/common/urlQueryParams";
 
 const parcelsFullNameSearch: ParcelsFilterMethod<string> = fullNameSearch<DbParcelRow>(
     "client_full_name",
@@ -245,20 +246,6 @@ const buildFilters = async (): Promise<{
     return { primaryFilters: primaryFilters, additionalFilters: additionalFilters };
 };
 
-// QQ utility function
-const readArrayParamFromQuery = (params: ParsedQuery, paramName: string): string[] | null => {
-    const paramValue = params[paramName];
-
-    if (paramValue) {
-        if (typeof paramValue === "string") {
-            return [paramValue];
-        } else if (Array.isArray(paramValue)) {
-            return paramValue.filter((method): method is string => method !== null);
-        }
-    }
-    return null;
-};
-
 export const updateFiltersFromQueryParams = (
     params: ParsedQuery,
     primaryFilters: ParcelsFilters,
@@ -389,29 +376,28 @@ export const updateFiltersFromQueryParams = (
 };
 
 export const buildQueryParamsFromFilters = (
-    primaryFilters: ParcelsFilters,
-    additionalFilters: ParcelsFilters
+    allFilters: ParcelsFilters
 ): Record<string, string | string[]> => {
     const params: Record<string, string | string[]> = {};
 
-    const packingDateFilter = primaryFilters.find((filter) => filter.key === "packingDate");
+    const packingDateFilter = allFilters.find((filter) => filter.key === "packingDate");
     if (packingDateFilter) {
         const { from, to } = packingDateFilter.state as DateRangeState;
         params.packingDateFrom = from.format("YYYY-MM-DD");
         params.packingDateTo = to.format("YYYY-MM-DD");
     }
 
-    const fullNameFilter = primaryFilters.find((filter) => filter.key === "fullName");
+    const fullNameFilter = allFilters.find((filter) => filter.key === "fullName");
     if (fullNameFilter) {
         params.name = fullNameFilter.state as string;
     }
 
-    const postcodeFilter = primaryFilters.find((filter) => filter.key === "addressPostcode");
+    const postcodeFilter = allFilters.find((filter) => filter.key === "addressPostcode");
     if (postcodeFilter) {
         params.postcode = postcodeFilter.state as string;
     }
 
-    const deliveryCollectionFilter = primaryFilters.find(
+    const deliveryCollectionFilter = allFilters.find(
         (filter) => filter.key === "deliveryCollection"
     );
     if (deliveryCollectionFilter) {
@@ -419,29 +405,29 @@ export const buildQueryParamsFromFilters = (
         params.method = deliveryCollectionState;
     }
 
-    const packingSlotFilter = primaryFilters.find((filter) => filter.key === "packingSlot");
+    const packingSlotFilter = allFilters.find((filter) => filter.key === "packingSlot");
     if (packingSlotFilter) {
         const packingSlotState = packingSlotFilter.state as string[];
         params.packingSlot = packingSlotState;
     }
 
-    const lastStatusFilter = primaryFilters.find((filter) => filter.key === "lastStatus");
+    const lastStatusFilter = allFilters.find((filter) => filter.key === "lastStatus");
     if (lastStatusFilter) {
         const lastStatusState = lastStatusFilter.state as string[];
         params.lastStatus = lastStatusState;
     }
 
-    const familySizeFilter = additionalFilters.find((filter) => filter.key === "familyCategory");
+    const familySizeFilter = allFilters.find((filter) => filter.key === "familyCategory");
     if (familySizeFilter) {
         params.familySize = familySizeFilter.state as string;
     }
 
-    const phoneNumberFilter = additionalFilters.find((filter) => filter.key === "phoneNumber");
+    const phoneNumberFilter = allFilters.find((filter) => filter.key === "phoneNumber");
     if (phoneNumberFilter) {
         params.phone = phoneNumberFilter.state as string;
     }
 
-    const voucherFilter = additionalFilters.find((filter) => filter.key === "voucherNumber");
+    const voucherFilter = allFilters.find((filter) => filter.key === "voucherNumber");
     if (voucherFilter) {
         params.voucher = voucherFilter.state as string;
     }

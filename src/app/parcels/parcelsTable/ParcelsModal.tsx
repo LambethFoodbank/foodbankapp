@@ -1,53 +1,70 @@
 import supabase from "@/supabaseClient";
-import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
-import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
-import Modal from "@/components/Modal/Modal";
-import { Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
 import { Suspense, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { ParcelsTableRow, SelectedClientDetails } from "@/app/parcels/parcelsTable/types";
 import ExpandedParcelDetails from "../ExpandedParcelDetails";
 import ExpandedParcelDetailsFallback from "../ExpandedParcelDetailsFallback";
+import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
+import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
+import Statuses from "../ActionBar/Statuses";
+import { mergeParamsIntoURL } from "@/common/urlQueryParams";
+import { parcelIdParam } from "@/app/parcels/parcelsTable/constants";
+import Modal from "@/components/Modal/Modal";
+import { Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
 import LinkButton from "@/components/Buttons/LinkButton";
 import Icon from "@/components/Icons/Icon";
 import { faBoxArchive } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "styled-components";
-import { ParcelsTableRow, SelectedClientDetails } from "./types";
-import { useRouter } from "next/navigation";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import { Button } from "@mui/material";
 import { ArrowDropDown } from "@mui/icons-material";
-import Statuses from "../ActionBar/Statuses";
 
 interface ParcelsModalProps {
     modalIsOpen: boolean;
     setModalIsOpen: (modalIsOpen: boolean) => void;
     selectedParcelId: string | null;
-    selectedClientDetails: SelectedClientDetails | null;
-    modalErrorMessage: string | null;
-    setModalErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
+    setSelectedParcelId: (selectedParcelId: string | null) => void;
 }
 
 const ParcelsModal: React.FC<ParcelsModalProps> = ({
     modalIsOpen,
     setModalIsOpen,
     selectedParcelId,
-    selectedClientDetails,
-    modalErrorMessage,
-    setModalErrorMessage,
+    setSelectedParcelId,
 }) => {
+    const searchParams = useSearchParams();
+
     const [statusAnchorElement, setStatusAnchorElement] = useState<HTMLElement | null>(null);
     const refreshParcelDetailsRef = useRef<(() => void) | null>(null);
 
+    const [selectedClientDetails, setSelectedClientDetails] =
+        useState<SelectedClientDetails | null>(null); // QQ remove this
+
+    const [parcelClientId, setParcelClientId] = useState<string | null>(null);
+    const [isClientActive, setIsClientActive] = useState<boolean | null>(null);
+    const [modalErrorMessage, setModalErrorMessage] = useState<string | null>(null);
+
     const theme = useTheme();
-    const router = useRouter();
 
     const fetchParcel = async (): Promise<ParcelsTableRow[]> => {
         return await getParcelsByIds(supabase, [selectedParcelId as string]);
     };
 
     const refreshDetails = (): void => {
+        console.log("QQ refreshing parcel details");
+
         if (refreshParcelDetailsRef.current) {
             refreshParcelDetailsRef.current();
         }
+    };
+
+    const closeParcelModalAndUpdateURL = (): void => {
+        setModalIsOpen(false);
+        setSelectedParcelId(null);
+
+        const paramsRecord: Record<string, string | null> = {};
+        paramsRecord[parcelIdParam] = null;
+        mergeParamsIntoURL(searchParams, paramsRecord);
     };
 
     const postSetStatusCallback = (): void => {
@@ -72,8 +89,7 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                 }
                 isOpen={modalIsOpen}
                 onClose={() => {
-                    setModalIsOpen(false);
-                    router.push("/parcels"); // QQ this needs to set the shared URL params wrapped object, not overwrite
+                    closeParcelModalAndUpdateURL();
                 }}
                 headerId="expandedParcelDetailsModal"
                 footer={
@@ -91,17 +107,17 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                             >
                                 Set Status
                             </Button>
-                            {selectedClientDetails && (
+                            {parcelClientId && (
                                 <>
                                     <LinkButton
-                                        link={`/clients?clientId=${selectedClientDetails.clientId}`}
-                                        disabled={!selectedClientDetails.isClientActive}
+                                        link={`/clients?clientId=${parcelClientId}`}
+                                        disabled={!isClientActive}
                                     >
                                         See Client Details
                                     </LinkButton>
                                     <LinkButton
-                                        link={`/clients/edit/${selectedClientDetails.clientId}`}
-                                        disabled={!selectedClientDetails.isClientActive}
+                                        link={`/clients/edit/${parcelClientId}`}
+                                        disabled={!isClientActive}
                                     >
                                         Edit Client Details
                                     </LinkButton>
@@ -116,6 +132,8 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                         <Suspense fallback={<ExpandedParcelDetailsFallback />}>
                             <ExpandedParcelDetails
                                 parcelId={selectedParcelId}
+                                setParcelClientId={setParcelClientId}
+                                setIsClientActive={setIsClientActive}
                                 refreshCallback={(refresh) => {
                                     refreshParcelDetailsRef.current = refresh;
                                 }}

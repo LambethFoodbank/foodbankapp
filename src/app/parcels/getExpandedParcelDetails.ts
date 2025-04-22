@@ -141,6 +141,7 @@ const getExpandedParcelDetails = async (
             parcelDetails: {
                 expandedParcelData: {
                     isActive: true,
+                    clientId: client.primary_key,
                     voucherNumber: rawParcelDetails.voucher_number ?? "",
                     fullName: client.full_name ?? "",
                     listType: rawParcelDetails.list_type,
@@ -196,6 +197,7 @@ const getExpandedParcelDetails = async (
         parcelDetails: {
             expandedParcelData: {
                 isActive: false,
+                clientId: client.primary_key,
                 voucherNumber: rawParcelDetails.voucher_number ?? "",
                 listType: rawParcelDetails.list_type,
                 packingDateAndSlot: formatPackingDateAndSlot(
@@ -226,10 +228,12 @@ interface ParcelDataIndependentOfClient extends Data {
 
 interface ParcelDataForInactiveClient extends ParcelDataIndependentOfClient {
     isActive: false;
+    clientId: string;
 }
 
 interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     isActive: true;
+    clientId: string;
     fullName: string;
     address: string;
     deliveryInstructions: string;
@@ -296,6 +300,10 @@ export const getExpandedParcelDataForDataViewer = (
     });
     parcelDetailsForDataViewer["isActive"] = {
         value: parcelDetails["isActive"],
+        hide: true,
+    };
+    parcelDetailsForDataViewer["clientId"] = {
+        value: parcelDetails["clientId"],
         hide: true,
     };
     parcelDetailsForDataViewer["listType"] = {
