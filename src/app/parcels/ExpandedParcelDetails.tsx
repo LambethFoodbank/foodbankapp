@@ -67,7 +67,7 @@ const ExpandedParcelDetailsView = ({
         setParcelDetails(expandedParcelDetails);
         setParcelClientId(expandedParcelDetails.expandedParcelData.clientId);
         setIsClientActive(expandedParcelDetails.expandedParcelData.isActive);
-    }, [parcelId]);
+    }, [parcelId, setIsClientActive, setParcelClientId]);
 
     useEffect(() => {
         void fetchAndSetParcelDetails();

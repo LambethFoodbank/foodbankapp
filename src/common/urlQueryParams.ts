@@ -52,13 +52,7 @@ export const mergeParamsIntoURL = (
         )
     );
 
-    console.log("QQ Potentially updating URL...");
-    console.dir(paramsInURL);
-    console.dir(nonEmptyMergedParams);
-
     if (!areRecordsEqual(paramsInURL, nonEmptyMergedParams)) {
-        console.log("Updating URL with new params:", nonEmptyMergedParams);
-
         const queryStringified = queryString.stringify(nonEmptyMergedParams);
 
         // App Router doesn't support shallow routing, so router.push would reload the page

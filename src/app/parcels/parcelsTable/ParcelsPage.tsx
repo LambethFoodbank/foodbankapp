@@ -80,7 +80,7 @@ const ParcelsPage: React.FC = () => {
                 }
             }
         })();
-    }, [searchParams]);
+    }, [searchParams, primaryFilters, additionalFilters]);
 
     const packingManagerViewPrimaryFilters = useMemo(
         () =>

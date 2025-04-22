@@ -1,7 +1,7 @@
 import supabase from "@/supabaseClient";
 import { Suspense, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ParcelsTableRow, SelectedClientDetails } from "@/app/parcels/parcelsTable/types";
+import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import ExpandedParcelDetails from "../ExpandedParcelDetails";
 import ExpandedParcelDetailsFallback from "../ExpandedParcelDetailsFallback";
 import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
@@ -37,9 +37,6 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
     const [statusAnchorElement, setStatusAnchorElement] = useState<HTMLElement | null>(null);
     const refreshParcelDetailsRef = useRef<(() => void) | null>(null);
 
-    const [selectedClientDetails, setSelectedClientDetails] =
-        useState<SelectedClientDetails | null>(null); // QQ remove this
-
     const [parcelClientId, setParcelClientId] = useState<string | null>(null);
     const [isClientActive, setIsClientActive] = useState<boolean | null>(null);
     const [modalErrorMessage, setModalErrorMessage] = useState<string | null>(null);
@@ -51,8 +48,6 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
     };
 
     const refreshDetails = (): void => {
-        console.log("QQ refreshing parcel details");
-
         if (refreshParcelDetailsRef.current) {
             refreshParcelDetailsRef.current();
         }
