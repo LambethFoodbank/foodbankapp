@@ -9,6 +9,7 @@ import {
     ClientSideFilter,
 } from "./Filters";
 import { TableHeaders } from "./Table";
+import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 
 interface ServerSideTextFilterProps<Data, DbData extends Record<string, unknown>> {
     key: keyof Data;
@@ -18,6 +19,7 @@ interface ServerSideTextFilterProps<Data, DbData extends Record<string, unknown>
     method: ServerSideFilterMethod<DbData, string>;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHiddenInUrl?: boolean;
 }
 
 const TextFilterStyling = styled.div`
@@ -33,6 +35,7 @@ export const buildServerSideTextFilter = <Data, DbData extends Record<string, un
     method,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHiddenInUrl = false,
 }: ServerSideTextFilterProps<Data, DbData>): ServerSideFilter<Data, string, DbData> => {
     return {
         state: initialValue,
@@ -41,6 +44,7 @@ export const buildServerSideTextFilter = <Data, DbData extends Record<string, un
         method: method,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
+        isHiddenInUrl: isHiddenInUrl,
         filterComponent: (state, setState, isDisabled) => {
             return (
                 <TextFilterStyling key={label}>
@@ -58,6 +62,20 @@ export const buildServerSideTextFilter = <Data, DbData extends Record<string, un
             );
         },
         areStatesIdentical: (stateA, stateB) => stateA === stateB,
+        generateUrlParam: function (): UrlQueryParamsRecord {
+            const paramRecord: UrlQueryParamsRecord = {};
+
+            if (this.isHiddenInUrl) {
+                paramRecord[key as string] = null;
+            } else {
+                paramRecord[key as string] = this.state as string;
+            }
+            return paramRecord;
+        },
+        readStateFromUrlQueryParams: (urlParams: UrlQueryParamsRecord) => {
+            const paramVal = urlParams[key as string];
+            return paramVal && typeof paramVal == "string" ? paramVal : null;
+        },
     };
 };
 
@@ -69,6 +87,7 @@ interface ClientSideTextFilterProps<Data> {
     method: ClientSideFilterMethod<Data, string>;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHiddenInUrl?: boolean;
 }
 
 export const buildClientSideTextFilter = <Data,>({
@@ -78,6 +97,7 @@ export const buildClientSideTextFilter = <Data,>({
     method,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHiddenInUrl = false,
 }: ClientSideTextFilterProps<Data>): ClientSideFilter<Data, string> => {
     return {
         state: initialValue,
@@ -86,6 +106,7 @@ export const buildClientSideTextFilter = <Data,>({
         method: method,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
+        isHiddenInUrl: isHiddenInUrl,
         filterComponent: (state, setState) => {
             return (
                 <TextFilterStyling key={label}>
@@ -102,6 +123,20 @@ export const buildClientSideTextFilter = <Data,>({
             );
         },
         areStatesIdentical: (stateA, stateB) => stateA === stateB,
+        generateUrlParam: function (): UrlQueryParamsRecord {
+            const paramRecord: UrlQueryParamsRecord = {};
+
+            if (this.isHiddenInUrl) {
+                paramRecord[key as string] = null;
+            } else {
+                paramRecord[key as string] = this.state as string;
+            }
+            return paramRecord;
+        },
+        readStateFromUrlQueryParams: (urlParams: UrlQueryParamsRecord) => {
+            const paramVal = urlParams[key as string];
+            return paramVal && typeof paramVal == "string" ? paramVal : null;
+        },
     };
 };
 

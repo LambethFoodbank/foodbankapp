@@ -3,8 +3,10 @@
 import { ReadonlyURLSearchParams } from "next/navigation";
 import queryString, { ParsedQuery } from "query-string";
 
+export type UrlQueryParamsRecord = ParsedQuery;
+
 export const parseQueryParams = (searchParams: ReadonlyURLSearchParams): ParsedQuery => {
-    const parsedQuery = queryString.parse(searchParams.toString());
+    const parsedQuery = queryString.parse(searchParams.toString(), { arrayFormat: "bracket" });
     return parsedQuery;
 };
 
@@ -14,17 +16,25 @@ export const readArrayParamFromQuery = (
 ): string[] | null => {
     const paramValue = params[paramName];
 
+    // QQ is this needed with arrayFormat: bracket?
+
     if (paramValue) {
         if (typeof paramValue === "string") {
             return [paramValue];
         } else if (Array.isArray(paramValue)) {
-            return paramValue.filter((method): method is string => method !== null);
+            return paramValue.filter((val): val is string => val !== null);
         }
     }
     return null;
 };
 
-const areRecordsEqual = (obj1: ParsedQuery<string>, obj2: ParsedQuery<string>): boolean => {
+// QQ: Use standard solution here
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const areStringArraysEqual = (arr1: any[], arr2: any[]): boolean => {
+    return arr1.length === arr2.length && arr1.every((val, index) => arr2[index] === val);
+};
+
+const areRecordsEqual = (obj1: UrlQueryParamsRecord, obj2: UrlQueryParamsRecord): boolean => {
     const keys1 = Object.keys(obj1);
     const keys2 = Object.keys(obj2);
 
@@ -32,14 +42,20 @@ const areRecordsEqual = (obj1: ParsedQuery<string>, obj2: ParsedQuery<string>): 
         return false;
     }
 
-    return keys1.every((key) => obj1[key] === obj2[key]);
+    return keys1.every(
+        (key) =>
+            obj1[key] === obj2[key] ||
+            (Array.isArray(obj1[key]) &&
+                Array.isArray(obj2[key]) &&
+                areStringArraysEqual(obj1[key], obj2[key]))
+    );
 };
 
 export const mergeParamsIntoURL = (
     searchParams: ReadonlyURLSearchParams,
-    paramsToUpdate: Record<string, string | null | string[]>
+    paramsToUpdate: UrlQueryParamsRecord
 ): void => {
-    const paramsInURL = queryString.parse(searchParams.toString());
+    const paramsInURL = queryString.parse(searchParams.toString(), { arrayFormat: "bracket" });
 
     const mergedParams = {
         ...paramsInURL,
@@ -53,7 +69,13 @@ export const mergeParamsIntoURL = (
     );
 
     if (!areRecordsEqual(paramsInURL, nonEmptyMergedParams)) {
-        const queryStringified = queryString.stringify(nonEmptyMergedParams);
+        console.log("QQ: about to push new location state:");
+        console.dir(paramsInURL);
+        console.dir(nonEmptyMergedParams);
+
+        const queryStringified = queryString.stringify(nonEmptyMergedParams, {
+            arrayFormat: "bracket",
+        });
 
         // App Router doesn't support shallow routing, so router.push would reload the page
         window.history.pushState({}, "", `${window.location.pathname}?${queryStringified}`);

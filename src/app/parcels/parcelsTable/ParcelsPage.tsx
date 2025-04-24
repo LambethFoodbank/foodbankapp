@@ -5,7 +5,11 @@ import supabase from "@/supabaseClient";
 import { ParcelsTableRow, ParcelsSortState, ParcelsFilter } from "@/app/parcels/parcelsTable/types";
 import { useSearchParams } from "next/navigation";
 import { mergeParamsIntoURL, parseQueryParams } from "@/common/urlQueryParams";
-import { parcelIdParam } from "@/app/parcels/parcelsTable/constants";
+import {
+    pageViewTypePackingManager,
+    pageViewTypeParam,
+    parcelIdParam,
+} from "@/app/parcels/parcelsTable/constants";
 import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import buildFilters, {
     buildQueryParamsFromFilters,
@@ -48,6 +52,7 @@ const ParcelsPage: React.FC = () => {
 
     const [areFiltersLoadingForFirstTime, setAreFiltersLoadingForFirstTime] =
         useState<boolean>(true);
+    const [urlParamsHaveBeenProcessed, setUrlParamsHaveBeenProcessed] = useState<boolean>(false);
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -59,28 +64,41 @@ const ParcelsPage: React.FC = () => {
     const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
 
     useEffect(() => {
+        console.log("QQ: Page load");
+    }, []);
+
+    useEffect(() => {
         (async () => {
-            if (primaryFilters.length === 0 && additionalFilters.length === 0) {
-                setAreFiltersLoadingForFirstTime(true);
-                let filtersObject = await buildFilters();
-
-                const params = parseQueryParams(searchParams);
-                filtersObject = updateFiltersFromQueryParams(
-                    params,
-                    filtersObject.primaryFilters,
-                    filtersObject.additionalFilters
-                );
-
-                setPrimaryFilters(filtersObject.primaryFilters);
-                setAdditionalFilters(filtersObject.additionalFilters);
-                setAreFiltersLoadingForFirstTime(false);
-
-                if (params[parcelIdParam]) {
-                    openParcelModal(params[parcelIdParam] as string);
-                }
+            if (urlParamsHaveBeenProcessed) {
+                return;
             }
+
+            setAreFiltersLoadingForFirstTime(true);
+
+            const urlParams = parseQueryParams(searchParams);
+            if (urlParams[pageViewTypeParam] === pageViewTypePackingManager) {
+                setIsPackingManagerView(true);
+            }
+
+            let filtersObject = await buildFilters();
+
+            filtersObject = updateFiltersFromQueryParams(
+                urlParams,
+                filtersObject.primaryFilters,
+                filtersObject.additionalFilters
+            );
+
+            setPrimaryFilters(filtersObject.primaryFilters);
+            setAdditionalFilters(filtersObject.additionalFilters);
+            setAreFiltersLoadingForFirstTime(false);
+
+            if (urlParams[parcelIdParam]) {
+                openParcelModal(urlParams[parcelIdParam] as string);
+            }
+
+            setUrlParamsHaveBeenProcessed(true);
         })();
-    }, [searchParams, primaryFilters, additionalFilters]);
+    }, [urlParamsHaveBeenProcessed, searchParams, primaryFilters, additionalFilters]);
 
     const packingManagerViewPrimaryFilters = useMemo(
         () =>
@@ -90,10 +108,11 @@ const ParcelsPage: React.FC = () => {
                         ...filter,
                         state: { from: yesterday, to: today },
                         isDisabled: true,
+                        isHiddenInUrl: true,
                     } as ParcelsFilter<DateRangeState>;
                 }
                 if (shouldFilterBeDisabled(filter)) {
-                    return { ...filter, isDisabled: true };
+                    return { ...filter, isDisabled: true, isHiddenInUrl: true };
                 }
                 return filter;
             }),
@@ -107,13 +126,14 @@ const ParcelsPage: React.FC = () => {
     }, [isPackingManagerView, packingManagerViewPrimaryFilters, additionalFilters, primaryFilters]);
 
     useEffect(() => {
-        if (areFiltersLoadingForFirstTime) {
+        if (!urlParamsHaveBeenProcessed) {
             return;
         }
 
-        const filterParams = buildQueryParamsFromFilters(allFilters);
-        mergeParamsIntoURL(searchParams, filterParams);
-    }, [allFilters, areFiltersLoadingForFirstTime, searchParams]);
+        const paramsRecord = buildQueryParamsFromFilters(allFilters);
+        paramsRecord[pageViewTypeParam] = isPackingManagerView ? pageViewTypePackingManager : null;
+        mergeParamsIntoURL(searchParams, paramsRecord);
+    }, [allFilters, isPackingManagerView, searchParams, urlParamsHaveBeenProcessed]);
 
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
         if (checkedParcelIds.length === 0) {
@@ -142,6 +162,15 @@ const ParcelsPage: React.FC = () => {
 
         const paramsRecord: Record<string, string> = {};
         paramsRecord[parcelIdParam] = parcelId;
+        mergeParamsIntoURL(searchParams, paramsRecord);
+    };
+
+    const closeParcelModalAndUpdateURL = (): void => {
+        setModalIsOpen(false);
+        setSelectedParcelId(null);
+
+        const paramsRecord: Record<string, string | null> = {};
+        paramsRecord[parcelIdParam] = null;
         mergeParamsIntoURL(searchParams, paramsRecord);
     };
 
@@ -195,9 +224,8 @@ const ParcelsPage: React.FC = () => {
                     />
                     <ParcelsModal
                         modalIsOpen={modalIsOpen}
-                        setModalIsOpen={setModalIsOpen}
                         selectedParcelId={selectedParcelId}
-                        setSelectedParcelId={setSelectedParcelId}
+                        closeParcelModal={closeParcelModalAndUpdateURL}
                     />
                 </>
             )}

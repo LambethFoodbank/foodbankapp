@@ -1,14 +1,11 @@
 import supabase from "@/supabaseClient";
 import { Suspense, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import ExpandedParcelDetails from "../ExpandedParcelDetails";
 import ExpandedParcelDetailsFallback from "../ExpandedParcelDetailsFallback";
 import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import Statuses from "../ActionBar/Statuses";
-import { mergeParamsIntoURL } from "@/common/urlQueryParams";
-import { parcelIdParam } from "@/app/parcels/parcelsTable/constants";
 import Modal from "@/components/Modal/Modal";
 import { Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
 import LinkButton from "@/components/Buttons/LinkButton";
@@ -21,19 +18,15 @@ import { ArrowDropDown } from "@mui/icons-material";
 
 interface ParcelsModalProps {
     modalIsOpen: boolean;
-    setModalIsOpen: (modalIsOpen: boolean) => void;
     selectedParcelId: string | null;
-    setSelectedParcelId: (selectedParcelId: string | null) => void;
+    closeParcelModal: () => void;
 }
 
 const ParcelsModal: React.FC<ParcelsModalProps> = ({
     modalIsOpen,
-    setModalIsOpen,
     selectedParcelId,
-    setSelectedParcelId,
+    closeParcelModal,
 }) => {
-    const searchParams = useSearchParams();
-
     const [statusAnchorElement, setStatusAnchorElement] = useState<HTMLElement | null>(null);
     const refreshParcelDetailsRef = useRef<(() => void) | null>(null);
 
@@ -51,15 +44,6 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
         if (refreshParcelDetailsRef.current) {
             refreshParcelDetailsRef.current();
         }
-    };
-
-    const closeParcelModalAndUpdateURL = (): void => {
-        setModalIsOpen(false);
-        setSelectedParcelId(null);
-
-        const paramsRecord: Record<string, string | null> = {};
-        paramsRecord[parcelIdParam] = null;
-        mergeParamsIntoURL(searchParams, paramsRecord);
     };
 
     const postSetStatusCallback = (): void => {
@@ -84,7 +68,7 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                 }
                 isOpen={modalIsOpen}
                 onClose={() => {
-                    closeParcelModalAndUpdateURL();
+                    closeParcelModal();
                 }}
                 headerId="expandedParcelDetailsModal"
                 footer={

@@ -4,6 +4,7 @@ import React from "react";
 import { ClientSideFilter, ClientSideFilterMethod, defaultToString } from "./Filters";
 import Button from "@mui/material/Button";
 import { capitaliseWords } from "@/common/format";
+import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 
 interface ButtonGroupFilterProps<Data> {
     key: keyof Data;
@@ -13,6 +14,7 @@ interface ButtonGroupFilterProps<Data> {
     method: ClientSideFilterMethod<Data, string>;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHiddenInUrl?: boolean;
 }
 
 interface ButtonProps {
@@ -44,6 +46,7 @@ export const buttonGroupFilter = <Data,>({
     method,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHiddenInUrl = false,
 }: ButtonGroupFilterProps<Data>): ClientSideFilter<Data, string> => {
     return {
         key: key,
@@ -53,7 +56,7 @@ export const buttonGroupFilter = <Data,>({
         areStatesIdentical: (stateA, stateB) => stateA === stateB,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
-
+        isHiddenInUrl: isHiddenInUrl,
         filterComponent: function (
             state: string,
             setState: (state: string) => void,
@@ -73,6 +76,20 @@ export const buttonGroupFilter = <Data,>({
                     ))}
                 </>
             );
+        },
+        generateUrlParam: function (): UrlQueryParamsRecord {
+            const paramRecord: UrlQueryParamsRecord = {};
+
+            if (this.isHiddenInUrl) {
+                paramRecord[key as string] = null;
+            } else {
+                paramRecord[key as string] = this.state as string; // QQ what does this do on Lists?
+            }
+            return paramRecord;
+        },
+        readStateFromUrlQueryParams: (urlParams: UrlQueryParamsRecord) => {
+            const paramVal = urlParams[key as string];
+            return paramVal && typeof paramVal == "string" ? paramVal : null;
         },
     };
 };

@@ -2,6 +2,7 @@ import React from "react";
 import { TableHeaders } from "@/components/Tables/Table";
 import { Database } from "@/databaseTypesFile";
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
+import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 
 export enum PaginationType {
     Server = "SERVER",
@@ -32,11 +33,14 @@ interface BasicFilter<Data, State> {
         setState: (state: State) => void,
         isDisabled: boolean
     ) => React.ReactNode;
-    state: State;
     initialState: State;
+    state: State;
     areStatesIdentical: (stateA: State, stateB: State) => boolean;
+    generateUrlParam: () => UrlQueryParamsRecord;
+    readStateFromUrlQueryParams: (urlParams: UrlQueryParamsRecord) => State | null;
     shouldPersistOnClear: boolean;
     isDisabled: boolean;
+    isHiddenInUrl: boolean;
 }
 
 export interface ServerSideFilter<Data, State, DbData extends Record<string, unknown>>

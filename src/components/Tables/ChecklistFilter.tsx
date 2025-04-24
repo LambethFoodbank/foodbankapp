@@ -3,6 +3,7 @@
 import React from "react";
 import CheckboxGroupPopup from "../DataInput/CheckboxGroupPopup";
 import { ServerSideFilter, ServerSideFilterMethod } from "./Filters";
+import { UrlQueryParamsRecord, readArrayParamFromQuery } from "@/common/urlQueryParams";
 
 interface ChecklistFilterProps<
     Data,
@@ -15,6 +16,7 @@ interface ChecklistFilterProps<
     method: ServerSideFilterMethod<DbData, string[]>;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHiddenInUrl?: boolean;
 }
 
 export const serverSideChecklistFilter = <
@@ -28,6 +30,7 @@ export const serverSideChecklistFilter = <
     method,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHiddenInUrl = false,
 }: ChecklistFilterProps<Data, DbData>): ServerSideFilter<Data, string[], DbData> => {
     return {
         key: key,
@@ -36,6 +39,7 @@ export const serverSideChecklistFilter = <
         method,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
+        isHiddenInUrl: isHiddenInUrl,
         areStatesIdentical: (stateA, stateB) =>
             stateA.length === stateB.length && stateA.every((optionA) => stateB.includes(optionA)),
         filterComponent: function (
@@ -67,6 +71,20 @@ export const serverSideChecklistFilter = <
                     isDisabled={isDisabled}
                 />
             );
+        },
+        generateUrlParam: function (): UrlQueryParamsRecord {
+            const paramRecord: UrlQueryParamsRecord = {};
+
+            if (this.isHiddenInUrl) {
+                paramRecord[key as string] = null;
+            } else {
+                paramRecord[key as string] = this.state as string[];
+            }
+            return paramRecord;
+        },
+        readStateFromUrlQueryParams: (urlParams: UrlQueryParamsRecord) => {
+            const paramArray = readArrayParamFromQuery(urlParams, key as string);
+            return paramArray && Array.isArray(paramArray) ? paramArray : null;
         },
     };
 };

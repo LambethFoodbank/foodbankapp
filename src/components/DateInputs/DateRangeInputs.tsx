@@ -11,6 +11,16 @@ export interface DateRangeState {
     to: Dayjs;
 }
 
+export const isDateRangeValid = (from: Dayjs, to: Dayjs): boolean => {
+    return (
+        from.isValid() &&
+        to.isValid() &&
+        from <= to &&
+        from >= reasonableMinDate &&
+        to >= reasonableMinDate
+    );
+};
+
 interface Props {
     range: DateRangeState;
     setRange: (range: DateRangeState) => void;
