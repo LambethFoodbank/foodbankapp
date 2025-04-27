@@ -17,12 +17,13 @@ import {
     DataForDataViewer,
     convertDataToDataForDataViewer,
 } from "@/components/DataViewer/DataViewer";
-import { formatEventName } from "./format";
+import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
-import { cookingFacilitiesOptions } from "../clients/form/formSections/CookingFacilitiesCard";
-import { dietaryRequirementOptions } from "../clients/form/formSections/DietaryRequirementCard";
-import { otherRequirementOptions } from "../clients/form/formSections/OtherItemsCard";
-import { petFoodOptions } from "../clients/form/formSections/PetFoodCard";
+import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
+import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
+import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
+import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
+import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 
 type FetchExpandedParcelDetailsResult =
     | {
@@ -86,6 +87,9 @@ const getExpandedParcelDetails = async (
             pet_food,
             other_items,
             extra_information,
+            signposting_call_required,
+            signposting_call_reasons,
+            notes,
 
             family:families(
                 birth_year,
@@ -185,6 +189,11 @@ const getExpandedParcelDetails = async (
                         otherRequirementOptions
                     ),
                     extraInformation: client.extra_information ?? "",
+                    signpostingCall: formatSignpostingCall(
+                        client.signposting_call_required,
+                        client.signposting_call_reasons
+                    ),
+                    clientNotes: client.notes ?? "",
                     createdAt: formatDateTime(rawParcelDetails.created_at),
                 },
                 events: processEventsDetails(rawParcelDetails.events),
@@ -244,6 +253,8 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     petFood: string;
     otherRequirements: string;
     extraInformation: string;
+    signpostingCall: string;
+    clientNotes: string;
 }
 
 type ExpandedParcelData = ParcelDataForActiveClient | ParcelDataForInactiveClient;
@@ -277,6 +288,19 @@ const formatDeliveryOrCollection = (
     const methodString = isShown ? collectionCentreName : `${collectionCentreName} (inactive)`;
     const collectionDateTimeString = isDelivery ? "" : formatDateTime(collectionDatetime);
     return methodString + " " + collectionDateTimeString;
+};
+
+const formatSignpostingCall = (
+    signpostingCallRequired: boolean | null,
+    signpostingCallReasons: string[] | null
+): string => {
+    if (!signpostingCallRequired) {
+        return "No";
+    }
+
+    return (
+        "Yes: " + formatRequirementsByCanonicalOrder(signpostingCallReasons, signpostingCallOptions)
+    );
 };
 
 export const processEventsDetails = (
