@@ -297,6 +297,8 @@ export const updateFiltersFromQueryParams = (
 export const buildQueryParamsFromFilters = (allFilters: ParcelsFilters): UrlQueryParamsRecord => {
     let params: UrlQueryParamsRecord = {};
 
+    console.dir(allFilters);
+
     allFilters.forEach((filter: ParcelsFiltersAllStates) => {
         params = { ...params, ...filter.generateUrlParam() };
     });

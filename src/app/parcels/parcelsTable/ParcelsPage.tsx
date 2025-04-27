@@ -120,15 +120,22 @@ const ParcelsPage: React.FC = () => {
     );
 
     const allFilters = useMemo(() => {
-        return isPackingManagerView
+        console.log("UU: recalculate allFilters");
+
+        const tmp = isPackingManagerView
             ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
             : [...primaryFilters, ...additionalFilters];
+
+        console.dir(tmp);
+        return tmp;
     }, [isPackingManagerView, packingManagerViewPrimaryFilters, additionalFilters, primaryFilters]);
 
     useEffect(() => {
         if (!urlParamsHaveBeenProcessed) {
             return;
         }
+
+        console.log("UU: rebuilding query params from filters");
 
         const paramsRecord = buildQueryParamsFromFilters(allFilters);
         paramsRecord[pageViewTypeParam] = isPackingManagerView ? pageViewTypePackingManager : null;

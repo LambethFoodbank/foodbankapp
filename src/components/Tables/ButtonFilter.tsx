@@ -83,7 +83,7 @@ export const buttonGroupFilter = <Data,>({
             if (this.isHiddenInUrl) {
                 paramRecord[key as string] = null;
             } else {
-                paramRecord[key as string] = this.state as string; // QQ what does this do on Lists?
+                paramRecord[key as string] = this.state as string;
             }
             return paramRecord;
         },
