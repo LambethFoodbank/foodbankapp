@@ -108,28 +108,27 @@ const ParcelsPage: React.FC = () => {
         );
     }, [primaryFilters, today, yesterday]);
 
-    const currentlyAppliedFilters = () => {
+    const currentlyAppliedFilters = useMemo(() => {
+        console.log("WW: rebuilding currentlyAppliedFilters");
+
         return isPackingManagerView
             ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
             : [...primaryFilters, ...additionalFilters];
-    };
+    }, [isPackingManagerView, packingManagerViewPrimaryFilters, primaryFilters, additionalFilters]);
 
     useEffect(() => {
         if (!urlParamsHaveBeenProcessed) {
             return;
         }
 
-        const paramsRecord = buildQueryParamsFromFilters(currentlyAppliedFilters());
+        console.log("QQ: about to buildQueryParamsFromFilters");
+        // QQ Why is this happening twice, both times showing the old searchParams filter value,
+        // and why does the table refreshed twice, the first time based on the old filter value?
+
+        const paramsRecord = buildQueryParamsFromFilters(currentlyAppliedFilters);
         paramsRecord[pageViewTypeParam] = isPackingManagerView ? pageViewTypePackingManager : null;
         mergeParamsIntoURL(searchParams, paramsRecord);
-    }, [
-        isPackingManagerView,
-        primaryFilters,
-        packingManagerViewPrimaryFilters,
-        additionalFilters,
-        searchParams,
-        urlParamsHaveBeenProcessed,
-    ]);
+    }, [isPackingManagerView, currentlyAppliedFilters, searchParams, urlParamsHaveBeenProcessed]);
 
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
         if (checkedParcelIds.length === 0) {
@@ -217,7 +216,7 @@ const ParcelsPage: React.FC = () => {
                         openParcelModal={openParcelModalAndUpdateURL}
                         sortState={sortState}
                         setSortState={setSortState}
-                        appliedFilters={currentlyAppliedFilters()}
+                        appliedFilters={currentlyAppliedFilters}
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
                         isPackingManagerView={isPackingManagerView}
