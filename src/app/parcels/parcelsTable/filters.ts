@@ -17,7 +17,7 @@ import {
     packingSlotOptionsSet,
 } from "./types";
 import { buildServerSideTextFilter } from "@/components/Tables/TextFilter";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 import { parcelTableHeaderKeysAndLabels } from "./headers";
 import { DbParcelRow } from "@/databaseUtils";
@@ -28,6 +28,7 @@ import {
     phoneSearch,
     postcodeSearch,
 } from "@/common/databaseFilters";
+import { shouldFilterBeDisabled } from "./packingManagerHelpers";
 
 const parcelsFullNameSearch: ParcelsFilterMethod<string> = fullNameSearch<DbParcelRow>(
     "client_full_name",
@@ -294,12 +295,42 @@ export const updateFiltersFromQueryParams = (
     return { primaryFilters, additionalFilters };
 };
 
-export const buildQueryParamsFromFilters = (allFilters: ParcelsFilters): UrlQueryParamsRecord => {
+export const buildPackingManagerPrimaryFilters = (
+    primaryFilters: ParcelsFilters,
+    today: Dayjs,
+    yesterday: Dayjs
+): ParcelsFilters => {
+    return primaryFilters.map((filter) => {
+        if (shouldFilterBeDisabled(filter)) {
+            if (filter.key === "packingDate") {
+                return {
+                    ...filter,
+                    state: { from: yesterday, to: today },
+                    isDisabled: true,
+                    isHiddenInUrl: true,
+                } as ParcelsFilter<DateRangeState>;
+            } else if (["packingSlot", "lastStatus"].includes(filter.key)) {
+                return {
+                    ...filter,
+                    state: [] as string[],
+                    isDisabled: true,
+                    isHiddenInUrl: true,
+                } as ParcelsFilter<string[]>;
+            } else {
+                return { ...filter, isDisabled: true, isHiddenInUrl: true };
+            }
+        }
+
+        return { ...filter };
+    });
+};
+
+export const buildQueryParamsFromFilters = (
+    appliedFilters: ParcelsFilters
+): UrlQueryParamsRecord => {
     let params: UrlQueryParamsRecord = {};
 
-    console.dir(allFilters);
-
-    allFilters.forEach((filter: ParcelsFiltersAllStates) => {
+    appliedFilters.forEach((filter: ParcelsFiltersAllStates) => {
         params = { ...params, ...filter.generateUrlParam() };
     });
 

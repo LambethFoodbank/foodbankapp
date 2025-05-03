@@ -2,7 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import supabase from "@/supabaseClient";
-import { ParcelsTableRow, ParcelsSortState, ParcelsFilter } from "@/app/parcels/parcelsTable/types";
+import {
+    ParcelsTableRow,
+    ParcelsSortState,
+    ParcelsFilters,
+} from "@/app/parcels/parcelsTable/types";
 import { useSearchParams } from "next/navigation";
 import { mergeParamsIntoURL, parseQueryParams } from "@/common/urlQueryParams";
 import {
@@ -12,6 +16,7 @@ import {
 } from "@/app/parcels/parcelsTable/constants";
 import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import buildFilters, {
+    buildPackingManagerPrimaryFilters,
     buildQueryParamsFromFilters,
     updateFiltersFromQueryParams,
 } from "@/app/parcels/parcelsTable/filters";
@@ -26,7 +31,6 @@ import FloatingToast from "@/components/FloatingToast";
 import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import { DistributeServerFilter } from "@/components/Tables/Filters";
 import { DbParcelRow } from "@/databaseUtils";
-import { shouldFilterBeDisabled } from "./packingManagerHelpers";
 import dayjs from "dayjs";
 import { PreTableControlsContainer } from "@/components/controlsStyling";
 
@@ -43,12 +47,12 @@ const ParcelsPage: React.FC = () => {
 
     const [sortState, setSortState] = useState<ParcelsSortState>({ sortEnabled: false });
 
-    const [primaryFilters, setPrimaryFilters] = useState<
-        (ParcelsFilter<string> | ParcelsFilter<DateRangeState> | ParcelsFilter<string[]>)[]
-    >([]);
-    const [additionalFilters, setAdditionalFilters] = useState<
-        (ParcelsFilter<string> | ParcelsFilter<DateRangeState> | ParcelsFilter<string[]>)[]
-    >([]);
+    const [primaryFilters, setPrimaryFilters] = useState<ParcelsFilters>([]);
+    const [additionalFilters, setAdditionalFilters] = useState<ParcelsFilters>([]);
+
+    const [isPackingManagerView, setIsPackingManagerView] = useState<boolean>(false);
+    const [packingManagerViewPrimaryFilters, setPackingManagerViewPrimaryFilters] =
+        useState<ParcelsFilters>([]);
 
     const [areFiltersLoadingForFirstTime, setAreFiltersLoadingForFirstTime] =
         useState<boolean>(true);
@@ -57,8 +61,6 @@ const ParcelsPage: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const selectedParcelMessage = getSelectedParcelCountMessage(checkedParcelIds.length);
-
-    const [isPackingManagerView, setIsPackingManagerView] = useState<boolean>(false);
 
     const today = useMemo(() => dayjs().startOf("day"), []);
     const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
@@ -100,47 +102,34 @@ const ParcelsPage: React.FC = () => {
         })();
     }, [urlParamsHaveBeenProcessed, searchParams, primaryFilters, additionalFilters]);
 
-    const packingManagerViewPrimaryFilters = useMemo(
-        () =>
-            primaryFilters.map((filter) => {
-                if (filter.key === "packingDate") {
-                    return {
-                        ...filter,
-                        state: { from: yesterday, to: today },
-                        isDisabled: true,
-                        isHiddenInUrl: true,
-                    } as ParcelsFilter<DateRangeState>;
-                }
-                if (shouldFilterBeDisabled(filter)) {
-                    return { ...filter, isDisabled: true, isHiddenInUrl: true };
-                }
-                return filter;
-            }),
-        [primaryFilters, today, yesterday]
-    );
+    useEffect(() => {
+        setPackingManagerViewPrimaryFilters(
+            buildPackingManagerPrimaryFilters(primaryFilters, today, yesterday)
+        );
+    }, [primaryFilters, today, yesterday]);
 
-    const allFilters = useMemo(() => {
-        console.log("UU: recalculate allFilters");
-
-        const tmp = isPackingManagerView
+    const currentlyAppliedFilters = () => {
+        return isPackingManagerView
             ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
             : [...primaryFilters, ...additionalFilters];
-
-        console.dir(tmp);
-        return tmp;
-    }, [isPackingManagerView, packingManagerViewPrimaryFilters, additionalFilters, primaryFilters]);
+    };
 
     useEffect(() => {
         if (!urlParamsHaveBeenProcessed) {
             return;
         }
 
-        console.log("UU: rebuilding query params from filters");
-
-        const paramsRecord = buildQueryParamsFromFilters(allFilters);
+        const paramsRecord = buildQueryParamsFromFilters(currentlyAppliedFilters());
         paramsRecord[pageViewTypeParam] = isPackingManagerView ? pageViewTypePackingManager : null;
         mergeParamsIntoURL(searchParams, paramsRecord);
-    }, [allFilters, isPackingManagerView, searchParams, urlParamsHaveBeenProcessed]);
+    }, [
+        isPackingManagerView,
+        primaryFilters,
+        packingManagerViewPrimaryFilters,
+        additionalFilters,
+        searchParams,
+        urlParamsHaveBeenProcessed,
+    ]);
 
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
         if (checkedParcelIds.length === 0) {
@@ -199,7 +188,11 @@ const ParcelsPage: React.FC = () => {
                     filters={
                         isPackingManagerView ? packingManagerViewPrimaryFilters : primaryFilters
                     }
-                    setFilters={setPrimaryFilters}
+                    setFilters={
+                        isPackingManagerView
+                            ? setPackingManagerViewPrimaryFilters
+                            : setPrimaryFilters
+                    }
                     additionalFilters={additionalFilters}
                     setAdditionalFilters={setAdditionalFilters}
                 />
@@ -224,7 +217,7 @@ const ParcelsPage: React.FC = () => {
                         openParcelModal={openParcelModalAndUpdateURL}
                         sortState={sortState}
                         setSortState={setSortState}
-                        appliedFilters={allFilters}
+                        appliedFilters={currentlyAppliedFilters()}
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
                         isPackingManagerView={isPackingManagerView}
