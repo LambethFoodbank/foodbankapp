@@ -5,8 +5,8 @@ import queryString, { ParsedQuery } from "query-string";
 
 export type UrlQueryParamsRecord = ParsedQuery;
 
-export const parseQueryParams = (searchParams: ReadonlyURLSearchParams): UrlQueryParamsRecord => {
-    return queryString.parse(searchParams.toString(), { arrayFormat: "bracket" });
+export const parseQueryParams = (queryParams: string): UrlQueryParamsRecord => {
+    return queryString.parse(queryParams, { arrayFormat: "bracket" });
 };
 
 export const readArrayParamFromQuery = (
@@ -52,7 +52,7 @@ export const mergeParamsIntoURL = (
     searchParams: ReadonlyURLSearchParams,
     paramsToUpdate: UrlQueryParamsRecord
 ): void => {
-    const paramsInURL = parseQueryParams(searchParams);
+    const paramsInURL = parseQueryParams(window.location.search);
 
     const mergedParams = {
         ...paramsInURL,

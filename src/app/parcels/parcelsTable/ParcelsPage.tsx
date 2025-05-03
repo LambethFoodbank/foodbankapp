@@ -77,7 +77,7 @@ const ParcelsPage: React.FC = () => {
 
             setAreFiltersLoadingForFirstTime(true);
 
-            const urlParams = parseQueryParams(searchParams);
+            const urlParams = parseQueryParams(searchParams.toString());
             if (urlParams[pageViewTypeParam] === pageViewTypePackingManager) {
                 setIsPackingManagerView(true);
             }
