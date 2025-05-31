@@ -38,6 +38,24 @@ describe("Parcels page url params", () => {
         cy.url().should("not.include", "fullName=");
     });
 
+    it("Filters are set when URL params are changed directly", () => {
+        const fromDateYmd = "2024-05-14";
+        const fromDateDmy = "14/05/2024";
+        const toDateYmd = "2024-06-02";
+        const toDateDmy = "02/06/2024";
+        const newFullName = "er";
+
+        cy.visit(
+            `/parcels?fullName=${newFullName}&packingDate[]=${fromDateYmd}&packingDate[]=${toDateYmd}`
+        );
+
+        cy.get("[data-testid='text-filter-fullName']")
+            .find("input")
+            .should("have.value", newFullName);
+        cy.get("[data-testid='date-range-input-from']").should("have.value", fromDateDmy);
+        cy.get("[data-testid='date-range-input-to']").should("have.value", toDateDmy);
+    });
+
     it("URL params are updated when going into packing manager view", () => {
         // Wait until table has loaded data
         cy.get("[role='table']").should("be.visible");
@@ -51,6 +69,19 @@ describe("Parcels page url params", () => {
         cy.get("[data-testid='packing-manager-view-button']").click();
         cy.get("[data-testid='all-parcels-button']").click();
         cy.url().should("not.include", "view=");
+    });
+
+    it("Packing manager view enabled when URL param is set", () => {
+        cy.visit("/parcels?view=Packing%20Manager");
+
+        // Wait until table has loaded data
+        cy.get("[role='table']").should("be.visible");
+        cy.get("[aria-label='table-progress-bar']").should("not.exist");
+
+        cy.get("[data-testid='packing-manager-view-button']").should(
+            "have.class",
+            "MuiButton-contained"
+        );
     });
 
     // Skipping this test because the seed data doesn't have parcels dated today,

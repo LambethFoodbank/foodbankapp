@@ -227,14 +227,6 @@ const buildSpecialViewFilter = (today: Dayjs): ParcelsFilter<string> => {
         shouldPersistOnClear: true,
         isHidden: true,
     });
-
-    // QQ
-    // return buildServerSideTextFilter({
-    //     key: pageViewTypeParam,
-    //     label: "View",
-    //     method: specialViewSearchMethod,
-    //     isHidden: true,
-    // });
 };
 
 export const buildParcelFilters = async (
