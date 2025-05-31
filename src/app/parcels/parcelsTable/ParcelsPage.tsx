@@ -67,16 +67,10 @@ const ParcelsPage: React.FC = () => {
     const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
 
     useEffect(() => {
-        console.log("QQ: Page load: ", window.location.search);
-    }, []);
-
-    useEffect(() => {
         (async () => {
             if (urlParamsHaveBeenProcessed) {
                 return;
             }
-
-            console.log("VV: Processing URL params");
 
             setAreFiltersLoadingForFirstTime(true);
 
@@ -114,8 +108,6 @@ const ParcelsPage: React.FC = () => {
     }, [primaryFilters, today, yesterday]);
 
     const currentlyAppliedFilters = useMemo(() => {
-        console.log("WW: rebuilding currentlyAppliedFilters");
-
         return isPackingManagerView
             ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
             : [...primaryFilters, ...additionalFilters];
@@ -125,8 +117,6 @@ const ParcelsPage: React.FC = () => {
         if (!urlParamsHaveBeenProcessed) {
             return;
         }
-
-        console.log("QQ: about to buildQueryParamsFromFilters");
 
         const paramsRecord = buildQueryParamsFromFilters(currentlyAppliedFilters);
         mergeParamsIntoURL(searchParams, paramsRecord);

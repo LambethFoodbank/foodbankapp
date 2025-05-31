@@ -25,7 +25,6 @@ export const readArrayParamFromQuery = (
     return null;
 };
 
-// QQ: Use standard solution here
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const areStringArraysEqual = (arr1: any[], arr2: any[]): boolean => {
     return arr1.length === arr2.length && arr1.every((val, index) => arr2[index] === val);
@@ -66,19 +65,9 @@ export const mergeParamsIntoURL = (
     );
 
     if (!areRecordsEqual(paramsInURL, nonEmptyMergedParams)) {
-        console.log("QQ: about to push new location state:");
-        console.dir(paramsInURL);
-        console.dir(nonEmptyMergedParams);
-
         const queryStringified = queryString.stringify(nonEmptyMergedParams, {
             arrayFormat: "bracket",
         });
-
-        console.log("UU: window.location.search: ", window.location.search);
-        console.log(
-            "UU: window.location.pathname: ",
-            `${window.location.pathname}?${queryStringified}`
-        );
 
         // App Router doesn't support shallow routing, so router.push would reload the page
         window.history.pushState({}, "", `${window.location.pathname}?${queryStringified}`);

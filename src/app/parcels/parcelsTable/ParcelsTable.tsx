@@ -84,12 +84,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         if (parcelsTableFetchAbortController.current) {
             setErrorMessage(null);
 
-            console.log("TT: Fetching parcels data");
-            console.dir(appliedFilters);
-
-            console.log("TT: Fetching parcels data");
-            console.dir(appliedFilters);
-
             const { data, error } = await getParcelsDataAndCount(
                 supabase,
                 appliedFilters,
@@ -138,8 +132,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             clearTimeout(fetchParcelsTimer.current);
             fetchParcelsTimer.current = null;
         }
-
-        console.log("TT: loadCountAndDataWithTimer");
 
         setIsLoading(true);
         fetchParcelsTimer.current = setTimeout(() => {
