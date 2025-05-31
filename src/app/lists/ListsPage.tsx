@@ -86,6 +86,7 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
 const filters: ListFilter[] = [
     buildClientSideTextFilter({
         key: "itemName",
+        rowKey: "itemName",
         label: "Item",
         method: filterRowByText,
     }),
