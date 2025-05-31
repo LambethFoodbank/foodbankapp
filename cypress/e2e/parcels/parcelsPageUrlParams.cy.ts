@@ -4,7 +4,7 @@ describe("Parcels page url params", () => {
         cy.visit("/parcels");
     });
 
-    const formatTodaysDateAsYYYYMMDD = () => {
+    const formatTodaysDateAsYYYYMMDD = (): string => {
         const today = new Date();
         return today.toISOString().split("T")[0];
     };
@@ -27,7 +27,7 @@ describe("Parcels page url params", () => {
     it("Empty URL params are removed when filters are cleared", () => {
         const formattedDate = formatTodaysDateAsYYYYMMDD();
         cy.get("[data-testid='text-filter-fullName']").find("input").type("th");
-        cy.url().should("include", `fullName=th`);
+        cy.url().should("include", "fullName=th");
 
         cy.get("[data-testid='text-filter-fullName']").find("input").clear();
 

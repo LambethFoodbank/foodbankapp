@@ -1,6 +1,5 @@
 "use client";
 
-import { ReadonlyURLSearchParams } from "next/navigation";
 import queryString, { ParsedQuery } from "query-string";
 
 export type UrlQueryParamsRecord = ParsedQuery;
@@ -47,10 +46,7 @@ const areRecordsEqual = (obj1: UrlQueryParamsRecord, obj2: UrlQueryParamsRecord)
     );
 };
 
-export const mergeParamsIntoURL = (
-    searchParams: ReadonlyURLSearchParams,
-    paramsToUpdate: UrlQueryParamsRecord
-): void => {
+export const mergeParamsIntoURL = (paramsToUpdate: UrlQueryParamsRecord): void => {
     const paramsInURL = parseQueryParams(window.location.search);
 
     const mergedParams = {

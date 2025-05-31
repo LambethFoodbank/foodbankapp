@@ -119,7 +119,7 @@ const ParcelsPage: React.FC = () => {
         }
 
         const paramsRecord = buildQueryParamsFromFilters(currentlyAppliedFilters);
-        mergeParamsIntoURL(searchParams, paramsRecord);
+        mergeParamsIntoURL(paramsRecord);
     }, [isPackingManagerView, currentlyAppliedFilters, searchParams, urlParamsHaveBeenProcessed]);
 
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
@@ -158,7 +158,7 @@ const ParcelsPage: React.FC = () => {
 
         const paramsRecord: Record<string, string> = {};
         paramsRecord[parcelIdParam] = parcelId;
-        mergeParamsIntoURL(searchParams, paramsRecord);
+        mergeParamsIntoURL(paramsRecord);
     };
 
     const closeParcelModalAndUpdateURL = (): void => {
@@ -167,7 +167,7 @@ const ParcelsPage: React.FC = () => {
 
         const paramsRecord: Record<string, string | null> = {};
         paramsRecord[parcelIdParam] = null;
-        mergeParamsIntoURL(searchParams, paramsRecord);
+        mergeParamsIntoURL(paramsRecord);
     };
 
     return (
