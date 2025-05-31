@@ -17,12 +17,14 @@ const PreTableControls: React.FC<PreTableControlsProps> = (props) => {
             <Button
                 variant={props.isPackingManagerView ? "outlined" : "contained"}
                 onClick={() => props.setIsPackingManagerView(false)}
+                data-testid="all-parcels-button"
             >
                 All parcels
             </Button>
             <Button
                 variant={props.isPackingManagerView ? "contained" : "outlined"}
                 onClick={() => props.setIsPackingManagerView(true)}
+                data-testid="packing-manager-view-button"
             >
                 Packing manager view
             </Button>

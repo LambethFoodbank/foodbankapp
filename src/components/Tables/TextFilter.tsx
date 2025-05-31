@@ -59,6 +59,7 @@ export const buildServerSideTextFilter = <Data, DbData extends Record<string, un
                         }}
                         size="small"
                         disabled={isDisabled}
+                        data-testid={`text-filter-${key}`}
                     />
                 </TextFilterStyling>
             );
@@ -125,6 +126,7 @@ export const buildClientSideTextFilter = <Data,>({
                             setState(event.target.value);
                         }}
                         size="small"
+                        data-testid={`text-filter-${key}`}
                     />
                 </TextFilterStyling>
             );
