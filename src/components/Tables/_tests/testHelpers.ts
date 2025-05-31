@@ -1,5 +1,5 @@
 import { LIST_TYPES_ARRAY } from "@/common/databaseListTypes";
-import { buttonGroupFilter, filterRowbyButton } from "../ButtonFilter";
+import { clientSideButtonGroupFilter, filterRowbyButton } from "../ButtonFilter";
 import { buildClientSideTextFilter, filterRowByText } from "../TextFilter";
 import { ClientSideFilter } from "../Filters";
 import { SortOrder } from "react-data-table-component/dist/DataTable/types";
@@ -133,16 +133,17 @@ export const fakeDataHeaders = [
 ] as const;
 
 export const fullNameTextFilterTest = buildClientSideTextFilter<TestData>({
-    key: "full_name",
-    headers: fakeDataHeaders,
+    key: "fullName",
+    rowKey: "full_name",
     label: "Name",
     method: filterRowByText,
 });
 
-export const typeButtonFilterTest = buttonGroupFilter<TestData>({
-    key: "type",
+export const typeButtonFilterTest = clientSideButtonGroupFilter<TestData>({
+    key: "typeFilter",
+    rowKey: "type",
     filterLabel: "",
-    filterOptions: LIST_TYPES_ARRAY,
+    itemLabelsAndKeys: LIST_TYPES_ARRAY.map((type) => [type, type]),
     initialActiveFilter: "regular",
     method: filterRowbyButton,
     shouldPersistOnClear: true,

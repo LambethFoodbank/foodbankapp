@@ -74,6 +74,12 @@ export const mergeParamsIntoURL = (
             arrayFormat: "bracket",
         });
 
+        console.log("UU: window.location.search: ", window.location.search);
+        console.log(
+            "UU: window.location.pathname: ",
+            `${window.location.pathname}?${queryStringified}`
+        );
+
         // App Router doesn't support shallow routing, so router.push would reload the page
         window.history.pushState({}, "", `${window.location.pathname}?${queryStringified}`);
     }

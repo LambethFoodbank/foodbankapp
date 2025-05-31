@@ -17,7 +17,7 @@ import ListsDataView, {
 } from "@/app/lists/ListDataview";
 import { ErrorSecondaryText } from "../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { buttonGroupFilter, filterRowbyButton } from "@/components/Tables/ButtonFilter";
+import { clientSideButtonGroupFilter, filterRowbyButton } from "@/components/Tables/ButtonFilter";
 import { buildClientSideTextFilter, filterRowByText } from "@/components/Tables/TextFilter";
 
 interface FetchedListsData {
@@ -87,13 +87,13 @@ const filters: ListFilter[] = [
     buildClientSideTextFilter({
         key: "itemName",
         label: "Item",
-        headers: listsHeaderKeysAndLabels,
         method: filterRowByText,
     }),
-    buttonGroupFilter({
+    clientSideButtonGroupFilter({
         key: "listType",
+        rowKey: "listType",
         filterLabel: "",
-        filterOptions: LIST_TYPES_ARRAY,
+        itemLabelsAndKeys: LIST_TYPES_ARRAY.map((type) => [type, type]),
         initialActiveFilter: "regular",
         method: filterRowbyButton,
         shouldPersistOnClear: true,

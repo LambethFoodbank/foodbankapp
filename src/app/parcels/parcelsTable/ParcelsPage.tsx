@@ -15,7 +15,8 @@ import {
     parcelIdParam,
 } from "@/app/parcels/parcelsTable/constants";
 import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
-import buildFilters, {
+import {
+    buildParcelFilters,
     buildPackingManagerPrimaryFilters,
     buildQueryParamsFromFilters,
     updateFiltersFromQueryParams,
@@ -66,7 +67,7 @@ const ParcelsPage: React.FC = () => {
     const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
 
     useEffect(() => {
-        console.log("QQ: Page load");
+        console.log("QQ: Page load: ", window.location.search);
     }, []);
 
     useEffect(() => {
@@ -75,14 +76,13 @@ const ParcelsPage: React.FC = () => {
                 return;
             }
 
+            console.log("VV: Processing URL params");
+
             setAreFiltersLoadingForFirstTime(true);
 
             const urlParams = parseQueryParams(searchParams.toString());
-            if (urlParams[pageViewTypeParam] === pageViewTypePackingManager) {
-                setIsPackingManagerView(true);
-            }
 
-            let filtersObject = await buildFilters();
+            let filtersObject = await buildParcelFilters(today);
 
             filtersObject = updateFiltersFromQueryParams(
                 urlParams,
@@ -94,13 +94,18 @@ const ParcelsPage: React.FC = () => {
             setAdditionalFilters(filtersObject.additionalFilters);
             setAreFiltersLoadingForFirstTime(false);
 
+            setIsPackingManagerView(
+                filtersObject.primaryFilters.find((filter) => filter.key === pageViewTypeParam)
+                    ?.state === pageViewTypePackingManager
+            );
+
             if (urlParams[parcelIdParam]) {
                 openParcelModal(urlParams[parcelIdParam] as string);
             }
 
             setUrlParamsHaveBeenProcessed(true);
         })();
-    }, [urlParamsHaveBeenProcessed, searchParams, primaryFilters, additionalFilters]);
+    }, [urlParamsHaveBeenProcessed, searchParams, primaryFilters, additionalFilters, today]);
 
     useEffect(() => {
         setPackingManagerViewPrimaryFilters(
@@ -122,11 +127,8 @@ const ParcelsPage: React.FC = () => {
         }
 
         console.log("QQ: about to buildQueryParamsFromFilters");
-        // QQ Why is this happening twice, both times showing the old searchParams filter value,
-        // and why does the table refreshed twice, the first time based on the old filter value?
 
         const paramsRecord = buildQueryParamsFromFilters(currentlyAppliedFilters);
-        paramsRecord[pageViewTypeParam] = isPackingManagerView ? pageViewTypePackingManager : null;
         mergeParamsIntoURL(searchParams, paramsRecord);
     }, [isPackingManagerView, currentlyAppliedFilters, searchParams, urlParamsHaveBeenProcessed]);
 
@@ -145,6 +147,15 @@ const ParcelsPage: React.FC = () => {
 
     const postCheckedParcelActivity = (): void => {
         setCheckedParcelIds([]);
+    };
+
+    const setIsPackingManagerViewInternal = (isPackingManager: boolean): void => {
+        const viewFilter = primaryFilters.find((filter) => filter.key === pageViewTypeParam);
+        if (viewFilter) {
+            viewFilter.state = isPackingManager ? pageViewTypePackingManager : "";
+        }
+
+        setIsPackingManagerView(isPackingManager);
     };
 
     const openParcelModal = (parcelId: string): void => {
@@ -174,7 +185,7 @@ const ParcelsPage: React.FC = () => {
             <PreTableControlsContainer>
                 <PreTableControls
                     isPackingManagerView={isPackingManagerView}
-                    setIsPackingManagerView={setIsPackingManagerView}
+                    setIsPackingManagerView={setIsPackingManagerViewInternal}
                     selectedParcelMessage={selectedParcelMessage}
                     getCheckedParcelsData={getCheckedParcelsData}
                     postCheckedParcelActivity={postCheckedParcelActivity}
@@ -184,10 +195,10 @@ const ParcelsPage: React.FC = () => {
                     DistributeServerFilter<ParcelsTableRow, ParcelTableFilterState, DbParcelRow>,
                     ParcelTableFilterState
                 >
-                    filters={
+                    primaryFilters={
                         isPackingManagerView ? packingManagerViewPrimaryFilters : primaryFilters
                     }
-                    setFilters={
+                    setPrimaryFilters={
                         isPackingManagerView
                             ? setPackingManagerViewPrimaryFilters
                             : setPrimaryFilters

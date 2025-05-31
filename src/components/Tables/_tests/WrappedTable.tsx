@@ -117,12 +117,12 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
     useEffect(() => {
         const primaryFilteredData = mockData.filter((row) => {
             return primaryFilters.every((filter) => {
-                return filter.method(row, filter.state, filter.key);
+                return filter.method(row, filter.state, filter.rowKey);
             });
         });
         const secondaryFilteredData = primaryFilteredData.filter((row) => {
             return additionalFilters.every((filter) => {
-                return filter.method(row, filter.state, filter.key);
+                return filter.method(row, filter.state, filter.rowKey);
             });
         });
         setTestDataPortion(secondaryFilteredData.slice(startPoint, endPoint + 1));

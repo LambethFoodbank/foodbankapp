@@ -6,12 +6,14 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { UrlQueryParamsRecord, readArrayParamFromQuery } from "@/common/urlQueryParams";
 
 interface DateFilterProps<Data, DbData extends Record<string, unknown>> {
-    key: keyof Data;
+    key: string;
+    rowKey?: keyof Data;
     label: string;
     method: ServerSideFilterMethod<DbData, DateRangeState>;
     initialState: DateRangeState;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHidden?: boolean;
     isHiddenInUrl?: boolean;
 }
 
@@ -35,6 +37,7 @@ export const serverSideDateFilter = <Data, DbData extends Record<string, unknown
     initialState,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHidden = false,
     isHiddenInUrl = false,
 }: DateFilterProps<Data, DbData>): ServerSideFilter<Data, DateRangeState, DbData> => {
     return {
@@ -44,6 +47,7 @@ export const serverSideDateFilter = <Data, DbData extends Record<string, unknown
         method,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
+        isHidden: isHidden,
         isHiddenInUrl: isHiddenInUrl,
         areStatesIdentical: (stateA, stateB) => areDateRangesIdentical(stateA, stateB),
         filterComponent: function (
@@ -51,7 +55,7 @@ export const serverSideDateFilter = <Data, DbData extends Record<string, unknown
             setState: (state: DateRangeState) => void,
             isDisabled: boolean
         ): React.ReactNode {
-            return (
+            return isHidden ? null : (
                 <DateRangeInputs
                     key={key as string}
                     range={state}

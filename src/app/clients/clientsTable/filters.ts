@@ -1,5 +1,4 @@
 import { buildServerSideTextFilter } from "@/components/Tables/TextFilter";
-import clientsHeaders from "./headers";
 import { ClientsFilter, ClientsFilterMethod } from "./types";
 import {
     familySearch,
@@ -30,25 +29,21 @@ const clientsFilters: ClientsFilter[] = [
     buildServerSideTextFilter({
         key: "fullName",
         label: "Name",
-        headers: clientsHeaders,
         method: clientsFullNameSearch,
     }),
     buildServerSideTextFilter({
         key: "familyCategory",
         label: "Family Size",
-        headers: clientsHeaders,
         method: clientsFamilySearch,
     }),
     buildServerSideTextFilter({
         key: "addressPostcode",
         label: "Postcode",
-        headers: clientsHeaders,
         method: clientsPostcodeSearch,
     }),
     buildServerSideTextFilter({
         key: "phoneNumber",
         label: "Phone",
-        headers: clientsHeaders,
         method: clientsPhoneSearch,
     }),
 ];

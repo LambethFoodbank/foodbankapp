@@ -8,9 +8,9 @@ import { FilterBase } from "@/components/Tables/Filters";
 import { MENU_BREAKPOINT } from "@/common/sharedConstants";
 
 export interface TableFiltersBarProps<Data, Filter extends FilterBase<Data, State>, State> {
-    setFilters?: (filters: Filter[]) => void;
+    setPrimaryFilters?: (filters: Filter[]) => void;
     setAdditionalFilters?: (filters: Filter[]) => void;
-    filters?: Filter[];
+    primaryFilters?: Filter[];
     additionalFilters?: Filter[];
 }
 
@@ -73,9 +73,9 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
     props: TableFiltersBarProps<Data, Filter, State>
 ): React.ReactElement {
     const handleClear = (): void => {
-        if (props.setFilters && props.filters) {
-            props.setFilters(
-                props.filters?.map((filter) =>
+        if (props.setPrimaryFilters && props.primaryFilters) {
+            props.setPrimaryFilters(
+                props.primaryFilters?.map((filter) =>
                     filter.shouldPersistOnClear
                         ? filter
                         : {
@@ -101,7 +101,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
 
     const [showMoreFilters, setShowMoreFilters] = useState(false);
 
-    const hasPrimaryFilters = props.filters?.length !== 0 && props.setFilters;
+    const hasPrimaryFilters = props.primaryFilters?.length !== 0 && props.setPrimaryFilters;
 
     const hasAdditionalFilters =
         props.additionalFilters?.length !== 0 && props.setAdditionalFilters;
@@ -120,12 +120,12 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                 {hasPrimaryFilters && <FilterAltOutlined />}
                 <FiltersSingleRowContainer>
                     <>
-                        {props.filters &&
-                            props.filters?.length !== 0 &&
-                            props.setFilters &&
+                        {props.primaryFilters &&
+                            props.primaryFilters?.length !== 0 &&
+                            props.setPrimaryFilters &&
                             filtersToComponents<Data, Filter, State>(
-                                props.filters,
-                                props.setFilters
+                                props.primaryFilters,
+                                props.setPrimaryFilters
                             )}
                         <Grow />
                         {hasAdditionalFilters && (

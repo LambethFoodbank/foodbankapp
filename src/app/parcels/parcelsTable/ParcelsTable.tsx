@@ -20,9 +20,7 @@ import { parcelTableColumnStyleOptions } from "@/app/parcels/parcelsTable/styles
 import parcelsSortableColumns, {
     defaultParcelsSortConfig,
 } from "@/app/parcels/parcelsTable/sortableColumns";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import dayjs from "dayjs";
-import { shouldBeInPackingManagerView } from "@/app/parcels/parcelsTable/packingManagerHelpers";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     getParcelIds,
     getParcelsDataAndCount,
@@ -76,9 +74,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
 
     const parcelsTableFetchAbortController = useRef<AbortController | null>(null);
 
-    const today = useMemo(() => dayjs().startOf("day"), []);
-    const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
-
     const fetchAndDisplayParcelsData = useCallback(async (): Promise<void> => {
         if (parcelsTableFetchAbortController.current) {
             parcelsTableFetchAbortController.current.abort("stale request");
@@ -88,7 +83,9 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
 
         if (parcelsTableFetchAbortController.current) {
             setErrorMessage(null);
-            setIsLoading(true);
+
+            console.log("TT: Fetching parcels data");
+            console.dir(appliedFilters);
 
             console.log("TT: Fetching parcels data");
             console.dir(appliedFilters);
@@ -135,14 +132,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             void fetchAndDisplayParcelsData();
         }
     }, [areFiltersLoadingForFirstTime, fetchAndDisplayParcelsData]);
-
-    const packingManagerViewDataPortion = useMemo(
-        () =>
-            parcelsDataPortion.filter((parcel) =>
-                shouldBeInPackingManagerView(parcel, today, yesterday)
-            ),
-        [parcelsDataPortion, today, yesterday]
-    );
 
     const loadCountAndDataWithTimer = (): void => {
         if (fetchParcelsTimer.current) {
@@ -234,15 +223,11 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     return (
         <TableSurface>
             <ServerPaginatedTable<ParcelsTableRow, DbParcelRow, string | DateRangeState | string[]>
-                dataPortion={
-                    isPackingManagerView ? packingManagerViewDataPortion : parcelsDataPortion
-                }
+                dataPortion={parcelsDataPortion}
                 isLoading={isLoading}
                 paginationConfig={{
                     enablePagination: true,
-                    filteredCount: isPackingManagerView
-                        ? packingManagerViewDataPortion.length
-                        : filteredParcelCount,
+                    filteredCount: filteredParcelCount,
                     onPageChange: setCurrentPage,
                     onPerPageChange: setParcelCountPerPage,
                     defaultRowsPerPage: defaultNumberOfParcelsPerPage,

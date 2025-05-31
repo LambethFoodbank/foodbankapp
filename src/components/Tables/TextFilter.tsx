@@ -8,17 +8,17 @@ import {
     ClientSideFilterMethod,
     ClientSideFilter,
 } from "./Filters";
-import { TableHeaders } from "./Table";
 import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 
 interface ServerSideTextFilterProps<Data, DbData extends Record<string, unknown>> {
-    key: keyof Data;
-    headers: TableHeaders<Data>;
+    key: string;
+    rowKey?: keyof Data;
     label: string;
     initialValue?: string;
     method: ServerSideFilterMethod<DbData, string>;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHidden?: boolean;
     isHiddenInUrl?: boolean;
 }
 
@@ -35,6 +35,7 @@ export const buildServerSideTextFilter = <Data, DbData extends Record<string, un
     method,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHidden = false,
     isHiddenInUrl = false,
 }: ServerSideTextFilterProps<Data, DbData>): ServerSideFilter<Data, string, DbData> => {
     return {
@@ -44,9 +45,10 @@ export const buildServerSideTextFilter = <Data, DbData extends Record<string, un
         method: method,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
+        isHidden: isHidden,
         isHiddenInUrl: isHiddenInUrl,
         filterComponent: (state, setState, isDisabled) => {
-            return (
+            return isHidden ? null : (
                 <TextFilterStyling key={label}>
                     <FreeFormTextInput
                         key={label}
@@ -80,35 +82,40 @@ export const buildServerSideTextFilter = <Data, DbData extends Record<string, un
 };
 
 interface ClientSideTextFilterProps<Data> {
-    key: keyof Data;
-    headers: TableHeaders<Data>;
+    key: string;
+    rowKey?: keyof Data;
     label: string;
     initialValue?: string;
     method: ClientSideFilterMethod<Data, string>;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHidden?: boolean;
     isHiddenInUrl?: boolean;
 }
 
 export const buildClientSideTextFilter = <Data,>({
     key,
+    rowKey,
     label,
     initialValue = "",
     method,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHidden = false,
     isHiddenInUrl = false,
 }: ClientSideTextFilterProps<Data>): ClientSideFilter<Data, string> => {
     return {
         state: initialValue,
         initialState: initialValue,
         key: key,
+        rowKey: rowKey,
         method: method,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
+        isHidden: isHidden,
         isHiddenInUrl: isHiddenInUrl,
         filterComponent: (state, setState) => {
-            return (
+            return isHidden ? null : (
                 <TextFilterStyling key={label}>
                     <FreeFormTextInput
                         key={label}
@@ -140,8 +147,12 @@ export const buildClientSideTextFilter = <Data,>({
     };
 };
 
-export const filterRowByText = <Data,>(row: Data, state: string, key: keyof Data): boolean => {
-    let string = defaultToString(row[key]);
+export const filterRowByText = <Data,>(row: Data, state: string, rowKey?: keyof Data): boolean => {
+    if (!rowKey) {
+        return false;
+    }
+
+    let string = defaultToString(row[rowKey]);
     string = string.toLowerCase();
     state = state.toLowerCase();
     return string.includes(state);

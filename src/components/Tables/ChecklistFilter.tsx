@@ -9,13 +9,15 @@ interface ChecklistFilterProps<
     Data,
     DbData extends Record<string, unknown> = Record<string, never>,
 > {
-    key: keyof Data;
+    key: string;
+    rowKey?: keyof Data;
     filterLabel: string;
     itemLabelsAndKeys: [string, string][];
     initialCheckedKeys: string[];
     method: ServerSideFilterMethod<DbData, string[]>;
     shouldPersistOnClear?: boolean;
     isDisabled?: boolean;
+    isHidden?: boolean;
     isHiddenInUrl?: boolean;
 }
 
@@ -30,6 +32,7 @@ export const serverSideChecklistFilter = <
     method,
     shouldPersistOnClear = false,
     isDisabled = false,
+    isHidden = false,
     isHiddenInUrl = false,
 }: ChecklistFilterProps<Data, DbData>): ServerSideFilter<Data, string[], DbData> => {
     return {
@@ -39,6 +42,7 @@ export const serverSideChecklistFilter = <
         method,
         shouldPersistOnClear: shouldPersistOnClear,
         isDisabled: isDisabled,
+        isHidden: isHidden,
         isHiddenInUrl: isHiddenInUrl,
         areStatesIdentical: (stateA, stateB) =>
             stateA.length === stateB.length && stateA.every((optionA) => stateB.includes(optionA)),
@@ -47,6 +51,10 @@ export const serverSideChecklistFilter = <
             setState: (state: string[]) => void,
             isDisabled: boolean
         ): React.ReactNode {
+            if (isHidden) {
+                return null;
+            }
+
             const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
                 const checkboxKey = event.target.name as string;
                 if (event.target.checked) {
