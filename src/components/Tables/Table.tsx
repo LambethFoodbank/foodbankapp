@@ -439,12 +439,12 @@ const Table = <
                         : DistributeServerFilter<Data, FilterState, DbData>,
                     FilterState
                 >
-                    setFilters={
+                    setPrimaryFilters={
                         filterConfig.primaryFiltersShown
                             ? filterConfig.setPrimaryFilters
                             : undefined
                     }
-                    filters={
+                    primaryFilters={
                         filterConfig.primaryFiltersShown ? filterConfig.primaryFilters : undefined
                     }
                     additionalFilters={

@@ -11,6 +11,16 @@ export interface DateRangeState {
     to: Dayjs;
 }
 
+export const isDateRangeValid = (from: Dayjs, to: Dayjs): boolean => {
+    return (
+        from.isValid() &&
+        to.isValid() &&
+        from <= to &&
+        from >= reasonableMinDate &&
+        to >= reasonableMinDate
+    );
+};
+
 interface Props {
     range: DateRangeState;
     setRange: (range: DateRangeState) => void;
@@ -76,9 +86,14 @@ const DateRangeInputs: React.FC<Props> = (props) => {
                     textField: {
                         error: hasErrorState,
                         size: "small",
+                        inputProps: {
+                            "data-testid": "date-range-input-from",
+                            "aria-label": "From date",
+                        },
                     },
                 }}
                 disabled={props.isDisabled}
+                data-testid="date-range-input-from"
             />
             <DatePicker
                 onChange={(value) => setToValue(value)}
@@ -89,6 +104,10 @@ const DateRangeInputs: React.FC<Props> = (props) => {
                     textField: {
                         error: hasErrorState,
                         size: "small",
+                        inputProps: {
+                            "data-testid": "date-range-input-to",
+                            "aria-label": "To date",
+                        },
                     },
                 }}
                 disabled={props.isDisabled}

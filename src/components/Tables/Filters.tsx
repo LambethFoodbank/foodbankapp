@@ -1,7 +1,7 @@
 import React from "react";
-import { TableHeaders } from "@/components/Tables/Table";
 import { Database } from "@/databaseTypesFile";
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
+import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 
 export enum PaginationType {
     Server = "SERVER",
@@ -22,21 +22,26 @@ export type ServerSideFilterMethod<DbData extends Record<string, unknown>, State
 export type ClientSideFilterMethod<Data, State> = (
     row: Data,
     state: State,
-    key: keyof Data
+    rowKey?: keyof Data
 ) => boolean;
 
 interface BasicFilter<Data, State> {
-    key: keyof Data;
+    key: string;
+    rowKey?: keyof Data;
     filterComponent: (
         state: State,
         setState: (state: State) => void,
         isDisabled: boolean
     ) => React.ReactNode;
-    state: State;
     initialState: State;
+    state: State;
     areStatesIdentical: (stateA: State, stateB: State) => boolean;
+    generateUrlParam: () => UrlQueryParamsRecord;
+    readStateFromUrlQueryParams: (urlParams: UrlQueryParamsRecord) => State | null;
     shouldPersistOnClear: boolean;
     isDisabled: boolean;
+    isHidden: boolean;
+    isHiddenInUrl: boolean;
 }
 
 export interface ServerSideFilter<Data, State, DbData extends Record<string, unknown>>
@@ -64,13 +69,6 @@ export type DistributeServerFilter<
 export type FilterBase<Data, State> =
     | DistributeClientFilter<Data, State>
     | DistributeServerFilter<Data, State, Record<string, unknown>>;
-
-export const headerLabelFromKey = <Data, Key extends keyof Data>(
-    headers: TableHeaders<Data>,
-    key: Key
-): string => {
-    return headers.find(([headerKey]) => headerKey === key)?.[1] ?? key.toString();
-};
 
 export const defaultToString = (value: unknown): string => {
     if (typeof value === "string") {

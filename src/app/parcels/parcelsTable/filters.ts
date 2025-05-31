@@ -12,12 +12,14 @@ import {
     ParcelsFilter,
     ParcelsFilterMethod,
     ParcelsFilters,
+    ParcelsFiltersAllStates,
     ParcelsTableRow,
     packingSlotOptionsSet,
 } from "./types";
 import { buildServerSideTextFilter } from "@/components/Tables/TextFilter";
-import dayjs from "dayjs";
-import { parcelTableHeaderKeysAndLabels } from "./headers";
+import { serverSideButtonGroupFilter } from "@/components/Tables/ButtonFilter";
+import { Dayjs } from "dayjs";
+import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 import { DbParcelRow } from "@/databaseUtils";
 import {
     dbFilterWithSubstringQueries,
@@ -26,28 +28,33 @@ import {
     phoneSearch,
     postcodeSearch,
 } from "@/common/databaseFilters";
+import {
+    packingManagerParcelStatuses,
+    shouldFilterBeDisabledInPackingManagerView,
+} from "./packingManagerHelpers";
+import { pageViewTypePackingManager, pageViewTypeParam } from "./constants";
 
-const parcelsFullNameSearch: ParcelsFilterMethod<string> = fullNameSearch<DbParcelRow>(
+const parcelsFullNameSearchMethod: ParcelsFilterMethod<string> = fullNameSearch<DbParcelRow>(
     "client_full_name",
     "client_is_active"
 );
 
-const parcelsPostcodeSearch: ParcelsFilterMethod<string> = postcodeSearch<DbParcelRow>(
+const parcelsPostcodeSearchMethod: ParcelsFilterMethod<string> = postcodeSearch<DbParcelRow>(
     "client_address_postcode",
     "client_is_active"
 );
 
-const parcelsFamilySearch: ParcelsFilterMethod<string> = familySearch(
+const parcelsFamilySearchMethod: ParcelsFilterMethod<string> = familySearch(
     "family_count",
     "client_is_active"
 );
 
-const parcelsPhoneSearch: ParcelsFilterMethod<string> = phoneSearch<DbParcelRow>(
+const parcelsPhoneSearchMethod: ParcelsFilterMethod<string> = phoneSearch<DbParcelRow>(
     "client_phone_number",
     "client_is_active"
 );
 
-const voucherSearch: ParcelsFilterMethod<string> = dbFilterWithSubstringQueries<DbParcelRow>(
+const voucherSearchMethod: ParcelsFilterMethod<string> = dbFilterWithSubstringQueries<DbParcelRow>(
     (substring) => {
         const voucherColumnLabel = "voucher_number";
         if (substring === "?") {
@@ -192,11 +199,42 @@ const buildPackingSlotFilter = async (): Promise<ParcelsFilter<string[]>> => {
     });
 };
 
-const buildFilters = async (): Promise<{
+const buildSpecialViewFilter = (today: Dayjs): ParcelsFilter<string> => {
+    const yesterday = today.subtract(1, "day");
+
+    const specialViewSearchMethod: ParcelsFilterMethod<string> = (query, state) => {
+        if (state === pageViewTypePackingManager) {
+            return query
+                .or(
+                    `and(packing_date.eq.${getDbDate(yesterday)}, packing_slot_name.eq."PM"), ` +
+                        `and(packing_date.eq.${getDbDate(today)}, packing_slot_name.eq."AM")`
+                )
+                .in("last_status_event_name", packingManagerParcelStatuses);
+        }
+
+        return query;
+    };
+
+    return serverSideButtonGroupFilter({
+        key: pageViewTypeParam,
+        filterLabel: "",
+        itemLabelsAndKeys: [
+            ["All parcels", ""],
+            ["Packing manager view", pageViewTypePackingManager],
+        ],
+        initialActiveFilter: "",
+        method: specialViewSearchMethod,
+        shouldPersistOnClear: true,
+        isHidden: true,
+    });
+};
+
+export const buildParcelFilters = async (
+    today: Dayjs
+): Promise<{
     primaryFilters: ParcelsFilters;
     additionalFilters: ParcelsFilters;
 }> => {
-    const today = dayjs();
     const dateFilter = buildDateFilter({
         from: today,
         to: today,
@@ -206,41 +244,134 @@ const buildFilters = async (): Promise<{
         buildServerSideTextFilter({
             key: "fullName",
             label: "Name",
-            headers: parcelTableHeaderKeysAndLabels,
-            method: parcelsFullNameSearch,
+            method: parcelsFullNameSearchMethod,
         }),
         buildServerSideTextFilter({
             key: "addressPostcode",
             label: "Postcode",
-            headers: parcelTableHeaderKeysAndLabels,
-            method: parcelsPostcodeSearch,
+            method: parcelsPostcodeSearchMethod,
         }),
         await buildDeliveryCollectionFilter(),
         await buildPackingSlotFilter(),
         await buildLastStatusFilter(),
+        buildSpecialViewFilter(today),
     ];
 
     const additionalFilters: ParcelsFilters = [
         buildServerSideTextFilter({
             key: "familyCategory",
             label: "Family Size",
-            headers: parcelTableHeaderKeysAndLabels,
-            method: parcelsFamilySearch,
+            method: parcelsFamilySearchMethod,
         }),
         buildServerSideTextFilter({
             key: "phoneNumber",
             label: "Phone",
-            headers: parcelTableHeaderKeysAndLabels,
-            method: parcelsPhoneSearch,
+            method: parcelsPhoneSearchMethod,
         }),
         buildServerSideTextFilter({
             key: "voucherNumber",
             label: "Voucher",
-            headers: parcelTableHeaderKeysAndLabels,
-            method: voucherSearch,
+            method: voucherSearchMethod,
         }),
     ];
     return { primaryFilters: primaryFilters, additionalFilters: additionalFilters };
 };
 
-export default buildFilters;
+export const buildPackingManagerPrimaryFilters = (
+    primaryFilters: ParcelsFilters,
+    today: Dayjs,
+    yesterday: Dayjs
+): ParcelsFilters => {
+    return primaryFilters.map((filter) => {
+        if (shouldFilterBeDisabledInPackingManagerView(filter)) {
+            if (filter.key === "packingDate") {
+                return {
+                    ...filter,
+                    state: { from: yesterday, to: today },
+                    isDisabled: true,
+                    isHiddenInUrl: true,
+                } as ParcelsFilter<DateRangeState>;
+            } else if (["packingSlot", "lastStatus"].includes(filter.key)) {
+                return {
+                    ...filter,
+                    state: [] as string[],
+                    isDisabled: true,
+                    isHiddenInUrl: true,
+                } as ParcelsFilter<string[]>;
+            } else if (filter.key === pageViewTypeParam) {
+                return {
+                    ...filter,
+                    state: pageViewTypePackingManager,
+                    isDisabled: true,
+                    isHidden: true,
+                    isHiddenInUrl: false,
+                } as ParcelsFilter<string>;
+            } else {
+                return { ...filter, isDisabled: true, isHiddenInUrl: true };
+            }
+        }
+
+        return { ...filter };
+    });
+};
+
+export const updateFiltersFromQueryParams = (
+    urlParams: UrlQueryParamsRecord,
+    primaryFilters: ParcelsFilters,
+    additionalFilters: ParcelsFilters
+): {
+    primaryFilters: ParcelsFilters;
+    additionalFilters: ParcelsFilters;
+} => {
+    primaryFilters = primaryFilters.map((filter) => {
+        const paramValForFilter = filter.readStateFromUrlQueryParams(urlParams);
+        if (paramValForFilter !== null) {
+            if (filter.key === "packingDate") {
+                return {
+                    ...filter,
+                    state: paramValForFilter,
+                } as ParcelsFilter<DateRangeState>;
+            } else if (["fullName", "addressPostcode", pageViewTypeParam].includes(filter.key)) {
+                return {
+                    ...filter,
+                    state: paramValForFilter,
+                } as ParcelsFilter<string>;
+            } else if (["deliveryCollection", "packingSlot", "lastStatus"].includes(filter.key)) {
+                return {
+                    ...filter,
+                    state: paramValForFilter,
+                } as ParcelsFilter<string[]>;
+            }
+        }
+
+        return filter;
+    });
+
+    additionalFilters = additionalFilters.map((filter) => {
+        const paramValForFilter = filter.readStateFromUrlQueryParams(urlParams);
+        if (paramValForFilter !== null) {
+            if (["familyCategory", "phoneNumber", "voucherNumber"].includes(filter.key)) {
+                return {
+                    ...filter,
+                    state: paramValForFilter,
+                } as ParcelsFilter<string>;
+            }
+        }
+
+        return filter;
+    });
+
+    return { primaryFilters, additionalFilters };
+};
+
+export const buildQueryParamsFromFilters = (
+    appliedFilters: ParcelsFilters
+): UrlQueryParamsRecord => {
+    let params: UrlQueryParamsRecord = {};
+
+    appliedFilters.forEach((filter: ParcelsFiltersAllStates) => {
+        params = { ...params, ...filter.generateUrlParam() };
+    });
+
+    return params;
+};

@@ -266,7 +266,7 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
         setListData(
             listOfIngredients.filter((row) => {
                 return primaryFilters.every((filter) => {
-                    return filter.method(row, filter.state, filter.key);
+                    return filter.method(row, filter.state, filter.rowKey);
                 });
             })
         );

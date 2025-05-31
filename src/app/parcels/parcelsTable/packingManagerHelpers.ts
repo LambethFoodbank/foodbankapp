@@ -1,38 +1,21 @@
-import { areDaysIdentical } from "@/components/Tables/DateFilter";
-import { ParcelsFilter, ParcelsTableRow } from "./types";
-import dayjs from "dayjs";
+import { ParcelsFilter } from "./types";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
+import { pageViewTypeParam } from "./constants";
 
-export const shouldBeInPackingManagerView = (
-    parcel: ParcelsTableRow,
-    today: dayjs.Dayjs,
-    yesterday: dayjs.Dayjs
-): boolean => {
-    if (areDaysIdentical(dayjs(parcel.packingDate), today) && parcel.packingSlot !== "AM") {
-        return false;
-    }
-    if (areDaysIdentical(dayjs(parcel.packingDate), yesterday) && parcel.packingSlot !== "PM") {
-        return false;
-    }
-    if (parcel.lastStatus) {
-        if (
-            parcel.lastStatus.name.includes("Shipping Labels Downloaded") ||
-            parcel.lastStatus.name.includes("Shopping List Downloaded") ||
-            parcel.lastStatus.name.includes("Called and Confirmed")
-        ) {
-            return true;
-        }
-    }
-    return false;
-};
+export const packingManagerParcelStatuses = [
+    "Shipping Labels Downloaded",
+    "Shopping List Downloaded",
+    "Called and Confirmed",
+];
 
-export const shouldFilterBeDisabled = (
+export const shouldFilterBeDisabledInPackingManagerView = (
     filter: ParcelsFilter<string> | ParcelsFilter<DateRangeState> | ParcelsFilter<string[]>
 ): boolean => {
     if (
         filter.key === "packingDate" ||
         filter.key === "packingSlot" ||
-        filter.key === "lastStatus"
+        filter.key === "lastStatus" ||
+        filter.key === pageViewTypeParam
     ) {
         return true;
     }

@@ -1,17 +1,11 @@
 import { BreakPointConfig, Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
-import {
-    ParcelsFilter,
-    ParcelsSortState,
-    ParcelsTableRow,
-    SelectedClientDetails,
-} from "@/app/parcels/parcelsTable/types";
+import { ParcelsFilter, ParcelsSortState, ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { DbParcelRow } from "@/databaseUtils";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import {
     defaultNumberOfParcelsPerPage,
     numberOfParcelsPerPageOptions,
-    parcelIdParam,
 } from "@/app/parcels/parcelsTable/constants";
 import {
     parcelTableDefaultShownHeaders,
@@ -19,7 +13,6 @@ import {
     parcelTableToggleableHeaders,
 } from "@/app/parcels/parcelsTable/headers";
 import {
-    getClientIdAndIsActiveErrorMessage,
     getParcelDataErrorMessage,
     parcelTableColumnDisplayFunctions,
 } from "@/app/parcels/parcelsTable/format";
@@ -27,12 +20,8 @@ import { parcelTableColumnStyleOptions } from "@/app/parcels/parcelsTable/styles
 import parcelsSortableColumns, {
     defaultParcelsSortConfig,
 } from "@/app/parcels/parcelsTable/sortableColumns";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import dayjs from "dayjs";
-import { shouldBeInPackingManagerView } from "@/app/parcels/parcelsTable/packingManagerHelpers";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-    getClientIdAndIsActive,
     getParcelIds,
     getParcelsDataAndCount,
 } from "@/app/parcels/parcelsTable/fetchParcelTableData";
@@ -41,11 +30,9 @@ import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyl
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 
 interface ParcelsTableProps {
-    setSelectedParcelId: (parcelId: string | null) => void;
-    setSelectedClientDetails: (clientDetails: SelectedClientDetails | null) => void;
     checkedParcelIds: string[];
     setCheckedParcelIds: (ids: string[]) => void;
-    setModalIsOpen: (isOpen: boolean) => void;
+    openParcelModal: (parcelId: string) => void;
     sortState: ParcelsSortState;
     setSortState: (sortState: ParcelsSortState) => void;
     appliedFilters: (
@@ -55,22 +42,18 @@ interface ParcelsTableProps {
     )[];
     areFiltersLoadingForFirstTime: boolean;
     setErrorMessage: (errorMessage: string | null) => void;
-    setModalErrorMessage: (errorMessage: string | null) => void;
     isPackingManagerView: boolean;
 }
 
 const ParcelsTable: React.FC<ParcelsTableProps> = ({
-    setSelectedParcelId,
-    setSelectedClientDetails,
     checkedParcelIds,
     setCheckedParcelIds,
-    setModalIsOpen,
+    openParcelModal,
     sortState,
     setSortState,
     appliedFilters,
     areFiltersLoadingForFirstTime,
     setErrorMessage,
-    setModalErrorMessage,
     isPackingManagerView,
 }) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -84,45 +67,12 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const [isAllCheckBoxSelected, setAllCheckBoxSelected] = useState(false);
     const fetchParcelsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const searchParams = useSearchParams();
-    const parcelId = searchParams.get(parcelIdParam);
-
     const [parcelCountPerPage, setParcelCountPerPage] = useState(defaultNumberOfParcelsPerPage);
     const [currentPage, setCurrentPage] = useState(1);
     const startPoint = (currentPage - 1) * parcelCountPerPage;
     const endPoint = currentPage * parcelCountPerPage - 1;
 
     const parcelsTableFetchAbortController = useRef<AbortController | null>(null);
-
-    const router = useRouter();
-
-    const today = useMemo(() => dayjs().startOf("day"), []);
-    const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
-
-    const fetchAndSetClientDetailsForSelectedParcel = useCallback(async (): Promise<void> => {
-        if (parcelId === null) {
-            return;
-        }
-
-        const { data, error } = await getClientIdAndIsActive(parcelId);
-        if (error) {
-            setModalErrorMessage(getClientIdAndIsActiveErrorMessage(error));
-        } else {
-            setSelectedClientDetails(data);
-        }
-    }, [parcelId, setSelectedClientDetails, setModalErrorMessage]);
-
-    useEffect(() => {
-        if (parcelId) {
-            setSelectedParcelId(parcelId);
-            setModalIsOpen(true);
-        }
-    }, [parcelId, setSelectedParcelId, setModalIsOpen]);
-
-    useEffect(() => {
-        setSelectedClientDetails(null);
-        void fetchAndSetClientDetailsForSelectedParcel();
-    }, [fetchAndSetClientDetailsForSelectedParcel, setSelectedClientDetails]);
 
     const fetchAndDisplayParcelsData = useCallback(async (): Promise<void> => {
         if (parcelsTableFetchAbortController.current) {
@@ -133,7 +83,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
 
         if (parcelsTableFetchAbortController.current) {
             setErrorMessage(null);
-            setIsLoading(true);
 
             const { data, error } = await getParcelsDataAndCount(
                 supabase,
@@ -177,14 +126,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             void fetchAndDisplayParcelsData();
         }
     }, [areFiltersLoadingForFirstTime, fetchAndDisplayParcelsData]);
-
-    const packingManagerViewDataPortion = useMemo(
-        () =>
-            parcelsDataPortion.filter((parcel) =>
-                shouldBeInPackingManagerView(parcel, today, yesterday)
-            ),
-        [parcelsDataPortion, today, yesterday]
-    );
 
     const loadCountAndDataWithTimer = (): void => {
         if (fetchParcelsTimer.current) {
@@ -268,22 +209,17 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     }, [filteredParcelCount, checkedParcelIds, isAllCheckBoxSelected]);
 
     const onParcelTableRowClick = (row: Row<ParcelsTableRow>): void => {
-        setSelectedParcelId(row.data.parcelId);
-        router.push(`/parcels?${parcelIdParam}=${row.data.parcelId}`);
+        openParcelModal(row.data.parcelId);
     };
 
     return (
         <TableSurface>
             <ServerPaginatedTable<ParcelsTableRow, DbParcelRow, string | DateRangeState | string[]>
-                dataPortion={
-                    isPackingManagerView ? packingManagerViewDataPortion : parcelsDataPortion
-                }
+                dataPortion={parcelsDataPortion}
                 isLoading={isLoading}
                 paginationConfig={{
                     enablePagination: true,
-                    filteredCount: isPackingManagerView
-                        ? packingManagerViewDataPortion.length
-                        : filteredParcelCount,
+                    filteredCount: filteredParcelCount,
                     onPageChange: setCurrentPage,
                     onPerPageChange: setParcelCountPerPage,
                     defaultRowsPerPage: defaultNumberOfParcelsPerPage,

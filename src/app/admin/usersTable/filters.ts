@@ -1,7 +1,6 @@
 import { serverSideChecklistFilter } from "@/components/Tables/ChecklistFilter";
 import { UserRow, UsersFilter, UsersFilterMethod, UsersFilters } from "./types";
 import { buildServerSideTextFilter } from "@/components/Tables/TextFilter";
-import { usersTableHeaderKeysAndLabels } from "./headers";
 import { allRoles } from "@/app/roles";
 import { Schema } from "@/databaseUtils";
 
@@ -45,19 +44,16 @@ export const usersFilters: UsersFilters = [
     buildServerSideTextFilter({
         key: "firstName",
         label: "First Name",
-        headers: usersTableHeaderKeysAndLabels,
         method: firstNameSearch,
     }),
     buildServerSideTextFilter({
         key: "lastName",
         label: "Last Name",
-        headers: usersTableHeaderKeysAndLabels,
         method: lastNameSearch,
     }),
     buildServerSideTextFilter({
         key: "email",
         label: "Email",
-        headers: usersTableHeaderKeysAndLabels,
         method: emailSearch,
     }),
     buildUserRoleFilter(),

@@ -20,6 +20,8 @@ const DeletedText = styled.div`
 
 interface Props {
     parcelId: string | null;
+    setParcelClientId: (clientId: string | null) => void;
+    setIsClientActive: (isActive: boolean | null) => void;
     refreshCallback?: (refreshFunction: () => void) => void;
 }
 
@@ -38,7 +40,12 @@ function getErrorMessageForExpandedParcelDetailsError(
     }
 }
 
-const ExpandedParcelDetailsView = ({ parcelId, refreshCallback }: Props): ReactElement => {
+const ExpandedParcelDetailsView = ({
+    parcelId,
+    setParcelClientId,
+    setIsClientActive,
+    refreshCallback,
+}: Props): ReactElement => {
     const [parcelDetails, setParcelDetails] = useState<ExpandedParcelDetails | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -58,7 +65,9 @@ const ExpandedParcelDetailsView = ({ parcelId, refreshCallback }: Props): ReactE
         }
 
         setParcelDetails(expandedParcelDetails);
-    }, [parcelId]);
+        setParcelClientId(expandedParcelDetails.expandedParcelData.clientId);
+        setIsClientActive(expandedParcelDetails.expandedParcelData.isActive);
+    }, [parcelId, setIsClientActive, setParcelClientId]);
 
     useEffect(() => {
         void fetchAndSetParcelDetails();
