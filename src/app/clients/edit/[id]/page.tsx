@@ -2,6 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import supabase from "@/supabaseClient";
+import { useSearchParams } from "next/navigation";
+import { parseQueryParams } from "@/common/urlQueryParams";
+import { returnPathQueryParam } from "@/common/constants";
 import ClientForm, { ClientErrors } from "@/app/clients/form/ClientForm";
 import { Errors } from "@/components/Form/formFunctions";
 import autofill from "@/app/clients/edit/[id]/autofill";
@@ -16,15 +19,24 @@ interface EditClientsParameters {
 const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = ({
     params,
 }: EditClientsParameters) => {
+    const searchParams = useSearchParams();
+
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);
     const [familyData, setFamilyData] = useState<Schema["families"][] | null>(null);
     const [error, setError] = useState<string | null>();
+    const [returnPath, setReturnPath] = useState<string | null>(null);
 
     useEffect(() => {
         (async () => {
             if (!params.id) {
                 return;
             }
+
+            const urlQueryParams = parseQueryParams(searchParams.toString());
+            if (urlQueryParams[returnPathQueryParam]) {
+                setReturnPath(urlQueryParams[returnPathQueryParam] as string);
+            }
+
             setError(null);
             const { data: clientData, error: clientError } = await fetchClient(params.id, supabase);
             if (clientError) {
@@ -41,6 +53,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                 return;
             }
             setClientData(clientData);
+
             const { data: familyData, error: familyError } = await fetchFamily(
                 clientData.family_id,
                 supabase
@@ -79,6 +92,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                         initialFields={initialFields}
                         initialFormErrors={initialFormErrors}
                         editConfig={{ clientID: params.id, editMode: true }}
+                        returnPath={returnPath}
                     />
                 )
             )}

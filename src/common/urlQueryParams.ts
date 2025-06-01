@@ -1,11 +1,16 @@
 "use client";
 
 import queryString, { ParsedQuery } from "query-string";
+import { returnPathQueryParam } from "@/common/constants";
 
 export type UrlQueryParamsRecord = ParsedQuery;
 
 export const parseQueryParams = (queryParams: string): UrlQueryParamsRecord => {
     return queryString.parse(queryParams, { arrayFormat: "bracket" });
+};
+
+export const stringifyQueryParams = (params: UrlQueryParamsRecord): string => {
+    return queryString.stringify(params, { arrayFormat: "bracket" });
 };
 
 export const readArrayParamFromQuery = (
@@ -61,11 +66,22 @@ export const mergeParamsIntoURL = (paramsToUpdate: UrlQueryParamsRecord): void =
     );
 
     if (!areRecordsEqual(paramsInURL, nonEmptyMergedParams)) {
-        const queryStringified = queryString.stringify(nonEmptyMergedParams, {
-            arrayFormat: "bracket",
-        });
+        const queryStringified = stringifyQueryParams(nonEmptyMergedParams);
 
         // App Router doesn't support shallow routing, so router.push would reload the page
         window.history.pushState({}, "", `${window.location.pathname}?${queryStringified}`);
     }
+};
+
+const encodeCurrentPathAndQueryParams = (windowLocation: Location): string => {
+    const currentPath = windowLocation.pathname;
+    const currentQueryParams = windowLocation.search;
+
+    return encodeURIComponent(`${currentPath}${currentQueryParams}`);
+};
+
+export const generateReturnPathQueryParam = (windowLocation: Location): string => {
+    const paramsRecord: Record<string, string> = {};
+    paramsRecord[returnPathQueryParam] = encodeCurrentPathAndQueryParams(windowLocation);
+    return stringifyQueryParams(paramsRecord);
 };

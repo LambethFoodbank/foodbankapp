@@ -1,6 +1,6 @@
 import { ParcelsFilter } from "./types";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
-import { pageViewTypeParam } from "@/common/constants";
+import { pageViewTypeQueryParam } from "@/common/constants";
 
 export const packingManagerParcelStatuses = [
     "Shipping Labels Downloaded",
@@ -15,7 +15,7 @@ export const shouldFilterBeDisabledInPackingManagerView = (
         filter.key === "packingDate" ||
         filter.key === "packingSlot" ||
         filter.key === "lastStatus" ||
-        filter.key === pageViewTypeParam
+        filter.key === pageViewTypeQueryParam
     ) {
         return true;
     }
