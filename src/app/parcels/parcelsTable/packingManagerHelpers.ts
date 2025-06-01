@@ -1,6 +1,6 @@
 import { ParcelsFilter } from "./types";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
-import { pageViewTypeParam } from "./constants";
+import { pageViewTypeParam } from "@/common/constants";
 
 export const packingManagerParcelStatuses = [
     "Shipping Labels Downloaded",

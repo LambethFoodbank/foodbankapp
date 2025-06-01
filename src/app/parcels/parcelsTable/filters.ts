@@ -32,7 +32,7 @@ import {
     packingManagerParcelStatuses,
     shouldFilterBeDisabledInPackingManagerView,
 } from "./packingManagerHelpers";
-import { pageViewTypePackingManager, pageViewTypeParam } from "./constants";
+import { pageViewTypePackingManager, pageViewTypeParam } from "@/common/constants";
 
 const parcelsFullNameSearchMethod: ParcelsFilterMethod<string> = fullNameSearch<DbParcelRow>(
     "client_full_name",

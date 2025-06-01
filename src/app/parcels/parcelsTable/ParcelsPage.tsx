@@ -9,11 +9,8 @@ import {
 } from "@/app/parcels/parcelsTable/types";
 import { useSearchParams } from "next/navigation";
 import { mergeParamsIntoURL, parseQueryParams } from "@/common/urlQueryParams";
-import {
-    pageViewTypePackingManager,
-    pageViewTypeParam,
-    parcelIdParam,
-} from "@/app/parcels/parcelsTable/constants";
+import { parcelIdParam } from "@/app/parcels/parcelsTable/constants";
+import { pageViewTypePackingManager, pageViewTypeParam } from "@/common/constants";
 import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import {
     buildParcelFilters,
