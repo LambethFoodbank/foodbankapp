@@ -112,6 +112,7 @@ interface ParcelFormProps {
     packingSlotsLabelsAndValues: PackingSlotsLabelsAndValues;
     writeParcelInfoToDatabase: WriteParcelToDatabaseFunction;
     listTypeLabelsAndValues: ListTypeLabelsAndValues;
+    returnPath?: string | null;
 }
 
 const withCollectionFormSections = [
@@ -156,9 +157,6 @@ const databaseErrorMessageFromErrorType = (
     }
 };
 
-// TODO VFB-55:
-// The param deliveryPrimaryKey will need to remain until VFB-55 is done.
-
 const ParcelForm: React.FC<ParcelFormProps> = ({
     initialFields,
     initialFormErrors,
@@ -168,6 +166,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     collectionCentresLabelsAndValues,
     packingSlotsLabelsAndValues,
     listTypeLabelsAndValues,
+    returnPath,
 }) => {
     const router = useRouter();
     const [fields, setFields] = useState(initialFields);
@@ -277,7 +276,11 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         const { parcelId, error } = await writeParcelInfoToDatabase(parcelRecord);
 
         if (parcelId) {
-            router.push(parcelModalRouterPath(parcelId));
+            if (returnPath) {
+                router.push(decodeURIComponent(returnPath));
+            } else {
+                router.push(parcelModalRouterPath(parcelId));
+            }
         }
 
         if (error) {

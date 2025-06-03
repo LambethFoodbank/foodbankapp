@@ -1,5 +1,9 @@
-import { Metadata } from "next";
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { returnPathQueryParam } from "@/common/constants";
+import { parseQueryParams } from "@/common/urlQueryParams";
 import ClientForm, { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
 import { Errors } from "@/components/Form/formFunctions";
 
@@ -48,19 +52,26 @@ const AddClients: () => React.ReactElement = () => {
         deliveryInstructions: Errors.none,
     };
 
+    const searchParams = useSearchParams();
+    const [returnPath, setReturnPath] = useState<string | null>(null);
+
+    useEffect(() => {
+        const urlQueryParams = parseQueryParams(searchParams.toString());
+        if (urlQueryParams[returnPathQueryParam]) {
+            setReturnPath(urlQueryParams[returnPathQueryParam] as string);
+        }
+    }, [searchParams]);
+
     return (
         <main>
             <ClientForm
                 initialFields={initialFields}
                 initialFormErrors={initialFormErrors}
                 editConfig={{ editMode: false }}
+                returnPath={returnPath}
             />
         </main>
     );
-};
-
-export const metadata: Metadata = {
-    title: "Add Clients",
 };
 
 export default AddClients;

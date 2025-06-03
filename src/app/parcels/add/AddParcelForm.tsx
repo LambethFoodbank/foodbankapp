@@ -21,6 +21,9 @@ import supabase from "@/supabaseClient";
 import Title from "@/components/Title/Title";
 import { insertParcel } from "@/app/parcels/form/submitFormHelpers";
 import { capitaliseWords } from "@/common/format";
+import { useSearchParams } from "next/navigation";
+import { parseQueryParams } from "@/common/urlQueryParams";
+import { returnPathQueryParam } from "@/common/constants";
 
 interface AddParcelProps {
     clientId: string;
@@ -48,6 +51,8 @@ const getErrorMessage = (
 };
 
 const AddParcels = ({ clientId }: AddParcelProps): React.ReactElement => {
+    const searchParams = useSearchParams();
+
     const [deliveryPrimaryKey, setDeliveryPrimaryKey] = useState<string | null>(null);
     const [collectionCentresLabelsAndValues, setCollectionCentresLabelsAndValues] =
         useState<CollectionCentresLabelsAndValues | null>(null);
@@ -60,6 +65,14 @@ const AddParcels = ({ clientId }: AddParcelProps): React.ReactElement => {
         FetchCollectionCentresError | PackingSlotsError | FetchClientError | null
     >(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [returnPath, setReturnPath] = useState<string | null>(null);
+
+    useEffect(() => {
+        const urlQueryParams = parseQueryParams(searchParams.toString());
+        if (urlQueryParams[returnPathQueryParam]) {
+            setReturnPath(urlQueryParams[returnPathQueryParam] as string);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         (async () => {
@@ -125,6 +138,7 @@ const AddParcels = ({ clientId }: AddParcelProps): React.ReactElement => {
                         collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                         packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                         listTypeLabelsAndValues={listTypeLabelsAndValues}
+                        returnPath={returnPath}
                     />
                 )
             )}

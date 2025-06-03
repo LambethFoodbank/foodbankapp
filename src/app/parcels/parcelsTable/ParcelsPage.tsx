@@ -9,11 +9,8 @@ import {
 } from "@/app/parcels/parcelsTable/types";
 import { useSearchParams } from "next/navigation";
 import { mergeParamsIntoURL, parseQueryParams } from "@/common/urlQueryParams";
-import {
-    pageViewTypePackingManager,
-    pageViewTypeParam,
-    parcelIdParam,
-} from "@/app/parcels/parcelsTable/constants";
+import { parcelIdParam } from "@/app/parcels/parcelsTable/constants";
+import { pageViewTypePackingManager, pageViewTypeQueryParam } from "@/common/constants";
 import { getParcelsByIdsWithFiltersAndSorting } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import {
     buildParcelFilters,
@@ -89,7 +86,7 @@ const ParcelsPage: React.FC = () => {
             setAreFiltersLoadingForFirstTime(false);
 
             setIsPackingManagerView(
-                filtersObject.primaryFilters.find((filter) => filter.key === pageViewTypeParam)
+                filtersObject.primaryFilters.find((filter) => filter.key === pageViewTypeQueryParam)
                     ?.state === pageViewTypePackingManager
             );
 
@@ -140,7 +137,7 @@ const ParcelsPage: React.FC = () => {
     };
 
     const setIsPackingManagerViewInternal = (isPackingManager: boolean): void => {
-        const viewFilter = primaryFilters.find((filter) => filter.key === pageViewTypeParam);
+        const viewFilter = primaryFilters.find((filter) => filter.key === pageViewTypeQueryParam);
         if (viewFilter) {
             viewFilter.state = isPackingManager ? pageViewTypePackingManager : "";
         }

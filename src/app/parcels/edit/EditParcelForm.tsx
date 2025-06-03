@@ -22,6 +22,9 @@ import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import Title from "@/components/Title/Title";
 import { updateParcel } from "@/app/parcels/form/submitFormHelpers";
 import { formatDatetimeAsTime, capitaliseWords } from "@/common/format";
+import { useSearchParams } from "next/navigation";
+import { parseQueryParams } from "@/common/urlQueryParams";
+import { returnPathQueryParam } from "@/common/constants";
 
 interface EditParcelFormProps {
     parcelId: string;
@@ -76,6 +79,8 @@ const getErrorMessage = (
 };
 
 const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement => {
+    const searchParams = useSearchParams();
+
     const [isLoading, setIsLoading] = useState(true);
     const [initialFormFields, setInitialFormFields] = useState<ParcelFields>(initialParcelFields);
     const [deliveryKey, setDeliveryKey] = useState("");
@@ -91,6 +96,14 @@ const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement =
     const [error, setError] = useState<
         FetchCollectionCentresError | PackingSlotsError | FetchParcelError | FetchClientError | null
     >(null);
+    const [returnPath, setReturnPath] = useState<string | null>(null);
+
+    useEffect(() => {
+        const urlQueryParams = parseQueryParams(searchParams.toString());
+        if (urlQueryParams[returnPathQueryParam]) {
+            setReturnPath(urlQueryParams[returnPathQueryParam] as string);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         (async () => {
@@ -185,6 +198,7 @@ const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement =
                     collectionCentresLabelsAndValues={collectionCentres}
                     packingSlotsLabelsAndValues={packingSlots}
                     listTypeLabelsAndValues={listTypeLabelsAndValues}
+                    returnPath={returnPath}
                 />
             )}
         </>

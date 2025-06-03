@@ -1,5 +1,6 @@
 import supabase from "@/supabaseClient";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { generateReturnPathQueryParam } from "@/common/urlQueryParams";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import ExpandedParcelDetails from "../ExpandedParcelDetails";
 import ExpandedParcelDetailsFallback from "../ExpandedParcelDetailsFallback";
@@ -33,8 +34,15 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
     const [parcelClientId, setParcelClientId] = useState<string | null>(null);
     const [isClientActive, setIsClientActive] = useState<boolean | null>(null);
     const [modalErrorMessage, setModalErrorMessage] = useState<string | null>(null);
+    const [returnPathQueryParamForLinks, setReturnPathQueryParamForLinks] = useState<string | null>(
+        null
+    );
 
     const theme = useTheme();
+
+    useEffect(() => {
+        setReturnPathQueryParamForLinks(generateReturnPathQueryParam(window.location));
+    }, [modalIsOpen]);
 
     const fetchParcel = async (): Promise<ParcelsTableRow[]> => {
         return await getParcelsByIds(supabase, [selectedParcelId as string]);
@@ -74,7 +82,9 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                 footer={
                     <Centerer>
                         <ConfirmButtons>
-                            <LinkButton link={`/parcels/edit/${selectedParcelId}`}>
+                            <LinkButton
+                                link={`/parcels/edit/${selectedParcelId}?${returnPathQueryParamForLinks}`}
+                            >
                                 Edit Parcel
                             </LinkButton>
                             <Button
@@ -89,13 +99,13 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                             {parcelClientId && (
                                 <>
                                     <LinkButton
-                                        link={`/clients?clientId=${parcelClientId}`}
+                                        link={`/clients?clientId=${parcelClientId}&${returnPathQueryParamForLinks}`}
                                         disabled={!isClientActive}
                                     >
                                         See Client Details
                                     </LinkButton>
                                     <LinkButton
-                                        link={`/clients/edit/${parcelClientId}`}
+                                        link={`/clients/edit/${parcelClientId}?${returnPathQueryParamForLinks}`}
                                         disabled={!isClientActive}
                                     >
                                         Edit Client Details

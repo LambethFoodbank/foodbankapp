@@ -32,7 +32,7 @@ import {
     packingManagerParcelStatuses,
     shouldFilterBeDisabledInPackingManagerView,
 } from "./packingManagerHelpers";
-import { pageViewTypePackingManager, pageViewTypeParam } from "./constants";
+import { pageViewTypePackingManager, pageViewTypeQueryParam } from "@/common/constants";
 
 const parcelsFullNameSearchMethod: ParcelsFilterMethod<string> = fullNameSearch<DbParcelRow>(
     "client_full_name",
@@ -216,7 +216,7 @@ const buildSpecialViewFilter = (today: Dayjs): ParcelsFilter<string> => {
     };
 
     return serverSideButtonGroupFilter({
-        key: pageViewTypeParam,
+        key: pageViewTypeQueryParam,
         filterLabel: "",
         itemLabelsAndKeys: [
             ["All parcels", ""],
@@ -298,7 +298,7 @@ export const buildPackingManagerPrimaryFilters = (
                     isDisabled: true,
                     isHiddenInUrl: true,
                 } as ParcelsFilter<string[]>;
-            } else if (filter.key === pageViewTypeParam) {
+            } else if (filter.key === pageViewTypeQueryParam) {
                 return {
                     ...filter,
                     state: pageViewTypePackingManager,
@@ -331,7 +331,9 @@ export const updateFiltersFromQueryParams = (
                     ...filter,
                     state: paramValForFilter,
                 } as ParcelsFilter<DateRangeState>;
-            } else if (["fullName", "addressPostcode", pageViewTypeParam].includes(filter.key)) {
+            } else if (
+                ["fullName", "addressPostcode", pageViewTypeQueryParam].includes(filter.key)
+            ) {
                 return {
                     ...filter,
                     state: paramValForFilter,

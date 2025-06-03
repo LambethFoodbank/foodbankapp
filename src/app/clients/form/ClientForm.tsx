@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { returnPathQueryParam } from "@/common/constants";
+import { stringifyQueryParams } from "@/common/urlQueryParams";
 import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import {
     CardProps,
@@ -45,6 +47,7 @@ interface Props {
     initialFields: ClientFields;
     initialFormErrors: ClientErrors;
     editConfig: EditConfig;
+    returnPath?: string | null;
 }
 
 type EditConfig = { editMode: true; clientID: string } | { editMode: false };
@@ -117,7 +120,12 @@ const formSections = [
     ClientNotesCard,
 ];
 
-const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editConfig }) => {
+const ClientForm: React.FC<Props> = ({
+    initialFields,
+    initialFormErrors,
+    editConfig,
+    returnPath,
+}) => {
     const router = useRouter();
     const [fields, setFields] = useState<ClientFields>(initialFields);
     const [formErrors, setFormErrors] = useState<ClientErrors>(initialFormErrors);
@@ -191,7 +199,12 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
                 setSubmitDisabled(false);
                 return;
             }
-            router.push(`/clients?clientId=${clientId}`);
+
+            if (returnPath) {
+                router.push(decodeURIComponent(returnPath));
+            } else {
+                router.push(`/clients?clientId=${clientId}`);
+            }
         } else {
             const { clientId, error: addClientError } = await submitAddClientForm(fields);
             if (addClientError) {
@@ -205,7 +218,14 @@ const ClientForm: React.FC<Props> = ({ initialFields, initialFormErrors, editCon
                 setSubmitDisabled(false);
                 return;
             }
-            router.push(`/parcels/add/${clientId}`);
+
+            let targetUrl = `/parcels/add/${clientId}`;
+            if (returnPath) {
+                const paramsRecord: Record<string, string> = {};
+                paramsRecord[returnPathQueryParam] = returnPath;
+                targetUrl += `?${stringifyQueryParams(paramsRecord)}`;
+            }
+            router.push(targetUrl);
         }
     };
 
