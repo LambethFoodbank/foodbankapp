@@ -1,4 +1,5 @@
-import { Metadata } from "next";
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { returnPathQueryParam } from "@/common/constants";
@@ -59,7 +60,7 @@ const AddClients: () => React.ReactElement = () => {
         if (urlQueryParams[returnPathQueryParam]) {
             setReturnPath(urlQueryParams[returnPathQueryParam] as string);
         }
-    });
+    }, [searchParams]);
 
     return (
         <main>
@@ -71,10 +72,6 @@ const AddClients: () => React.ReactElement = () => {
             />
         </main>
     );
-};
-
-export const metadata: Metadata = {
-    title: "Add Clients",
 };
 
 export default AddClients;

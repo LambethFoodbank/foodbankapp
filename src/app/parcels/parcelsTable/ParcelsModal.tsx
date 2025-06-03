@@ -1,5 +1,5 @@
 import supabase from "@/supabaseClient";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { generateReturnPathQueryParam } from "@/common/urlQueryParams";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import ExpandedParcelDetails from "../ExpandedParcelDetails";
@@ -42,7 +42,7 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
 
     useEffect(() => {
         setReturnPathQueryParamForLinks(generateReturnPathQueryParam(window.location));
-    }, [modalIsOpen, window.location]);
+    }, [modalIsOpen]);
 
     const fetchParcel = async (): Promise<ParcelsTableRow[]> => {
         return await getParcelsByIds(supabase, [selectedParcelId as string]);

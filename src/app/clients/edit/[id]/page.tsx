@@ -67,7 +67,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             }
             setFamilyData(familyData);
         })();
-    }, [params.id]);
+    }, [params.id, searchParams]);
 
     const initialFields = clientData && familyData ? autofill(clientData, familyData) : null;
 

@@ -85,3 +85,11 @@ export const generateReturnPathQueryParam = (windowLocation: Location): string =
     paramsRecord[returnPathQueryParam] = encodeCurrentPathAndQueryParams(windowLocation);
     return stringifyQueryParams(paramsRecord);
 };
+
+export const readReturnPathQueryParam = (windowLocation: Location): string | null => {
+    const params = parseQueryParams(windowLocation.search);
+    if (params[returnPathQueryParam]) {
+        return params[returnPathQueryParam] as string;
+    }
+    return null;
+};
