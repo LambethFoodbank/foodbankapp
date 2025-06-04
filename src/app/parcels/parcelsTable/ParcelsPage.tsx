@@ -126,7 +126,7 @@ const ParcelsPage: React.FC = () => {
 
         return await getParcelsByIdsWithFiltersAndSorting(
             supabase,
-            primaryFilters.concat(additionalFilters),
+            currentlyAppliedFilters,
             sortState,
             checkedParcelIds
         );
