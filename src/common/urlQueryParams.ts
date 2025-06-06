@@ -1,9 +1,9 @@
 "use client";
 
-import queryString, { ParsedQuery } from "query-string";
+import * as queryString from "query-string";
 import { returnPathQueryParam } from "@/common/constants";
 
-export type UrlQueryParamsRecord = ParsedQuery;
+export type UrlQueryParamsRecord = { [key: string]: string | string[] | null | undefined };
 
 export const parseQueryParams = (queryParams: string): UrlQueryParamsRecord => {
     return queryString.parse(queryParams, { arrayFormat: "bracket" });

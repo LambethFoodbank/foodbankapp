@@ -88,7 +88,7 @@
     "next": "^14.2.29",
     "nyc": "^15.1.0",
     "pdf-parse": "^1.1.1",
-    "query-string": "^9.1.1",
+    "query-string": "^6.14.1",
     "react": "^18.3.1",
     "react-data-table-component": "^7.5.4",
     "react-dom": "^18.3.1",
