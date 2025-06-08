@@ -1,5 +1,5 @@
 import { Supabase } from "@/supabaseUtils";
-import { AbortError, DatabaseError, EdgeFunctionError } from "../../errorClasses";
+import { DatabaseError, EdgeFunctionError } from "../../errorClasses";
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { DbParcelRow } from "@/databaseUtils";
@@ -7,7 +7,7 @@ import {
     ParcelsFilters,
     ParcelsSortState,
     GetDbParcelDataResult,
-    GetParcelDataAndCountResult,
+    GetParcelDataAndIdsResult,
     GetParcelDataAndCountErrorType,
     ParcelsTableRow,
     ParcelStatusesReturnType,
@@ -35,9 +35,10 @@ const getCongestionChargeDetailsForParcelsTable = async (
 const getParcelsQuery = (
     supabase: Supabase,
     filters: ParcelsFilters,
-    sortState: ParcelsSortState
+    sortState: ParcelsSortState,
+    selectString = "*"
 ): DbQuery<DbParcelRow> => {
-    let query = supabase.from("parcels_plus").select("*") as DbQuery<DbParcelRow>;
+    let query = supabase.from("parcels_plus").select(selectString) as DbQuery<DbParcelRow>;
 
     filters.forEach((filter: ParcelsFiltersAllStates) => {
         // We know that filter.method and filter.state are compatible, but it doesn't work with filter defined
@@ -94,14 +95,14 @@ const fetchParcelsDbRows = async (
     };
 };
 
-export const getParcelsDataAndCount = async (
+export const getParcelsTableDataAndAllIds = async (
     supabase: Supabase,
     filters: ParcelsFilters,
     sortState: ParcelsSortState,
     abortSignal: AbortSignal,
     startIndex: number,
     endIndex: number
-): Promise<GetParcelDataAndCountResult> => {
+): Promise<GetParcelDataAndIdsResult> => {
     const { parcels, error: getDbParcelsError } = await fetchParcelsDbRows(
         supabase,
         filters,
@@ -159,75 +160,45 @@ export const getParcelsDataAndCount = async (
         }
     }
 
-    const count = await getParcelsCount(supabase, filters, abortSignal);
+    const allParcelIds = await getParcelIds(supabase, filters, sortState, abortSignal);
 
     return {
         data: {
             parcelTableRows,
-            count,
+            allParcelIds,
         },
         error: null,
     };
 };
 
-const getParcelsCount = async (
-    supabase: Supabase,
-    filters: ParcelsFilters,
-    abortSignal: AbortSignal
-): Promise<number> => {
-    let query = supabase
-        .from("parcels_plus")
-        .select("*", { count: "exact", head: true }) as DbQuery<DbParcelRow>;
-
-    filters.forEach((filter: ParcelsFiltersAllStates) => {
-        // We know that filter.method and filter.state are compatible, but it doesn't work with filter defined
-        // through interfaces. Ideally we would rewrite filters to be classes so it's all consistent.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        query = filter.method(query, filter.state as any);
-    });
-
-    query = query.abortSignal(abortSignal);
-
-    const { count, error } = await query;
-
-    if (error) {
-        const logId = abortSignal.aborted
-            ? await logInfoReturnLogId("Aborted fetch: parcel table count", error)
-            : await logErrorReturnLogId("Error with fetch: parcel table count", error);
-        if (abortSignal.aborted) {
-            throw new AbortError("fetch", "parcel table", logId);
-        }
-
-        throw new DatabaseError("fetch", "parcel table", logId);
-    }
-
-    if (count === null) {
-        const logId = await logErrorReturnLogId("Error with fetch: Parcels, count is null");
-        throw new DatabaseError("fetch", "parcels", logId);
-    }
-    return count;
-};
-
 export const getParcelIds = async (
     supabase: Supabase,
     filters: ParcelsFilters,
-    sortState: ParcelsSortState
+    sortState: ParcelsSortState,
+    abortSignal: AbortSignal | null = null
 ): Promise<string[]> => {
-    const query = getParcelsQuery(supabase, filters, sortState);
+    const query = getParcelsQuery(supabase, filters, sortState, "parcel_id");
 
-    const { data, error } = (await query) as {
-        data: DbParcelRow[];
-        error: Error | null;
-    };
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch", {}, error);
-        throw new DatabaseError("fetch", "parcels", logId);
+    if (abortSignal) {
+        query.abortSignal(abortSignal);
     }
 
-    return data.reduce<string[]>((reducedData, parcel) => {
-        parcel.parcel_id && reducedData.push(parcel.parcel_id);
-        return reducedData;
-    }, []);
+    const { data, error } = (await query) as {
+        data: { parcel_id: string }[];
+        error: Error | null;
+    };
+
+    if (error) {
+        if (abortSignal && abortSignal.aborted) {
+            await logInfoReturnLogId("Aborted fetch: parcel IDs", {}, error);
+            return [];
+        } else {
+            const logId = await logErrorReturnLogId("Error with fetch", {}, error);
+            throw new DatabaseError("fetch", "parcels", logId);
+        }
+    }
+
+    return data.map((parcel) => parcel.parcel_id);
 };
 
 export const getParcelsByIds = async (
