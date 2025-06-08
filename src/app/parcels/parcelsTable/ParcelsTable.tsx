@@ -21,10 +21,7 @@ import parcelsSortableColumns, {
     defaultParcelsSortConfig,
 } from "@/app/parcels/parcelsTable/sortableColumns";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-    getParcelIds,
-    getParcelsTableDataAndAllIds,
-} from "@/app/parcels/parcelsTable/fetchParcelTableData";
+import { getParcelsTableDataAndAllIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import supabase from "@/supabaseClient";
 import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
@@ -199,7 +196,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             setCheckedParcelIds([]);
             setAllCheckBoxSelected(false);
         } else {
-            setCheckedParcelIds(await getParcelIds(supabase, appliedFilters, sortState));
+            setCheckedParcelIds(allFilteredParcelIds);
             setAllCheckBoxSelected(true);
         }
     };
