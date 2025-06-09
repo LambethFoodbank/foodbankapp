@@ -5,7 +5,7 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ParcelCardProps } from "../ParcelForm";
 
-const voucherNumberIsRequired = false;
+const voucherNumberIsRequired = true;
 
 const VoucherNumberCard: React.FC<ParcelCardProps> = ({
     errorSetter,
