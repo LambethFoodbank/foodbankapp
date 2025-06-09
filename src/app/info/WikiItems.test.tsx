@@ -8,14 +8,12 @@ import "@testing-library/jest-dom/jest-globals";
 import { RoleUpdateContext } from "@/app/roles";
 import userEvent from "@testing-library/user-event";
 
-const adminAndManagerRoles: { [role: string]: UserRole }[] = [
+const adminManagerAndStaffRoles: { [role: string]: UserRole }[] = [
     { role: "admin" },
     { role: "manager" },
-];
-const volunteerAndStaffRoles: { [role: string]: UserRole }[] = [
-    { role: "volunteer" },
     { role: "staff" },
 ];
+const otherRoles: { [role: string]: UserRole }[] = [{ role: "volunteer" }];
 
 const logID = "a2adb0ba-873e-506b-abd1-8cd1782923c8";
 
@@ -78,8 +76,8 @@ describe("Wiki items component", () => {
         ];
     });
 
-    it.each(adminAndManagerRoles)(
-        "renders the add, edit, reorder buttons for admins and managers in display mode",
+    it.each(adminManagerAndStaffRoles)(
+        "renders the add, edit, reorder buttons for admins, managers and staff in display mode",
         ({ role }) => {
             render(
                 <StyleManager>
@@ -100,8 +98,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "has edit button for admin and manager users, and on click, has update, cancel, and delete buttons",
+    it.each(adminManagerAndStaffRoles)(
+        "has edit button for admin, manager and staff users, and on click, has update, cancel, and delete buttons",
         ({ role }) => {
             render(
                 <StyleManager>
@@ -119,8 +117,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(volunteerAndStaffRoles)(
-        "does not render the add, reorder, or edit buttons for volunteers and staff",
+    it.each(otherRoles)(
+        "does not render the add, reorder, or edit buttons for volunteers",
         ({ role }) => {
             render(
                 <StyleManager>
@@ -153,8 +151,8 @@ describe("Wiki items component", () => {
         expect(screen.getByText("Test 3")).toBeVisible();
     });
 
-    it.each(adminAndManagerRoles)(
-        "reorders the wiki items when reorder buttons are clicked in display mode for admins and managers",
+    it.each(adminManagerAndStaffRoles)(
+        "reorders the wiki items when reorder buttons are clicked in display mode for admins, managers and staff",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -172,8 +170,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "reorders the wiki items when reorder buttons are clicked in edit mode for admins and managers",
+    it.each(adminManagerAndStaffRoles)(
+        "reorders the wiki items when reorder buttons are clicked in edit mode for admins, managers and staff",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -192,8 +190,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "deletes a wiki item when its delete button is clicked by an admin or a manager",
+    it.each(adminManagerAndStaffRoles)(
+        "deletes a wiki item when its delete button is clicked by an admin, manager and staff member",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -210,8 +208,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "edits a wiki item when its edit button is clicked by an admin or a manager",
+    it.each(adminManagerAndStaffRoles)(
+        "edits a wiki item when its edit button is clicked by an admin, manager and staff member",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -235,7 +233,7 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
+    it.each(adminManagerAndStaffRoles)(
         "adds an item with contents by an admin or a manager",
         async ({ role }) => {
             const user = userEvent.setup();
@@ -258,8 +256,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "cancels an edit when the cancel button is clicked by an admin or a manager",
+    it.each(adminManagerAndStaffRoles)(
+        "cancels an edit when the cancel button is clicked by an admin, manager and staff member",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -283,8 +281,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "deletes an empty item when it is saved by an admin or a manager",
+    it.each(adminManagerAndStaffRoles)(
+        "deletes an empty item when it is saved by an admin, manager and staff member",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -302,8 +300,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "deletes an empty item when it is canceled by an admin or a manager",
+    it.each(adminManagerAndStaffRoles)(
+        "deletes an empty item when it is canceled by an admin, manager and staff member",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -321,8 +319,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "only adds one item when add is clicked, and does not add a second new item if one is already present for admins and managers",
+    it.each(adminManagerAndStaffRoles)(
+        "only adds one item when add is clicked, and does not add a second new item if one is already present for admins, managers and staff",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -340,8 +338,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "does not allow the user to reorder the first item up or the last item down for admins and managers",
+    it.each(adminManagerAndStaffRoles)(
+        "does not allow the user to reorder the first item up or the last item down for admins, managers and staff",
         async ({ role }) => {
             const user = userEvent.setup();
 
@@ -363,8 +361,8 @@ describe("Wiki items component", () => {
         }
     );
 
-    it.each(adminAndManagerRoles)(
-        "does not delete an item if the user does not confirm the deletion for admins and managers",
+    it.each(adminManagerAndStaffRoles)(
+        "does not delete an item if the user does not confirm the deletion for admins, managers and staff",
         async ({ role }) => {
             const user = userEvent.setup();
             jest.spyOn(window, "confirm").mockImplementation(() => false);
