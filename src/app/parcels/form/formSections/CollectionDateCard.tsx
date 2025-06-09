@@ -25,7 +25,6 @@ const CollectionDateCard: React.FC<ParcelCardProps> = ({
                     }}
                     label="Date"
                     value={fields.collectionDate ? dayjs(fields.collectionDate) : null}
-                    disablePast
                 />
                 <ErrorText>{getErrorText(formErrors.collectionDate)}</ErrorText>
             </>
