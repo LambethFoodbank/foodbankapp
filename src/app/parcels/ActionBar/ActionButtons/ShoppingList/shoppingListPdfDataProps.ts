@@ -94,10 +94,13 @@ export const prepareItemsListForHousehold = async (
         if (listItemError) {
             return { data: null, error: listItemError };
         }
-        itemsList.push({
-            description: row.item_name,
-            ...listItemData,
-        });
+
+        if (!["", "0"].includes(listItemData.quantity.trim())) {
+            itemsList.push({
+                description: row.item_name,
+                ...listItemData,
+            });
+        }
     }
     return { data: itemsList, error: null };
 };
