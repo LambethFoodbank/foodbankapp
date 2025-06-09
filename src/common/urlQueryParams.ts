@@ -1,5 +1,5 @@
 "use client";
-
+// Versions of query-string that support ESM modules don't work on old Safari versions
 import * as queryString from "query-string";
 import { returnPathQueryParam } from "@/common/constants";
 

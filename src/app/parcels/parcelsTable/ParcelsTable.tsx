@@ -21,10 +21,7 @@ import parcelsSortableColumns, {
     defaultParcelsSortConfig,
 } from "@/app/parcels/parcelsTable/sortableColumns";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-    getParcelIds,
-    getParcelsDataAndCount,
-} from "@/app/parcels/parcelsTable/fetchParcelTableData";
+import { getParcelsTableDataAndAllIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import supabase from "@/supabaseClient";
 import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
@@ -59,6 +56,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const [isLoading, setIsLoading] = useState(true);
     const [parcelsDataPortion, setParcelsDataPortion] = useState<ParcelsTableRow[]>([]);
     const [filteredParcelCount, setFilteredParcelCount] = useState<number>(0);
+    const [allFilteredParcelIds, setAllFilteredParcelIds] = useState<string[]>([]);
 
     const [parcelRowBreakPointConfig, setParcelRowBreakPointConfig] = useState<BreakPointConfig[]>(
         []
@@ -84,7 +82,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         if (parcelsTableFetchAbortController.current) {
             setErrorMessage(null);
 
-            const { data, error } = await getParcelsDataAndCount(
+            const { data, error } = await getParcelsTableDataAndAllIds(
                 supabase,
                 appliedFilters,
                 sortState,
@@ -100,7 +98,9 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 }
             } else {
                 setParcelsDataPortion(data.parcelTableRows);
-                setFilteredParcelCount(data.count);
+                setFilteredParcelCount(data.allParcelIds.length);
+                setAllFilteredParcelIds(data.allParcelIds);
+
                 if (sortState.sortEnabled && sortState.column.headerKey) {
                     setParcelRowBreakPointConfig(
                         searchForBreakPoints(sortState.column.headerKey, data.parcelTableRows)
@@ -196,10 +196,18 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             setCheckedParcelIds([]);
             setAllCheckBoxSelected(false);
         } else {
-            setCheckedParcelIds(await getParcelIds(supabase, appliedFilters, sortState));
+            setCheckedParcelIds(allFilteredParcelIds);
             setAllCheckBoxSelected(true);
         }
     };
+
+    useEffect(() => {
+        if (checkedParcelIds.some((parcelId) => !allFilteredParcelIds.includes(parcelId))) {
+            setCheckedParcelIds(
+                allFilteredParcelIds.filter((parcelId) => checkedParcelIds.includes(parcelId))
+            );
+        }
+    }, [allFilteredParcelIds, checkedParcelIds, setCheckedParcelIds]);
 
     useEffect(() => {
         const allChecked = checkedParcelIds.length === filteredParcelCount;

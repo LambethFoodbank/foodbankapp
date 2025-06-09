@@ -35,11 +35,11 @@ export interface ParcelsTableRow {
     clientIsActive: boolean;
 }
 
-export type GetParcelDataAndCountResult =
+export type GetParcelDataAndIdsResult =
     | {
           data: {
               parcelTableRows: ParcelsTableRow[];
-              count: number;
+              allParcelIds: string[];
           };
           error: null;
       }
