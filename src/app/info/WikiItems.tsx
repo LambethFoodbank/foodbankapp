@@ -5,7 +5,7 @@ import { DbWikiRow } from "@/databaseUtils";
 import { WikiItemPositioner } from "@/app/info/StyleComponents";
 import React, { useEffect, useMemo, useRef } from "react";
 import EditModeDependentItem from "@/app/info/EditModeDependentItem";
-import AdminManagerDependentView from "@/app/info/AdminManagerDependentView";
+import OrganisationRoleDependentView from "@/app/info/OrganisationRoleDependentView";
 import AddWikiItemButton from "@/app/info/AddWikiItemButton";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
@@ -212,12 +212,12 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
 
     return (
         <>
-            <AdminManagerDependentView>
+            <OrganisationRoleDependentView>
                 <AddWikiItemButton
                     doesEmptyRowExist={doesEmptyRowExist}
                     appendNewRow={appendNewRow}
                 />
-            </AdminManagerDependentView>
+            </OrganisationRoleDependentView>
             {errorMessage && (
                 <TextValueContainer>
                     <ErrorSecondaryText>{errorMessage}</ErrorSecondaryText>

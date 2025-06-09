@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { DbWikiRow } from "@/databaseUtils";
 import WikiItemDisplay from "@/app/info/WikiItemDisplay";
 import WikiItemEdit from "@/app/info/WikiItemEdit";
-import AdminManagerDependentView from "@/app/info/AdminManagerDependentView";
+import OrganisationRoleDependentView from "@/app/info/OrganisationRoleDependentView";
 import { DirectionString } from "@/app/info/WikiItems";
 
 interface EditProps {
@@ -28,7 +28,7 @@ const EditModeDependentItem: React.FC<EditProps> = ({
         <>
             {rowData &&
                 (isInEditMode || (rowData.title === "" && rowData.content === "") ? (
-                    <AdminManagerDependentView>
+                    <OrganisationRoleDependentView>
                         <WikiItemEdit
                             rowData={rowData}
                             setRowData={setrowData}
@@ -38,7 +38,7 @@ const EditModeDependentItem: React.FC<EditProps> = ({
                             swapRows={swapRows}
                             setErrorMessage={setErrorMessage}
                         />
-                    </AdminManagerDependentView>
+                    </OrganisationRoleDependentView>
                 ) : (
                     <WikiItemDisplay
                         rowData={rowData}

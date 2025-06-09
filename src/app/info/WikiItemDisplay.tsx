@@ -11,7 +11,7 @@ import {
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { convertContentToElements, DirectionString } from "@/app/info/WikiItems";
-import AdminManagerDependentView from "@/app/info/AdminManagerDependentView";
+import OrganisationRoleDependentView from "@/app/info/OrganisationRoleDependentView";
 import EditIcon from "@mui/icons-material/Edit";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
@@ -25,7 +25,7 @@ interface DefaultViewProps {
 const WikiItemDisplay: React.FC<DefaultViewProps> = ({ rowData, openEditMode, swapRows }) => {
     return (
         <>
-            <AdminManagerDependentView>
+            <OrganisationRoleDependentView>
                 <ReorderArrowDiv>
                     <WikiUpdateDataButton
                         onClick={() => {
@@ -52,7 +52,7 @@ const WikiItemDisplay: React.FC<DefaultViewProps> = ({ rowData, openEditMode, sw
                 >
                     <EditIcon />
                 </WikiUpdateDataButton>
-            </AdminManagerDependentView>
+            </OrganisationRoleDependentView>
             <WikiItemAccordionSurface>
                 <Accordion elevation={0}>
                     <AccordionSummary
