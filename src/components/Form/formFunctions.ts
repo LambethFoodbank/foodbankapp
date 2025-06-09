@@ -5,7 +5,7 @@ import {
     SelectChangeEventHandler,
 } from "@/components/DataInput/inputHandlerFactories";
 import { Database } from "@/databaseTypesFile";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 
 export type Setter<SpecificFields extends Fields> = (
     fieldValuesToUpdate: Partial<SpecificFields>
@@ -237,13 +237,6 @@ export const onChangeDate = <SpecificFields extends Fields>(
     onChangeDateOrTime(fieldSetter, errorSetter, key, value);
     if (value === null || isNaN(Date.parse(value.toString()))) {
         return;
-    }
-
-    const earliestPossibleDateTime = dayjs().startOf("day");
-    if (value.isBefore(earliestPossibleDateTime)) {
-        errorSetter({ [key]: Errors.pastDate } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors;
-        });
     }
 };
 

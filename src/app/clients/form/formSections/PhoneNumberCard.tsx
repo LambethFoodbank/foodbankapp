@@ -10,6 +10,8 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 import { formatPhoneNumber, phoneNumberRegex } from "@/common/format";
 
+const phoneNumberIsRequired = true;
+
 const PhoneNumberCard: React.FC<ClientCardProps> = ({
     formErrors,
     errorSetter,
@@ -17,14 +19,14 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
     fields,
 }) => {
     return (
-        <GenericFormCard title="Phone Number" required={false}>
+        <GenericFormCard title="Phone Number" required={phoneNumberIsRequired}>
             <FreeFormTextInput
                 label="Phone Number"
                 defaultValue={getDefaultTextValue(fields, "phoneNumber")}
                 error={errorExists(formErrors.phoneNumber)}
                 helperText={getErrorText(formErrors.phoneNumber)}
                 onChange={onChangeText(fieldSetter, errorSetter, "phoneNumber", {
-                    required: false,
+                    required: phoneNumberIsRequired,
                     regex: phoneNumberRegex,
                     formattingFunction: formatPhoneNumber,
                 })}
