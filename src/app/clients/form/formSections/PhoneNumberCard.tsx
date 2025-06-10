@@ -21,6 +21,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
     return (
         <GenericFormCard title="Phone Number" required={phoneNumberIsRequired}>
             <FreeFormTextInput
+                id="client-phone-number"
                 label="Phone Number"
                 defaultValue={getDefaultTextValue(fields, "phoneNumber")}
                 error={errorExists(formErrors.phoneNumber)}
