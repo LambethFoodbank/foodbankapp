@@ -94,7 +94,7 @@ export const initialParcelFields: ParcelFields = {
 
 export const initialParcelFormErrors: ParcelErrors = {
     listType: Errors.none,
-    voucherNumber: Errors.none,
+    voucherNumber: Errors.initial,
     packingDate: Errors.initial,
     packingSlot: Errors.initial,
     shippingMethod: Errors.initial,
