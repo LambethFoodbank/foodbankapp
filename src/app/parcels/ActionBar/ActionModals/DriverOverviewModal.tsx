@@ -9,7 +9,7 @@ import GeneralActionModal, {
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import dayjs, { Dayjs } from "dayjs";
-import { DatePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import { getStatusErrorMessageWithLogId } from "../Statuses";
 import DriverOverviewPdfButton from "@/app/parcels/ActionBar/ActionButtons/DriverOverview/DriverOverviewPdfButton";
 import { DriverOverviewError } from "../ActionButtons/DriverOverview/getDriverOverviewData";
@@ -20,7 +20,7 @@ import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { saveParcelTableRowsStatus } from "../saveStatus";
 
 interface DriverOverviewInputProps {
-    onDateChange: (newDate: Dayjs | null) => void;
+    onDateTimeChange: (newDate: Dayjs | null) => void;
     onDriverNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setDateValid: () => void;
     setDateInvalid: () => void;
@@ -28,12 +28,12 @@ interface DriverOverviewInputProps {
 
 interface ContentProps {
     selectedParcels: ParcelsTableRow[];
-    date: Dayjs;
+    dateTime: Dayjs;
     driverName: string | null;
     onPdfCreationCompleted: () => void;
     onPdfCreationFailed: (pdfError: DriverOverviewError) => void;
     isInputValid: boolean | null;
-    onDateChange: (newDate: Dayjs | null) => void;
+    onDateTimeChange: (newDate: Dayjs | null) => void;
     onDriverNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setIsDateValid: (valid: boolean) => void;
     maxParcelsToShow: number;
@@ -41,6 +41,8 @@ interface ContentProps {
 
 const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInputProps>(
     (props, driverNameInputFocusRef) => {
+        const dateTime = dayjs();
+
         return (
             <>
                 <Heading>Delivery Information</Heading>
@@ -51,9 +53,9 @@ const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInp
                     fullWidth
                     margin="normal"
                 />
-                <DatePicker
-                    defaultValue={dayjs()}
-                    onChange={props.onDateChange}
+                <DateTimePicker
+                    defaultValue={dateTime}
+                    onChange={props.onDateTimeChange}
                     onError={(error) => {
                         if (error) {
                             props.setDateInvalid();
@@ -62,7 +64,6 @@ const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInp
                         }
                     }}
                     slotProps={{ textField: { fullWidth: true, margin: "normal" } }}
-                    disablePast
                 />
             </>
         );
@@ -91,12 +92,12 @@ const getPdfErrorMessage = (error: DriverOverviewError): string => {
 };
 
 const DriverOverviewModalContent: React.FC<ContentProps> = ({
-    onDateChange,
+    onDateTimeChange,
     onDriverNameChange,
     setIsDateValid,
     selectedParcels,
     maxParcelsToShow,
-    date,
+    dateTime: date,
     driverName,
     onPdfCreationCompleted,
     onPdfCreationFailed,
@@ -111,7 +112,7 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
     return (
         <form>
             <DriverOverviewInput
-                onDateChange={onDateChange}
+                onDateTimeChange={onDateTimeChange}
                 onDriverNameChange={onDriverNameChange}
                 setDateValid={() => setIsDateValid(true)}
                 setDateInvalid={() => setIsDateValid(false)}
@@ -151,8 +152,10 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
         const trimmedDriverName = event.target.value.trim();
         setDriverName(trimmedDriverName.length !== 0 ? trimmedDriverName : null);
     };
-    const onDateChange = (newDate: Dayjs | null): void => {
+
+    const onDateTimeChange = (newDate: Dayjs | null): void => {
         if (newDate) {
+            newDate = newDate.set("second", 0).set("millisecond", 0);
             setDate(newDate);
         }
     };
@@ -213,12 +216,12 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
         >
             {!actionCompleted && (
                 <DriverOverviewModalContent
-                    onDateChange={onDateChange}
+                    onDateTimeChange={onDateTimeChange}
                     onDriverNameChange={onDriverNameChange}
                     setIsDateValid={setIsDateValid}
                     selectedParcels={props.selectedParcels}
                     maxParcelsToShow={maxParcelsToShow}
-                    date={date}
+                    dateTime={date}
                     driverName={driverName}
                     onPdfCreationCompleted={onPdfCreationCompleted}
                     onPdfCreationFailed={onPdfCreationFailed}

@@ -57,7 +57,7 @@ const DriverOverviewPdfButton = ({
             data: {
                 fileData: {
                     driverName: driverName,
-                    date: date.toDate(),
+                    dateTime: date.toDate(),
                     tableData: driverPdfData,
                     message: driverMessageData.value,
                 },

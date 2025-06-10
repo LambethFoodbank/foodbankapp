@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Text, Document, Page, View, StyleSheet, Image } from "@react-pdf/renderer";
-import { displayNameForNullDriverName, formatDate } from "@/common/format";
+import { displayNameForNullDriverName, formatDateTime } from "@/common/format";
 import {
     DriverOverviewRowData,
     DriverOverviewTablesData,
@@ -10,7 +10,7 @@ import {
 
 export interface DriverOverviewPdfData {
     driverName: string | null;
-    date: Date;
+    dateTime: Date;
     tableData: DriverOverviewTablesData;
     message: string;
 }
@@ -246,7 +246,7 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                             </Text>
                         </View>
                         <View style={styles.infoColumn}>
-                            <Text style={styles.h1text}>{formatDate(data.date)}</Text>
+                            <Text style={styles.h1text}>{formatDateTime(data.dateTime)}</Text>
                         </View>
                     </View>
                     {/* eslint-disable-next-line -- needed to remove the need for alt text on the logo */}

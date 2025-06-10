@@ -4,6 +4,11 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 const localeCode = "en-GB";
 
+const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+    dateStyle: "short",
+    timeStyle: "short",
+};
+
 export const displayPostcodeForHomelessClient = "NFA";
 
 export const displayNameForDeletedClient = "Deleted Client";
@@ -71,7 +76,7 @@ export const formatTimestampAsDatetime = (timestamp: number): string => {
         return "-";
     }
 
-    return new Date(timestamp).toLocaleString(localeCode);
+    return new Date(timestamp).toLocaleString(localeCode, dateTimeFormatOptions);
 };
 
 export const formatDatetimeAsDate = (datetime: Date | string | null): string => {
@@ -96,14 +101,14 @@ export const formatDatetimeAsTime = (datetime: string | null): string => {
 
 export const formatDateTime = (datetime: Date | string | null): string => {
     if (datetime instanceof Date) {
-        return datetime.toLocaleString(localeCode);
+        return datetime.toLocaleString(localeCode, dateTimeFormatOptions);
     }
 
     if (datetime === null || isNaN(Date.parse(datetime))) {
         return "-";
     }
 
-    return new Date(datetime).toLocaleString(localeCode);
+    return new Date(datetime).toLocaleString(localeCode, dateTimeFormatOptions);
 };
 
 export const getDbDate = (dateTime: Dayjs): string => dateTime.format("YYYY-MM-DD");
