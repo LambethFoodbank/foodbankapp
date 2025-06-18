@@ -143,6 +143,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-transformer-svg": "^2.0.2",
     "npm": "^11.1.0",
+    "postgres": "^3.4.7",
     "react-router-dom": "^6.25.1",
     "react-test-renderer": "^18.3.1",
     "seedrandom": "^3.0.5",
@@ -150,5 +151,8 @@
     "text-encoding": "^0.7.0",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2"
+  },
+  "@snaplet/seed": {
+    "config": "supabase/seed/seed.config.ts"
   }
 }
