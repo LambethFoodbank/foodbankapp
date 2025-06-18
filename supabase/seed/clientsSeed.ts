@@ -53,21 +53,52 @@ export const possibleSignpostingCallReasons = [
     "Other",
 ];
 
-export const possibleDefaultListTypesWeighted = Array(5)
-    .fill("regular")
-    .concat(Array(1).fill("hotel"));
+export const possibleListTypesWeighted = Array(5).fill("regular").concat(Array(1).fill("hotel"));
 
-export const possibleParcelPostCodes = [
+export const possiblePostCodes = [
     "E1 6AA",
     "E1 6AD",
     "E1 6AG",
+    "E5 9BQ",
+    "E13 0PD",
     "N13 5UJ",
+    "N15 4QL",
     "NW6 4RL",
+    "SE7 7BN",
+    "SE8 3JW",
+    "SE11 4DJ",
+    "SE11 4HN",
+    "SE11 4PH",
+    "SE11 4QE",
+    "SE11 5DQ",
     "SE11 5RD",
+    "SE11 6NB",
+    "SE12 0AL",
+    "SE15 4UP",
+    "SE21 8BW",
     "SE24 0HG",
-    "SW14 8DL",
+    "SW1A 1BG",
+    "SW1H 0NB",
     "SW1P 4JL",
+    "SW4 0JD",
+    "SW7 2AZ",
+    "SW7 3SS",
     "SW8 1SY",
+    "SW10 0AB",
+    "SW11 1WQ",
+    "SW14 8DL",
+    "SW14 8AE",
+    "SW15 3PG",
+    "SW16 2AZ",
+    "SW1W 9SA",
+    "W1B 1NT",
+    "W1C 2DZ",
+    "W1F 0SG",
+    "W1J 5RH",
+    "WC1H 0JL",
+    "WC1X 9QW",
+    "WC2H 7HA",
+    "WC2R 3NL",
     null,
 ];
 

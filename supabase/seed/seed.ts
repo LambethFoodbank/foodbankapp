@@ -10,11 +10,11 @@ import {
     booleansWeightedToTrue,
     possibleBabyOtherItems,
     possibleCookingFacilities,
-    possibleDefaultListTypesWeighted,
+    possibleListTypesWeighted,
     possibleDietaryRequirements,
     possibleHygieneOtherItems,
     possibleOtherItems,
-    possibleParcelPostCodes,
+    possiblePostCodes,
     possiblePets,
     possibleSignpostingCallReasons,
 } from "./clientsSeed";
@@ -54,10 +54,10 @@ const main = async (): Promise<never> => {
             address_2: (ctx) => copycat.streetAddress(ctx.seed),
             address_town: (ctx) => copycat.city(ctx.seed),
             address_county: (ctx) => copycat.state(ctx.seed),
-            address_postcode: (ctx) => copycat.oneOf(ctx.seed, possibleParcelPostCodes),
+            address_postcode: (ctx) => copycat.oneOf(ctx.seed, possiblePostCodes),
             delivery_instructions: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
             family_id: (ctx) => copycat.uuid(ctx.seed),
-            default_list: (ctx) => copycat.oneOf(ctx.seed, possibleDefaultListTypesWeighted),
+            default_list: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
             cooking_facilities: (ctx) =>
                 copycat.someOf(
                     ctx.seed,
@@ -143,7 +143,7 @@ const main = async (): Promise<never> => {
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
                 collection_datetime: (ctx) =>
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
-                list_type: (ctx) => copycat.oneOf(ctx.seed, possibleDefaultListTypesWeighted),
+                list_type: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
                 created_at: parcelCreationDateTime,
             }),
         { connect: true }

@@ -173,10 +173,9 @@ You can regenerate the types
     ```shell
     npx @snaplet/seed login
     ```
--   Follow link and log in using credentials in keeper [QQ: maybe not needed??]
 -   Regenerate assets in sync with your new database
     ```shell
-    npx @snaplet/seed generate
+    npx @snaplet/seed sync
     ```
 -   Then generate `supabase/seed.sql` from `supabase/seed/seed.ts`
     ```shell
