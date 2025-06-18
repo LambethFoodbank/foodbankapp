@@ -178,7 +178,6 @@ You can regenerate the types
     ```shell
     npx @snaplet/seed generate
     ```
--   If error with createSeedClient, close IDE and restart [QQ: ???]
 -   Then generate `supabase/seed.sql` from `supabase/seed/seed.ts`
     ```shell
     npm run db:generate_seed

@@ -19,7 +19,7 @@ import {
     possibleSignpostingCallReasons,
 } from "./clientsSeed";
 import { genders } from "./families";
-import { collectionCentres } from "./collectionCentresSeed";
+import { collectionCentresWithStringSlots } from "./collectionCentresSeed";
 import { listsSeedRequired } from "./listsSeed";
 import {
     earliestParcelOrEventDate,
@@ -34,7 +34,7 @@ import {
     eventNamesWithNumberData,
 } from "./eventsSeed";
 
-const main = async () => {
+const main = async (): Promise<never> => {
     const seed = await createSeedClient({
         dryRun: process.env.DRY !== "0",
     });
@@ -65,54 +65,42 @@ const main = async () => {
                     possibleCookingFacilities
                 ),
             dietary_requirements: (ctx) =>
-                copycat.oneOf(ctx.seed, [
-                    null,
-                    copycat.someOf(
-                        ctx.seed,
-                        [0, possibleDietaryRequirements.length],
-                        possibleDietaryRequirements
-                    ),
-                ]),
+                copycat.someOf(
+                    ctx.seed,
+                    [0, possibleDietaryRequirements.length],
+                    possibleDietaryRequirements
+                ),
             pet_food: (ctx) => copycat.someOf(ctx.seed, [0, possiblePets.length], possiblePets),
             hygiene_pads: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
             hygiene_tampons: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
             hygiene_other_items: (ctx) =>
-                copycat.oneOf(ctx.seed, [
-                    null,
-                    copycat.someOf(
-                        ctx.seed,
-                        [0, possibleHygieneOtherItems.length],
-                        possibleHygieneOtherItems
-                    ),
-                ]),
+                copycat.someOf(
+                    ctx.seed,
+                    [0, possibleHygieneOtherItems.length],
+                    possibleHygieneOtherItems
+                ),
             baby_nappies: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
             baby_formula: (ctx) =>
                 copycat.oneOf(ctx.seed, [null, copycat.sentence(ctx.seed, { maxWords: 3 })]),
             baby_food: (ctx) =>
                 copycat.oneOf(ctx.seed, [null, copycat.sentence(ctx.seed, { maxWords: 5 })]),
             baby_other_items: (ctx) =>
-                copycat.oneOf(ctx.seed, [
-                    null,
-                    copycat.someOf(
-                        ctx.seed,
-                        [0, possibleBabyOtherItems.length],
-                        possibleBabyOtherItems
-                    ),
-                ]),
+                copycat.someOf(
+                    ctx.seed,
+                    [0, possibleBabyOtherItems.length],
+                    possibleBabyOtherItems
+                ),
             other_items: (ctx) =>
                 copycat.someOf(ctx.seed, [0, possibleOtherItems.length], possibleOtherItems),
             extra_information: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
             flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
             signposting_call_required: (ctx) => copycat.bool(ctx.seed),
             signposting_call_reasons: (ctx) =>
-                copycat.oneOf(ctx.seed, [
-                    null,
-                    copycat.someOf(
-                        ctx.seed,
-                        [0, possibleSignpostingCallReasons.length],
-                        possibleSignpostingCallReasons
-                    ),
-                ]),
+                copycat.someOf(
+                    ctx.seed,
+                    [0, possibleSignpostingCallReasons.length],
+                    possibleSignpostingCallReasons
+                ),
             is_active: (ctx) => copycat.oneOf(ctx.seed, booleansWeightedToTrue),
             families: (generateFamily) =>
                 generateFamily(
@@ -143,14 +131,14 @@ const main = async () => {
         { connect: true }
     );
 
-    await seed.collection_centres(collectionCentres);
+    await seed.collection_centres(collectionCentresWithStringSlots);
 
     await seed.lists(listsSeedRequired);
 
     await seed.parcels(
         (generate) =>
             generate(7500, {
-                voucher_number: (ctx) => copycat.scramble("A-1111-111-11-11"),
+                voucher_number: (_ctx) => copycat.scramble("A-1111-111-11-11", { preserve: ["-"] }),
                 packing_date: (ctx) =>
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
                 collection_datetime: (ctx) =>

@@ -24,8 +24,8 @@ interface SnapletList {
 }
 
 interface SnapletListRequired {
-    itemName: string;
-    rowOrder: number;
+    item_name: string;
+    row_order: number;
     quantity_for_1: string | undefined;
     notes_for_1: string | null;
     quantity_for_2: string | undefined;
@@ -50,8 +50,8 @@ interface SnapletListRequired {
 
 const snapletListToRequired = (list: SnapletList): SnapletListRequired => {
     return {
-        itemName: list.item_name,
-        rowOrder: list.row_order,
+        item_name: list.item_name,
+        row_order: list.row_order,
         quantity_for_1: list.quantity_for_1 ?? undefined,
         notes_for_1: list.notes_for_1 ?? null,
         quantity_for_2: list.quantity_for_2 ?? undefined,
