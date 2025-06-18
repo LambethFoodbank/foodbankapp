@@ -1,3 +1,14 @@
+export const possibleCookingFacilities = [
+    "None",
+    "Microwave",
+    "Kettle",
+    "Hob",
+    "Oven",
+    "Air Fryer",
+    "Toaster",
+    "Other",
+];
+
 export const possibleDietaryRequirements = [
     "Fresh Fruit",
     "Fresh Veg",
@@ -5,6 +16,7 @@ export const possibleDietaryRequirements = [
     "Ginger",
     "Chillies",
     "Spices",
+    "Eggs",
     "Bread",
     "Tea",
     "Coffee",
@@ -12,6 +24,7 @@ export const possibleDietaryRequirements = [
     "Rice",
     "Meat (No Pork)",
     "Meat & Pork",
+    "Fish",
     "Gluten Free",
     "Dairy Free",
     "Vegetarian",
@@ -23,11 +36,26 @@ export const possibleDietaryRequirements = [
     "Seafood Allergy",
 ];
 
-export const possibleFeminineProducts = ["Tampons", "Pads", "Incontinence Pads"];
+export const possibleHygieneOtherItems = ["Female Incontinence Pads", "Male Incontinence Pads"];
+
+export const possibleBabyOtherItems = ["Baby Wipes", "Baby Toiletries"];
 
 export const possiblePets = ["Cat", "Dog"];
 
 export const possibleOtherItems = ["Hot Water Bottle", "Blanket"];
+
+export const possibleSignpostingCallReasons = [
+    "Benefits",
+    "Debt",
+    "Housing",
+    "Cost of Living",
+    "Mental Health",
+    "Other",
+];
+
+export const possibleDefaultListTypesWeighted = Array(5)
+    .fill("regular")
+    .concat(Array(1).fill("hotel"));
 
 export const possibleParcelPostCodes = [
     "E1 6AA",

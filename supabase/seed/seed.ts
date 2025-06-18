@@ -5,22 +5,22 @@ which only gets generated after running npx snaplet generate with local database
 
 import { createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
-import { listsSeedRequired } from "./listsSeed";
+import { packingSlots } from "./packingSlotsSeed";
 import {
     booleansWeightedToTrue,
+    possibleBabyOtherItems,
+    possibleCookingFacilities,
+    possibleDefaultListTypesWeighted,
     possibleDietaryRequirements,
-    possibleFeminineProducts,
+    possibleHygieneOtherItems,
     possibleOtherItems,
     possibleParcelPostCodes,
     possiblePets,
+    possibleSignpostingCallReasons,
 } from "./clientsSeed";
-import {
-    eventNamesWithDriverData,
-    eventNamesWithNoData,
-    eventNamesWithNumberData,
-} from "./eventsSeed";
+import { genders } from "./families";
 import { collectionCentres } from "./collectionCentresSeed";
-import { packingSlots } from "./packingSlotsSeed";
+import { listsSeedRequired } from "./listsSeed";
 import {
     earliestParcelOrEventDate,
     farFutureDate,
@@ -28,59 +28,103 @@ import {
     latestEventDate,
     parcelCreationDateTime,
 } from "./dateData";
-import { genders } from "./families";
+import {
+    eventNamesWithDriverData,
+    eventNamesWithNoData,
+    eventNamesWithNumberData,
+} from "./eventsSeed";
 
-generateSeed();
-
-async function generateSeed(): Promise<void> {
+const main = async () => {
     const seed = await createSeedClient({
         dryRun: process.env.DRY !== "0",
     });
 
     await seed.$resetDatabase(); // Clears all existing data in the database, but keep the structure
 
-    await seed.packingSlots(packingSlots);
+    await seed.packing_slots(packingSlots);
 
     const today = new Date();
     const thisYear = today.getFullYear();
 
     await seed.clients((generate) =>
-        generate(500, {
-            fullName: (ctx) => copycat.fullName(ctx.seed),
-            phoneNumber: (ctx) => copycat.phoneNumber(ctx.seed),
-            address1: (ctx) => copycat.streetAddress(ctx.seed),
-            address2: (ctx) => copycat.streetAddress(ctx.seed),
-            addressTown: (ctx) => copycat.city(ctx.seed),
-            addressCounty: (ctx) => copycat.state(ctx.seed),
-            addressPostcode: (ctx) => copycat.oneOf(ctx.seed, possibleParcelPostCodes),
-            deliveryInstructions: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
-            familyId: (ctx) => copycat.uuid(ctx.seed),
-            dietaryRequirements: (ctx) =>
+        generate(750, {
+            full_name: (ctx) => copycat.fullName(ctx.seed),
+            phone_number: (ctx) => copycat.phoneNumber(ctx.seed),
+            address_1: (ctx) => copycat.streetAddress(ctx.seed),
+            address_2: (ctx) => copycat.streetAddress(ctx.seed),
+            address_town: (ctx) => copycat.city(ctx.seed),
+            address_county: (ctx) => copycat.state(ctx.seed),
+            address_postcode: (ctx) => copycat.oneOf(ctx.seed, possibleParcelPostCodes),
+            delivery_instructions: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
+            family_id: (ctx) => copycat.uuid(ctx.seed),
+            default_list: (ctx) => copycat.oneOf(ctx.seed, possibleDefaultListTypesWeighted),
+            cooking_facilities: (ctx) =>
                 copycat.someOf(
                     ctx.seed,
-                    [0, possibleDietaryRequirements.length],
-                    possibleDietaryRequirements
+                    [0, possibleCookingFacilities.length],
+                    possibleCookingFacilities
                 ),
-            feminineProducts: (ctx) =>
-                copycat.someOf(
-                    ctx.seed,
-                    [0, possibleFeminineProducts.length],
-                    possibleFeminineProducts
-                ),
-            petFood: (ctx) => copycat.someOf(ctx.seed, [0, possiblePets.length], possiblePets),
-            otherItems: (ctx) =>
+            dietary_requirements: (ctx) =>
+                copycat.oneOf(ctx.seed, [
+                    null,
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleDietaryRequirements.length],
+                        possibleDietaryRequirements
+                    ),
+                ]),
+            pet_food: (ctx) => copycat.someOf(ctx.seed, [0, possiblePets.length], possiblePets),
+            hygiene_pads: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
+            hygiene_tampons: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
+            hygiene_other_items: (ctx) =>
+                copycat.oneOf(ctx.seed, [
+                    null,
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleHygieneOtherItems.length],
+                        possibleHygieneOtherItems
+                    ),
+                ]),
+            baby_nappies: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
+            baby_formula: (ctx) =>
+                copycat.oneOf(ctx.seed, [null, copycat.sentence(ctx.seed, { maxWords: 3 })]),
+            baby_food: (ctx) =>
+                copycat.oneOf(ctx.seed, [null, copycat.sentence(ctx.seed, { maxWords: 5 })]),
+            baby_other_items: (ctx) =>
+                copycat.oneOf(ctx.seed, [
+                    null,
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleBabyOtherItems.length],
+                        possibleBabyOtherItems
+                    ),
+                ]),
+            other_items: (ctx) =>
                 copycat.someOf(ctx.seed, [0, possibleOtherItems.length], possibleOtherItems),
-            extraInformation: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
-            flaggedForAttention: (ctx) => copycat.bool(ctx.seed),
-            signpostingCallRequired: (ctx) => copycat.bool(ctx.seed),
-            isActive: (ctx) => copycat.oneOf(ctx.seed, booleansWeightedToTrue),
+            extra_information: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
+            flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
+            signposting_call_required: (ctx) => copycat.bool(ctx.seed),
+            signposting_call_reasons: (ctx) =>
+                copycat.oneOf(ctx.seed, [
+                    null,
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleSignpostingCallReasons.length],
+                        possibleSignpostingCallReasons
+                    ),
+                ]),
+            is_active: (ctx) => copycat.oneOf(ctx.seed, booleansWeightedToTrue),
             families: (generateFamily) =>
                 generateFamily(
                     { min: 1, max: 8 },
                     {
-                        birthYear: (ctx) =>
+                        birth_year: (ctx) =>
                             copycat.int(ctx.seed, { min: thisYear - 120, max: thisYear }),
-                        birthMonth: null,
+                        birth_month: (ctx) =>
+                            copycat.oneOf(ctx.seed, [
+                                null,
+                                copycat.int(ctx.seed, { min: 1, max: 12 }),
+                            ]),
                         gender: (ctx) => copycat.oneOf(ctx.seed, genders),
                     }
                 ),
@@ -91,24 +135,28 @@ async function generateSeed(): Promise<void> {
     await seed.families(
         (generate) =>
             generate(100, {
-                birthYear: thisYear,
-                birthMonth: (ctx) => copycat.int(ctx.seed, { min: 1, max: 5 }),
+                birth_year: thisYear,
+                birth_month: (ctx) =>
+                    copycat.oneOf(ctx.seed, [null, copycat.int(ctx.seed, { min: 1, max: 12 })]),
+                gender: (ctx) => copycat.oneOf(ctx.seed, genders),
             }),
         { connect: true }
     );
 
-    await seed.collectionCentres(collectionCentres);
+    await seed.collection_centres(collectionCentres);
 
     await seed.lists(listsSeedRequired);
 
     await seed.parcels(
         (generate) =>
-            generate(5000, {
-                packingDate: (ctx) =>
+            generate(7500, {
+                voucher_number: (ctx) => copycat.scramble("A-1111-111-11-11"),
+                packing_date: (ctx) =>
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
-                collectionDatetime: (ctx) =>
+                collection_datetime: (ctx) =>
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
-                createdAt: parcelCreationDateTime,
+                list_type: (ctx) => copycat.oneOf(ctx.seed, possibleDefaultListTypesWeighted),
+                created_at: parcelCreationDateTime,
             }),
         { connect: true }
     );
@@ -117,8 +165,8 @@ async function generateSeed(): Promise<void> {
         await seed.events(
             (generate) =>
                 generate(1000, {
-                    newParcelStatus: status,
-                    eventData: (ctx) => copycat.int(ctx.seed, { min: 1, max: 10 }).toString(),
+                    new_parcel_status: status,
+                    event_data: (ctx) => copycat.int(ctx.seed, { min: 1, max: 10 }).toString(),
                     timestamp: (ctx) =>
                         getPseudoRandomDateBetween(
                             earliestParcelOrEventDate,
@@ -133,9 +181,9 @@ async function generateSeed(): Promise<void> {
     for (const status of eventNamesWithNoData) {
         await seed.events(
             (generate) =>
-                generate(1000, {
-                    newParcelStatus: status,
-                    eventData: () => "",
+                generate(1500, {
+                    new_parcel_status: status,
+                    event_data: () => "",
                     timestamp: (ctx) =>
                         getPseudoRandomDateBetween(
                             earliestParcelOrEventDate,
@@ -151,8 +199,8 @@ async function generateSeed(): Promise<void> {
         await seed.events(
             (generate) =>
                 generate(1000, {
-                    newParcelStatus: status,
-                    eventData: (ctx) => `with ${copycat.firstName(ctx.seed)}`,
+                    new_parcel_status: status,
+                    event_data: (ctx) => `with ${copycat.firstName(ctx.seed)}`,
                     timestamp: (ctx) =>
                         getPseudoRandomDateBetween(
                             earliestParcelOrEventDate,
@@ -163,4 +211,8 @@ async function generateSeed(): Promise<void> {
             { connect: true }
         );
     }
-}
+
+    process.exit();
+};
+
+main();
