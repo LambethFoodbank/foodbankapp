@@ -138,7 +138,8 @@ const main = async (): Promise<never> => {
     await seed.parcels(
         (generate) =>
             generate(7500, {
-                voucher_number: (_ctx) => copycat.scramble("A-1111-111-11-11", { preserve: ["-"] }),
+                voucher_number: (ctx) =>
+                    copycat.word(ctx.seed, { capitalize: true, minSyllables: 3 }),
                 packing_date: (ctx) =>
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
                 collection_datetime: (ctx) =>
