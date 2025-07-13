@@ -195,7 +195,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         if (isAllCheckBoxSelected) {
             setCheckedParcelIds([]);
             setAllCheckBoxSelected(false);
-        } else {
+        } else if (allFilteredParcelIds.length > 0) {
             setCheckedParcelIds(allFilteredParcelIds);
             setAllCheckBoxSelected(true);
         }
@@ -210,7 +210,8 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     }, [allFilteredParcelIds, checkedParcelIds, setCheckedParcelIds]);
 
     useEffect(() => {
-        const allChecked = checkedParcelIds.length === filteredParcelCount;
+        const allChecked =
+            checkedParcelIds.length === filteredParcelCount && filteredParcelCount > 0;
         if (allChecked !== isAllCheckBoxSelected) {
             setAllCheckBoxSelected(allChecked);
         }
