@@ -49,7 +49,8 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
     const [isAllCheckBoxSelected, setAllCheckBoxSelected] = useState(false);
 
     useEffect(() => {
-        const allChecked = checkedRowIds.length === testDataPortion.length;
+        const allChecked =
+            checkedRowIds.length === testDataPortion.length && testDataPortion.length > 0;
         if (allChecked !== isAllCheckBoxSelected) {
             setAllCheckBoxSelected(allChecked);
         }
