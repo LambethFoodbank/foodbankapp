@@ -43,7 +43,6 @@ const RowToDeliveryCollectionColumn = (
         icons.push(
             <>
                 <HotelIcon color={theme.main.largeForeground[0]} />
-                {congestionChargeApplies && <CongestionChargeAppliesIcon />}
             </>
         );
     }
