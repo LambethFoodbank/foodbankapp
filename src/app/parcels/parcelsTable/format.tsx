@@ -16,6 +16,7 @@ import FlaggedForAttentionIcon from "@/components/Icons/FlaggedForAttentionIcon"
 import PhoneIcon from "@/components/Icons/PhoneIcon";
 import CollectionIcon from "@/components/Icons/CollectionIcon";
 import { useTheme } from "styled-components";
+import HotelIcon from "@/components/Icons/HotelIcon";
 
 const RowToIconsColumn = ({
     flaggedForAttention,
@@ -34,14 +35,31 @@ const RowToDeliveryCollectionColumn = (
     collectionData: ParcelsTableRow["deliveryCollection"]
 ): React.ReactElement => {
     const theme = useTheme();
-    const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies } =
+    const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies, hotelDelivery } =
         collectionData;
-    if (collectionCentreName === "Delivery") {
+    if (collectionCentreName === "Delivery" && hotelDelivery === "hotel") {
         return (
             <>
-                <DeliveryIcon color={theme.main.largeForeground[0]} />
-                {congestionChargeApplies && <CongestionChargeAppliesIcon />}
+                <>
+                    <DeliveryIcon color={theme.main.largeForeground[0]} />
+                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
+                </>
+                <>
+                    <HotelIcon color={theme.main.largeForeground[0]} />
+                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
+                </>
             </>
+        );
+    }
+
+    if (collectionCentreName === "Delivery") {
+        return (
+          <>
+              <>
+                  <DeliveryIcon color={theme.main.largeForeground[0]} />
+                  {congestionChargeApplies && <CongestionChargeAppliesIcon />}
+              </>
+          </>
         );
     }
 
