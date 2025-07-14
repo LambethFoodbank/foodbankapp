@@ -17,7 +17,7 @@ import { Checkbox, CircularProgress, NoSsr } from "@mui/material";
 import React, { useState } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import styled, { useTheme } from "styled-components";
-import { Primitive, SortOrder } from "react-data-table-component/dist/DataTable/types";
+import { ConditionalStyles, Primitive, SortOrder } from "react-data-table-component/dist/DataTable/types";
 import { Centerer } from "../Modal/ModalFormStyles";
 import { ClientSideSortMethod, ServerSideSortMethod } from "./sortMethods";
 import {
@@ -429,6 +429,13 @@ const Table = <
 
     const rows = dataPortion.map((data, index) => ({ rowId: index, data }));
 
+    const selectedRows = [
+        {when: (row: Row<Data>) => checkboxConfig.displayed && checkboxConfig.isRowChecked(row.data),
+        style: {
+            backgroundColor: 'red!important',
+        },},
+];
+
     return (
         <div aria-live="polite">
             {(filterConfig.primaryFiltersShown || filterConfig.additionalFiltersShown) && (
@@ -527,6 +534,7 @@ const Table = <
                             }
                             progressPending={isLoading}
                             pointerOnHover={pointerOnHover}
+                            conditionalRowStyles={selectedRows}
                             striped
                         />
                     </NoSsr>
