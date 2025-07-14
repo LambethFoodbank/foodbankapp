@@ -37,59 +37,37 @@ const RowToDeliveryCollectionColumn = (
     const theme = useTheme();
     const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies, listType } =
         collectionData;
-    if (collectionCentreName === "Delivery" && listType === "hotel") {
-        return (
+    const icons: React.ReactNode[] = [];
+
+    if (listType === "hotel") {
+        icons.push(
             <>
-                <>
-                    <DeliveryIcon color={theme.main.largeForeground[0]} />
-                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
-                </>
-                <>
-                    <HotelIcon color={theme.main.largeForeground[0]} />
-                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
-                </>
+                <HotelIcon color={theme.main.largeForeground[0]} />
+                {congestionChargeApplies && <CongestionChargeAppliesIcon />}
             </>
         );
     }
 
     if (collectionCentreName === "Delivery") {
-        return (
+        icons.push(
             <>
-                <>
-                    <DeliveryIcon color={theme.main.largeForeground[0]} />
-                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
-                </>
+                <DeliveryIcon color={theme.main.largeForeground[0]} />
+                {congestionChargeApplies && <CongestionChargeAppliesIcon />}
+            </>
+        );
+    } else {
+        icons.push(
+            <>
+                <CollectionIcon
+                    color={theme.main.largeForeground[0]}
+                    collectionPoint={collectionCentreName}
+                />
+                {collectionCentreAcronym}
             </>
         );
     }
 
-    if (listType === "hotel") {
-        return (
-            <>
-                <>
-                    <CollectionIcon
-                        color={theme.main.largeForeground[0]}
-                        collectionPoint={collectionCentreName}
-                    />
-                    {collectionCentreAcronym}
-                </>
-                <>
-                    <HotelIcon color={theme.main.largeForeground[0]} />
-                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
-                </>
-            </>
-        );
-    }
-
-    return (
-        <>
-            <CollectionIcon
-                color={theme.main.largeForeground[0]}
-                collectionPoint={collectionCentreName}
-            />
-            {collectionCentreAcronym}
-        </>
-    );
+    return <>{icons}</>;
 };
 
 const rowToLastStatusColumn = (data: ParcelsTableRow["lastStatus"] | null): string => {
