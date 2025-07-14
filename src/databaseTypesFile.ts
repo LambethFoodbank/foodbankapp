@@ -864,7 +864,6 @@ export type Database = {
       }
       parcels_plus: {
         Row: {
-          list_type: string;
           all_events: string[] | null
           client_address_postcode: string | null
           client_delivery_instructions: string | null
@@ -884,6 +883,7 @@ export type Database = {
           last_status_event_name: string | null
           last_status_timestamp: string | null
           last_status_workflow_order: number | null
+          list_type: Database["public"]["Enums"]["list_type"] | null
           packing_date: string | null
           packing_slot_name: string | null
           packing_slot_order: number | null
