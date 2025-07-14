@@ -53,7 +53,7 @@ const convertParcelDbtoParcelRow = async (
                     collectionCentreName: parcel.collection_centre_name ?? "-",
                     collectionCentreAcronym: parcel.collection_centre_acronym ?? "-",
                     congestionChargeApplies: congestionCharge[index].congestionCharge,
-                    hotelDelivery: parcel.list_type,
+                    listType: parcel.list_type,
                 },
                 collectionDatetime: parcel.collection_datetime
                     ? new Date(parcel.collection_datetime)

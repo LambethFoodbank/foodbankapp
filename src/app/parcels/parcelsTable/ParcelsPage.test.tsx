@@ -81,7 +81,7 @@ describe("Parcels Page", () => {
                         collectionCentreName: "COLLECTION_CENTRE",
                         collectionCentreAcronym: "CC",
                         congestionChargeApplies: true,
-                        hotelDelivery: "regular",
+                        listType: "regular",
                     },
                     packingSlot: "AM",
                     lastStatus: {

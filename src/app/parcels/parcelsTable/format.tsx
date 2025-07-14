@@ -39,9 +39,9 @@ const RowToDeliveryCollectionColumn = (
         collectionCentreName,
         collectionCentreAcronym,
         congestionChargeApplies,
-        hotelDelivery,
+        listType,
     } = collectionData;
-    if (collectionCentreName === "Delivery" && hotelDelivery === "hotel") {
+    if (collectionCentreName === "Delivery" && listType === "hotel") {
         return (
             <>
                 <>
