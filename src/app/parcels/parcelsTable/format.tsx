@@ -35,8 +35,12 @@ const RowToDeliveryCollectionColumn = (
     collectionData: ParcelsTableRow["deliveryCollection"]
 ): React.ReactElement => {
     const theme = useTheme();
-    const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies, hotelDelivery } =
-        collectionData;
+    const {
+        collectionCentreName,
+        collectionCentreAcronym,
+        congestionChargeApplies,
+        hotelDelivery,
+    } = collectionData;
     if (collectionCentreName === "Delivery" && hotelDelivery === "hotel") {
         return (
             <>
@@ -54,12 +58,12 @@ const RowToDeliveryCollectionColumn = (
 
     if (collectionCentreName === "Delivery") {
         return (
-          <>
-              <>
-                  <DeliveryIcon color={theme.main.largeForeground[0]} />
-                  {congestionChargeApplies && <CongestionChargeAppliesIcon />}
-              </>
-          </>
+            <>
+                <>
+                    <DeliveryIcon color={theme.main.largeForeground[0]} />
+                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
+                </>
+            </>
         );
     }
 
