@@ -16,7 +16,7 @@ export interface ParcelsTableRow {
         collectionCentreName: string;
         collectionCentreAcronym: string;
         congestionChargeApplies: boolean;
-        hotelDelivery: ListType;
+        listType: ListType | null;
     };
     packingSlot: string | null;
     collectionDatetime: Date | null;
