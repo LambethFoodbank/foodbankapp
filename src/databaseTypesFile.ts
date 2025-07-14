@@ -864,6 +864,7 @@ export type Database = {
       }
       parcels_plus: {
         Row: {
+          list_type: string;
           all_events: string[] | null
           client_address_postcode: string | null
           client_delivery_instructions: string | null
