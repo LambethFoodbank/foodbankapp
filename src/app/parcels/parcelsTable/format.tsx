@@ -63,6 +63,24 @@ const RowToDeliveryCollectionColumn = (
         );
     }
 
+    if (listType === "hotel") {
+        return (
+            <>
+                <>
+                    <CollectionIcon
+                        color={theme.main.largeForeground[0]}
+                        collectionPoint={collectionCentreName}
+                    />
+                    {collectionCentreAcronym}
+                </>
+                <>
+                    <HotelIcon color={theme.main.largeForeground[0]} />
+                    {congestionChargeApplies && <CongestionChargeAppliesIcon />}
+                </>
+            </>
+        );
+    }
+
     return (
         <>
             <CollectionIcon
