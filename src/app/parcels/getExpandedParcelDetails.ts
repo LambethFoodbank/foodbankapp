@@ -56,6 +56,7 @@ const getExpandedParcelDetails = async (
         created_at,
         collection_datetime,
         list_type,
+        notes,
         packing_slot: packing_slots (
             name
          ),
@@ -149,6 +150,7 @@ const getExpandedParcelDetails = async (
                     voucherNumber: rawParcelDetails.voucher_number ?? "",
                     fullName: client.full_name ?? "",
                     listType: rawParcelDetails.list_type,
+                    parcelNotes: rawParcelDetails.notes ?? "",
                     address: formatAddressFromClientDetails(client),
                     packingDateAndSlot: formatPackingDateAndSlot(
                         rawParcelDetails.packing_date,
@@ -209,6 +211,7 @@ const getExpandedParcelDetails = async (
                 clientId: client.primary_key,
                 voucherNumber: rawParcelDetails.voucher_number ?? "",
                 listType: rawParcelDetails.list_type,
+                clientNotes: rawParcelDetails.notes,
                 packingDateAndSlot: formatPackingDateAndSlot(
                     rawParcelDetails.packing_date,
                     rawParcelDetails.packing_slot?.name
@@ -233,6 +236,7 @@ interface ParcelDataIndependentOfClient extends Data {
     deliveryOrCollection: string;
     createdAt: string;
     listType: ListType;
+    notes: string;
 }
 
 interface ParcelDataForInactiveClient extends ParcelDataIndependentOfClient {
@@ -259,6 +263,7 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     extraInformation: string;
     signpostingCall: string;
     clientNotes: string;
+    parcelNotes: string;
 }
 
 type ExpandedParcelData = ParcelDataForActiveClient | ParcelDataForInactiveClient;

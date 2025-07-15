@@ -2,19 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import {
+    CardProps,
     checkErrorOnSubmit,
+    createSetter,
     Errors,
     Fields,
-    FormErrors,
-    createSetter,
-    CardProps,
+    FormErrors
 } from "@/components/Form/formFunctions";
-import {
-    CenterComponent,
-    FormErrorText,
-    StyledForm,
-    StyledName,
-} from "@/components/Form/formStyling";
+import { CenterComponent, FormErrorText, StyledForm, StyledName } from "@/components/Form/formStyling";
 
 import { useRouter } from "next/navigation";
 
@@ -24,10 +19,7 @@ import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCa
 import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
 import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
 import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
-import {
-    WriteParcelToDatabaseErrors,
-    WriteParcelToDatabaseFunction,
-} from "@/app/parcels/form/submitFormHelpers";
+import { WriteParcelToDatabaseErrors, WriteParcelToDatabaseFunction } from "@/app/parcels/form/submitFormHelpers";
 import { Button, IconButton } from "@mui/material";
 import { Schema } from "@/databaseUtils";
 import dayjs, { Dayjs } from "dayjs";
@@ -36,12 +28,10 @@ import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
     getActiveTimeSlotsForCollectionCentre,
-    PackingSlotsLabelsAndValues,
+    PackingSlotsLabelsAndValues
 } from "@/common/fetch";
 import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
+import getExpandedClientDetails, { ExpandedClientData } from "@/app/clients/getExpandedClientDetails";
 import Modal from "@/components/Modal/Modal";
 import InfoIcon from "@mui/icons-material/Info";
 import Icon from "@/components/Icons/Icon";
@@ -52,6 +42,7 @@ import { getDbDate } from "@/common/format";
 import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
+import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -64,6 +55,7 @@ export interface ParcelFields extends Fields {
     collectionSlot: string | null;
     collectionCentre: string | null;
     lastUpdated: string | undefined;
+    notes: string | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -90,6 +82,7 @@ export const initialParcelFields: ParcelFields = {
     collectionSlot: null,
     collectionCentre: null,
     lastUpdated: undefined,
+    notes: null,
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -124,6 +117,7 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
+    ParcelNotesCard,
 ];
 
 const noCollectionFormSections = [
@@ -132,6 +126,7 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    ParcelNotesCard,
 ];
 
 export const mergeDateAndTime = (date: string, time: string): Dayjs => {
@@ -271,6 +266,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             collection_centre: isDelivery ? deliveryPrimaryKey : fields.collectionCentre,
             collection_datetime: collectionDateTime,
             last_updated: fields.lastUpdated,
+            notes: fields.notes,
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(parcelRecord);
