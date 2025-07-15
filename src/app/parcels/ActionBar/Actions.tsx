@@ -16,6 +16,7 @@ import ShoppingListModal from "./ActionModals/ShoppingListModal";
 import DateChangeModal from "./ActionModals/DateChangeModal";
 import SlotChangeModal from "./ActionModals/SlotChangeModal";
 import SignPostingReportModal from "./ActionModals/SignpostingReportModal";
+import PendingMoreInfoReportModal from "./ActionModals/PendingMoreInfoReportModal";
 import VoucherReportModal from "@/app/parcels/ActionBar/ActionModals/VoucherReportModal";
 
 const isNotAtLeastOne = (value: number): boolean => {
@@ -40,7 +41,8 @@ export type ActionName =
     | "Download Driver Overview"
     | "Delete Parcel"
     | "Download Signposting Report"
-    | "Download Missing Voucher Report";
+    | "Download Missing Voucher Report"
+    | "Download Pending More Info Report";
 
 type ActionTypes = {
     actionName: ActionName;
@@ -110,6 +112,12 @@ const availableActions: ActionTypes[] = [
         errorMessage: errorMesageForDoesNotEqualZero,
         availableToRole: organisationRoles,
     },
+    {
+        actionName: "Download Pending More Info Report",
+        errorCondition: doesNotEqualZero,
+        errorMessage: errorMesageForDoesNotEqualZero,
+        availableToRole: organisationRoles,
+    },
 ];
 
 interface Props {
@@ -146,6 +154,8 @@ const getActionModal = (
             return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
         case "Download Missing Voucher Report":
             return <VoucherReportModal key={elementKey} {...actionModalProps} />;
+        case "Download Pending More Info Report":
+            return <PendingMoreInfoReportModal key={elementKey} {...actionModalProps} />;
     }
 };
 
