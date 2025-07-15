@@ -180,6 +180,7 @@ interface Props<Data, DbData extends Record<string, unknown>, PaginationType, Fi
     editableConfig: EditableConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
     pointerOnHover?: boolean;
+    reduceRowHeight?: boolean;
 }
 interface CellProps<Data> {
     row: Row<Data>;
@@ -239,6 +240,7 @@ const Table = <
     paginationConfig,
     editableConfig,
     pointerOnHover,
+    reduceRowHeight,
 }: Props<Data, DbData, PaginationType, FilterState>): React.ReactElement => {
     const [shownHeaderKeys, setShownHeaderKeys] = useState(
         defaultShownHeaders ?? headerKeysAndLabels.map(([key]) => key)
@@ -436,6 +438,11 @@ const Table = <
             style: {
                 backgroundColor: `${theme.primary.background[1]} !important`,
             },
+
+          when: () => reduceRowHeight === true,
+          style: {
+            height: "0px",
+          },
         },
     ];
 
