@@ -154,6 +154,7 @@ export type BreakPointConfig = {
     breakPoints: number[];
     dividingLineStyle: keyof DividingLineStyleOptions;
 };
+
 interface Props<Data, DbData extends Record<string, unknown>, PaginationType, FilterState> {
     dataPortion: Data[];
     headerKeysAndLabels: TableHeaders<Data>;
@@ -180,7 +181,9 @@ interface Props<Data, DbData extends Record<string, unknown>, PaginationType, Fi
     editableConfig: EditableConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
     pointerOnHover?: boolean;
+    compressRows?: boolean;
 }
+
 interface CellProps<Data> {
     row: Row<Data>;
     columnDisplayFunctions: ColumnDisplayFunctions<Data>;
@@ -196,7 +199,7 @@ const CustomCell = <Data,>({
         <>
             {columnDisplayFunctions[headerKey]
                 ? columnDisplayFunctions[headerKey]?.(row.data[headerKey])
-                : row.data[headerKey]}
+                : String(row.data[headerKey])}
         </>
     );
 
@@ -239,6 +242,7 @@ const Table = <
     paginationConfig,
     editableConfig,
     pointerOnHover,
+    compressRows,
 }: Props<Data, DbData, PaginationType, FilterState>): React.ReactElement => {
     const [shownHeaderKeys, setShownHeaderKeys] = useState(
         defaultShownHeaders ?? headerKeysAndLabels.map(([key]) => key)
@@ -429,6 +433,15 @@ const Table = <
 
     const rows = dataPortion.map((data, index) => ({ rowId: index, data }));
 
+    const selectedRows = [
+        {
+            when: (row: Row<Data>) => compressRows == true,
+            style: {
+                padding: "0rem 0rem!important",
+            },
+        },
+    ];
+
     return (
         <div aria-live="polite">
             {(filterConfig.primaryFiltersShown || filterConfig.additionalFiltersShown) && (
@@ -528,6 +541,7 @@ const Table = <
                             progressPending={isLoading}
                             pointerOnHover={pointerOnHover}
                             striped
+                            conditionalRowStyles={selectedRows}
                         />
                     </NoSsr>
                 </TableStyling>

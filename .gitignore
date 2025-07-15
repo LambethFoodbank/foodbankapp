@@ -55,3 +55,8 @@ supabase/tools/**/*.js
 # Snaplet generated files
 .snaplet/snaplet-client.d.ts
 .snaplet/snaplet.d.ts
+
+# amplify
+.amplify
+amplify_outputs*
+amplifyconfiguration*
