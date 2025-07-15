@@ -267,13 +267,19 @@ const PendingMoreInfoReportCsvButton = ({
     disabled,
 }: ButtonProps): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
-        FileGenerationDataFetchResponse<PendingMoreInfoReportRow[], FetchPendingMoreInfoReportErrorType>
+        FileGenerationDataFetchResponse<
+            PendingMoreInfoReportRow[],
+            FetchPendingMoreInfoReportErrorType
+        >
     > => {
         const { data: requiredData, error } = await getPendingMoreInfoReportData(fromDate, toDate);
         if (error) {
             return { data: null, error };
         }
-        return { data: { fileData: requiredData, fileName: "PendingMoreInfoReport.csv" }, error: null };
+        return {
+            data: { fileData: requiredData, fileName: "PendingMoreInfoReport.csv" },
+            error: null,
+        };
     };
 
     return (
