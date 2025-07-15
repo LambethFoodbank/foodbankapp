@@ -435,7 +435,7 @@ const Table = <
 
     const selectedRows = [
         {
-            when: (row: Row<Data>) => compressRows == true,
+            when: () => compressRows == true,
             style: {
                 padding: "0rem 0rem!important",
             },
