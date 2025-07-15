@@ -3,6 +3,7 @@ import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Fi
 import { SortState } from "@/components/Tables/Table";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { DbParcelRow, ParcelStatus, Schema } from "@/databaseUtils";
+import { ListType } from "@/common/databaseListTypes";
 
 export interface ParcelsTableRow {
     parcelId: Schema["parcels"]["primary_key"];
@@ -15,6 +16,7 @@ export interface ParcelsTableRow {
         collectionCentreName: string;
         collectionCentreAcronym: string;
         congestionChargeApplies: boolean;
+        listType: ListType | null;
     };
     packingSlot: string | null;
     collectionDatetime: Date | null;
