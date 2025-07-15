@@ -74,6 +74,7 @@ const DriverOverviewPdfButton = ({
             onFileCreationFailed={onPdfCreationFailed}
             disabled={disabled}
             formSubmitButton={true}
+            formatName={false}
         />
     );
 };

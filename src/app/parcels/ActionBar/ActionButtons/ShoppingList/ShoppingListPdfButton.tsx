@@ -38,6 +38,7 @@ const ShoppingListPdfButton = ({
             onFileCreationCompleted={onPdfCreationCompleted}
             onFileCreationFailed={onPdfCreationFailed}
             focusOnButton={true}
+            formatName={false}
         />
     );
 };

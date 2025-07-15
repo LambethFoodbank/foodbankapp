@@ -180,6 +180,7 @@ const ShippingLabelsPdfButton = ({
             disabled={disabled}
             onFileCreationFailed={onPdfCreationFailed}
             formSubmitButton={true}
+            formatName={false}
         />
     );
 };
