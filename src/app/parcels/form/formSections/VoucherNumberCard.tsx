@@ -1,8 +1,8 @@
 import React from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import { getErrorText, onChangeText } from "@/components/Form/formFunctions";
+import { errorExists, getErrorText, onChangeText } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ErrorText } from "@/components/Form/formStyling";
+import { ErrorText, GappedDiv } from "@/components/Form/formStyling";
 import { ParcelCardProps } from "../ParcelForm";
 
 const voucherNumberIsRequired = true;
@@ -19,14 +19,40 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
             required={voucherNumberIsRequired}
             text="This is usually found in the following format: E-000000-000000 or E-00000-000000."
         >
-            <FreeFormTextInput
-                label="Voucher Number"
-                onChange={onChangeText(fieldSetter, errorSetter, "voucherNumber", {
-                    required: voucherNumberIsRequired,
-                })}
-                value={fields.voucherNumber ?? undefined}
-            />
-            <ErrorText>{getErrorText(formErrors.voucherNumber)}</ErrorText>
+            <GappedDiv>
+                <FreeFormTextInput
+                    label="Voucher Number*"
+                    error={errorExists(formErrors.voucherNumber)}
+                    helperText={getErrorText(formErrors.voucherNumber)}
+                    onChange={onChangeText(fieldSetter, errorSetter, "voucherNumber", {
+                        required: voucherNumberIsRequired,
+                    })}
+                />
+                <FreeFormTextInput
+                    label="Referral Agency"
+                    onChange={onChangeText(fieldSetter, errorSetter, "referralAgency", {
+                        required: false,
+                    })}
+                />
+                <FreeFormTextInput
+                    label="Referrer Name"
+                    onChange={onChangeText(fieldSetter, errorSetter, "referrerName", {
+                        required: false,
+                    })}
+                />
+                <FreeFormTextInput
+                    label="Referrer Email"
+                    onChange={onChangeText(fieldSetter, errorSetter, "referrerEmail", {
+                        required: false,
+                    })}
+                />
+                <FreeFormTextInput
+                    label="Referrer Phone"
+                    onChange={onChangeText(fieldSetter, errorSetter, "referrerPhone", {
+                        required: false,
+                    })}
+                />
+            </GappedDiv>
         </GenericFormCard>
     );
 };
