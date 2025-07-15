@@ -1,7 +1,5 @@
-drop view if exists "public"."parcels_plus";
-
-create view
-  "public"."parcels_plus" as
+create or replace view
+  "public"."parcels_plus" with (security_invoker = true) as
 select
   parcels.primary_key as parcel_id,
   parcels.collection_datetime,
@@ -29,7 +27,7 @@ select
   clients.delivery_instructions as client_delivery_instructions,
   parcels.list_type
 from
-  parcels
+  (((((parcels
   left join collection_centres on ((parcels.collection_centre = collection_centres.primary_key)))
   left join clients on ((parcels.client_id = clients.primary_key)))
   left join packing_slots on ((parcels.packing_slot = packing_slots.primary_key)))
