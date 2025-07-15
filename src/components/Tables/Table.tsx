@@ -429,12 +429,12 @@ const Table = <
 
     const rows = dataPortion.map((data, index) => ({ rowId: index, data }));
 
-    const selectedRows = [
+    const conditionalRowStyles = [
         {
             when: (row: Row<Data>) =>
                 checkboxConfig.displayed && checkboxConfig.isRowChecked(row.data),
             style: {
-                backgroundColor: `${theme.primary.background[1]}!important`,
+                backgroundColor: `${theme.primary.background[1]} !important`,
             },
         },
     ];
@@ -537,7 +537,7 @@ const Table = <
                             }
                             progressPending={isLoading}
                             pointerOnHover={pointerOnHover}
-                            conditionalRowStyles={selectedRows}
+                            conditionalRowStyles={conditionalRowStyles}
                             striped
                         />
                     </NoSsr>
