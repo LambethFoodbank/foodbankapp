@@ -84,7 +84,7 @@ const getPendingMoreInfoReportData = async (
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
+        .or('last_status_event_name.eq."Pending More Info"');
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -159,7 +159,6 @@ const getPendingMoreInfoReportData = async (
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
         .eq("client.is_active", true)
-        .eq("client.signposting_call_required", true)
         .order("packing_date")
         .order("client_id");
 
