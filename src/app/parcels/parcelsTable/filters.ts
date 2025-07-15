@@ -58,7 +58,7 @@ const voucherSearchMethod: ParcelsFilterMethod<string> = dbFilterWithSubstringQu
     (substring) => {
         const voucherColumnLabel = "voucher_number";
         if (substring === "?") {
-            return `${voucherColumnLabel}.ilike.""`;
+            return `${voucherColumnLabel}.not.ilike.E%`;
         }
         return `${voucherColumnLabel}.ilike.%${substring}%`;
     }
