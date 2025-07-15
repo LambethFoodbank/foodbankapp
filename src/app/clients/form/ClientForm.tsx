@@ -54,7 +54,7 @@ type EditConfig = { editMode: true; clientID: string } | { editMode: false };
 
 export interface ClientFields extends Fields {
     fullName: string;
-    phoneNumber: string;
+    phoneNumber: string | null;
     addressLine1: string;
     addressLine2: string;
     addressTown: string;
