@@ -51,7 +51,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     appliedFilters,
     areFiltersLoadingForFirstTime,
     setErrorMessage,
-    isPackingManagerView,
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [parcelsDataPortion, setParcelsDataPortion] = useState<ParcelsTableRow[]>([]);
@@ -244,7 +243,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     setSortState: setSortState,
                 }}
                 defaultSortConfig={defaultParcelsSortConfig}
-                rowBreakPointConfigs={isPackingManagerView ? undefined : parcelRowBreakPointConfig}
+                rowBreakPointConfigs={parcelRowBreakPointConfig}
                 filterConfig={{
                     primaryFiltersShown: false,
                     additionalFiltersShown: false,
