@@ -221,7 +221,7 @@ const ClientsPage: React.FC = () => {
                             isLoading={isLoading}
                             pointerOnHover={true}
                             columnDisplayFunctions={{ addressPostcode: formatNullPostcode }}
-                            compressRows={true}
+                            reduceRowHeight={true}
                         />
                     </TableSurface>
 
