@@ -197,7 +197,7 @@ const CustomCell = <Data,>({
         <>
             {columnDisplayFunctions[headerKey]
                 ? columnDisplayFunctions[headerKey]?.(row.data[headerKey])
-                : String(row.data[headerKey])}
+                : row.data[headerKey]}
         </>
     );
 
