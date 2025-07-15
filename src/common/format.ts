@@ -25,6 +25,10 @@ export const formatPhoneNumber = (value: string): string => {
     return numericInput[0] === "0" ? "+44" + numericInput.slice(1) : "+" + numericInput;
 };
 
+export const formatEmail = (value: string): string => {
+    return value.toLowerCase();
+};
+
 export const formatCamelCaseKey = (objectKey: string): string => {
     const withSpace = objectKey.replaceAll(/([a-z])([A-Z])/g, "$1 $2");
     return withSpace.toUpperCase();

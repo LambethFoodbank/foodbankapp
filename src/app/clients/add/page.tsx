@@ -10,6 +10,7 @@ import { Errors } from "@/components/Form/formFunctions";
 const AddClients: () => React.ReactElement = () => {
     const initialFields: ClientFields = {
         fullName: "",
+        email: "",
         phoneNumber: "",
         addressLine1: "",
         addressLine2: "",
@@ -44,6 +45,7 @@ const AddClients: () => React.ReactElement = () => {
     const initialFormErrors: ClientErrors = {
         fullName: Errors.initial,
         phoneNumber: Errors.none,
+        email: Errors.initial,
         addressLine1: Errors.initial,
         addressPostcode: Errors.initial,
         numberOfAdults: Errors.initial,

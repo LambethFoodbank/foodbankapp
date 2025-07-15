@@ -33,6 +33,7 @@ export const formatClientRecord = (
 ): ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord => {
     return {
         full_name: fields.fullName,
+        email: fields.email,
         phone_number: fields.phoneNumber,
         address_1: fields.addressLine1,
         address_2: fields.addressLine2,
