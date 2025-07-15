@@ -58,6 +58,10 @@ export interface ParcelFields extends Fields {
     clientId: string | null;
     listType?: ListType;
     voucherNumber: string | null;
+    referralAgency: string | null;
+    referrerName: string | null;
+    referrerEmail: string | null;
+    referrerPhone: string | null;
     packingDate: string | null;
     packingSlot: string | undefined;
     shippingMethod: string | null;
@@ -85,6 +89,10 @@ export const initialParcelFields: ParcelFields = {
     clientId: null,
     listType: undefined,
     voucherNumber: "",
+    referralAgency: null,
+    referrerName: null,
+    referrerEmail: null,
+    referrerPhone: null,
     packingDate: null,
     packingSlot: "",
     shippingMethod: null,
