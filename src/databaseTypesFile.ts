@@ -509,11 +509,11 @@ export type Database = {
           created_at: string
           last_updated: string
           list_type: Database["public"]["Enums"]["list_type"]
+          notes: string | null
           packing_date: string | null
           packing_slot: string | null
           primary_key: string
           voucher_number: string | null
-          notes: string | null
         }
         Insert: {
           client_id: string
@@ -522,11 +522,11 @@ export type Database = {
           created_at?: string
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
+          notes?: string | null
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
           voucher_number?: string | null
-          notes?: string | null
         }
         Update: {
           client_id?: string
@@ -535,11 +535,11 @@ export type Database = {
           created_at?: string
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
+          notes?: string | null
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
           voucher_number?: string | null
-          notes?: string | null
         }
         Relationships: [
           {
@@ -891,8 +891,8 @@ export type Database = {
           packing_slot_name: string | null
           packing_slot_order: number | null
           parcel_id: string | null
-          voucher_number: string | null
           parcel_notes: string | null
+          voucher_number: string | null
         }
         Relationships: [
           {

@@ -25,6 +25,7 @@ select
   parcels_events.last_event_workflow_order as last_status_workflow_order,
   parcels_events.all_events,
   clients.delivery_instructions as client_delivery_instructions,
+  parcels.list_type,
   parcels.notes as parcel_notes
 from
   (((((parcels
