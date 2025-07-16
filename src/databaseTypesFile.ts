@@ -512,11 +512,11 @@ export type Database = {
           packing_date: string | null
           packing_slot: string | null
           primary_key: string
-          voucher_number: string | null
           referral_agency: string | null
-          referrer_name: string | null
           referrer_email: string | null
+          referrer_name: string | null
           referrer_phone: string | null
+          voucher_number: string | null
         }
         Insert: {
           client_id: string
@@ -528,11 +528,11 @@ export type Database = {
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
+          referral_agency?: string | null
+          referrer_email?: string | null
+          referrer_name?: string | null
+          referrer_phone?: string | null
           voucher_number?: string | null
-          referral_agency: string | null
-          referrer_name: string | null
-          referrer_email: string | null
-          referrer_phone: string | null
         }
         Update: {
           client_id?: string
@@ -544,11 +544,11 @@ export type Database = {
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
+          referral_agency?: string | null
+          referrer_email?: string | null
+          referrer_name?: string | null
+          referrer_phone?: string | null
           voucher_number?: string | null
-          referral_agency: string | null
-          referrer_name: string | null
-          referrer_email: string | null
-          referrer_phone: string | null
         }
         Relationships: [
           {
@@ -900,6 +900,10 @@ export type Database = {
           packing_slot_name: string | null
           packing_slot_order: number | null
           parcel_id: string | null
+          referral_agency: string | null
+          referrer_email: string | null
+          referrer_name: string | null
+          referrer_phone: string | null
           voucher_number: string | null
         }
         Relationships: [
