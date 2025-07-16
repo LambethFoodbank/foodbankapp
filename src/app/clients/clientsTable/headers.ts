@@ -6,7 +6,6 @@ const clientsHeaders: TableHeaders<ClientsTableRow> = [
     ["familyCategory", "Family Size"],
     ["addressPostcode", "Postcode"],
     ["phoneNumber", "Phone"],
-    ["email", "Email"],
 ];
 
 export default clientsHeaders;
