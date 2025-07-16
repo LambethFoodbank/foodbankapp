@@ -21,7 +21,7 @@ const PdfButton = <Data, ErrorType extends string>({
     pdfComponent: PdfComponent,
     onFileCreationCompleted: onFileCreationCompleted = () => undefined,
     onFileCreationFailed: onFileCreationFailed,
-    formatName = false,
+    formatName = true,
     disabled = false,
     focusOnButton = false,
     formSubmitButton = false,
