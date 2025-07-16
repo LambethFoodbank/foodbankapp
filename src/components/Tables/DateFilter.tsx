@@ -4,6 +4,7 @@ import DateRangeInputs, { DateRangeState, isDateRangeValid } from "../DateInputs
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { UrlQueryParamsRecord, readArrayParamFromQuery } from "@/common/urlQueryParams";
+import { isEmpty } from "react-data-table-component/dist/DataTable/util";
 
 interface DateFilterProps<Data, DbData extends Record<string, unknown>> {
     key: string;
@@ -15,6 +16,7 @@ interface DateFilterProps<Data, DbData extends Record<string, unknown>> {
     isDisabled?: boolean;
     isHidden?: boolean;
     isHiddenInUrl?: boolean;
+    isEmpty: boolean;
 }
 
 const areDateRangesIdentical = (
@@ -39,6 +41,7 @@ export const serverSideDateFilter = <Data, DbData extends Record<string, unknown
     isDisabled = false,
     isHidden = false,
     isHiddenInUrl = false,
+    isEmpty = true,
 }: DateFilterProps<Data, DbData>): ServerSideFilter<Data, DateRangeState, DbData> => {
     return {
         key: key,
@@ -49,6 +52,7 @@ export const serverSideDateFilter = <Data, DbData extends Record<string, unknown
         isDisabled: isDisabled,
         isHidden: isHidden,
         isHiddenInUrl: isHiddenInUrl,
+        isEmpty: isEmpty,
         areStatesIdentical: (stateA, stateB) => areDateRangesIdentical(stateA, stateB),
         filterComponent: function (
             state: DateRangeState,

@@ -19,6 +19,7 @@ interface ChecklistFilterProps<
     isDisabled?: boolean;
     isHidden?: boolean;
     isHiddenInUrl?: boolean;
+    isEmpty: boolean;
 }
 
 export const serverSideChecklistFilter = <
@@ -34,6 +35,7 @@ export const serverSideChecklistFilter = <
     isDisabled = false,
     isHidden = false,
     isHiddenInUrl = false,
+    isEmpty = true,
 }: ChecklistFilterProps<Data, DbData>): ServerSideFilter<Data, string[], DbData> => {
     return {
         key: key,
@@ -44,6 +46,7 @@ export const serverSideChecklistFilter = <
         isDisabled: isDisabled,
         isHidden: isHidden,
         isHiddenInUrl: isHiddenInUrl,
+        isEmpty: isEmpty,
         areStatesIdentical: (stateA, stateB) =>
             stateA.length === stateB.length && stateA.every((optionA) => stateB.includes(optionA)),
         filterComponent: function (
@@ -77,6 +80,7 @@ export const serverSideChecklistFilter = <
                     onChange={onChangeCheckbox}
                     anySelected={anySelected}
                     isDisabled={isDisabled}
+                    isEmpty={isEmpty}
                 />
             );
         },

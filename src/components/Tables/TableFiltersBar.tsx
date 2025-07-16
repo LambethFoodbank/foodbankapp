@@ -3,7 +3,7 @@
 import React, { Fragment, useState } from "react";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
-import { FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
+import { ArrowDropDown, FilterAlt, FilterAltOff, FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
 import { FilterBase } from "@/components/Tables/Filters";
 import { MENU_BREAKPOINT } from "@/common/sharedConstants";
 
@@ -114,6 +114,27 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
         return <></>;
     }
 
+    const hasActiveFilters = (): boolean => {
+        let hasAdditionalFilters = false;
+        let hasPrimaryFilters = false;
+
+        for (let i = 0; i < props.additionalFilters?.length; i++) {
+            if (props.additionalFilters[i].isEmpty == false) {
+                hasAdditionalFilters = true;
+                break;
+            }
+        }
+
+        for (let i = 0; i < props.primaryFilters?.length - 1; i++) {
+            if (props.primaryFilters[i].isEmpty == false) {
+                hasPrimaryFilters = true;
+                break;
+            }
+        }
+
+        return hasAdditionalFilters || hasPrimaryFilters;
+    };
+
     return (
         <>
             <FiltersAndIconContainer>
@@ -143,7 +164,14 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                                 variant="outlined"
                                 onClick={handleClear}
                                 color="inherit"
-                                startIcon={<FilterAltOffOutlined />}
+                                // TODO: set flags for any filters that are active
+                                startIcon={
+                                    hasActiveFilters() ? (
+                                        <FilterAltOff />
+                                    ) : (
+                                        <FilterAltOffOutlined />
+                                    )
+                                }
                             >
                                 Clear
                             </StyledButton>
