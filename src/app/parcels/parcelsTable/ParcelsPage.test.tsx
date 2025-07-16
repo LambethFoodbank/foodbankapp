@@ -51,10 +51,10 @@ const sampleProcessingData: DbParcelRow[] = [
         client_is_active: true,
         client_delivery_instructions: "SOME_DELIVERY_INSTRUCTIONS",
         list_type: "regular",
-        referral_agency: "Agency 1",
         referrer_email: "example@example.com",
         referrer_name: "John Smith",
         referrer_phone: "0987 654321",
+        referral_agency: "Agency 1",
     },
 ];
 
