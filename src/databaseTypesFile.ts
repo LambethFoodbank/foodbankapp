@@ -513,6 +513,10 @@ export type Database = {
           packing_slot: string | null
           primary_key: string
           voucher_number: string | null
+          referral_agency: string | null
+          referrer_name: string | null
+          referrer_email: string | null
+          referrer_phone: string | null
         }
         Insert: {
           client_id: string
@@ -525,6 +529,10 @@ export type Database = {
           packing_slot?: string | null
           primary_key?: string
           voucher_number?: string | null
+          referral_agency: string | null
+          referrer_name: string | null
+          referrer_email: string | null
+          referrer_phone: string | null
         }
         Update: {
           client_id?: string
@@ -537,6 +545,10 @@ export type Database = {
           packing_slot?: string | null
           primary_key?: string
           voucher_number?: string | null
+          referral_agency: string | null
+          referrer_name: string | null
+          referrer_email: string | null
+          referrer_phone: string | null
         }
         Relationships: [
           {
