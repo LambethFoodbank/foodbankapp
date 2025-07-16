@@ -1,6 +1,6 @@
 import React from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import { errorExists, Errors, getErrorText, onChangeText } from "@/components/Form/formFunctions";
+import { errorExists, Errors, getErrorText, onChangeReferralText, onChangeText } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText, GappedDiv } from "@/components/Form/formStyling";
 import { ParcelCardProps } from "../ParcelForm";
@@ -52,7 +52,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                             ? getErrorText(formErrors.referrerEmail)
                             : undefined
                     }
-                    onChange={onChangeText(fieldSetter, errorSetter, "referrerEmail", {
+                    onChange={onChangeReferralText(fieldSetter, errorSetter, "referrerEmail", {
                         required: false,
                         regex: emailRegex,
                     })}
@@ -66,7 +66,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                             ? getErrorText(formErrors.referrerPhone)
                             : undefined
                     }
-                    onChange={onChangeText(fieldSetter, errorSetter, "referrerPhone", {
+                    onChange={onChangeReferralText(fieldSetter, errorSetter, "referrerPhone", {
                         required: false,
                         regex: phoneNumberRegex,
                     })}
