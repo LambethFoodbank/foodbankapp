@@ -81,6 +81,8 @@ export interface ParcelErrors extends FormErrors<ParcelFields> {
     collectionDate: Errors;
     collectionSlot: Errors;
     collectionCentre: Errors;
+    referrerEmail: Errors;
+    referrerPhone: Errors;
 }
 
 export type ParcelCardProps = CardProps<ParcelFields, ParcelErrors>;
@@ -104,7 +106,7 @@ export const initialParcelFields: ParcelFields = {
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
-    listType: Errors.none,
+    listType: Errors.initial,
     voucherNumber: Errors.initial,
     packingDate: Errors.initial,
     packingSlot: Errors.initial,
@@ -112,10 +114,10 @@ export const initialParcelFormErrors: ParcelErrors = {
     collectionDate: Errors.initial,
     collectionSlot: Errors.initial,
     collectionCentre: Errors.initial,
-    referralAgency: Errors.none,
-    referrerName: Errors.none,
-    referrerEmail: Errors.none,
-    referrerPhone: Errors.none,
+    referralAgency: Errors.initial,
+    referrerName: Errors.initial,
+    referrerEmail: Errors.initial,
+    referrerPhone: Errors.initial,
 };
 
 interface ParcelFormProps {
@@ -252,6 +254,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         } else {
             inputError = checkErrorOnSubmit(formErrors, setFormErrors, [
                 "voucherNumber",
+                "referrerEmail",
+                "referrerPhone",
                 "packingDate",
                 "packingSlot",
                 "shippingMethod",
