@@ -438,11 +438,12 @@ const Table = <
             style: {
                 backgroundColor: `${theme.primary.background[1]} !important`,
             },
-
-          when: () => reduceRowHeight === true,
-          style: {
-            height: "0px",
-          },
+        },
+        {
+            when: () => reduceRowHeight === true,
+            style: {
+                height: "0px",
+            },
         },
     ];
 
