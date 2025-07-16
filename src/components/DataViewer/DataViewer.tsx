@@ -123,7 +123,7 @@ const DataViewer: React.FC<DataViewerProps> = ({ data }) => {
     return (
         <DataViewerContainer>
             {Object.entries(data).map(([key, value]) => {
-                if (!value.hide) {
+                if (!value.hide && value.value !== "") {
                     return (
                         <DataViewerItem key={key}>
                             <Key>{formatCamelCaseKey(key)}</Key>
