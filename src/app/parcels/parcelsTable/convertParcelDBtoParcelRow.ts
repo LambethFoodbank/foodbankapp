@@ -61,6 +61,10 @@ const convertParcelDbtoParcelRow = async (
                 lastStatus: processLastStatus(parcel),
                 allStatuses: parcel.all_events,
                 voucherNumber: parcel.voucher_number,
+                referralAgency: parcel.referral_agency,
+                referrerName: parcel.referrer_name,
+                referrerEmail: parcel.referrer_email,
+                referrerPhone: parcel.referrer_phone,
                 packingDate: parcel.packing_date ? new Date(parcel.packing_date) : null,
                 iconsColumn: {
                     flaggedForAttention: parcel.client_is_active
