@@ -11,7 +11,7 @@ export const dbFilterWithSubstringQueries = <DbData extends DbClientRow | DbParc
     return (query, state) => {
         const substrings = state
             .split(textFilterDelimiter)
-            .map((substring) => substring.trim().replace(/[^a-zA-Z0-9 \-+?]/g, ""))
+            .map((substring) => substring.trim().replace(/[^a-zA-Z0-9 '\-+?]/g, ""))
             .filter((substring) => substring.length > 0);
 
         if (substrings.length === 0) {
