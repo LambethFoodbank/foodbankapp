@@ -4,6 +4,7 @@ import { errorExists, getErrorText, onChangeText } from "@/components/Form/formF
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText, GappedDiv } from "@/components/Form/formStyling";
 import { ParcelCardProps } from "../ParcelForm";
+import { emailRegex, formatPhoneNumber, phoneNumberRegex } from "@/common/format";
 
 const voucherNumberIsRequired = true;
 
@@ -48,6 +49,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                     label="Referrer Email"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerEmail", {
                         required: false,
+                        regex: emailRegex
                     })}
                     value={fields.referrerEmail ?? undefined}
                 />
@@ -55,6 +57,8 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                     label="Referrer Phone"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerPhone", {
                         required: false,
+                        regex: phoneNumberRegex,
+                        formattingFunction: formatPhoneNumber,
                     })}
                     value={fields.referrerPhone ?? undefined}
                 />
