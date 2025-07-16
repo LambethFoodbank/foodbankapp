@@ -37,6 +37,10 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     primary_key: string;
     voucher_number: string | null;
     last_updated: string | undefined;
+    referral_agency: string | null;
+    referrer_name: string | null;
+    referrer_email: string | null;
+    referrer_phone: string | null;
     notes: string | null;
 }
 

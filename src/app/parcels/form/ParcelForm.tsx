@@ -112,6 +112,10 @@ export const initialParcelFormErrors: ParcelErrors = {
     collectionDate: Errors.initial,
     collectionSlot: Errors.initial,
     collectionCentre: Errors.initial,
+    referralAgency: Errors.none,
+    referrerName: Errors.none,
+    referrerEmail: Errors.none,
+    referrerPhone: Errors.none,
 };
 
 interface ParcelFormProps {
@@ -284,6 +288,10 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             collection_centre: isDelivery ? deliveryPrimaryKey : fields.collectionCentre,
             collection_datetime: collectionDateTime,
             last_updated: fields.lastUpdated,
+            referral_agency: fields.referralAgency,
+            referrer_name: fields.referrerName,
+            referrer_email: fields.referrerEmail,
+            referrer_phone: fields.referrerPhone,
             notes: fields.notes,
         };
 
