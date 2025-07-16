@@ -52,6 +52,10 @@ const getExpandedParcelDetails = async (
         .select(
             `
         voucher_number,
+        referral_agency,
+        referrer_name,
+        referrer_email,
+        referrer_phone,
         packing_date,
         created_at,
         collection_datetime,
@@ -147,6 +151,10 @@ const getExpandedParcelDetails = async (
                     isActive: true,
                     clientId: client.primary_key,
                     voucherNumber: rawParcelDetails.voucher_number ?? "",
+                    referralAgency: rawParcelDetails.referral_agency ?? "",
+                    referrerName: rawParcelDetails.referrer_name ?? "",
+                    referrerEmail: rawParcelDetails.referrer_email ?? "",
+                    referrerPhone: rawParcelDetails.referrer_phone ?? "",
                     fullName: client.full_name ?? "",
                     listType: rawParcelDetails.list_type,
                     address: formatAddressFromClientDetails(client),
@@ -208,6 +216,10 @@ const getExpandedParcelDetails = async (
                 isActive: false,
                 clientId: client.primary_key,
                 voucherNumber: rawParcelDetails.voucher_number ?? "",
+                referralAgency: rawParcelDetails.referral_agency ?? "",
+                referrerName: rawParcelDetails.referrer_name ?? "",
+                referrerEmail: rawParcelDetails.referrer_email ?? "",
+                referrerPhone: rawParcelDetails.referrer_phone ?? "",
                 listType: rawParcelDetails.list_type,
                 packingDateAndSlot: formatPackingDateAndSlot(
                     rawParcelDetails.packing_date,
@@ -233,6 +245,10 @@ interface ParcelDataIndependentOfClient extends Data {
     deliveryOrCollection: string;
     createdAt: string;
     listType: ListType;
+    referralAgency: string;
+    referrerName: string;
+    referrerEmail: string;
+    referrerPhone: string;
 }
 
 interface ParcelDataForInactiveClient extends ParcelDataIndependentOfClient {
