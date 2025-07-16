@@ -150,7 +150,6 @@ const getExpandedParcelDetails = async (
                     voucherNumber: rawParcelDetails.voucher_number ?? "",
                     fullName: client.full_name ?? "",
                     listType: rawParcelDetails.list_type,
-                    parcelNotes: rawParcelDetails.notes ?? "",
                     address: formatAddressFromClientDetails(client),
                     packingDateAndSlot: formatPackingDateAndSlot(
                         rawParcelDetails.packing_date,
@@ -163,6 +162,7 @@ const getExpandedParcelDetails = async (
                         rawParcelDetails.collection_datetime
                     ),
                     deliveryInstructions: client.delivery_instructions ?? "",
+                    notes: rawParcelDetails.notes ?? "",
                     phoneNumber: client.phone_number ?? "",
                     household: formatHouseholdFromFamilyDetails(client.family),
                     adults: formatBreakdownOfAdultsFromFamilyDetails(client.family),
@@ -211,7 +211,8 @@ const getExpandedParcelDetails = async (
                 clientId: client.primary_key,
                 voucherNumber: rawParcelDetails.voucher_number ?? "",
                 listType: rawParcelDetails.list_type,
-                clientNotes: rawParcelDetails.notes,
+                clientNotes: client.notes,
+                notes: rawParcelDetails.notes,
                 packingDateAndSlot: formatPackingDateAndSlot(
                     rawParcelDetails.packing_date,
                     rawParcelDetails.packing_slot?.name
@@ -236,7 +237,7 @@ interface ParcelDataIndependentOfClient extends Data {
     deliveryOrCollection: string;
     createdAt: string;
     listType: ListType;
-    notes: string;
+    notes: string | null;
 }
 
 interface ParcelDataForInactiveClient extends ParcelDataIndependentOfClient {
@@ -263,7 +264,6 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     extraInformation: string;
     signpostingCall: string;
     clientNotes: string;
-    parcelNotes: string;
 }
 
 type ExpandedParcelData = ParcelDataForActiveClient | ParcelDataForInactiveClient;

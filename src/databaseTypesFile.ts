@@ -513,6 +513,7 @@ export type Database = {
           packing_slot: string | null
           primary_key: string
           voucher_number: string | null
+          notes: string | null
         }
         Insert: {
           client_id: string
@@ -525,6 +526,7 @@ export type Database = {
           packing_slot?: string | null
           primary_key?: string
           voucher_number?: string | null
+          notes?: string | null
         }
         Update: {
           client_id?: string
@@ -537,6 +539,7 @@ export type Database = {
           packing_slot?: string | null
           primary_key?: string
           voucher_number?: string | null
+          notes?: string | null
         }
         Relationships: [
           {
@@ -888,6 +891,7 @@ export type Database = {
           packing_slot_order: number | null
           parcel_id: string | null
           voucher_number: string | null
+          parcel_notes: string | null
         }
         Relationships: [
           {
