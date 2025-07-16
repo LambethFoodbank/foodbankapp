@@ -48,6 +48,10 @@ const prepareParcelDataForForm = (
         collectionSlot: formatDatetimeAsTime(parcelData.collection_datetime),
         collectionCentre: parcelData.collection_centre?.primary_key ?? null,
         lastUpdated: parcelData.last_updated,
+        referralAgency: parcelData.referral_agency ?? null,
+        referrerName: parcelData.referrer_name ?? null,
+        referrerEmail: parcelData.referrer_email ?? null,
+        referrerPhone: parcelData.referrer_phone ?? null,
     };
 };
 
