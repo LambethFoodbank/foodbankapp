@@ -429,6 +429,16 @@ const Table = <
 
     const rows = dataPortion.map((data, index) => ({ rowId: index, data }));
 
+    const conditionalRowStyles = [
+        {
+            when: (row: Row<Data>) =>
+                checkboxConfig.displayed && checkboxConfig.isRowChecked(row.data),
+            style: {
+                backgroundColor: `${theme.primary.background[1]} !important`,
+            },
+        },
+    ];
+
     return (
         <div aria-live="polite">
             {(filterConfig.primaryFiltersShown || filterConfig.additionalFiltersShown) && (
@@ -527,6 +537,7 @@ const Table = <
                             }
                             progressPending={isLoading}
                             pointerOnHover={pointerOnHover}
+                            conditionalRowStyles={conditionalRowStyles}
                             striped
                         />
                     </NoSsr>
