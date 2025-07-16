@@ -45,26 +45,23 @@ type VoucherReportRow = {
     voucherNumber: string | null;
     packingDate: string;
     fullName: string;
-    flaggedForAttention: boolean;
     phoneNumber: string;
-    address: string;
     parcelStatus: string;
     deliveryOrCollection: string;
-    deliveryCollectionDate: string;
-    deliveryInstructions: string;
-    extraInformation: string;
-    notes: string;
-    cookingFacilities: string;
-    dietaryRequirements: string;
-    hygieneProducts: string;
-    babyProducts: string;
-    petFood: string;
-    otherItems: string;
+    // deliveryCollectionDate: string;
+    // deliveryInstructions: string;
+    // extraInformation: string;
+    // notes: string;
+    // cookingFacilities: string;
+    // dietaryRequirements: string;
+    // hygieneProducts: string;
+    // babyProducts: string;
+    // petFood: string;
+    // otherItems: string;
     household: string;
-    adults: string;
-    children: string;
+    // adults: string;
+    // children: string;
     parcelListType: string;
-    clientIsActive: boolean;
     recordCreatedOn: string;
 };
 
@@ -80,7 +77,7 @@ const getVoucherReportData = async (
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
+        .or("voucher_number.not.ilike.E%, voucher_number.is.null");
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId("Failed to fetch Voucher parcel IDs and statuses", {
@@ -113,10 +110,8 @@ const getVoucherReportData = async (
             client:clients(
                 full_name,
                 is_active,
-                Voucher_call_required,
                 flagged_for_attention,
                 phone_number,
-                Voucher_call_reasons,
                 delivery_instructions,
                 extra_information,
                 notes,
@@ -151,8 +146,6 @@ const getVoucherReportData = async (
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
-        .eq("client.is_active", true)
-        .eq("client.Voucher_call_required", true)
         .order("packing_date")
         .order("client_id");
 
@@ -178,12 +171,8 @@ const getVoucherReportData = async (
                     voucherNumber: rawParcel.voucher_number ?? "",
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
-                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
-                        : "",
-                    address: rawParcel.client
-                        ? formatAddressFromClientDetails(rawParcel.client)
                         : "",
                     parcelStatus:
                         idAndStatusList.find(
@@ -192,48 +181,10 @@ const getVoucherReportData = async (
                     deliveryOrCollection: rawParcel.collection_centre?.is_shown
                         ? rawParcel.collection_centre?.name
                         : `${rawParcel.collection_centre?.name} (inactive)`,
-                    deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
-                    deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
-                    extraInformation: rawParcel.client?.extra_information ?? "",
-                    notes: rawParcel.client?.notes ?? "",
-                    cookingFacilities: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.cooking_facilities ?? null,
-                        cookingFacilitiesOptions
-                    ),
-                    dietaryRequirements: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.dietary_requirements ?? null,
-                        dietaryRequirementOptions
-                    ),
-                    hygieneProducts: formatHygieneProducts(
-                        rawParcel.client?.hygiene_tampons ?? null,
-                        rawParcel.client?.hygiene_pads ?? null,
-                        rawParcel.client?.hygiene_other_items ?? []
-                    ),
-                    babyProducts: formatBabyProducts(
-                        rawParcel.client?.baby_food ?? null,
-                        rawParcel.client?.baby_formula ?? null,
-                        rawParcel.client?.baby_nappies ?? null,
-                        rawParcel.client?.baby_other_items ?? []
-                    ),
-                    petFood: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.pet_food ?? null,
-                        petFoodOptions
-                    ),
-                    otherItems: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.other_items ?? null,
-                        otherRequirementOptions
-                    ),
                     household: rawParcel.client
                         ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
                         : "",
-                    adults: rawParcel.client
-                        ? formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    children: rawParcel.client
-                        ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
-                        : "",
                     parcelListType: rawParcel.list_type,
-                    clientIsActive: rawParcel.client?.is_active ?? false,
                     recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
                 };
             }),

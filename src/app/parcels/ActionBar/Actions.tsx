@@ -16,6 +16,7 @@ import ShoppingListModal from "./ActionModals/ShoppingListModal";
 import DateChangeModal from "./ActionModals/DateChangeModal";
 import SlotChangeModal from "./ActionModals/SlotChangeModal";
 import SignPostingReportModal from "./ActionModals/SignpostingReportModal";
+import VoucherReportModal from "@/app/parcels/ActionBar/ActionModals/VoucherReportModal";
 
 const isNotAtLeastOne = (value: number): boolean => {
     return value < 1;
@@ -144,7 +145,7 @@ const getActionModal = (
         case "Download Signposting Report":
             return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
         case "Download Missing Voucher Report":
-            return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
+            return <VoucherReportModal key={elementKey} {...actionModalProps} />;
     }
 };
 
