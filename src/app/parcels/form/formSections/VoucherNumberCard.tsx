@@ -27,30 +27,35 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                     onChange={onChangeText(fieldSetter, errorSetter, "voucherNumber", {
                         required: voucherNumberIsRequired,
                     })}
+                    value={fields.voucherNumber ?? undefined}
                 />
                 <FreeFormTextInput
                     label="Referral Agency"
                     onChange={onChangeText(fieldSetter, errorSetter, "referralAgency", {
                         required: false,
                     })}
+                    value={fields.referralAgency ?? undefined}
                 />
                 <FreeFormTextInput
                     label="Referrer Name"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerName", {
                         required: false,
                     })}
+                    value={fields.referrerName ?? undefined}
                 />
                 <FreeFormTextInput
                     label="Referrer Email"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerEmail", {
                         required: false,
                     })}
+                    value={fields.referrerEmail ?? undefined}
                 />
                 <FreeFormTextInput
                     label="Referrer Phone"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerPhone", {
                         required: false,
                     })}
+                    value={fields.referrerPhone ?? undefined}
                 />
             </GappedDiv>
         </GenericFormCard>
