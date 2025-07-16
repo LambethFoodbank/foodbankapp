@@ -97,7 +97,7 @@ const getCenteredBatchGridDisplayColumns = (
             width: EMAIL_WIDTH,
             editable: true,
             preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-                const hasError: boolean = false;
+                const hasError = false;
                 if (!hasError) {
                     dispatch({
                         type: "update_cell",

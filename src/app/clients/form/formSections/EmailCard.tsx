@@ -12,12 +12,7 @@ import { emailRegex, formatEmail } from "@/common/format";
 
 const emailIsRequired = true;
 
-const EmailCard: React.FC<ClientCardProps> = ({
-    formErrors,
-    errorSetter,
-    fieldSetter,
-    fields,
-}) => {
+const EmailCard: React.FC<ClientCardProps> = ({ formErrors, errorSetter, fieldSetter, fields }) => {
     return (
         <GenericFormCard title="Email" required={emailIsRequired}>
             <FreeFormTextInput

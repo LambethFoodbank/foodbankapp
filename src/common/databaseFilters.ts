@@ -62,8 +62,8 @@ export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
 };
 
 export const emailSearch = <DbData extends DbClientRow | DbParcelRow>(
-    emailColumnLabel: Extract<keyof DbData, "email" | "client_email">,
-    clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
+    emailColumnLabel: string,
+    clientIsActiveColumnLabel: string
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
         if ("-".includes(substring.toLowerCase())) {

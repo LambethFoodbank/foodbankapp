@@ -820,6 +820,7 @@ export type Database = {
           full_name: string | null
           is_active: boolean | null
           phone_number: string | null
+          email: string | null
         }
         Relationships: []
       }

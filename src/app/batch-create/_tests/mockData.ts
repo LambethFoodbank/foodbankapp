@@ -13,6 +13,7 @@ export const mockTableDataState: BatchTableDataState = {
                 client: {
                     fullName: "John Doe",
                     phoneNumber: "0123456789",
+                    email: "test@example.com",
                     address: {
                         addressLine1: "123 Main St",
                         addressLine2: null,
@@ -56,6 +57,7 @@ export const mockTableDataState: BatchTableDataState = {
                 client: {
                     fullName: "Jane Smiths",
                     phoneNumber: "9876543210",
+                    email: "test@example.com",
                     address: {
                         addressLine1: "456 Elm St",
                         addressLine2: null,
@@ -98,6 +100,7 @@ export const batchSubmitTestData: BatchTableDataState = {
             client: {
                 fullName: null,
                 phoneNumber: null,
+                email: null,
                 address: null,
                 adultInfo: null,
                 childrenInfo: null,
@@ -130,6 +133,7 @@ export const batchSubmitTestData: BatchTableDataState = {
                 client: {
                     fullName: "John Doe",
                     phoneNumber: "07822235203",
+                    email: "test@example.com",
                     address: {
                         addressLine1: "123 Main St",
                         addressLine2: null,
@@ -179,6 +183,7 @@ export const batchSubmitTestData: BatchTableDataState = {
                 client: {
                     fullName: "Jane Smith",
                     phoneNumber: "07426030199",
+                    email: "test@example.com",
                     address: {
                         addressLine1: "456 Elm St",
                         addressLine2: null,
@@ -234,6 +239,7 @@ export const batchSubmitTestData: BatchTableDataState = {
                 client: {
                     fullName: "Joe Brown",
                     phoneNumber: "07822031259",
+                    email: "test@example.com",
                     address: {
                         addressLine1: "789 Oak St",
                         addressLine2: null,
@@ -295,6 +301,7 @@ export const mockExistingClientRow: Schema["clients"] = {
     primary_key: "dcb54bc0-b0d3-57fa-bf9b-f1c4da6931a9",
     full_name: "Test Person",
     phone_number: "+140969525594300",
+    email: "test@example.com",
     address_1: "3454 Test St",
     address_2: null,
     address_town: "Test Town",
@@ -365,6 +372,7 @@ export const mockExistingClientRowWithNappySize: Schema["clients"] = {
     primary_key: "44d14896-357b-5e91-ab64-2ca95b6a2faa",
     full_name: "Test Nappy Person",
     phone_number: "+661129414051390",
+    email: "test@example.com",
     address_1: "3454 Nappy St",
     address_2: null,
     address_town: "Nappy Town",

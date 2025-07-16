@@ -24,10 +24,7 @@ const clientsPhoneSearch: ClientsFilterMethod = phoneSearch<DbClientRow>(
     "is_active"
 );
 
-const clientsEmailSearch: ClientsFilterMethod = emailSearch<DbClientRow>(
-    "email",
-    "is_active"
-);
+const clientsEmailSearch: ClientsFilterMethod = emailSearch<DbClientRow>("email", "is_active");
 
 const clientsFamilySearch: ClientsFilterMethod = familySearch("family_count", "is_active");
 
