@@ -17,6 +17,7 @@ import {
     ROW_NUMBER_WIDTH,
     FULL_NAME_WIDTH,
     PHONE_NUMBER_WIDTH,
+    EMAIL_WIDTH,
     VOUCHER_NUMBER_WIDTH,
     PACKING_DATE_WIDTH,
 } from "@/app/batch-create/columnWidths";
@@ -80,6 +81,32 @@ const getCenteredBatchGridDisplayColumns = (
                                 type: "client",
                                 newValue: params.props.value,
                                 fieldName: "phoneNumber",
+                            },
+                        },
+                    });
+                }
+                return {
+                    ...params.props,
+                    error: hasError,
+                };
+            },
+        },
+        {
+            field: "email",
+            headerName: "Email",
+            width: EMAIL_WIDTH,
+            editable: true,
+            preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+                const hasError: boolean = false;
+                if (!hasError) {
+                    dispatch({
+                        type: "update_cell",
+                        updateCellPayload: {
+                            rowId: params.id as number,
+                            newValueAndFieldName: {
+                                type: "client",
+                                newValue: params.props.value,
+                                fieldName: "email",
                             },
                         },
                     });

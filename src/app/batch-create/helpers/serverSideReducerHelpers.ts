@@ -71,6 +71,7 @@ export const getClientDataForBatchParcels = async (
     return {
         fullName: data.full_name ?? "",
         phoneNumber: data.phone_number ?? "",
+        email: data.email ?? "",
         address: {
             addressLine1: data.address_1 ?? "",
             addressLine2: data?.address_2 ?? "",

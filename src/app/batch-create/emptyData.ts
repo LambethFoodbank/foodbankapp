@@ -5,6 +5,7 @@ export const getEmptyBatchEditData = (): BatchEditData => {
         client: {
             fullName: null,
             phoneNumber: null,
+            email: null,
             address: null,
             adultInfo: null,
             childrenInfo: null,
@@ -36,6 +37,7 @@ export const getEmptyOverrideData = (): OverrideData => {
         client: {
             fullName: null,
             phoneNumber: null,
+            email: null,
             address: null,
             adultInfo: null,
             childrenInfo: null,

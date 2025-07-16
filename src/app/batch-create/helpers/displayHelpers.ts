@@ -15,6 +15,7 @@ const getEmptyRow = (id: number): BatchGridDisplayRow => {
         id: id,
         fullName: "",
         phoneNumber: "",
+        email: "",
         address: "",
         adults: null,
         children: null,
@@ -70,6 +71,7 @@ const overrideDataToOverrideDisplayRow = (dataRow: OverrideDataRow): BatchGridDi
     }
     const {
         phoneNumber,
+        email,
         address,
         adultInfo,
         childrenInfo,
@@ -89,6 +91,7 @@ const overrideDataToOverrideDisplayRow = (dataRow: OverrideDataRow): BatchGridDi
         id: 0,
         fullName: "",
         phoneNumber: phoneNumber ?? "",
+        email: email ?? "",
         address: addressToString(address) ?? "",
         adults: adultInfo ? (adultInfo.numberOfAdults ? adultInfo.numberOfAdults : null) : null,
         children: childrenInfo
@@ -120,6 +123,7 @@ const batchDataToBatchDisplayRow = (dataRow: BatchDataRow): BatchGridDisplayRow 
     const {
         fullName,
         phoneNumber,
+        email,
         address,
         adultInfo,
         childrenInfo,
@@ -145,6 +149,7 @@ const batchDataToBatchDisplayRow = (dataRow: BatchDataRow): BatchGridDisplayRow 
         id: dataRow.id,
         fullName: fullName ?? "",
         phoneNumber: phoneNumber ?? "",
+        email: email ?? "",
         address: addressToString(address) ?? "",
         adults: adultInfo ? (adultInfo.numberOfAdults ? adultInfo.numberOfAdults : null) : null,
         children: childrenInfo
