@@ -162,7 +162,6 @@ const DayOverviewPdfButton = ({
             onFileCreationCompleted={onPdfCreationCompleted}
             onFileCreationFailed={onPdfCreationFailed}
             focusOnButton={true}
-            formatName={true}
         />
     );
 };
