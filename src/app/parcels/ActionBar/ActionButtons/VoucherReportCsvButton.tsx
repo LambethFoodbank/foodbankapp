@@ -22,7 +22,7 @@ import { dietaryRequirementOptions } from "@/app/clients/form/formSections/Dieta
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
-// import { VoucherCallOptions } from "@/app/clients/form/formSections/VoucherCallCard";
+import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 
 type FetchVoucherReportResult =
     | {
@@ -42,26 +42,31 @@ export interface FetchVoucherReportError {
 type FetchVoucherReportErrorType = "failedToFetchVoucherRows" | "failedToFetchVoucherParcelIds";
 
 type VoucherReportRow = {
-    voucherNumber: string | null;
+    voucherNumber: string;
     packingDate: string;
     fullName: string;
+    signpostingCallRequired: boolean;
+    flaggedForAttention: boolean;
     phoneNumber: string;
+    signpostingCallReasons: string;
+    address: string;
     parcelStatus: string;
     deliveryOrCollection: string;
-    // deliveryCollectionDate: string;
-    // deliveryInstructions: string;
-    // extraInformation: string;
-    // notes: string;
-    // cookingFacilities: string;
-    // dietaryRequirements: string;
-    // hygieneProducts: string;
-    // babyProducts: string;
-    // petFood: string;
-    // otherItems: string;
+    deliveryCollectionDate: string;
+    deliveryInstructions: string;
+    extraInformation: string;
+    notes: string;
+    cookingFacilities: string;
+    dietaryRequirements: string;
+    hygieneProducts: string;
+    babyProducts: string;
+    petFood: string;
+    otherItems: string;
     household: string;
-    // adults: string;
-    // children: string;
+    adults: string;
+    children: string;
     parcelListType: string;
+    clientIsActive: boolean;
     recordCreatedOn: string;
 };
 
@@ -110,8 +115,10 @@ const getVoucherReportData = async (
             client:clients(
                 full_name,
                 is_active,
+                signposting_call_required,
                 flagged_for_attention,
                 phone_number,
+                signposting_call_reasons,
                 delivery_instructions,
                 extra_information,
                 notes,
@@ -171,8 +178,17 @@ const getVoucherReportData = async (
                     voucherNumber: rawParcel.voucher_number ?? "",
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
+                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
+                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
+                        : "",
+                    signpostingCallReasons: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.signposting_call_reasons ?? null,
+                        signpostingCallOptions
+                    ),
+                    address: rawParcel.client
+                        ? formatAddressFromClientDetails(rawParcel.client)
                         : "",
                     parcelStatus:
                         idAndStatusList.find(
@@ -181,10 +197,48 @@ const getVoucherReportData = async (
                     deliveryOrCollection: rawParcel.collection_centre?.is_shown
                         ? rawParcel.collection_centre?.name
                         : `${rawParcel.collection_centre?.name} (inactive)`,
+                    deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
+                    deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
+                    extraInformation: rawParcel.client?.extra_information ?? "",
+                    notes: rawParcel.client?.notes ?? "",
+                    cookingFacilities: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.cooking_facilities ?? null,
+                        cookingFacilitiesOptions
+                    ),
+                    dietaryRequirements: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.dietary_requirements ?? null,
+                        dietaryRequirementOptions
+                    ),
+                    hygieneProducts: formatHygieneProducts(
+                        rawParcel.client?.hygiene_tampons ?? null,
+                        rawParcel.client?.hygiene_pads ?? null,
+                        rawParcel.client?.hygiene_other_items ?? []
+                    ),
+                    babyProducts: formatBabyProducts(
+                        rawParcel.client?.baby_food ?? null,
+                        rawParcel.client?.baby_formula ?? null,
+                        rawParcel.client?.baby_nappies ?? null,
+                        rawParcel.client?.baby_other_items ?? []
+                    ),
+                    petFood: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.pet_food ?? null,
+                        petFoodOptions
+                    ),
+                    otherItems: formatRequirementsByCanonicalOrder(
+                        rawParcel.client?.other_items ?? null,
+                        otherRequirementOptions
+                    ),
                     household: rawParcel.client
                         ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
                         : "",
+                    adults: rawParcel.client
+                        ? formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family)
+                        : "",
+                    children: rawParcel.client
+                        ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
+                        : "",
                     parcelListType: rawParcel.list_type,
+                    clientIsActive: rawParcel.client?.is_active ?? false,
                     recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
                 };
             }),
