@@ -50,6 +50,10 @@ const sampleProcessingData: DbParcelRow[] = [
         created_at: "2023-12-31T12:00:00+00:00",
         client_is_active: true,
         client_delivery_instructions: "SOME_DELIVERY_INSTRUCTIONS",
+        referral_agency: "Agency 1",
+        referrer_email: "example@example.com",
+        referrer_name: "John Smith",
+        referrer_phone: "0987 654321",
     },
 ];
 
@@ -92,6 +96,10 @@ describe("Parcels Page", () => {
                     },
                     allStatuses: ["LAST_EVENT"],
                     voucherNumber: "VOUCHER_1",
+                    referralAgency: "Agency 1",
+                    referrerEmail: "example@example.com",
+                    referrerName: "John Smith",
+                    referrerPhone: "0987 654321",
                     packingDate: new Date("2023-08-04T13:30:00+00:00"),
                     iconsColumn: {
                         flaggedForAttention: false,
