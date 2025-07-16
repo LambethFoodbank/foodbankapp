@@ -38,7 +38,8 @@ export type ActionName =
     | "Generate Map"
     | "Download Driver Overview"
     | "Delete Parcel"
-    | "Download Signposting Report";
+    | "Download Signposting Report"
+    | "Download Missing Voucher Report";
 
 type ActionTypes = {
     actionName: ActionName;
@@ -102,6 +103,12 @@ const availableActions: ActionTypes[] = [
         errorMessage: errorMesageForDoesNotEqualZero,
         availableToRole: organisationRoles,
     },
+    {
+        actionName: "Download Missing Voucher Report",
+        errorCondition: doesNotEqualZero,
+        errorMessage: errorMesageForDoesNotEqualZero,
+        availableToRole: organisationRoles,
+    },
 ];
 
 interface Props {
@@ -135,6 +142,8 @@ const getActionModal = (
         case "Delete Parcel":
             return <DeleteParcelModal key={elementKey} {...actionModalProps} />;
         case "Download Signposting Report":
+            return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
+        case "Download Missing Voucher Report":
             return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
     }
 };
