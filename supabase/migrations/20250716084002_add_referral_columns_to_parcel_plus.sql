@@ -22,6 +22,7 @@ create or replace view "public"."parcels_plus" as  SELECT parcels.primary_key AS
     parcels_events.last_event_workflow_order AS last_status_workflow_order,
     parcels_events.all_events,
     clients.delivery_instructions AS client_delivery_instructions,
+    parcels.list_type,
     parcels.referral_agency,
     parcels.referrer_name,
     parcels.referrer_email,
