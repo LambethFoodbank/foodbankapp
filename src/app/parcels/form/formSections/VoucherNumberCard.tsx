@@ -1,10 +1,15 @@
 import React from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import { errorExists, Errors, getErrorText, onChangeReferralText, onChangeText } from "@/components/Form/formFunctions";
+import {
+    errorExists,
+    getErrorText,
+    onChangeReferralText,
+    onChangeText,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ErrorText, GappedDiv } from "@/components/Form/formStyling";
+import { GappedDiv } from "@/components/Form/formStyling";
 import { ParcelCardProps } from "../ParcelForm";
-import { emailRegex, formatPhoneNumber, phoneNumberRegex } from "@/common/format";
+import { emailRegex, phoneNumberRegex } from "@/common/format";
 
 const voucherNumberIsRequired = true;
 
