@@ -7,9 +7,14 @@ import {
     createSetter,
     Errors,
     Fields,
-    FormErrors
+    FormErrors,
 } from "@/components/Form/formFunctions";
-import { CenterComponent, FormErrorText, StyledForm, StyledName } from "@/components/Form/formStyling";
+import {
+    CenterComponent,
+    FormErrorText,
+    StyledForm,
+    StyledName,
+} from "@/components/Form/formStyling";
 
 import { useRouter } from "next/navigation";
 
@@ -19,7 +24,10 @@ import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCa
 import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
 import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
 import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
-import { WriteParcelToDatabaseErrors, WriteParcelToDatabaseFunction } from "@/app/parcels/form/submitFormHelpers";
+import {
+    WriteParcelToDatabaseErrors,
+    WriteParcelToDatabaseFunction,
+} from "@/app/parcels/form/submitFormHelpers";
 import { Button, IconButton } from "@mui/material";
 import { Schema } from "@/databaseUtils";
 import dayjs, { Dayjs } from "dayjs";
@@ -28,10 +36,12 @@ import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
     getActiveTimeSlotsForCollectionCentre,
-    PackingSlotsLabelsAndValues
+    PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
 import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
-import getExpandedClientDetails, { ExpandedClientData } from "@/app/clients/getExpandedClientDetails";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
 import Modal from "@/components/Modal/Modal";
 import InfoIcon from "@mui/icons-material/Info";
 import Icon from "@/components/Icons/Icon";
