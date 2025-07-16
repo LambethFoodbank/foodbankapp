@@ -25,6 +25,7 @@ jest.mock("@/logger/logger", () => ({
 
 const sampleProcessingData: DbParcelRow[] = [
     {
+        list_type: "regular",
         parcel_id: "PRIMARY_KEY",
         collection_centre_name: "COLLECTION_CENTRE",
         collection_centre_acronym: "CC",
@@ -81,6 +82,7 @@ describe("Parcels Page", () => {
                         collectionCentreName: "COLLECTION_CENTRE",
                         collectionCentreAcronym: "CC",
                         congestionChargeApplies: true,
+                        listType: "regular",
                     },
                     packingSlot: "AM",
                     lastStatus: {
