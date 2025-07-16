@@ -29,6 +29,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                     })}
                     value={fields.voucherNumber ?? undefined}
                 />
+                <ErrorText>{getErrorText(formErrors.voucherNumber)}</ErrorText>
                 <FreeFormTextInput
                     label="Referral Agency"
                     onChange={onChangeText(fieldSetter, errorSetter, "referralAgency", {
