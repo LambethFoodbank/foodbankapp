@@ -184,6 +184,8 @@ const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement =
         collectionDate: Errors.none,
         collectionSlot: Errors.none,
         collectionCentre: collectionCentreIsShown ? Errors.none : Errors.invalidCollectionCentre,
+        referrerEmail: Errors.none,
+        referrerPhone: Errors.none,
     };
 
     return (
