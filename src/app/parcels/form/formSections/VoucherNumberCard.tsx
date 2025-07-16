@@ -49,7 +49,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                     label="Referrer Email"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerEmail", {
                         required: false,
-                        regex: emailRegex
+                        regex: emailRegex,
                     })}
                     value={fields.referrerEmail ?? undefined}
                 />
