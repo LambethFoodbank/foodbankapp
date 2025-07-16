@@ -39,7 +39,6 @@ interface ParcelsTableProps {
     )[];
     areFiltersLoadingForFirstTime: boolean;
     setErrorMessage: (errorMessage: string | null) => void;
-    isPackingManagerView: boolean;
 }
 
 const ParcelsTable: React.FC<ParcelsTableProps> = ({
