@@ -1,5 +1,7 @@
+import { Schema } from "@/databaseUtils";
+import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
-import { ListType } from "@/common/databaseListTypes";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { formatAddress } from "@/common/format";
 import {
     getAdultAgeStringUsingBirthYear,
@@ -7,18 +9,16 @@ import {
     isAdultFamilyMember,
     isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
+import { ListType } from "@/common/databaseListTypes";
 import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
-import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
-import { Schema } from "@/databaseUtils";
-import { logErrorReturnLogId } from "@/logger/logger";
-import supabase from "@/supabaseClient";
-import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
-import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
-import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
+import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
+import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
+import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
+import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);

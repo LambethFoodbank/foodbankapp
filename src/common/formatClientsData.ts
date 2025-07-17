@@ -1,9 +1,9 @@
 import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
-    formatBabyProducts, formatExtraInformation,
+    formatBabyProducts,
     formatHygieneProducts,
-    formatRequirementsByCanonicalOrder
+    formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
