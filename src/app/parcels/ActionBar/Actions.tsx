@@ -18,6 +18,7 @@ import SlotChangeModal from "./ActionModals/SlotChangeModal";
 import SignPostingReportModal from "./ActionModals/SignpostingReportModal";
 import PendingMoreInfoReportModal from "./ActionModals/PendingMoreInfoReportModal";
 import VoucherReportModal from "@/app/parcels/ActionBar/ActionModals/VoucherReportModal";
+import SelectedParcelsReportModal from "@/app/parcels/ActionBar/ActionModals/SelectedParcelsReportModal";
 
 const isNotAtLeastOne = (value: number): boolean => {
     return value < 1;

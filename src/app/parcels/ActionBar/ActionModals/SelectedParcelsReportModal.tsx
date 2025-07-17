@@ -5,13 +5,15 @@ import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./Genera
 import { sendAuditLog } from "@/server/auditLog";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import { FetchSignpostingReportError } from "@/app/parcels/ActionBar/ActionButtons/SignpostingReportCsvButton";
+import SelectedParcelsReportCsvButton, {
+    FetchSelectedParcelsReportError,
+} from "@/app/parcels/ActionBar/ActionButtons/SelectedParcelsReportCsvButton";
 
 interface ContentProps {
     selectedParcels: ParcelsTableRow[];
     maxParcelsToShow: number;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (csvError: FetchSignpostingReportError) => void;
+    onFileCreationFailed: (csvError: FetchSelectedParcelsReportError) => void;
 }
 
 const SelectedParcelsReportModalContent: React.FC<ContentProps> = ({
@@ -57,7 +59,7 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
     };
 
     // need to change error
-    const onFileCreationFailed = (csvError: FetchSignpostingReportError): void => {
+    const onFileCreationFailed = (csvError: FetchSelectedParcelsReportError): void => {
         setErrorMessage("Failed to fetch signposting report data");
         setActionShown(false);
         void sendAuditLog({
