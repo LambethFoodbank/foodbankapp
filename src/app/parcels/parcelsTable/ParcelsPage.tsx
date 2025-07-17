@@ -217,7 +217,6 @@ const ParcelsPage: React.FC = () => {
                         appliedFilters={currentlyAppliedFilters}
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
-                        isPackingManagerView={isPackingManagerView}
                     />
                     <ParcelsModal
                         modalIsOpen={modalIsOpen}

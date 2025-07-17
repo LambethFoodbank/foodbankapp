@@ -39,7 +39,6 @@ interface ParcelsTableProps {
     )[];
     areFiltersLoadingForFirstTime: boolean;
     setErrorMessage: (errorMessage: string | null) => void;
-    isPackingManagerView: boolean;
 }
 
 const ParcelsTable: React.FC<ParcelsTableProps> = ({
@@ -51,7 +50,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     appliedFilters,
     areFiltersLoadingForFirstTime,
     setErrorMessage,
-    isPackingManagerView,
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [parcelsDataPortion, setParcelsDataPortion] = useState<ParcelsTableRow[]>([]);
@@ -244,7 +242,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     setSortState: setSortState,
                 }}
                 defaultSortConfig={defaultParcelsSortConfig}
-                rowBreakPointConfigs={isPackingManagerView ? undefined : parcelRowBreakPointConfig}
+                rowBreakPointConfigs={parcelRowBreakPointConfig}
                 filterConfig={{
                     primaryFiltersShown: false,
                     additionalFiltersShown: false,
