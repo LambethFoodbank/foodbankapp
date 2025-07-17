@@ -1,7 +1,5 @@
-import { Schema } from "@/databaseUtils";
-import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
-import { logErrorReturnLogId } from "@/logger/logger";
+import { ListType } from "@/common/databaseListTypes";
 import { formatAddress } from "@/common/format";
 import {
     getAdultAgeStringUsingBirthYear,
@@ -9,16 +7,18 @@ import {
     isAdultFamilyMember,
     isChildFamilyMember,
 } from "@/common/getAgesOfFamily";
-import { ListType } from "@/common/databaseListTypes";
 import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
-import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
 import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
+import { Schema } from "@/databaseUtils";
+import { logErrorReturnLogId } from "@/logger/logger";
+import supabase from "@/supabaseClient";
+import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
+import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
+import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
+import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
 import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
-import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
-import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
-import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -147,7 +147,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.other_items,
             otherRequirementOptions
         ),
-        extraInformation: client.extra_information ?? "",
+        extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,
         signpostingCallReasons:
             client.signposting_call_required === true
@@ -175,6 +175,10 @@ export const formatAddressFromClientDetails = (
         client.address_postcode,
         false
     );
+};
+
+export const formatExtraInformation = (extraInformation: string | null): string => {
+    return extraInformation ? extraInformation.replace(/[\r\n]+/g, "\n") : "";
 };
 
 export const formatHouseholdFromFamilyDetails = (
