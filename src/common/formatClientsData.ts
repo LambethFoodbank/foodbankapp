@@ -2,6 +2,7 @@ import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
     formatBabyProducts,
+    formatExtraInformation,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
