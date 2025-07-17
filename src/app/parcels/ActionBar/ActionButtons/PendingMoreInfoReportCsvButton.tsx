@@ -32,7 +32,8 @@ type FetchPendingMoreInfoReportResult =
     | {
           data: null;
           error: FetchPendingMoreInfoReportError;
-      };
+      }
+      ;
 
 export interface FetchPendingMoreInfoReportError {
     type: FetchPendingMoreInfoReportErrorType;
@@ -41,7 +42,9 @@ export interface FetchPendingMoreInfoReportError {
 
 type FetchPendingMoreInfoReportErrorType =
     | "failedToFetchPendingMoreInfoRows"
+    | "noPendingMoreInfoRowsForInterval"
     | "failedToFetchPendingMoreInfoParcelIds";
+
 
 type PendingMoreInfoReportRow = {
     voucherNumber: string;
@@ -192,7 +195,7 @@ const getPendingMoreInfoReportData = async (
         return {
             data: null,
             error: {
-                type: "failedToFetchPendingMoreInfoRows",
+                type: "noPendingMoreInfoRowsForInterval",
                 logId,
             },
         };
@@ -278,7 +281,7 @@ interface ButtonProps {
     fromDate: Dayjs;
     toDate: Dayjs;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (error: FetchPendingMoreInfoReportError) => void;
+    onFileCreationFailed: (error: "FetchPendingMoreInfoReportError") => void;
     disabled: boolean;
 }
 
