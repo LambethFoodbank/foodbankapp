@@ -42,7 +42,8 @@ export type ActionName =
     | "Delete Parcel"
     | "Download Signposting Report"
     | "Download Missing Voucher Report"
-    | "Download Pending More Info Report";
+    | "Download Pending More Info Report"
+    | "Download Selected Parcels Report";
 
 type ActionTypes = {
     actionName: ActionName;
@@ -118,6 +119,12 @@ const availableActions: ActionTypes[] = [
         errorMessage: errorMesageForDoesNotEqualZero,
         availableToRole: organisationRoles,
     },
+    {
+        actionName: "Download Selected Parcels Report",
+        errorCondition: isNotAtLeastOne,
+        errorMessage: errorMessageForIsNotAtLeastOne,
+        availableToRole: organisationRoles,
+    },
 ];
 
 interface Props {
@@ -156,6 +163,8 @@ const getActionModal = (
             return <VoucherReportModal key={elementKey} {...actionModalProps} />;
         case "Download Pending More Info Report":
             return <PendingMoreInfoReportModal key={elementKey} {...actionModalProps} />;
+        case "Download Selected Parcels Report":
+            return <SelectedParcelsReportModal key={elementKey} {...actionModalProps} />;
     }
 };
 
