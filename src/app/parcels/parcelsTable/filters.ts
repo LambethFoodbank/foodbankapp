@@ -104,7 +104,6 @@ const buildDeliveryCollectionFilter = async (): Promise<ParcelsFilter<string[]>>
         itemLabelsAndKeys: optionsSet.map((option) => [option.value, option.key]),
         initialCheckedKeys: [],
         method: deliveryCollectionSearch,
-        isEmpty: false,
     });
 };
 
@@ -149,7 +148,6 @@ const buildLastStatusFilter = async (): Promise<ParcelsFilter<string[]>> => {
         itemLabelsAndKeys: optionsSet.map((value) => [value, value]),
         initialCheckedKeys: [],
         method: lastStatusSearch,
-        isEmpty: false,
     });
 };
 
@@ -198,7 +196,6 @@ const buildPackingSlotFilter = async (): Promise<ParcelsFilter<string[]>> => {
         itemLabelsAndKeys: optionsSet.map((option) => [option.value, option.key]),
         initialCheckedKeys: [],
         method: packingSlotSearch,
-        isEmpty: false,
     });
 };
 

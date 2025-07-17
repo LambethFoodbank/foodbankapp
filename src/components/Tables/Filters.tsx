@@ -42,7 +42,6 @@ interface BasicFilter<Data, State> {
     isDisabled: boolean;
     isHidden: boolean;
     isHiddenInUrl: boolean;
-    isEmpty: boolean;
 }
 
 export interface ServerSideFilter<Data, State, DbData extends Record<string, unknown>>

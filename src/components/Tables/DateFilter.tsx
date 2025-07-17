@@ -16,7 +16,6 @@ interface DateFilterProps<Data, DbData extends Record<string, unknown>> {
     isDisabled?: boolean;
     isHidden?: boolean;
     isHiddenInUrl?: boolean;
-    isEmpty: boolean;
 }
 
 const areDateRangesIdentical = (
@@ -52,7 +51,6 @@ export const serverSideDateFilter = <Data, DbData extends Record<string, unknown
         isDisabled: isDisabled,
         isHidden: isHidden,
         isHiddenInUrl: isHiddenInUrl,
-        isEmpty: isEmpty,
         areStatesIdentical: (stateA, stateB) => areDateRangesIdentical(stateA, stateB),
         filterComponent: function (
             state: DateRangeState,
