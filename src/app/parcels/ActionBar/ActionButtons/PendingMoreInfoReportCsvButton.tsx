@@ -85,7 +85,7 @@ const getPendingMoreInfoReportData = async (
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
+        .or('last_status_event_name.eq."Pending More Info"');
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -157,14 +157,7 @@ const getPendingMoreInfoReportData = async (
         .limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
-            idAndStatusList
-                .filter(
-                    (idAndStatus) =>
-                        idAndStatus.last_status_event_name !== null &&
-                        idAndStatus.last_status_event_name === "Pending More Info"
-                )
-                .map((idAndStatus) => idAndStatus.parcel_id)
-                .filter((id) => id !== null)
+            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
         .eq("client.is_active", true)
         .order("packing_date")
@@ -178,22 +171,6 @@ const getPendingMoreInfoReportData = async (
             data: null,
             error: {
                 type: "failedToFetchPendingMoreInfoRows",
-                logId,
-            },
-        };
-    }
-
-    if (!rawParcelList?.length) {
-        const logId = await logErrorReturnLogId(
-            "No parcels with 'Pending More Info' status to fetch",
-            {
-                error: parcelFetchError,
-            }
-        );
-        return {
-            data: null,
-            error: {
-                type: "noPendingMoreInfoRowsForInterval",
                 logId,
             },
         };
