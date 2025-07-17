@@ -3,7 +3,12 @@
 import React, { Fragment, useState } from "react";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
-import { ArrowDropDown, FilterAlt, FilterAltOff, FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
+import {
+    FilterAlt,
+    FilterAltOff,
+    FilterAltOffOutlined,
+    FilterAltOutlined,
+} from "@mui/icons-material";
 import { FilterBase } from "@/components/Tables/Filters";
 import { MENU_BREAKPOINT } from "@/common/sharedConstants";
 
@@ -114,31 +119,49 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
         return <></>;
     }
 
-    const hasActiveFilters = (): boolean => {
+    const hasActiveAdditionalFillters = (): boolean => {
         let hasAdditionalFilters = false;
-        let hasPrimaryFilters = false;
 
         for (let i = 0; i < props.additionalFilters?.length; i++) {
-            if (props.additionalFilters[i].isEmpty == false) {
+            if (
+                props.additionalFilters[i].state != props.additionalFilters[i].initialState &&
+                !props.additionalFilters[i].isDisabled
+            ) {
                 hasAdditionalFilters = true;
                 break;
             }
         }
 
-        for (let i = 0; i < props.primaryFilters?.length - 1; i++) {
-            if (props.primaryFilters[i].isEmpty == false) {
+        return hasAdditionalFilters;
+    };
+
+    const hasActivePrimaryFilters = (): boolean => {
+        let hasPrimaryFilters = false;
+
+        for (let i = 0; i < props.primaryFilters?.length; i++) {
+            if (props.primaryFilters[i].key === "view") {
+                continue;
+            }
+            if (
+                props.primaryFilters[i].state != props.primaryFilters[i].initialState &&
+                !props.primaryFilters[i].isDisabled
+            ) {
                 hasPrimaryFilters = true;
                 break;
             }
         }
 
-        return hasAdditionalFilters || hasPrimaryFilters;
+        return hasPrimaryFilters;
     };
 
     return (
         <>
             <FiltersAndIconContainer>
-                {hasPrimaryFilters && <FilterAltOutlined />}
+                {hasPrimaryFilters && hasActivePrimaryFilters() ? (
+                    <FilterAlt />
+                ) : (
+                    <FilterAltOutlined />
+                )}
                 <FiltersSingleRowContainer>
                     <>
                         {props.primaryFilters &&
@@ -163,10 +186,14 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                             <StyledButton
                                 variant="outlined"
                                 onClick={handleClear}
-                                color="inherit"
+                                color={
+                                    hasActivePrimaryFilters() || hasActiveAdditionalFillters()
+                                        ? "primary"
+                                        : "inherit"
+                                }
                                 // TODO: set flags for any filters that are active
                                 startIcon={
-                                    hasActiveFilters() ? (
+                                    hasActivePrimaryFilters() || hasActiveAdditionalFillters() ? (
                                         <FilterAltOff />
                                     ) : (
                                         <FilterAltOffOutlined />
@@ -182,7 +209,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
             {hasAdditionalFilters && showMoreFilters && (
                 <>
                     <FiltersAndIconContainer>
-                        <FilterAltOutlined />
+                        {hasActiveAdditionalFillters() ? <FilterAlt /> : <FilterAltOutlined />}
                         <FiltersSingleRowContainer>
                             {props.additionalFilters &&
                                 props.additionalFilters.length !== 0 &&
