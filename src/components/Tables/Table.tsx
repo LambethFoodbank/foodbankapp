@@ -442,7 +442,7 @@ const Table = <
         {
             when: () => reduceRowHeight === true,
             style: {
-                height: "0px",
+                height: "48px",
             },
         },
     ];
