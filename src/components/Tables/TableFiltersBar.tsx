@@ -186,7 +186,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                             <StyledButton
                                 variant="outlined"
                                 onClick={handleToggleAdditional}
-                                color="inherit"
+                                color={hasActiveAdditionalFillters() ? "primary" : "inherit"}
                                 startIcon={<FilterAltOutlined />}
                             >
                                 {showMoreFilters ? "Less" : "More"}
@@ -201,7 +201,6 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                                         ? "primary"
                                         : "inherit"
                                 }
-                                // TODO: set flags for any filters that are active
                                 startIcon={
                                     hasActivePrimaryFilters() || hasActiveAdditionalFillters() ? (
                                         <FilterAltOff />
