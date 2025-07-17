@@ -1,9 +1,9 @@
 import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
-    formatBabyProducts,
+    formatBabyProducts, formatExtraInformation,
     formatHygieneProducts,
-    formatRequirementsByCanonicalOrder,
+    formatRequirementsByCanonicalOrder
 } from "@/app/clients/getExpandedClientDetails";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
@@ -50,7 +50,7 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
         name: full_name ?? "",
         contact: phone_number ?? "",
         address: address_postcode ? formattedAddress : displayPostcodeForHomelessClient,
-        extraInformation: extra_information ?? "",
+        extraInformation: formatExtraInformation(extra_information),
     };
 };
 
