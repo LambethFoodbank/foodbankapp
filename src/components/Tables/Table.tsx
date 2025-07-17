@@ -442,6 +442,8 @@ const Table = <
         {
             when: () => reduceRowHeight === true,
             style: {
+                // The default DataTable class has a predefined min-height of 48px for the row-element
+                // for this reason, any value < 48px would not decrease the height.
                 height: "48px",
             },
         },
