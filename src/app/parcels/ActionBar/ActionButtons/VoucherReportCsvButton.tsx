@@ -82,7 +82,9 @@ const getVoucherReportData = async (
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
-        .or("voucher_number.not.ilike.E%, voucher_number.is.null");
+        .or("voucher_number.not.ilike.E%, voucher_number.is.null")
+        .not("client_full_name", "ilike", "%Deleted Client%")
+        .eq("client_is_active", true);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId("Failed to fetch Voucher parcel IDs and statuses", {
