@@ -121,36 +121,46 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
 
     const hasActiveAdditionalFillters = (): boolean => {
         let hasAdditionalFilters = false;
-
-        for (let i = 0; i < props.additionalFilters?.length; i++) {
-            if (
-                props.additionalFilters[i].state != props.additionalFilters[i].initialState &&
-                !props.additionalFilters[i].isDisabled
+        if (props.additionalFilters) {
+            for (
+                let indexFilter = 0;
+                indexFilter < props.additionalFilters?.length;
+                indexFilter++
             ) {
-                hasAdditionalFilters = true;
-                break;
+                if (
+                    props.additionalFilters[indexFilter].state !=
+                        props.additionalFilters[indexFilter].initialState &&
+                    !props.additionalFilters[indexFilter].isDisabled
+                ) {
+                    hasAdditionalFilters = true;
+                    break;
+                }
             }
         }
-
         return hasAdditionalFilters;
     };
 
     const hasActivePrimaryFilters = (): boolean => {
         let hasPrimaryFilters = false;
-
-        for (let i = 0; i < props.primaryFilters?.length; i++) {
-            if (props.primaryFilters[i].key === "view") {
-                continue;
-            }
-            if (
-                props.primaryFilters[i].state != props.primaryFilters[i].initialState &&
-                !props.primaryFilters[i].isDisabled
-            ) {
-                hasPrimaryFilters = true;
-                break;
+        if (props.primaryFilters) {
+            for (let indexFilter = 0; indexFilter < props.primaryFilters?.length; indexFilter++) {
+                if (
+                    props.primaryFilters[indexFilter].key === "view" ||
+                    props.primaryFilters[indexFilter].key === "packingDate" ||
+                    props.primaryFilters[indexFilter].key === "listType"
+                ) {
+                    continue;
+                }
+                if (
+                    props.primaryFilters[indexFilter].state !=
+                        props.primaryFilters[indexFilter].initialState &&
+                    !props.primaryFilters[indexFilter].isDisabled
+                ) {
+                    hasPrimaryFilters = true;
+                    break;
+                }
             }
         }
-
         return hasPrimaryFilters;
     };
 
