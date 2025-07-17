@@ -10,7 +10,7 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 import { formatPhoneNumber, phoneNumberRegex } from "@/common/format";
 
-const phoneNumberIsRequired = true;
+const phoneNumberIsRequired = false;
 
 const PhoneNumberCard: React.FC<ClientCardProps> = ({
     formErrors,
