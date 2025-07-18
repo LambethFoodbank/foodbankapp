@@ -35,14 +35,14 @@
       "argsIgnorePattern": "^_"
     }],
     "react/jsx-key": "error",
-    "react/no-array-index-key": "error",
-    "sort-imports": [
-      "warn",
-      {
-        "ignoreCase": true,
-        "ignoreDeclarationSort": true
-      }
-    ]
+    "react/no-array-index-key": "error"
+//    "sort-imports": [
+//      "warn",
+//      {
+//        "ignoreCase": true,
+//        "ignoreDeclarationSort": true
+//      }
+//    ]
 //    "import/order": [
 //      1,
 //      {
