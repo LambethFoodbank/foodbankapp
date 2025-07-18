@@ -587,10 +587,6 @@ export type Database = {
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
-          referral_agency?: string | null
-          referrer_email?: string | null
-          referrer_name?: string | null
-          referrer_phone?: string | null
           voucher_number?: string | null
         }
         Update: {
@@ -604,10 +600,6 @@ export type Database = {
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
-          referral_agency?: string | null
-          referrer_email?: string | null
-          referrer_name?: string | null
-          referrer_phone?: string | null
           voucher_number?: string | null
         }
         Relationships: [
@@ -877,6 +869,37 @@ export type Database = {
         }
         Relationships: []
       }
+      completed_parcels: {
+        Row: {
+          completed_timestamp: string | null
+          family_count: number | null
+          parcel_id: string | null
+          pet_food: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_events_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "public_events_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_events"
+            referencedColumns: ["parcel_id"]
+          },
+          {
+            foreignKeyName: "public_events_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_plus"
+            referencedColumns: ["parcel_id"]
+          },
+        ]
+      }
       dietary_requirements_plus: {
         Row: {
           dairy_free: Database["public"]["Enums"]["item_dietary_status"] | null
@@ -914,7 +937,6 @@ export type Database = {
         Row: {
           all_events: string[] | null
           last_event_data: string | null
-          last_event_is_successfully_completed: boolean | null
           last_event_name: string | null
           last_event_timestamp: string | null
           last_event_workflow_order: number | null
@@ -949,7 +971,6 @@ export type Database = {
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
-          last_status_is_successfully_completed: boolean | null
           last_status_timestamp: string | null
           last_status_workflow_order: number | null
           list_type: Database["public"]["Enums"]["list_type"] | null
@@ -957,10 +978,7 @@ export type Database = {
           packing_slot_name: string | null
           packing_slot_order: number | null
           parcel_id: string | null
-          referral_agency: string | null
-          referrer_email: string | null
-          referrer_name: string | null
-          referrer_phone: string | null
+          parcel_notes: string | null
           voucher_number: string | null
         }
         Relationships: [
