@@ -1087,6 +1087,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      delivery_area_order_swap: {
+        Args: {
+          id1: string
+          id2: string
+        }
+        Returns: undefined
+      }
       insert_client_and_family: {
         Args: {
           clientrecord: Json

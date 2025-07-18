@@ -55,7 +55,7 @@ function EditToolbar(props: EditToolbarProps): React.JSX.Element {
         const id = rows.length + 1;
         setRows((oldRows) => [
             ...oldRows,
-            { id, name: "", isShown: false, order: id, isNew: true },
+            { id, postcode: "", isDeliverable: false, order: id, isNew: true },
         ]);
         setRowModesModel((oldModel) => ({
             ...oldModel,
@@ -83,8 +83,8 @@ function getBaseAuditLogForDeliveryAreasAction(
         action,
         content: {
             currentDeliveryAreasOrder: deliveryAreasRow.order,
-            deliveryAreasName: deliveryAreasRow.name,
-            deliveryAreasIsShown: deliveryAreasRow.isShown,
+            deliveryAreasPostcode: deliveryAreasRow.postcode,
+            deliveryAreasIsDeliverable: deliveryAreasRow.isDeliverable,
         },
         deliveryAreasId: options?.excludeDeliveryAreasId ? undefined : deliveryAreasRow.id,
     };
@@ -101,7 +101,7 @@ const DeliveryAreasTable: React.FC = () => {
         fetchDeliveryAreas()
             .then((response) => setRows(response))
             .catch((error) => {
-                void logErrorReturnLogId("Error with fetch: Packing slots", error);
+                void logErrorReturnLogId("Error with fetch: Delivery areas", error);
                 setErrorMessage("Error fetching data, please reload");
             })
             .finally(() => setIsLoading(false));
@@ -110,7 +110,7 @@ const DeliveryAreasTable: React.FC = () => {
     useEffect(() => {
         // This requires that the DB table has Realtime turned on
         const subscriptionChannel = supabase
-            .channel("packing-slot-table-changes")
+            .channel("delivery-areas-table-changes")
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "delivery_areas" },
@@ -124,7 +124,7 @@ const DeliveryAreasTable: React.FC = () => {
                         setErrorMessage("Error fetching data, please reload");
                         if (error instanceof Error) {
                             void logErrorReturnLogId(
-                                "Error with fetch: Packing slots subscription",
+                                "Error with fetch: Delivery areas subscription",
                                 {},
                                 error
                             );
@@ -133,7 +133,7 @@ const DeliveryAreasTable: React.FC = () => {
                 }
             )
             .subscribe(async (status, error) => {
-                if (subscriptionStatusRequiresErrorMessage(status, error, "packing_slots")) {
+                if (subscriptionStatusRequiresErrorMessage(status, error, "delivery_areas")) {
                     setErrorMessage("Error fetching data, please reload");
                 } else {
                     setErrorMessage(null);
@@ -160,14 +160,14 @@ const DeliveryAreasTable: React.FC = () => {
             const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
                 await insertNewDeliveryAreas(newRow);
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "add a new packing slot",
+                "add a new delivery area",
                 newRow,
                 { excludeDeliveryAreasId: true }
             );
 
             if (insertDeliveryAreasError) {
                 setErrorMessage(
-                    `Failed to add the packing slot. Log ID: ${insertDeliveryAreasError.logId}`
+                    `Failed to add the delivery area. Log ID: ${insertDeliveryAreasError.logId}`
                 );
                 setRows((rows) => rows.slice(0, -1));
                 void sendAuditLog({
@@ -185,13 +185,13 @@ const DeliveryAreasTable: React.FC = () => {
         } else {
             const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(newRow);
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "update a packing slot",
+                "update a delivery area",
                 newRow
             );
 
             if (updateDeliveryAreasError) {
                 setErrorMessage(
-                    `Failed to update the packing slot. Log ID: ${updateDeliveryAreasError.logId}`
+                    `Failed to update the delivery area. Log ID: ${updateDeliveryAreasError.logId}`
                 );
                 void sendAuditLog({
                     ...baseAuditLog,
@@ -231,7 +231,7 @@ const DeliveryAreasTable: React.FC = () => {
         const editedRow = rows.find((row) => row.id === id);
         if (editedRow === undefined) {
             void logErrorReturnLogId(
-                "Edited row in packing slots admin table is undefined onCancelClick"
+                "Edited row in delivery areas admin table is undefined onCancelClick"
             );
             setErrorMessage("Table error, please try again");
         } else if (editedRow.isNew) {
@@ -249,13 +249,13 @@ const DeliveryAreasTable: React.FC = () => {
             const { error: swapRowsError } = await swapRows(rowOne, rowTwo);
 
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "move a packing slot up",
+                "move a delivery area up",
                 row
             );
 
             if (swapRowsError) {
                 setErrorMessage(
-                    `Failed to move packing slot (${row.name}) up. Log ID: ${swapRowsError.logId}`
+                    `Failed to move delivery area (${row.postcode}) up. Log ID: ${swapRowsError.logId}`
                 );
                 void sendAuditLog({
                     ...baseAuditLog,
@@ -280,13 +280,13 @@ const DeliveryAreasTable: React.FC = () => {
             const { error: swapRowsError } = await swapRows(clickedRow, rowBelow);
 
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "move a packing slot down",
+                "move a delivery area down",
                 row
             );
 
             if (swapRowsError) {
                 setErrorMessage(
-                    `Failed to move packing slot (${row.name}) down. Log ID: ${swapRowsError.logId}`
+                    `Failed to move delivery area (${row.postcode}) down. Log ID: ${swapRowsError.logId}`
                 );
                 void sendAuditLog({
                     ...baseAuditLog,
@@ -361,16 +361,16 @@ const DeliveryAreasTable: React.FC = () => {
             },
         },
         {
-            field: "name",
-            headerName: "Slot Name",
+            field: "postcode",
+            headerName: "Postcode",
             flex: 1,
             editable: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
-            field: "isShown",
+            field: "isDeliverable",
             type: "boolean",
-            headerName: "Show",
+            headerName: "Deliverable",
             flex: 1,
             editable: true,
             renderHeader: (params) => <Header {...params} />,
