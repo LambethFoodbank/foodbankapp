@@ -1,22 +1,22 @@
+import { CircularProgress } from "@mui/material";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-import DataViewer, {
-    DataForDataViewer,
-    convertDataToDataForDataViewer,
-} from "@/components/DataViewer/DataViewer";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
+import styled from "styled-components";
 import ClientParcelsTable from "@/app/clients/ClientParcelsTable";
 import {
     ExpandedClientParcelDetails,
     getClientParcelsDetails,
 } from "@/app/clients/getClientParcelsData";
-import styled from "styled-components";
-import { ErrorSecondaryText } from "../errorStylingandMessages";
-import { CircularProgress } from "@mui/material";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
+import { capitaliseWords } from "@/common/format";
+import DataViewer, {
+    convertDataToDataForDataViewer,
+    DataForDataViewer,
+} from "@/components/DataViewer/DataViewer";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { updateClientNotes } from "./updateClientNotes";
-import { capitaliseWords } from "@/common/format";
+import { ErrorSecondaryText } from "../errorStylingandMessages";
 
 interface Props {
     clientId: string;
@@ -60,10 +60,12 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
         setErrorMessage(null);
         const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
         if (error) {
-            setErrorMessage(`Error saving notes. Log ID: ${error.logId}`);
+            setErrorMessage(`Error saving notes, please refresh the page. Log ID: ${error.logId}`);
             setNotes(originalNotes);
+        } else {
+            setNotes(notes);
+            loadData();
         }
-        loadData();
     };
 
     const onChangeNotes = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -73,8 +75,17 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
 
     const onCancelNotes = async (): Promise<void> => {
         setErrorMessage(null);
-        setNotes(originalNotes);
-        loadData();
+        const { error } = await updateClientNotes(
+            clientId,
+            originalNotes,
+            clientDetails?.lastUpdated
+        );
+        if (error) {
+            setErrorMessage(`Error saving notes, please refresh the page. Log ID: ${error.logId}`);
+            setNotes(originalNotes);
+        } else {
+            loadData();
+        }
     };
 
     const getExpandedClientDetailsForDataViewer = (
