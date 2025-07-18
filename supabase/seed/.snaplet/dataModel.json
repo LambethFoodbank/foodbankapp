@@ -1483,6 +1483,180 @@
         }
       ]
     },
+    "dietary_requirements": {
+      "id": "public.dietary_requirements",
+      "schemaName": "public",
+      "tableName": "dietary_requirements",
+      "fields": [
+        {
+          "id": "public.dietary_requirements.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.halal",
+          "name": "halal",
+          "columnName": "halal",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.vegetarian",
+          "name": "vegetarian",
+          "columnName": "vegetarian",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.vegan",
+          "name": "vegan",
+          "columnName": "vegan",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.meat",
+          "name": "meat",
+          "columnName": "meat",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.gluten_free",
+          "name": "gluten_free",
+          "columnName": "gluten_free",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.pescatarian",
+          "name": "pescatarian",
+          "columnName": "pescatarian",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.dairy_free",
+          "name": "dairy_free",
+          "columnName": "dairy_free",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.seafood_allergy",
+          "name": "seafood_allergy",
+          "columnName": "seafood_allergy",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_requirements.pet_food",
+          "name": "pet_food",
+          "columnName": "pet_food",
+          "type": "item_dietary_status",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "lists",
+          "type": "lists",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "dietary_requirementsTolists",
+          "relationFromFields": [
+            "id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "dietary_requirements_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "events": {
       "id": "public.events",
       "schemaName": "public",
@@ -3130,6 +3304,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false
+        },
+        {
+          "name": "dietary_requirements",
+          "type": "dietary_requirements",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "dietary_requirementsTolists",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [
@@ -4484,6 +4672,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.parcels.notes",
+          "name": "notes",
+          "columnName": "notes",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
         },
@@ -7843,6 +8045,20 @@
         },
         {
           "name": "other"
+        }
+      ]
+    },
+    "item_dietary_status": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "excluded"
+        },
+        {
+          "name": "included"
+        },
+        {
+          "name": "not_specified"
         }
       ]
     },
