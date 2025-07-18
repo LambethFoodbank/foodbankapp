@@ -1452,6 +1452,20 @@
           "maxLength": null
         },
         {
+          "id": "public.collection_centres.available_days",
+          "name": "available_days",
+          "columnName": "available_days",
+          "type": "collection_availability_days[]",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "id": "public.collection_centres.last_updated",
           "name": "last_updated",
           "columnName": "last_updated",
@@ -8143,6 +8157,32 @@
         },
         {
           "name": "stream_xchacha20"
+        }
+      ]
+    },
+    "day_of_week": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "Friday"
+        },
+        {
+          "name": "Monday"
+        },
+        {
+          "name": "Saturday"
+        },
+        {
+          "name": "Sunday"
+        },
+        {
+          "name": "Thursday"
+        },
+        {
+          "name": "Tuesday"
+        },
+        {
+          "name": "Wednesday"
         }
       ]
     },
