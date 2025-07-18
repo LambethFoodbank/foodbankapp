@@ -3,6 +3,7 @@ import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Schema } from "@/databaseUtils";
+import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 
 export interface CollectionCentresTableRow {
     acronym: Schema["collection_centres"]["acronym"];
@@ -11,6 +12,7 @@ export interface CollectionCentresTableRow {
     isDelivery: Schema["collection_centres"]["is_delivery"];
     isShown: Schema["collection_centres"]["is_shown"];
     timeSlots: Schema["collection_centres"]["time_slots"];
+    availableDays: Schema["collection_centres"]["available_days"];
     isNew: boolean;
 }
 
@@ -19,14 +21,25 @@ export interface FormattedTimeSlot {
     isActive: boolean;
 }
 
+export interface FormattedAvailableDays {
+    day: DaysOfWeekType;
+    isActive: boolean;
+}
+
 export interface FormattedTimeSlotsWithPrimaryKey {
     primaryKey: Schema["collection_centres"]["primary_key"];
     timeSlots: FormattedTimeSlot[];
 }
 
+export interface FormattedAvailableDaysWithPrimaryKey {
+    primaryKey: Schema["collection_centres"]["primary_key"];
+    availableDays: FormattedAvailableDays[];
+}
+
 type DbCollectionCentre = Tables<"collection_centres">;
 type NewDbCollectionCentre = Omit<DbCollectionCentre, "primary_key">;
 type DbCollectionCentreTimeSlots = Schema["collection_centres"]["time_slots"];
+type DbCollectionCentreAvailableDays = Schema["collection_centres"]["available_days"];
 
 type FetchCollectionCentresResult =
     | {
@@ -53,6 +66,7 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
             isShown: row.is_shown,
             isDelivery: row.is_delivery,
             timeSlots: row.time_slots,
+            availableDays: row.available_days,
             isNew: false,
         })
     );
@@ -68,6 +82,17 @@ const formatTimeSlotToDBCollectionCentreTimeSlot = (
     });
 };
 
+const formatAvailableDaysToDBCollectionCentreTimeSlot = (
+    availableDaysData: FormattedAvailableDays[]
+): DbCollectionCentreAvailableDays => {
+    return availableDaysData.map((availableDays) => {
+        return {
+            day: availableDays.day === "" ? null : availableDays.day,
+            is_active: availableDays.isActive,
+        };
+    });
+};
+
 const formatExistingRowToDBCollectionCentre = (
     row: CollectionCentresTableRow
 ): DbCollectionCentre => {
@@ -78,6 +103,7 @@ const formatExistingRowToDBCollectionCentre = (
         is_shown: row.isShown,
         is_delivery: row.isDelivery,
         time_slots: row.timeSlots,
+        available_days: row.availableDays,
     };
 };
 
@@ -90,6 +116,7 @@ const formatNewRowToDBCollectionCentre = (
         is_shown: newRow.isShown,
         is_delivery: newRow.isDelivery,
         time_slots: newRow.timeSlots,
+        available_days: newRow.availableDays,
     };
 };
 
@@ -171,6 +198,32 @@ export const updateDbCollectionCentreTimeSlots = async (
             error,
             newCollectionCentreData: processedData,
         });
+
+        return { error: { dbError: error, logId } };
+    }
+
+    return { error: null };
+};
+
+export const updateDbCollectionCentreAvailableDays = async (
+    availableDaysWithPrimaryKey: FormattedAvailableDaysWithPrimaryKey
+): Promise<UpdateCollectionCentreResult> => {
+    const processedData = formatAvailableDaysToDBCollectionCentreTimeSlot(
+        availableDaysWithPrimaryKey.availableDays
+    );
+    const { error } = await supabase
+        .from("collection_centres")
+        .update({ available_days: processedData })
+        .eq("primary_key", availableDaysWithPrimaryKey.primaryKey);
+
+    if (error) {
+        const logId = await logErrorReturnLogId(
+            "Failed to update collection centre available days",
+            {
+                error,
+                newCollectionCentreData: processedData,
+            }
+        );
 
         return { error: { dbError: error, logId } };
     }
