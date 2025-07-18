@@ -113,6 +113,9 @@ const DietaryRequirementsTable: React.FC = () => {
                     aria-label="Dietary Requirements Table"
                     columns={dietaryRequirementsColumns}
                     getRowHeight={() => "auto"}
+                    editMode="row"
+                    rowModesModel={rowModesModel}
+                    onRowModesModelChange={setRowModesModel}
                     loading={isLoading}
                     getRowClassName={(params) =>
                         (params.indexRelativeToCurrentPage + 1) % 2 === 0
