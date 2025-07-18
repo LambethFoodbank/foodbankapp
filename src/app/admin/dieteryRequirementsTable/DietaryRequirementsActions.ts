@@ -1,21 +1,18 @@
-import { PostgrestError } from "@supabase/supabase-js";
-import { Tables } from "@/databaseTypesFile";
-import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 
 export interface DietaryRequirementsRawData {
-    id: Schema["dietary_requirements_plus"]["id"];
-    name: Schema["dietary_requirements_plus"]["item_name"];
-    halal: Schema["dietary_requirements_plus"]["halal"];
-    vegetarian: Schema["dietary_requirements_plus"]["vegetarian"];
-    vegan: Schema["dietary_requirements_plus"]["vegan"];
-    meat: Schema["dietary_requirements_plus"]["meat"];
-    glutenFree: Schema["dietary_requirements_plus"]["gluten_free"];
-    pescatarian: Schema["dietary_requirements_plus"]["pescatarian"];
-    dairyFree: Schema["dietary_requirements_plus"]["dairy_free"];
-    seafoodAllergy: Schema["dietary_requirements_plus"]["seafood_allergy"];
-    petFood: Schema["dietary_requirements_plus"]["pet_food"];
+    id: string;
+    name: string;
+    halal: string | null;
+    vegetarian: string | null;
+    vegan: string | null;
+    meat: string | null;
+    glutenFree: string | null;
+    pescatarian: string | null;
+    dairyFree: string | null;
+    seafoodAllergy: string | null;
+    petFood: string | null;
 }
 
 export interface DietaryRequirementsTableRow {
