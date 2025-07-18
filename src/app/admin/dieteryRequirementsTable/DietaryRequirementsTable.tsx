@@ -10,28 +10,7 @@ import {
 import Header from "@/app/admin/websiteDataTable/Header";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
-import { AuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
-
-function getBaseAuditLogForDietaryRequirementsAction(
-    action: string,
-    dietaryRequirementsRow: DietaryRequirementsTableRow,
-    options?: {
-        excludeDietaryRequirementsId?: boolean;
-    }
-): Pick<AuditLog, "action" | "content" | "collectionCentreId"> {
-    return {
-        action,
-        content: {
-            dietaryRequirement: dietaryRequirementsRow.dietary_requirement,
-            included: dietaryRequirementsRow.included,
-            excluded: dietaryRequirementsRow.excluded,
-        },
-        collectionCentreId: options?.excludeDietaryRequirementsId
-            ? undefined
-            : dietaryRequirementsRow.id,
-    };
-}
 
 const DietaryRequirementsTable: React.FC = () => {
     const [rows, setRows] = useState<DietaryRequirementsTableRow[]>([]);
@@ -102,7 +81,7 @@ const DietaryRequirementsTable: React.FC = () => {
             headerName: "Excluded",
             flex: 1,
             editable: true,
-            renderCell: (params: any) => (
+            renderCell: (params) => (
                 <div style={{ whiteSpace: "pre-line" }}>
                     {Array.isArray(params.value) ? params.value.join(", ") : ""}
                 </div>

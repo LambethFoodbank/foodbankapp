@@ -22,7 +22,6 @@ import PackingSlotsTable from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import WebsiteDataTable from "./websiteDataTable/WebsiteDataTable";
 import AuditLogTable from "./auditLogTable/AuditLogTable";
 import { faBowlFood } from "@fortawesome/free-solid-svg-icons/faBowlFood";
-import DietaryRequirementCard from "@/app/clients/form/formSections/DietaryRequirementCard";
 import DietaryRequirementsTable from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsTable";
 
 const PanelTitle = styled.h2`
