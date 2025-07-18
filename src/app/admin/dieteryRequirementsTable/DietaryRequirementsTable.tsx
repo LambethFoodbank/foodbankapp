@@ -59,11 +59,17 @@ const DietaryRequirementsTable: React.FC = () => {
             .channel("dietary-requirements-table-changes")
             .on(
                 "postgres_changes",
-                { event: "*", schema: "public", table: "dietary_requirements" },
+                { event: "*", schema: "public", table: "dietary_requirements_plus" },
                 getDietaryRequirementsForTable
             )
             .subscribe((status, error) => {
-                if (subscriptionStatusRequiresErrorMessage(status, error, "dietary_requirements")) {
+                if (
+                    subscriptionStatusRequiresErrorMessage(
+                        status,
+                        error,
+                        "dietary_requirements_plus"
+                    )
+                ) {
                     setErrorMessage("Error fetching data, please reload");
                 } else {
                     setErrorMessage(null);
@@ -77,15 +83,15 @@ const DietaryRequirementsTable: React.FC = () => {
 
     const dietaryRequirementsColumns: GridColDef[] = [
         {
-            field: "id",
+            field: "dietary_requirement",
             headerName: "Dietary Requirement",
             flex: 1,
-            minWidth: 400,
+            width: 200,
             editable: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
-            field: "isNew",
+            field: "included",
             headerName: "Included",
             flex: 1,
             editable: true,
@@ -96,6 +102,11 @@ const DietaryRequirementsTable: React.FC = () => {
             headerName: "Excluded",
             flex: 1,
             editable: true,
+            renderCell: (params: any) => (
+                <div style={{ whiteSpace: "pre-line" }}>
+                    {Array.isArray(params.value) ? params.value.join("\t ,") : ""}
+                </div>
+            ),
             renderHeader: (params) => <Header {...params} />,
         },
     ];
@@ -114,6 +125,7 @@ const DietaryRequirementsTable: React.FC = () => {
                     rows={rows}
                     aria-label="Dietary Requirements Table"
                     columns={dietaryRequirementsColumns}
+                    getRowHeight={() => "auto"}
                     editMode="row"
                     rowModesModel={rowModesModel}
                     onRowModesModelChange={setRowModesModel}
