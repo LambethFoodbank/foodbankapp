@@ -3,6 +3,12 @@ import { styled } from "styled-components";
 import React from "react";
 
 const DataGridStyling = styled(DataGrid)`
+    &.dietary-table {
+        & .MuiDataGrid-row {
+            min-height: 56px !important;
+        }
+    }
+
     & > div {
         border-radius: 1rem;
         border: 0px;
