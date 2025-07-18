@@ -104,7 +104,7 @@ const DietaryRequirementsTable: React.FC = () => {
             editable: true,
             renderCell: (params: any) => (
                 <div style={{ whiteSpace: "pre-line" }}>
-                    {Array.isArray(params.value) ? params.value.join("\t ,") : ""}
+                    {Array.isArray(params.value) ? params.value.join(", ") : ""}
                 </div>
             ),
             renderHeader: (params) => <Header {...params} />,
@@ -123,6 +123,7 @@ const DietaryRequirementsTable: React.FC = () => {
             {rows && (
                 <StyledDataGrid
                     rows={rows}
+                    className="dietary-table"
                     aria-label="Dietary Requirements Table"
                     columns={dietaryRequirementsColumns}
                     getRowHeight={() => "auto"}
