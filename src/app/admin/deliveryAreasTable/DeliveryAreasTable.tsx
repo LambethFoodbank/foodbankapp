@@ -48,6 +48,22 @@ export interface DeliveryAreasRow {
     isNew: boolean;
 }
 
+const formatPostcode = (value: string): string => {
+    value = value.slice(0, 4);
+    const regex = /^(GIR|[A-Z]{1,2}[0-9][0-9A-Z]?)$/;
+    value = value.slice(0, 4);
+    if (isNaN(Number(value.charAt(3)))) {
+        value = value.slice(0,3);
+    }
+    if (isNaN(Number(value.charAt(2)))) {
+        value = value.slice(0,2);
+    } 
+    if (regex.exec(value)?.includes(value, 1)) {
+        value = value.slice(0, 1);
+    }
+    return value.toUpperCase();
+};
+
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
     const { setRows, setRowModesModel, rows } = props;
 
@@ -365,6 +381,11 @@ const DeliveryAreasTable: React.FC = () => {
             headerName: "Postcode",
             flex: 1,
             editable: true,
+            // regex: postcodeRegex,
+            // formattingFunction: formatPostcode,
+            //valueFormatter: (params) => {params.value = formatPostcode(params.value); console.log(params.value)},
+            //valueSetter: (params) => {return formatPostcode(params.value);},
+            valueParser: (params) => {return formatPostcode(params)},
             renderHeader: (params) => <Header {...params} />,
         },
         {
