@@ -58,7 +58,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
 
     const onSaveNotes = async (): Promise<void> => {
         setErrorMessage(null);
-        const { error } = await updateClientNotes(clientId, notes);
+        const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
         if (error) {
             setErrorMessage(`Error saving notes. Log ID: ${error.logId}`);
             setNotes(originalNotes);

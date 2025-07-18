@@ -1,4 +1,4 @@
-import { logErrorReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 
@@ -8,7 +8,8 @@ type UpdateClientNotesResponse =
 
 export const updateClientNotes = async (
     clientId: string,
-    notes: string | null
+    notes: string | null,
+    lastUpdated: string | undefined
 ): Promise<UpdateClientNotesResponse> => {
     const baseAuditLogProps = {
         action: "update client notes",
@@ -16,13 +17,20 @@ export const updateClientNotes = async (
         content: { notes: notes, clientId },
     };
 
-    const { error } = await supabase
+    const { error, count } = await supabase
         .from("clients")
-        .update({ notes: notes })
-        .eq("primary_key", clientId);
+        .update({ notes: notes }, { count: "exact" })
+        .eq("primary_key", clientId)
+        .eq("last_updated", lastUpdated);
 
     if (error) {
         const logId = await logErrorReturnLogId("update client notes failed", { error });
+        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
+        return { error: { type: "updateNotesFailed", logId } };
+    }
+
+    if (count === 0) {
+        const logId = await logWarningReturnLogId("Concurrent editing of parcel");
         await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
         return { error: { type: "updateNotesFailed", logId } };
     }
