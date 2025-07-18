@@ -2,8 +2,8 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 
 export interface DietaryRequirementsRawData {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
     halal: string | null;
     vegetarian: string | null;
     vegan: string | null;
