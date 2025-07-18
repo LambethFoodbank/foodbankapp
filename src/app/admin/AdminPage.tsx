@@ -6,6 +6,7 @@ import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import TableSurface from "@/components/Tables/TableSurface";
 import CreateUserForm from "@/app/admin/createUser/CreateUserForm";
+
 import {
     faUsers,
     faUserPlus,
@@ -14,6 +15,7 @@ import {
     IconDefinition,
     faServer,
     faRectangleList,
+    faTruck,
 } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,6 +23,7 @@ import CollectionCentresTable from "@/app/admin/collectionCentresTable/Collectio
 import PackingSlotsTable from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import WebsiteDataTable from "./websiteDataTable/WebsiteDataTable";
 import AuditLogTable from "./auditLogTable/AuditLogTable";
+import DeliveryAreasTable from "@/app/admin/deliveryAreasTable/DeliveryAreasTable";
 
 const PanelTitle = styled.h2`
     text-transform: uppercase;
@@ -65,6 +68,11 @@ const AdminPage: React.FC = () => {
             panelTitle: "View Audit Logs",
             panelIcon: auditLogIcon,
             panelContent: <AuditLogTable />,
+        },
+        {
+            panelTitle: "Edit Delivery Areas",
+            panelIcon: faTruck,
+            panelContent: <DeliveryAreasTable />,
         },
     ];
 

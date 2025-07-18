@@ -17,6 +17,7 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
+          delivery_areas_id: string | null
           event_id: string | null
           list_id: string | null
           log_id: string | null
@@ -36,6 +37,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -55,6 +57,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -95,6 +98,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "parcels_plus"
             referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "audit_log_delivery_areas_id_fkey"
+            columns: ["delivery_areas_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_areas"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_event_id_fkey"
@@ -301,6 +311,27 @@ export type Database = {
           time_slots?:
             | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
             | null
+        }
+        Relationships: []
+      }
+      delivery_areas: {
+        Row: {
+          id: string
+          is_deliverable: boolean
+          order: number
+          postcode: string
+        }
+        Insert: {
+          id?: string
+          is_deliverable: boolean
+          order: number
+          postcode: string
+        }
+        Update: {
+          id?: string
+          is_deliverable?: boolean
+          order?: number
+          postcode?: string
         }
         Relationships: []
       }
