@@ -32,6 +32,7 @@ import { EditToolbar } from "@/app/admin/collectionCentresTable/CollectionCentre
 import Button from "@mui/material/Button";
 import FloatingToast from "@/components/FloatingToast";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
+import CollectionCentreAvailableDaysModal from "./CollectionCentreAvailableDaysModal";
 
 function getBaseAuditLogForCollectionCentreAction(
     action: string,
@@ -59,6 +60,9 @@ const CollectionCentresTable: React.FC = () => {
     const [existingRowData, setExistingRowData] = useState<CollectionCentresTableRow | null>(null);
     const [timeSlotModalIsOpen, setTimeSlotModalIsOpen] = useState<boolean>(false);
     const [selectedRowForTimeSlotEdit, setSelectedRowForTimeSlotEdit] =
+        useState<CollectionCentresTableRow | null>(null);
+    const [availableDaysModalIsOpen, setAvailableDaysModalIsOpen] = useState<boolean>(false);
+    const [selectedRowForAvailableDaysEdit, setSelectedRowForAvailableDaysEdit] =
         useState<CollectionCentresTableRow | null>(null);
 
     const getCollectionCentresForTable = useCallback(async () => {
@@ -276,6 +280,31 @@ const CollectionCentresTable: React.FC = () => {
             },
         },
         {
+            field: "collectionDays",
+            type: "actions",
+            headerName: "Collection Days",
+            flex: 1,
+            renderHeader: (params) => <Header {...params} />,
+            renderCell: (params) => {
+                const handleEditCollectionCentreAvailableDays = (): void => {
+                    setSelectedRowForAvailableDaysEdit(params.row as CollectionCentresTableRow);
+                    setAvailableDaysModalIsOpen(true);
+                };
+
+                return (
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleEditCollectionCentreAvailableDays}
+                        disabled={params.row.isNew || params.row.isDelivery}
+                        aria-label={`Edit collection available days for ${params.row.name}`}
+                    >
+                        Edit Collection Available Days
+                    </Button>
+                );
+            },
+        },
+        {
             field: "actions",
             type: "actions",
             headerName: "Actions",
@@ -364,6 +393,15 @@ const CollectionCentresTable: React.FC = () => {
                         setTimeSlotModalIsOpen(false);
                     }}
                 ></CollectionCentreTimeSlotsModal>
+            )}
+            {availableDaysModalIsOpen && (
+                <CollectionCentreAvailableDaysModal
+                    selectedCollectionCentreInfo={selectedRowForAvailableDaysEdit}
+                    isOpen={availableDaysModalIsOpen}
+                    onClose={() => {
+                        setAvailableDaysModalIsOpen(false);
+                    }}
+                ></CollectionCentreAvailableDaysModal>
             )}
         </>
     );
