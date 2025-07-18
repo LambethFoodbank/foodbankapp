@@ -1,7 +1,7 @@
 create table "public"."delivery_areas" (
     "id" uuid not null default gen_random_uuid(),
     "postcode" text not null,
-    "is_deliverable" boolean not null,
+    "is_deliverable" boolean not null default false,
     "order" smallint not null
 );
 
