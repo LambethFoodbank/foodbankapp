@@ -84,7 +84,9 @@ export interface ListItem {
 export const fetchAllItems = async (): Promise<ListItem[]> => {
     const { data, error } = await supabase.from("lists").select("primary_key, item_name");
 
-    if (error) throw error;
+    if (error) {
+        throw error;
+    }
 
     return data.map((row) => ({
         id: row.primary_key,
