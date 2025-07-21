@@ -15,6 +15,18 @@ export interface DietaryRequirementsRawData {
     petFood: string | null;
 }
 
+export const dietaryRequirementTypes = [
+    { key: "halal", label: "Halal" },
+    { key: "vegetarian", label: "Vegetarian" },
+    { key: "vegan", label: "Vegan" },
+    { key: "meat", label: "Meat" },
+    { key: "gluten_free", label: "Gluten Free" },
+    { key: "pescatarian", label: "Pescatarian" },
+    { key: "dairy_free", label: "Dairy Free" },
+    { key: "seafood_allergy", label: "Seafood Allergy" },
+    { key: "pet_food", label: "Pet Food" },
+];
+
 export interface DietaryRequirementsTableRow {
     id: string;
     dietary_requirement: string;
@@ -63,6 +75,22 @@ export const fetchDietaryRequirementsForTable =
 
         return { data: formattedData, error: null };
     };
+
+export interface ListItem {
+    id: string;
+    name: string;
+}
+
+export const fetchAllItems = async (): Promise<ListItem[]> => {
+    const { data, error } = await supabase.from("lists").select("primary_key, item_name");
+
+    if (error) throw error;
+
+    return data.map((row) => ({
+        id: row.primary_key,
+        name: row.item_name,
+    }));
+};
 
 function getFormattedData(rawData: DietaryRequirementsRawData[]): DietaryRequirementsTableRow[] {
     if (!rawData || rawData.length === 0) {
