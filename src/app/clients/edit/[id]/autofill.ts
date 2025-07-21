@@ -1,8 +1,8 @@
-import { Schema } from "@/databaseUtils";
 import { ClientFields } from "@/app/clients/form/ClientForm";
-import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
-import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
 import { getFormattedPeople } from "@/common/formatFamiliesData";
+import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
+import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
+import { Schema } from "@/databaseUtils";
 
 const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
     const reverted: BooleanGroup = {};
@@ -27,7 +27,7 @@ const autofill = (
         addressLine2: noPostcode ? "" : clientData.address_2 ?? "",
         addressTown: noPostcode ? "" : clientData.address_town ?? "",
         addressCounty: noPostcode ? "" : clientData.address_county ?? "",
-        addressPostcode: clientData.address_postcode,
+        addressPostcode: clientData.address_postcode ?? "",
         numberOfAdults: adults.length,
         adults: adults,
         numberOfChildren: children.length,

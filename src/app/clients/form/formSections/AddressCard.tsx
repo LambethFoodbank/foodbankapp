@@ -1,16 +1,16 @@
+import { Checkbox, FormControlLabel } from "@mui/material";
 import React, { useState } from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
-    Errors,
     errorExists,
-    getErrorText,
+    Errors,
     getDefaultTextValue,
+    getErrorText,
     onChangeText,
 } from "@/components/Form/formFunctions";
-import GenericFormCard from "@/components/Form/GenericFormCard";
 import { GappedDiv } from "@/components/Form/formStyling";
+import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
-import { Checkbox, FormControlLabel } from "@mui/material";
 
 export const postcodeRegex =
     /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})$/;
@@ -35,7 +35,7 @@ const AddressCard: React.FC<ClientCardProps> = ({
         if (event.target.checked) {
             errorSetter({ addressPostcode: Errors.none, addressLine1: Errors.none });
             fieldSetter({
-                addressPostcode: null,
+                addressPostcode: "",
                 addressLine1: "",
                 addressLine2: "",
                 addressTown: "",
