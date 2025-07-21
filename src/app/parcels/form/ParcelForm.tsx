@@ -5,7 +5,6 @@ import InfoIcon from "@mui/icons-material/Info";
 import { Button, IconButton } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "styled-components";
 import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
@@ -49,6 +48,52 @@ import {
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { Schema } from "@/databaseUtils";
+
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useTheme } from "styled-components";
+import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
+import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
+import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
+import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
+import DeliveryInstructionsCard from "@/app/parcels/form/formSections/DeliveryInstructionsCard";
+import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
+import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
+import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
+import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
+import {
+    WriteParcelToDatabaseErrors,
+    WriteParcelToDatabaseFunction,
+} from "@/app/parcels/form/submitFormHelpers";
+import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
+import {
+    CollectionCentresLabelsAndValues,
+    CollectionTimeSlotsLabelsAndValues,
+    getActiveTimeSlotsForCollectionCentre,
+    PackingSlotsLabelsAndValues,
+} from "@/common/fetch";
+import { getDbDate } from "@/common/format";
+import {
+    CardProps,
+    checkErrorOnSubmit,
+    createSetter,
+    Errors,
+    Fields,
+    FormErrors,
+} from "@/components/Form/formFunctions";
+import {
+    CenterComponent,
+    FormErrorText,
+    StyledForm,
+    StyledName,
+} from "@/components/Form/formStyling";
+
+import Icon from "@/components/Icons/Icon";
+import Modal from "@/components/Modal/Modal";
+import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 
@@ -67,6 +112,7 @@ export interface ParcelFields extends Fields {
     collectionSlot: string | null;
     collectionCentre: string | null;
     lastUpdated: string | undefined;
+    deliveryInstructions: string | null | undefined;
     notes: string | null;
 }
 
@@ -79,6 +125,7 @@ export interface ParcelErrors extends FormErrors<ParcelFields> {
     collectionDate: Errors;
     collectionSlot: Errors;
     collectionCentre: Errors;
+    deliveryInstructions: Errors;
     referrerEmail: Errors;
     referrerPhone: Errors;
 }
@@ -100,6 +147,7 @@ export const initialParcelFields: ParcelFields = {
     collectionSlot: null,
     collectionCentre: null,
     lastUpdated: undefined,
+    deliveryInstructions: null, // this should be the client's field
     notes: null,
 };
 
@@ -112,6 +160,7 @@ export const initialParcelFormErrors: ParcelErrors = {
     collectionDate: Errors.initial,
     collectionSlot: Errors.initial,
     collectionCentre: Errors.initial,
+    deliveryInstructions: Errors.none,
     referralAgency: Errors.none,
     referrerName: Errors.none,
     referrerEmail: Errors.none,
@@ -148,6 +197,7 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
 
@@ -315,6 +365,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             collection_centre: isDelivery ? deliveryPrimaryKey : fields.collectionCentre,
             collection_datetime: collectionDateTime,
             last_updated: fields.lastUpdated,
+            delivery_instructions: fields.delivery_instructions,
             referral_agency: fields.referralAgency,
             referrer_name: fields.referrerName,
             referrer_email: fields.referrerEmail,
