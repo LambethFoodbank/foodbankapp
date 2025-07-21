@@ -2,7 +2,7 @@ import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import supabase from "@/supabaseClient";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
-import { ClientFields } from "./ClientForm";
+import { ClientFields, DeliveryAreaFields } from "./ClientForm";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
 
@@ -66,6 +66,17 @@ export const formatClientRecord = (
     };
 };
 
+export const formatDeliveryAreaRecord = (
+    fields: ClientFields
+): DeliveryAreaDatabaseInsertRecord => {
+    return {
+        is_deliverable: true,
+        // order: 1,
+        postcode: fields.addressPostcode,
+    };
+};
+
+
 type addClientErrors = "failedToInsertClientAndFamily";
 export type addClientResult =
     | { clientId: string; error: null }
@@ -73,6 +84,34 @@ export type addClientResult =
           clientId: null;
           error: { type: addClientErrors; logId: string };
       };
+
+export type DeliveryAreaDatabaseInsertRecord = InsertSchema["delivery_areas"];
+type InsertDeliveryAreaErrorType = "failedToInsertDeliveryArea";
+export type InsertDeliveryAreaReturnType = {
+    error: { type: InsertDeliveryAreaErrorType; logId: string } | null;
+};
+type InsertDeliveryArea = (deliveryAreaRecord: DeliveryAreaDatabaseInsertRecord) => Promise<InsertDeliveryAreaReturnType>;
+
+export const insertDeliveryArea: InsertDeliveryArea = async (deliveryAreaRecord) => {
+    const { data, error } = await supabase
+        .from("delivery_areas")
+        .insert(deliveryAreaRecord)
+        .single();
+
+    const auditLog = {
+        action: "add a delivery area",
+        content: { deliveryAreaDetails: deliveryAreaRecord },
+    } as const satisfies Partial<AuditLog>;
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with insert: delivery area data", error);
+        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+        return { id: null, error: { type: "failedToInsertDeliveryArea", logId } };
+    }
+
+    await sendAuditLog({ ...auditLog, wasSuccess: true});
+    return { error: null };
+};
 
 export const submitAddClientForm = async (fields: ClientFields): Promise<addClientResult> => {
     const clientRecord = formatClientRecord(fields);
@@ -82,6 +121,9 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         familymembers: familyMembers,
     });
 
+    const deliveryAreaRecord = formatDeliveryAreaRecord(fields);
+    await insertDeliveryArea(deliveryAreaRecord);
+    
     const auditLog = {
         action: "add a client",
         content: {
