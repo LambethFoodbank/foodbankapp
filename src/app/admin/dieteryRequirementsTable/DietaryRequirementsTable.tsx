@@ -11,10 +11,13 @@ import Header from "@/app/admin/websiteDataTable/Header";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
 import supabase from "@/supabaseClient";
+import { Button } from "@mui/material";
+import { EditDietaryRequirementsModal } from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsForm";
 
 const DietaryRequirementsTable: React.FC = () => {
     const [rows, setRows] = useState<DietaryRequirementsTableRow[]>([]);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+    const [openEditModal, setOpenEditModal] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -38,9 +41,10 @@ const DietaryRequirementsTable: React.FC = () => {
             .channel("dietary-requirements-table-changes")
             .on(
                 "postgres_changes",
-                { event: "*", schema: "public", table: "dietary_requirements_plus" },
+                { event: "*", schema: "public", table: "dietary_requirements" },
                 getDietaryRequirementsForTable
             )
+
             .subscribe((status, error) => {
                 if (
                     subscriptionStatusRequiresErrorMessage(
@@ -92,6 +96,15 @@ const DietaryRequirementsTable: React.FC = () => {
 
     return (
         <>
+            <Button variant="contained" onClick={() => setOpenEditModal(true)}>
+                Edit Dietary Requirements
+            </Button>
+
+            <EditDietaryRequirementsModal
+                open={openEditModal}
+                onClose={() => setOpenEditModal(false)}
+            />
+
             {errorMessage && (
                 <FloatingToast
                     message={errorMessage}
