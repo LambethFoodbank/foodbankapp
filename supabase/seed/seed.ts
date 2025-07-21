@@ -6,6 +6,7 @@ which only gets generated after running npx snaplet generate with local database
 import { createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
 import { packingSlots } from "./packingSlotsSeed";
+import { possibleDeliveryAreas } from "./postcodeSeed";
 import {
     booleansWeightedToTrue,
     possibleBabyOtherItems,
@@ -53,6 +54,8 @@ const main = async (): Promise<never> => {
     await seed.$resetDatabase(); // Clears all existing data in the database, but keep the structure
 
     await seed.packing_slots(packingSlots);
+
+    await seed.delivery_areas(possibleDeliveryAreas);
 
     const today = new Date();
     const thisYear = today.getFullYear();
