@@ -1,11 +1,12 @@
-import React from "react";
-import { onChangeDate, getErrorText } from "@/components/Form/formFunctions";
-import GenericFormCard from "@/components/Form/GenericFormCard";
 import { DatePicker } from "@mui/x-date-pickers";
-import { ErrorText } from "@/components/Form/formStyling";
-import dayjs from "dayjs";
-import { ParcelCardProps } from "../ParcelForm";
+import dayjs, { Dayjs } from "dayjs";
+import React from "react";
 import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
+import { getAvailableDaysIndices } from "@/common/format";
+import { getErrorText, onChangeDate } from "@/components/Form/formFunctions";
+import { ErrorText } from "@/components/Form/formStyling";
+import GenericFormCard from "@/components/Form/GenericFormCard";
+import { ParcelCardProps } from "../ParcelForm";
 
 interface DateCardProps extends ParcelCardProps {
     availableDays: DbCollectionCentreAvailableDaysType;
@@ -18,7 +19,14 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
     fields,
     availableDays,
 }) => {
-    console.log(availableDays);
+    const availableDaysIndices = getAvailableDaysIndices(availableDays);
+
+    console.log(availableDaysIndices);
+
+    const isUnavailable = (availableDay: Dayjs): boolean => {
+        return !availableDaysIndices?.includes(dayjs(availableDay).day()) as boolean;
+    };
+
     return (
         <GenericFormCard
             title="Collection Date"
@@ -32,6 +40,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
                     }}
                     label="Date"
                     value={fields.collectionDate ? dayjs(fields.collectionDate) : null}
+                    shouldDisableDate={isUnavailable}
                 />
                 <ErrorText>{getErrorText(formErrors.collectionDate)}</ErrorText>
             </>
