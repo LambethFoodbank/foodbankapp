@@ -5,13 +5,20 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { ErrorText } from "@/components/Form/formStyling";
 import dayjs from "dayjs";
 import { ParcelCardProps } from "../ParcelForm";
+import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
 
-const CollectionDateCard: React.FC<ParcelCardProps> = ({
+interface DateCardProps extends ParcelCardProps {
+    availableDays: DbCollectionCentreAvailableDaysType;
+}
+
+const CollectionDateCard: React.FC<DateCardProps> = ({
     fieldSetter,
     errorSetter,
     formErrors,
     fields,
+    availableDays,
 }) => {
+    console.log(availableDays);
     return (
         <GenericFormCard
             title="Collection Date"
