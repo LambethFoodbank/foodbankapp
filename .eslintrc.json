@@ -35,7 +35,7 @@
       "argsIgnorePattern": "^_"
     }],
     "react/jsx-key": "error",
-    "react/no-array-index-key": "error",
+    "react/no-array-index-key": "error"
 //    "sort-imports": [
 //      "warn",
 //      {
