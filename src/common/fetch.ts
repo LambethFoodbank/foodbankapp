@@ -1,8 +1,8 @@
-import { DbWikiRow, Schema } from "@/databaseUtils";
-import { Supabase } from "@/supabaseUtils";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
 import { formatTimeStringToHoursAndMinutes } from "@/common/format";
+import { DbWikiRow, Schema } from "@/databaseUtils";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { Supabase } from "@/supabaseUtils";
 import { ListType } from "./databaseListTypes";
 
 type CollectionCentre = Pick<
@@ -11,6 +11,8 @@ type CollectionCentre = Pick<
 >;
 
 type PackingSlot = Pick<Schema["packing_slots"], "primary_key" | "is_shown" | "name">;
+
+type Client = Pick<Schema["clients"], "primary_key" | "delivery_instructions">;
 
 type DatabaseProfile = Pick<
     Schema["profiles"],
@@ -37,6 +39,7 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     primary_key: string;
     voucher_number: string | null;
     last_updated: string | undefined;
+    client: Client | null;
     referral_agency: string | null;
     referrer_name: string | null;
     referrer_email: string | null;
@@ -72,6 +75,10 @@ export const fetchParcel = async (
                 name,
                 primary_key,
                 is_shown
+            ),
+            client: clients(
+                primary_key,
+                delivery_instructions
             )`
         )
         .eq("primary_key", parcelID)
@@ -86,6 +93,7 @@ export const fetchParcel = async (
         );
         return { data: null, error: { type: "noMatchingParcels", logId: logId } };
     }
+
     return { data: data, error: null };
 };
 
