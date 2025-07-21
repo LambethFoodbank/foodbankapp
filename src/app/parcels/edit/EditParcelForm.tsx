@@ -17,7 +17,7 @@ import {
     getActiveCollectionCentres,
     PackingSlotsError,
     PackingSlotsLabelsAndValues,
-    ParcelWithCollectionCentreAndPackingSlot
+    ParcelWithCollectionCentreAndPackingSlot,
 } from "@/common/fetch";
 import { capitaliseWords, formatDatetimeAsTime } from "@/common/format";
 import { parseQueryParams } from "@/common/urlQueryParams";
