@@ -174,6 +174,25 @@ type DbCollectionTimeSlotType = {
     is_active: boolean;
 };
 
+type FetchCollectionAvailableDaysResponse =
+    | {
+          data: DbCollectionCentreAvailableDaysType;
+          error: null;
+      }
+    | {
+          data: null;
+          error: FetchCollectionAvailableDaysError;
+      };
+
+type FetchCollectionAvailableDaysErrorType = "collectionAvailableDaysFetchFailed";
+
+export type FetchCollectionAvailableDaysError = {
+    type: FetchCollectionAvailableDaysErrorType;
+    logId: string;
+};
+
+export type DbCollectionCentreAvailableDaysType = Schema["collection_centres"]["available_days"];
+
 export const getActiveTimeSlotsForCollectionCentre = async (
     collectionCentrePrimaryKey: string,
     supabase: Supabase
@@ -208,6 +227,35 @@ export const getActiveTimeSlotsForCollectionCentre = async (
         ]);
 
     return { data: activeTimeSlots, error: null };
+};
+
+export const getAvailableDaysForCollectionCentre = async (
+    collectionCentrePrimaryKey: string,
+    supabase: Supabase
+): Promise<FetchCollectionAvailableDaysResponse> => {
+    const { data, error } = await supabase
+        .from("collection_centres")
+        .select("available_days")
+        .eq("primary_key", collectionCentrePrimaryKey)
+        .single();
+
+    if (error) {
+        const logId = await logErrorReturnLogId(
+            "Error with fetch: Collection available days data",
+            error
+        );
+        return { data: null, error: { type: "collectionAvailableDaysFetchFailed", logId: logId } };
+    }
+
+    if (!data.available_days) {
+        return { data: [], error: null };
+    }
+
+    const availableDays: DbCollectionCentreAvailableDaysType = data.available_days.filter(
+        (availableDay) => availableDay.is_active
+    );
+
+    return { data: availableDays, error: null };
 };
 
 export type FetchClientError = { type: FetchClientErrorType; logId: string };

@@ -25,32 +25,34 @@ import { Schema } from "@/databaseUtils";
 
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useTheme } from "styled-components";
-import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
 import { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
 import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
 import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
-import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
 import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
 import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
-import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
-import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
 import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
+import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
+import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
 import {
     WriteParcelToDatabaseErrors,
     WriteParcelToDatabaseFunction,
 } from "@/app/parcels/form/submitFormHelpers";
-import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
 import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
+    DbCollectionCentreAvailableDaysType,
     getActiveTimeSlotsForCollectionCentre,
+    getAvailableDaysForCollectionCentre,
     PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
+import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
+import { useTheme } from "styled-components";
+import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
 import { getDbDate } from "@/common/format";
+import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
@@ -208,6 +210,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [clientDetails, setClientDetails] = useState<ExpandedClientData | null>(null);
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
+    const [collectionAvailableDays, setAvailableDays] =
+        useState<DbCollectionCentreAvailableDaysType>([]);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 
@@ -247,6 +251,32 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         };
 
         void getTimeSlots();
+    }, [fields.collectionCentre, initialFormErrors]);
+
+    useEffect(() => {
+        const getAvailableDays = async (): Promise<void> => {
+            if (fields.collectionCentre) {
+                const { data, error } = await getAvailableDaysForCollectionCentre(
+                    fields.collectionCentre,
+                    supabase
+                );
+
+                if (error) {
+                    let errorMessage;
+                    switch (error.type) {
+                        case "collectionAvailableDaysFetchFailed":
+                            errorMessage = "Failed to fetch collection time slots";
+                            break;
+                    }
+                    setSubmitErrorMessage(`${errorMessage}. Log ID: ${error.logId}`);
+                    return;
+                }
+
+                setAvailableDays(data);
+            }
+        };
+
+        void getAvailableDays();
     }, [fields.collectionCentre, initialFormErrors]);
 
     useEffect(() => {
@@ -388,6 +418,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                             collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                             packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                             collectionTimeSlotsLabelsAndValues={collectionSlotsLabelsAndValues}
+                            availableDays={collectionAvailableDays}
                             listTypeLabelsAndValues={listTypeLabelsAndValues}
                         />
                     );
