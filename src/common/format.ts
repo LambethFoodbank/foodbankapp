@@ -1,6 +1,8 @@
 import { Json } from "@/databaseTypesFile";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { DAYSOFWEEK_ARRAY } from "@/common/databaseDaysOfWeek";
+import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
 
 const localeCode = "en-GB";
 
@@ -177,4 +179,16 @@ export const formatDayjsToHoursAndMinutes = (dayjsTime: Dayjs): string => {
     const hours = String(dayjsTime.hour()).padStart(2, "0");
     const minutes = String(dayjsTime.minute()).padStart(2, "0");
     return `${hours}:${minutes}`;
+};
+
+export const getAvailableDaysIndices = (
+    available_days: DbCollectionCentreAvailableDaysType
+): number[] | null => {
+    if (available_days == null) {
+        return [];
+    }
+
+    return available_days.map((available_day) => {
+        return DAYSOFWEEK_ARRAY.indexOf(available_day.day != null ? available_day.day : "");
+    });
 };
