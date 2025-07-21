@@ -4,7 +4,7 @@ import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
-import { ClientFields, DeliveryAreaFields } from "./ClientForm";
+import { ClientFields } from "./ClientForm";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
