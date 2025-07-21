@@ -1,6 +1,16 @@
 "use client";
 
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import InfoIcon from "@mui/icons-material/Info";
+import { Button, IconButton } from "@mui/material";
+import dayjs, { Dayjs } from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
+import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
+import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
+import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
 import {
     CardProps,
     checkErrorOnSubmit,
@@ -16,36 +26,27 @@ import {
     StyledName,
 } from "@/components/Form/formStyling";
 
-import { useRouter } from "next/navigation";
-
-import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
-import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
 import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
-import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
 import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
-import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
 import {
     WriteParcelToDatabaseErrors,
     WriteParcelToDatabaseFunction,
 } from "@/app/parcels/form/submitFormHelpers";
-import { Button, IconButton } from "@mui/material";
+import Icon from "@/components/Icons/Icon";
+import Modal from "@/components/Modal/Modal";
 import { Schema } from "@/databaseUtils";
-import dayjs, { Dayjs } from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
+    DbCollectionCentreAvailableDaysType,
     getActiveTimeSlotsForCollectionCentre,
+    getAvailableDaysForCollectionCentre,
     PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
 import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
 import getExpandedClientDetails, {
     ExpandedClientData,
 } from "@/app/clients/getExpandedClientDetails";
-import Modal from "@/components/Modal/Modal";
-import InfoIcon from "@mui/icons-material/Info";
-import Icon from "@/components/Icons/Icon";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "styled-components";
 import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
 import { getDbDate } from "@/common/format";
@@ -196,6 +197,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [clientDetails, setClientDetails] = useState<ExpandedClientData | null>(null);
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
+    const [collectionAvailableDays, setAvailableDays] =
+        useState<DbCollectionCentreAvailableDaysType>([]);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 
@@ -235,6 +238,32 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         };
 
         void getTimeSlots();
+    }, [fields.collectionCentre, initialFormErrors]);
+
+    useEffect(() => {
+        const getAvailableDays = async (): Promise<void> => {
+            if (fields.collectionCentre) {
+                const { data, error } = await getAvailableDaysForCollectionCentre(
+                    fields.collectionCentre,
+                    supabase
+                );
+
+                if (error) {
+                    let errorMessage;
+                    switch (error.type) {
+                        case "collectionAvailableDaysFetchFailed":
+                            errorMessage = "Failed to fetch collection time slots";
+                            break;
+                    }
+                    setSubmitErrorMessage(`${errorMessage}. Log ID: ${error.logId}`);
+                    return;
+                }
+
+                setAvailableDays(data);
+            }
+        };
+
+        void getAvailableDays();
     }, [fields.collectionCentre, initialFormErrors]);
 
     const formSections =
@@ -347,6 +376,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                             collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                             packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                             collectionTimeSlotsLabelsAndValues={collectionSlotsLabelsAndValues}
+                            availableDays={collectionAvailableDays}
                             listTypeLabelsAndValues={listTypeLabelsAndValues}
                         />
                     );
