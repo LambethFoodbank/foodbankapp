@@ -1571,7 +1571,11 @@
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
-          "sequence": false,
+          "sequence": {
+            "identifier": "\"public\".\"delivery_areas_order_seq\"",
+            "increment": 1,
+            "start": 1
+          },
           "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
@@ -1603,6 +1607,13 @@
           "name": "delivery_areas_pkey",
           "fields": [
             "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "delivery_areas_postcode_key",
+          "fields": [
+            "postcode"
           ],
           "nullNotDistinct": false
         }
