@@ -10,10 +10,6 @@ import {
     Box,
     Button,
     Checkbox,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     FormControlLabel,
     Grid,
     MenuItem,
@@ -21,6 +17,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import Modal from "@/components/Modal/Modal";
 
 interface Props {
     open: boolean;
@@ -43,6 +40,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
             setItems(items);
 
             const { data } = await supabase.from("dietary_requirements_plus").select();
+
             if (!data) {
                 return;
             }
@@ -68,19 +66,19 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
                         case "meat":
                             value = row.meat;
                             break;
-                        case "glutenFree":
+                        case "gluten_free":
                             value = row.gluten_free;
                             break;
                         case "pescatarian":
                             value = row.pescatarian;
                             break;
-                        case "dairyFree":
+                        case "dairy_free":
                             value = row.dairy_free;
                             break;
-                        case "seafoodAllergy":
+                        case "seafood_allergy":
                             value = row.seafood_allergy;
                             break;
-                        case "petFood":
+                        case "pet_food":
                             value = row.pet_food;
                             break;
                     }
@@ -157,80 +155,85 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle fontWeight="bold" variant="h5">
-                Edit Dietary Requirements
-            </DialogTitle>
-            <DialogContent>
-                <Box mb={3}>
-                    <Typography fontWeight="bold" variant="h6">
-                        Select Dietary Requirement Type:
-                    </Typography>
-                    <Select
-                        fullWidth
-                        value={selectedType}
-                        onChange={(event) => {
-                            setSelectedType(event.target.value);
-                            setIncluded(new Set());
-                            setExcluded(new Set());
-                        }}
-                    >
-                        {dietaryRequirementTypes.map((dietary) => (
-                            <MenuItem key={dietary.key} value={dietary.key}>
-                                {dietary.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </Box>
+        <Modal
+            isOpen={open}
+            onClose={onClose}
+            header="Edit Dietary Requirements"
+            headerId="edit-dietary-requirements-modal"
+            maxWidth="md"
+            footer={
+                <>
+                    <Button onClick={onClose} sx={{ mr: 2 }}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSubmit} variant="contained">
+                        Save
+                    </Button>
+                </>
+            }
+        >
+            <Box mb={3}>
+                <Typography fontWeight="bold" variant="h6">
+                    Select Dietary Requirement Type:
+                </Typography>
+                <Select
+                    fullWidth
+                    value={selectedType}
+                    onChange={(event) => {
+                        setSelectedType(event.target.value);
+                        setIncluded(new Set());
+                        setExcluded(new Set());
+                    }}
+                >
+                    {dietaryRequirementTypes.map((dietary) => (
+                        <MenuItem key={dietary.key} value={dietary.key}>
+                            {dietary.label}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </Box>
 
-                <Box sx={{ mt: 4, mb: 4 }}>
-                    <Typography fontWeight="bold" variant="h6" gutterBottom>
-                        Included
-                    </Typography>
-                    <Grid container spacing={0.5}>
-                        {items.map((item) => (
-                            <Grid item xs={6} sm={4} md={4} key={`included-${item.id}`}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={included.has(item.id)}
-                                            onChange={() => handleToggle(item.id, "included")}
-                                        />
-                                    }
-                                    label={item.name}
-                                />
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Box>
+            <Box sx={{ mt: 4, mb: 4 }}>
+                <Typography fontWeight="bold" variant="h6" gutterBottom>
+                    Included
+                </Typography>
+                <Grid container spacing={0.5}>
+                    {items.map((item) => (
+                        <Grid item xs={6} sm={4} md={4} key={`included-${item.id}`}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={included.has(item.id)}
+                                        onChange={() => handleToggle(item.id, "included")}
+                                    />
+                                }
+                                label={item.name}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
 
-                <Box>
-                    <Typography fontWeight="bold" variant="h6" gutterBottom>
-                        Excluded
-                    </Typography>
-                    <Grid container spacing={0.5}>
-                        {items.map((item) => (
-                            <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={excluded.has(item.id)}
-                                            onChange={() => handleToggle(item.id, "excluded")}
-                                        />
-                                    }
-                                    label={item.name}
-                                />
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Box>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleSubmit} variant="contained">
-                    Save
-                </Button>
-            </DialogActions>
-        </Dialog>
+            <Box>
+                <Typography fontWeight="bold" variant="h6" gutterBottom>
+                    Excluded
+                </Typography>
+                <Grid container spacing={0.5}>
+                    {items.map((item) => (
+                        <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={excluded.has(item.id)}
+                                        onChange={() => handleToggle(item.id, "excluded")}
+                                    />
+                                }
+                                label={item.name}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
+        </Modal>
     );
 };
