@@ -219,6 +219,8 @@ const databaseErrorMessageFromErrorType = (
             return `Failed to insert parcel. Log ID: ${logId}`;
         case "failedToUpdateParcel":
             return `Failed to update parcel. Log ID: ${logId}`;
+        case "failedToUpdateDeliveryInstructions":
+            return `Failed to update delivery instructions. Log ID: ${logId}`;
         case "concurrentUpdateConflict":
             return `Record has been edited recently - please refresh the page. LogID: ${logId}`;
     }
@@ -373,7 +375,10 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             notes: fields.notes,
         };
 
-        const { parcelId, error } = await writeParcelInfoToDatabase(parcelRecord);
+        const { parcelId, error } = await writeParcelInfoToDatabase(
+            parcelRecord,
+            fields.deliveryInstructions == null ? "" : fields.deliveryInstructions
+        );
 
         if (parcelId) {
             if (returnPath) {

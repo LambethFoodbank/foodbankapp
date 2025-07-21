@@ -1,7 +1,8 @@
-import supabase from "@/supabaseClient";
+import { updateClientDeliveryInstructions } from "@/app/clients/updateDeliveryInstructions";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import supabase from "@/supabaseClient";
 
 export type WriteParcelToDatabaseFunction = UpdateParcel | InsertParcel;
 export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelErrorType;
@@ -44,7 +45,10 @@ export const insertParcel: InsertParcel = async (parcelRecord) => {
     return { parcelId: data.primary_key, error: null };
 };
 
-type UpdateParcelErrorType = "failedToUpdateParcel" | "concurrentUpdateConflict";
+type UpdateParcelErrorType =
+    | "failedToUpdateParcel"
+    | "concurrentUpdateConflict"
+    | "failedToUpdateDeliveryInstructions";
 export type UpdateParcelError = { type: UpdateParcelErrorType; logId: string };
 type UpdateParcelReturnType = {
     error: UpdateParcelError | null;
@@ -52,38 +56,56 @@ type UpdateParcelReturnType = {
 };
 
 type UpdateParcelWithPrimaryKey = (primaryKey: string) => UpdateParcel;
-type UpdateParcel = (parcelRecord: ParcelDatabaseUpdateRecord) => Promise<UpdateParcelReturnType>;
+type UpdateParcel = (
+    parcelRecord: ParcelDatabaseUpdateRecord,
+    deliveryInstructions: string | undefined
+) => Promise<UpdateParcelReturnType>;
 
-export const updateParcel: UpdateParcelWithPrimaryKey = (primaryKey) => async (parcelRecord) => {
-    const { error, count } = await supabase
-        .from("parcels")
-        .update(parcelRecord, { count: "exact" })
-        .eq("primary_key", primaryKey)
-        .eq("last_updated", parcelRecord.last_updated);
+export const updateParcel: UpdateParcelWithPrimaryKey =
+    (primaryKey) => async (parcelRecord, deliveryInstructions) => {
+        const { error, count } = await supabase
+            .from("parcels")
+            .update(parcelRecord, { count: "exact" })
+            .eq("primary_key", primaryKey)
+            .eq("last_updated", parcelRecord.last_updated);
 
-    const auditLog = {
-        action: "edit a parcel",
-        content: { parcelDetails: parcelRecord, count: count },
-        clientId: parcelRecord.client_id,
-        collectionCentreId: parcelRecord.collection_centre
-            ? parcelRecord.collection_centre
-            : undefined,
-        packingSlotId: parcelRecord.packing_slot ? parcelRecord.packing_slot : undefined,
-        parcelId: primaryKey,
-    } as const satisfies Partial<AuditLog>;
+        const auditLog = {
+            action: "edit a parcel",
+            content: { parcelDetails: parcelRecord, count: count },
+            clientId: parcelRecord.client_id,
+            collectionCentreId: parcelRecord.collection_centre
+                ? parcelRecord.collection_centre
+                : undefined,
+            packingSlotId: parcelRecord.packing_slot ? parcelRecord.packing_slot : undefined,
+            parcelId: primaryKey,
+        } as const satisfies Partial<AuditLog>;
 
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with update: parcel data", error);
-        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-        return { parcelId: null, error: { type: "failedToUpdateParcel", logId } };
-    }
+        if (error) {
+            const logId = await logErrorReturnLogId("Error with update: parcel data", error);
+            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+            return { parcelId: null, error: { type: "failedToUpdateParcel", logId } };
+        }
 
-    if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of parcel");
-        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-        return { parcelId: null, error: { type: "concurrentUpdateConflict", logId } };
-    }
+        if (count === 0) {
+            const logId = await logWarningReturnLogId("Concurrent editing of parcel");
+            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+            return { parcelId: null, error: { type: "concurrentUpdateConflict", logId } };
+        }
 
-    await sendAuditLog({ ...auditLog, wasSuccess: true });
-    return { parcelId: primaryKey, error: null };
-};
+        const { error: updateDeliveryInstructionsError } = await updateClientDeliveryInstructions(
+            parcelRecord.client_id == undefined ? "" : parcelRecord.client_id,
+            deliveryInstructions
+        );
+
+        if (updateDeliveryInstructionsError) {
+            const logId = await logErrorReturnLogId(
+                "Error with update: parcel data",
+                updateDeliveryInstructionsError
+            );
+            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+            return { parcelId: null, error: { type: "failedToUpdateDeliveryInstructions", logId } };
+        }
+
+        await sendAuditLog({ ...auditLog, wasSuccess: true });
+        return { parcelId: primaryKey, error: null };
+    };
