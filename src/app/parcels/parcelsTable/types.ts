@@ -120,6 +120,11 @@ export interface packingSlotOptionsSet {
     value: string;
 }
 
+export interface deliveryAreaOptionsSet {
+    key: string;
+    value: boolean;
+}
+
 type FetchClientIdAndIsActiveErrorType = "failedClientIdAndIsActiveFetch" | "noMatchingClient";
 
 export interface FetchClientIdAndIsActiveError {

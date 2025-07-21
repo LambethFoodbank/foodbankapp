@@ -1027,6 +1027,7 @@ export type Database = {
           created_at: string | null
           family_count: number | null
           flagged_for_attention: boolean | null
+          is_deliverable: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
