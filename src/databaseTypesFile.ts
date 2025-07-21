@@ -906,6 +906,7 @@ export type Database = {
           collection_datetime: string | null
           created_at: string | null
           family_count: number | null
+          is_deliverable: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
