@@ -1,14 +1,15 @@
-import { InsertSchema, UpdateSchema } from "@/databaseUtils";
-import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
-import supabase from "@/supabaseClient";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
-import { ClientFields, DeliveryAreaFields } from "./ClientForm";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
+import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
+import { InsertSchema, UpdateSchema } from "@/databaseUtils";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import supabase from "@/supabaseClient";
+import { ClientFields, DeliveryAreaFields } from "./ClientForm";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
 export type ClientDatabaseUpdateRecord = UpdateSchema["clients"];
+export type DeliveryAreaDatabaseInsertRecord = InsertSchema["delivery_areas"];
 
 const personToFamilyRecordWithoutFamilyId = (person: Person): FamilyDatabaseInsertRecord => {
     return {
@@ -75,11 +76,9 @@ export const formatDeliveryAreaRecord = (
 ): DeliveryAreaDatabaseInsertRecord => {
     return {
         is_deliverable: true,
-        // order: 1,
-        postcode: fields.addressPostcode,
+        postcode: fields.addressPostcode.split(/\s+/)[0],
     };
 };
-
 
 type addClientErrors = "failedToInsertClientAndFamily";
 export type addClientResult =
@@ -89,18 +88,16 @@ export type addClientResult =
           error: { type: addClientErrors; logId: string };
       };
 
-export type DeliveryAreaDatabaseInsertRecord = InsertSchema["delivery_areas"];
 type InsertDeliveryAreaErrorType = "failedToInsertDeliveryArea";
 export type InsertDeliveryAreaReturnType = {
     error: { type: InsertDeliveryAreaErrorType; logId: string } | null;
 };
-type InsertDeliveryArea = (deliveryAreaRecord: DeliveryAreaDatabaseInsertRecord) => Promise<InsertDeliveryAreaReturnType>;
+type InsertDeliveryArea = (
+    deliveryAreaRecord: DeliveryAreaDatabaseInsertRecord
+) => Promise<InsertDeliveryAreaReturnType>;
 
 export const insertDeliveryArea: InsertDeliveryArea = async (deliveryAreaRecord) => {
-    const { data, error } = await supabase
-        .from("delivery_areas")
-        .insert(deliveryAreaRecord)
-        .single();
+    const { error } = await supabase.from("delivery_areas").insert(deliveryAreaRecord).single();
 
     const auditLog = {
         action: "add a delivery area",
@@ -113,7 +110,7 @@ export const insertDeliveryArea: InsertDeliveryArea = async (deliveryAreaRecord)
         return { id: null, error: { type: "failedToInsertDeliveryArea", logId } };
     }
 
-    await sendAuditLog({ ...auditLog, wasSuccess: true});
+    await sendAuditLog({ ...auditLog, wasSuccess: true });
     return { error: null };
 };
 
@@ -127,7 +124,7 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
 
     const deliveryAreaRecord = formatDeliveryAreaRecord(fields);
     await insertDeliveryArea(deliveryAreaRecord);
-    
+
     const auditLog = {
         action: "add a client",
         content: {
@@ -179,6 +176,8 @@ export const submitEditClientForm = async (
             clientid: primaryKey,
         }
     );
+    const deliveryAreaRecord = formatDeliveryAreaRecord(fields);
+    await insertDeliveryArea(deliveryAreaRecord);
 
     const auditLog = {
         action: "edit a client",

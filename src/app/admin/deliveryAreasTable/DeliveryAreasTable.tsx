@@ -49,7 +49,11 @@ export interface DeliveryAreasRow {
 }
 
 const formatPostcode = (value: string): string => {
-    return value.toUpperCase().slice(0, 4);
+    value = value.toUpperCase().slice(0, 4);
+    if (!value.charAt(0).match(/[A-Z]/)) {
+        value = value.slice(0, 0);
+    }
+    return value;
 };
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
@@ -373,7 +377,9 @@ const DeliveryAreasTable: React.FC = () => {
             // formattingFunction: formatPostcode,
             //valueFormatter: (params) => {params.value = formatPostcode(params.value); console.log(params.value)},
             //valueSetter: (params) => {return formatPostcode(params.value);},
-            valueParser: (params) => {return formatPostcode(params)},
+            valueParser: (params) => {
+                return formatPostcode(params);
+            },
             renderHeader: (params) => <Header {...params} />,
         },
         {
