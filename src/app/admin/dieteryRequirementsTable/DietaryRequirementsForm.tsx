@@ -34,24 +34,62 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
     const [excluded, setExcluded] = useState<Set<string>>(new Set());
 
     useEffect(() => {
-        if (!open) return;
+        if (!open) {
+            return;
+        }
 
         const fetchData = async (): Promise<void> => {
             const items = await fetchAllItems();
             setItems(items);
 
             const { data } = await supabase.from("dietary_requirements_plus").select();
-            if (!data) return;
+            if (!data) {
+                return;
+            }
 
             const includedSet = new Set<string>();
             const excludedSet = new Set<string>();
 
             items.forEach((item) => {
-                const row = data.find((r) => r.id === item.id);
+                const row = data.find((iterRow) => iterRow.id === item.id);
+
                 if (row) {
-                    const value = row[selectedType];
-                    if (value === "included") includedSet.add(item.id);
-                    if (value === "excluded") excludedSet.add(item.id);
+                    let value: string | null = null;
+                    switch (selectedType) {
+                        case "halal":
+                            value = row.halal;
+                            break;
+                        case "vegetarian":
+                            value = row.vegetarian;
+                            break;
+                        case "vegan":
+                            value = row.vegan;
+                            break;
+                        case "meat":
+                            value = row.meat;
+                            break;
+                        case "glutenFree":
+                            value = row.gluten_free;
+                            break;
+                        case "pescatarian":
+                            value = row.pescatarian;
+                            break;
+                        case "dairyFree":
+                            value = row.dairy_free;
+                            break;
+                        case "seafoodAllergy":
+                            value = row.seafood_allergy;
+                            break;
+                        case "petFood":
+                            value = row.pet_food;
+                            break;
+                    }
+
+                    if (value === "included") {
+                        includedSet.add(item.id);
+                    } else if (value === "excluded") {
+                        excludedSet.add(item.id);
+                    }
                 }
             });
 
@@ -70,25 +108,30 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
             }));
 
             included.forEach((id) => {
-                const item = allUpdates.find((i) => i.id === id);
-                if (item) item[selectedType] = "included";
+                const item = allUpdates.find((iterItem) => iterItem.id === id);
+                if (item) {
+                    item[selectedType] = "included";
+                }
             });
 
             excluded.forEach((id) => {
-                const item = allUpdates.find((i) => i.id === id);
-                if (item) item[selectedType] = "excluded";
+                const item = allUpdates.find((iterItem) => iterItem.id === id);
+                if (item) {
+                    item[selectedType] = "excluded";
+                }
             });
 
             const { error } = await supabase
                 .from("dietary_requirements")
                 .upsert(allUpdates, { onConflict: "id" });
 
-            if (error) throw error;
+            if (error) {
+                throw error;
+            }
 
             onClose();
-        } catch (e) {
-            alert("Error saving data. Check console.");
-            console.error(e);
+        } catch (errorMessage) {
+            alert("Error saving data.");
         }
     };
 
@@ -115,59 +158,72 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>Edit Dietary Requirements</DialogTitle>
+            <DialogTitle fontWeight="bold" variant="h5">
+                Edit Dietary Requirements
+            </DialogTitle>
             <DialogContent>
-                <Box mb={2}>
-                    <Typography>Select Dietary Requirement Type:</Typography>
+                <Box mb={3}>
+                    <Typography fontWeight="bold" variant="h6">
+                        Select Dietary Requirement Type:
+                    </Typography>
                     <Select
                         fullWidth
                         value={selectedType}
-                        onChange={(e) => {
-                            setSelectedType(e.target.value);
+                        onChange={(event) => {
+                            setSelectedType(event.target.value);
                             setIncluded(new Set());
                             setExcluded(new Set());
                         }}
                     >
-                        {dietaryRequirementTypes.map((d) => (
-                            <MenuItem key={d.key} value={d.key}>
-                                {d.label}
+                        {dietaryRequirementTypes.map((dietary) => (
+                            <MenuItem key={dietary.key} value={dietary.key}>
+                                {dietary.label}
                             </MenuItem>
                         ))}
                     </Select>
                 </Box>
 
-                <Grid container spacing={4}>
-                    <Grid item xs={6}>
-                        <Typography fontWeight="bold">Included</Typography>
+                <Box sx={{ mt: 4, mb: 4 }}>
+                    <Typography fontWeight="bold" variant="h6" gutterBottom>
+                        Included
+                    </Typography>
+                    <Grid container spacing={0.5}>
                         {items.map((item) => (
-                            <FormControlLabel
-                                key={item.id}
-                                control={
-                                    <Checkbox
-                                        checked={included.has(item.id)}
-                                        onChange={() => handleToggle(item.id, "included")}
-                                    />
-                                }
-                                label={item.name}
-                            />
+                            <Grid item xs={6} sm={4} md={4} key={`included-${item.id}`}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={included.has(item.id)}
+                                            onChange={() => handleToggle(item.id, "included")}
+                                        />
+                                    }
+                                    label={item.name}
+                                />
+                            </Grid>
                         ))}
                     </Grid>
-                    <Grid item xs={6}>
-                        <Typography fontWeight="bold">Excluded</Typography>
+                </Box>
+
+                <Box>
+                    <Typography fontWeight="bold" variant="h6" gutterBottom>
+                        Excluded
+                    </Typography>
+                    <Grid container spacing={0.5}>
                         {items.map((item) => (
-                            <FormControlLabel
-                                key={item.id}
-                                control={
-                                    <Checkbox
-                                        checked={excluded.has(item.id)}
-                                        onChange={() => handleToggle(item.id, "excluded")}
-                                    />
-                                }
-                                label={item.name}
-                            />
+                            <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={excluded.has(item.id)}
+                                            onChange={() => handleToggle(item.id, "excluded")}
+                                        />
+                                    }
+                                    label={item.name}
+                                />
+                            </Grid>
                         ))}
                     </Grid>
-                </Grid>
+                </Box>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
