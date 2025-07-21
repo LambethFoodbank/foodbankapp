@@ -59,7 +59,7 @@ export interface ClientFields extends Fields {
     addressLine2: string;
     addressTown: string;
     addressCounty: string;
-    addressPostcode: string | null;
+    addressPostcode: string;
     adults: Person[];
     numberOfAdults: number;
     children: Person[];
@@ -83,6 +83,12 @@ export interface ClientFields extends Fields {
     signpostingCallReasons: BooleanGroup | null;
     lastUpdated: string | undefined;
     notes: string | null;
+}
+
+export interface DeliveryAreaFields extends Fields {
+    postcode: string | null;
+    isDeliverable: boolean;
+    order: number;
 }
 
 export interface ClientErrors extends FormErrors<ClientFields> {

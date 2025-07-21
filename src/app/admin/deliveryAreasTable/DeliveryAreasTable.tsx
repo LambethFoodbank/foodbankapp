@@ -49,26 +49,7 @@ export interface DeliveryAreasRow {
 }
 
 const formatPostcode = (value: string): string => {
-    value = value.toUpperCase();
-    value = value.slice(0, 4);
-    const regex = /^(GIR|[A-Z]{1,2}[0-9][0-9A-Z]?)$/;
-    console.log("before:", value);
-    if (isNaN(Number(value.charAt(3)))) {
-        value = value.slice(0,3);
-    } 
-    console.log("2:", value);
-    if (isNaN(Number(value.charAt(2)))) {
-        value = value.slice(0,2);
-    } 
-    console.log("3:", value);
-    if (!value.charAt(1).match(/[a-zA-Z]/)) {
-        value = value.slice(0, 1);
-    }
-    if (!value.charAt(0).match(/[a-zA-Z]/)) {
-        value = value.slice(0, 0);
-    }
-    console.log("after:", value);
-    return value;
+    return value.toUpperCase().slice(0, 4);
 };
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
