@@ -6,6 +6,7 @@ import {
     GridActionsCellItem,
     GridColDef,
     GridEventListener,
+    GridRemoveIcon,
     GridRowEditStopReasons,
     GridRowId,
     GridRowModes,
@@ -18,6 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import {
@@ -33,6 +35,7 @@ import Header from "../websiteDataTable/Header";
 import StyledDataGrid from "../common/StyledDataGrid";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
+import { Delete } from "@mui/icons-material";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -43,8 +46,6 @@ interface EditToolbarProps {
 export interface DeliveryAreasRow {
     id: string;
     postcode: string;
-    isDeliverable: boolean;
-    order: number;
     isNew: boolean;
 }
 
@@ -63,7 +64,7 @@ function EditToolbar(props: EditToolbarProps): React.JSX.Element {
         const id = rows.length + 1;
         setRows((oldRows) => [
             ...oldRows,
-            { id, postcode: "", isDeliverable: false, order: id, isNew: true },
+            { id, postcode: "", isNew: true },
         ]);
         setRowModesModel((oldModel) => ({
             ...oldModel,
@@ -90,9 +91,7 @@ function getBaseAuditLogForDeliveryAreasAction(
     return {
         action,
         content: {
-            currentDeliveryAreasOrder: deliveryAreasRow.order,
             deliveryAreasPostcode: deliveryAreasRow.postcode,
-            deliveryAreasIsDeliverable: deliveryAreasRow.isDeliverable,
         },
         deliveryAreasId: options?.excludeDeliveryAreasId ? undefined : deliveryAreasRow.id,
     };
@@ -223,13 +222,6 @@ const DeliveryAreasTable: React.FC = () => {
         }
     };
 
-    const handleEditClick = (id: GridRowId) => () => {
-        setRowModesModel((currentValue) => ({
-            ...currentValue,
-            [id]: { mode: GridRowModes.Edit },
-        }));
-    };
-
     const handleCancelClick = (id: GridRowId) => () => {
         setRowModesModel((currentValue) => ({
             ...currentValue,
@@ -247,147 +239,21 @@ const DeliveryAreasTable: React.FC = () => {
         }
     };
 
-    const handleUpClick = (id: GridRowId, row: DeliveryAreasRow) => async () => {
-        const rowIndex = row.order - 1;
-        if (rowIndex > 0) {
-            setIsLoading(true);
-
-            const rowOne = rows[rowIndex];
-            const rowTwo = rows[rowIndex - 1];
-            const { error: swapRowsError } = await swapRows(rowOne, rowTwo);
-
-            const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "move a delivery area up",
-                row
-            );
-
-            if (swapRowsError) {
-                setErrorMessage(
-                    `Failed to move delivery area (${row.postcode}) up. Log ID: ${swapRowsError.logId}`
-                );
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    wasSuccess: false,
-                    logId: swapRowsError.logId,
-                });
-            } else {
-                void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
-            }
-
-            setIsLoading(false);
-        }
-    };
-
-    const handleDownClick = (id: GridRowId, row: DeliveryAreasRow) => async () => {
-        const rowIndex = row.order - 1;
-        if (rowIndex < rows.length - 1) {
-            setIsLoading(true);
-
-            const clickedRow = rows[rowIndex];
-            const rowBelow = rows[rowIndex + 1];
-            const { error: swapRowsError } = await swapRows(clickedRow, rowBelow);
-
-            const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "move a delivery area down",
-                row
-            );
-
-            if (swapRowsError) {
-                setErrorMessage(
-                    `Failed to move delivery area (${row.postcode}) down. Log ID: ${swapRowsError.logId}`
-                );
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    wasSuccess: false,
-                    logId: swapRowsError.logId,
-                });
-            } else {
-                void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
-            }
-
-            setIsLoading(false);
-        }
+    const handleRemoveClick = (id: GridRowId) => () => {
+        setRows((oldRows) => oldRows.filter((row) => row.id !== id));
     };
 
     const deliveryAreassColumns: GridColDef[] = [
         {
-            field: "order",
-            type: "actions",
-            headerName: "Order",
-            width: 100,
-            cellClassName: "actions",
-            renderHeader: (params) => <Header {...params} />,
-            getActions: ({ id, row }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-                if (isInEditMode) {
-                    return [];
-                }
-
-                if (row.order === 1) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<ArrowCircleDownIcon />}
-                            label="Down"
-                            onClick={handleDownClick(id, row)}
-                            color="inherit"
-                            key="Down"
-                        />,
-                    ];
-                }
-
-                if (rows && row.order === rows.length) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<ArrowCircleUpIcon />}
-                            label="Up"
-                            className="textPrimary"
-                            onClick={handleUpClick(id, row)}
-                            color="inherit"
-                            key="Up"
-                        />,
-                    ];
-                }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<ArrowCircleUpIcon />}
-                        label="Up"
-                        className="textPrimary"
-                        onClick={handleUpClick(id, row)}
-                        color="inherit"
-                        key="Up"
-                    />,
-                    <GridActionsCellItem
-                        icon={<ArrowCircleDownIcon />}
-                        label="Down"
-                        onClick={handleDownClick(id, row)}
-                        color="inherit"
-                        key="Down"
-                    />,
-                ];
-            },
-        },
-        {
             field: "postcode",
             headerName: "Postcode",
+            headerAlign: "center",
             flex: 1,
             editable: true,
-            // regex: postcodeRegex,
-            // formattingFunction: formatPostcode,
-            //valueFormatter: (params) => {params.value = formatPostcode(params.value); console.log(params.value)},
-            //valueSetter: (params) => {return formatPostcode(params.value);},
+            align: "center",
             valueParser: (params) => {
                 return formatPostcode(params);
             },
-            renderHeader: (params) => <Header {...params} />,
-        },
-        {
-            field: "isDeliverable",
-            type: "boolean",
-            headerName: "Deliverable",
-            flex: 1,
-            editable: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
@@ -424,12 +290,12 @@ const DeliveryAreasTable: React.FC = () => {
 
                 return [
                     <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
+                        icon={<DeleteIcon />}
+                        label="Remove"
                         className="textPrimary"
-                        onClick={handleEditClick(id)}
+                        onClick={handleRemoveClick(id)}
                         color="inherit"
-                        key="Edit"
+                        key="Remove"
                     />,
                 ];
             },
@@ -448,6 +314,11 @@ const DeliveryAreasTable: React.FC = () => {
             {rows && (
                 <StyledDataGrid
                     rows={rows}
+                    initialState={{
+                        sorting: {
+                        sortModel: [{ field: 'postcode', sort: 'asc' }],
+                        },
+                    }}
                     columns={deliveryAreassColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
