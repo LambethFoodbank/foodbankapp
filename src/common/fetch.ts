@@ -176,7 +176,7 @@ type DbCollectionTimeSlotType = {
 
 type FetchCollectionAvailableDaysResponse =
     | {
-          data: DbCollectionCentreAvailableDaysType;
+          data: DbCollectionCentreType[];
           error: null;
       }
     | {
@@ -192,6 +192,11 @@ export type FetchCollectionAvailableDaysError = {
 };
 
 export type DbCollectionCentreAvailableDaysType = Schema["collection_centres"]["available_days"];
+
+export type DbCollectionCentreType = {
+    available_days: Schema["collection_centres"]["available_days"];
+    primary_key: Schema["collection_centres"]["primary_key"];
+} | null;
 
 export const getActiveTimeSlotsForCollectionCentre = async (
     collectionCentrePrimaryKey: string,
@@ -229,15 +234,13 @@ export const getActiveTimeSlotsForCollectionCentre = async (
     return { data: activeTimeSlots, error: null };
 };
 
-export const getAvailableDaysForCollectionCentre = async (
-    collectionCentrePrimaryKey: string,
+export const getAvailableDaysForCollectionCentres = async (
     supabase: Supabase
 ): Promise<FetchCollectionAvailableDaysResponse> => {
     const { data, error } = await supabase
         .from("collection_centres")
-        .select("available_days")
-        .eq("primary_key", collectionCentrePrimaryKey)
-        .single();
+        .select("available_days, primary_key")
+        .eq("is_delivery", false);
 
     if (error) {
         const logId = await logErrorReturnLogId(
@@ -247,13 +250,19 @@ export const getAvailableDaysForCollectionCentre = async (
         return { data: null, error: { type: "collectionAvailableDaysFetchFailed", logId: logId } };
     }
 
-    if (!data.available_days) {
+    if (!data) {
         return { data: [], error: null };
     }
 
-    const availableDays: DbCollectionCentreAvailableDaysType = data.available_days.filter(
-        (availableDay) => availableDay.is_active
-    );
+    const availableDays = data.map((availableDaysObject) => {
+        if (availableDaysObject.available_days == null) {
+            return null;
+        }
+        availableDaysObject.available_days = availableDaysObject.available_days?.filter(
+            (availableDays) => availableDays.is_active
+        );
+        return availableDaysObject;
+    });
 
     return { data: availableDays, error: null };
 };
