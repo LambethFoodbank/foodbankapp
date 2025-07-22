@@ -19,7 +19,14 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
     fields,
     availableDays,
 }) => {
-    const availableDaysIndices = getAvailableDaysIndices(availableDays);
+    const daysForSelectedCentre = availableDays.find(
+        (availableDaysObject) => availableDaysObject?.primary_key === fields.collectionCentre
+    );
+    const availableDaysIndices =
+        daysForSelectedCentre?.available_days === undefined
+            ? []
+            : getAvailableDaysIndices(daysForSelectedCentre?.available_days);
+
     const isUnavailable = (availableDay: Dayjs): boolean => {
         return !availableDaysIndices?.includes(dayjs(availableDay).day()) as boolean;
     };
