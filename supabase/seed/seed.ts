@@ -184,6 +184,22 @@ const main = async (): Promise<never> => {
         { connect: true }
     );
 
+    await seed.dietary_requirements(
+        (generate) =>
+            generate(listsSeedRequired.length, {
+                halal: "not_specified",
+                vegetarian: "not_specified",
+                vegan: "not_specified",
+                meat: "not_specified",
+                gluten_free: "not_specified",
+                pescatarian: "not_specified",
+                dairy_free: "not_specified",
+                seafood_allergy: "not_specified",
+                pet_food: "not_specified",
+            }),
+        { connect: true }
+    );
+
     for (const status of eventNamesWithNumberData) {
         await seed.events(
             (generate) =>
