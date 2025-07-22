@@ -2,6 +2,15 @@ import { ServerSideFilterMethod } from "@/components/Tables/Filters";
 import { displayPostcodeForHomelessClient } from "./format";
 import { DbClientRow, DbParcelRow } from "@/databaseUtils";
 import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/format";
+import {
+    ParcelsFilter,
+    ParcelsFilterMethod,
+    ParcelsTableRow,
+} from "@/app/parcels/parcelsTable/types";
+import supabase from "@/supabaseClient";
+import { logErrorReturnLogId } from "@/logger/logger";
+import { DatabaseError } from "@/app/errorClasses";
+import { serverSideChecklistFilter } from "@/components/Tables/ChecklistFilter";
 
 const textFilterDelimiter = ",";
 const defaultQueryFilterRegex = /[^a-zA-Z0-9 '\-+?]/g;
@@ -105,5 +114,47 @@ export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
             return `and(${clientIsActiveColumnLabel}.is.true, ${familyCountColumnLabel}.gte.10)`;
         }
         return `and(${clientIsActiveColumnLabel}.is.true, ${familyCountColumnLabel}.eq.${substringAsNumber})`;
+    });
+};
+
+export const buildDeliveryAreasFilter = async <DbData extends DbClientRow | DbParcelRow>(
+    deliverableColumnLabel: Extract<keyof DbData, "is_deliverable">,
+    clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
+): Promise<ParcelsFilter<string[]>> => {
+    const deliveryAreasSearch: ParcelsFilterMethod<string[]> = (query, state) => {
+        console.log(query, state);
+        if (state.length === 0) {
+            return query;
+        }
+        return query.eq(clientIsActiveColumnLabel, true).in(deliverableColumnLabel, state);
+    };
+
+    const { error } = await supabase.from("delivery_areas").select("postcode, is_deliverable");
+    if (error) {
+        const logId = await logErrorReturnLogId(
+            "Error with fetch: Delivery area filter options",
+            error
+        );
+        throw new DatabaseError("fetch", "delivery areas filter options", logId);
+    }
+
+    const optionsSet = [
+        {
+            key: "Inside",
+            value: true,
+        },
+        {
+            key: "Outside",
+            value: false,
+        },
+    ];
+
+    optionsSet.sort();
+    return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
+        key: deliverableColumnLabel,
+        filterLabel: "Delivery Area",
+        itemLabelsAndKeys: optionsSet.map((option) => [option.key, String(option.value)]),
+        initialCheckedKeys: ["true"],
+        method: deliveryAreasSearch,
     });
 };

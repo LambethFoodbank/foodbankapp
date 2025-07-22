@@ -15,7 +15,6 @@ import {
     ParcelsFiltersAllStates,
     ParcelsTableRow,
     packingSlotOptionsSet,
-    deliveryAreaOptionsSet
 } from "./types";
 import { buildServerSideTextFilter } from "@/components/Tables/TextFilter";
 import { serverSideButtonGroupFilter } from "@/components/Tables/ButtonFilter";
@@ -29,6 +28,7 @@ import {
     fullNameSearch,
     phoneSearch,
     postcodeSearch,
+    buildDeliveryAreasFilter,
 } from "@/common/databaseFilters";
 import {
     packingManagerParcelStatuses,
@@ -206,46 +206,6 @@ const buildPackingSlotFilter = async (): Promise<ParcelsFilter<string[]>> => {
     });
 };
 
-const buildDeliveryAreasFilter = async (): Promise<ParcelsFilter<string[]>> => {
-    const deliveryAreasSearch: ParcelsFilterMethod<string[]> = (query, state) => {
-        console.log(query, state);
-        return state.length === 0 ? query : query.in("is_deliverable", state);
-    };
-
-    const { data, error } = await supabase
-        .from("delivery_areas")
-        .select("postcode, is_deliverable")
-    if (error) {
-        const logId = await logErrorReturnLogId(
-            "Error with fetch: Delivery area filter options",
-            error
-        );
-        throw new DatabaseError("fetch", "delivery areas filter options", logId);
-    }
-
-    const optionsResponse = data ?? [];
-    
-    const optionsSet = [
-            {
-                key: 'Inside',
-                value: true
-            },
-            {
-                key: 'Outside',
-                value: false
-            }
-        ];
-
-    optionsSet.sort();
-    return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
-        key: "is_deliverable",
-        filterLabel: "Delivery Area",
-        itemLabelsAndKeys: optionsSet.map((option) => [option.key, String(option.value)]),
-        initialCheckedKeys: ['true'],
-        method: deliveryAreasSearch,
-    });
-};
-
 const buildSpecialViewFilter = (today: Dayjs): ParcelsFilter<string> => {
     const yesterday = today.subtract(1, "day");
 
@@ -301,7 +261,7 @@ export const buildParcelFilters = async (
         await buildDeliveryCollectionFilter(),
         await buildPackingSlotFilter(),
         await buildLastStatusFilter(),
-        await buildDeliveryAreasFilter(),
+        await buildDeliveryAreasFilter("is_deliverable", "client_is_active"),
         buildSpecialViewFilter(today),
     ];
 
