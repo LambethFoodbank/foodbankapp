@@ -340,19 +340,16 @@ export type Database = {
         Row: {
           id: string
           is_deliverable: boolean
-          order: number
           postcode: string
         }
         Insert: {
           id?: string
           is_deliverable?: boolean
-          order?: number
           postcode: string
         }
         Update: {
           id?: string
           is_deliverable?: boolean
-          order?: number
           postcode?: string
         }
         Relationships: []

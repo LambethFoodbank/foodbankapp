@@ -46,6 +46,7 @@ interface EditToolbarProps {
 export interface DeliveryAreasRow {
     id: string;
     postcode: string;
+    isDeliverable: boolean;
     isNew: boolean;
 }
 
@@ -62,10 +63,7 @@ function EditToolbar(props: EditToolbarProps): React.JSX.Element {
 
     const handleClick = (): void => {
         const id = rows.length + 1;
-        setRows((oldRows) => [
-            ...oldRows,
-            { id, postcode: "", isNew: true },
-        ]);
+        setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
         setRowModesModel((oldModel) => ({
             ...oldModel,
             [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
@@ -316,7 +314,7 @@ const DeliveryAreasTable: React.FC = () => {
                     rows={rows}
                     initialState={{
                         sorting: {
-                        sortModel: [{ field: 'postcode', sort: 'asc' }],
+                            sortModel: [{ field: "postcode", sort: "asc" }],
                         },
                     }}
                     columns={deliveryAreassColumns}

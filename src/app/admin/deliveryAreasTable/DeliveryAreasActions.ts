@@ -20,7 +20,6 @@ export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
             id: row.id,
             postcode: row.postcode,
             isDeliverable: row.is_deliverable,
-            order: row.order,
             isNew: false,
         })
     );
@@ -31,7 +30,6 @@ const formatExistingRowToDbDeliveryAreas = (row: DeliveryAreasRow): DbDeliveryAr
         id: row.id,
         postcode: row.postcode,
         is_deliverable: row.isDeliverable,
-        order: row.order,
     };
 };
 
@@ -39,7 +37,6 @@ const formatNewRowToDbDeliveryAreas = (newRow: DeliveryAreasRow): NewDbDeliveryA
     return {
         postcode: newRow.postcode,
         is_deliverable: newRow.isDeliverable,
-        order: newRow.order,
     };
 };
 
