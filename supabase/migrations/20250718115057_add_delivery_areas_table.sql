@@ -1,18 +1,12 @@
 create table "public"."delivery_areas" (
     "id" uuid not null default gen_random_uuid(),
     "postcode" text not null,
-    "is_deliverable" boolean not null default true,
-    "order" smallint not null
+    "is_deliverable" boolean not null default true
 );
-
-
-CREATE UNIQUE INDEX delivery_areas_order_key ON public.delivery_areas USING btree ("order");
 
 CREATE UNIQUE INDEX delivery_areas_pkey ON public.delivery_areas USING btree (id);
 
 alter table "public"."delivery_areas" add constraint "delivery_areas_pkey" PRIMARY KEY using index "delivery_areas_pkey";
-
-alter table "public"."delivery_areas" add constraint "delivery_areas_order_key" UNIQUE using index "delivery_areas_order_key";
 
 grant delete on table "public"."delivery_areas" to "anon";
 
