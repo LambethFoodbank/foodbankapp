@@ -10,6 +10,7 @@ import {
     GetParcelDataAndCountErrorType,
     ParcelsTableRow,
 } from "./types";
+import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
 import CongestionChargeAppliesIcon from "@/components/Icons/CongestionChargeAppliesIcon";
 import DeliveryIcon from "@/components/Icons/DeliveryIcon";
 import FlaggedForAttentionIcon from "@/components/Icons/FlaggedForAttentionIcon";
