@@ -55,6 +55,8 @@ export const possibleSignpostingCallReasons = [
 
 export const possibleListTypesWeighted = Array(5).fill("regular").concat(Array(1).fill("hotel"));
 
+export const possibleDietaryRequirementsStatus = ["not_specified", "included", "excluded"];
+
 export const possiblePostCodes = [
     "E1 6AA",
     "E1 6AD",
