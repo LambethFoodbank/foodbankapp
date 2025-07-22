@@ -1,6 +1,6 @@
 "use client";
 
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRowModesModel } from "@mui/x-data-grid";
 import React, { useCallback, useEffect, useState } from "react";
 import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
 import {
