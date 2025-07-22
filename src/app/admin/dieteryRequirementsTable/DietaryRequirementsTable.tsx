@@ -1,6 +1,6 @@
 "use client";
 
-import { GridColDef, GridRowModesModel } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import React, { useCallback, useEffect, useState } from "react";
 import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
 import {
@@ -70,21 +70,18 @@ const DietaryRequirementsTable: React.FC = () => {
             headerName: "Dietary Requirement",
             flex: 1,
             width: 200,
-            editable: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
             field: "included",
             headerName: "Included",
             flex: 1,
-            editable: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
             field: "excluded",
             headerName: "Excluded",
             flex: 1,
-            editable: true,
             renderCell: (params) => (
                 <div style={{ whiteSpace: "pre-line" }}>
                     {Array.isArray(params.value) ? params.value.join(", ") : ""}
