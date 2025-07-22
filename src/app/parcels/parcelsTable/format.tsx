@@ -36,14 +36,27 @@ const RowToDeliveryCollectionColumn = (
     collectionData: ParcelsTableRow["deliveryCollection"]
 ): React.ReactElement => {
     const theme = useTheme();
-    const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies, listType } =
-        collectionData;
+    const {
+        collectionCentreName,
+        collectionCentreAcronym,
+        congestionChargeApplies,
+        listType,
+        isDeliverable,
+    } = collectionData;
     const icons: React.ReactNode[] = [];
 
     if (listType === "hotel") {
         icons.push(
             <>
                 <HotelIcon color={theme.main.largeForeground[0]} />
+            </>
+        );
+    }
+
+    if (!isDeliverable) {
+        icons.push(
+            <>
+                <ClientOutsideDeliveryAreaIcon />
             </>
         );
     }
