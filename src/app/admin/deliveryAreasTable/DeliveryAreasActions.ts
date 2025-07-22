@@ -9,7 +9,7 @@ type DbDeliveryAreas = Tables<"delivery_areas">;
 type NewDbDeliveryAreas = Omit<DbDeliveryAreas, "id">;
 
 export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
-    const { data, error } = await supabase.from("delivery_areas").select().order("order");
+    const { data, error } = await supabase.from("delivery_areas").select();
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Delivery areas", error);
         throw new DatabaseError("fetch", "delivery areas", logId);
