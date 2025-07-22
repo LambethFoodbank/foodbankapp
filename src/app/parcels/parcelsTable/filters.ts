@@ -28,7 +28,7 @@ import {
     fullNameSearch,
     phoneSearch,
     postcodeSearch,
-    buildDeliveryAreasFilter,
+    deliveryAreaFilter,
 } from "@/common/databaseFilters";
 import {
     packingManagerParcelStatuses,
@@ -261,7 +261,7 @@ export const buildParcelFilters = async (
         await buildDeliveryCollectionFilter(),
         await buildPackingSlotFilter(),
         await buildLastStatusFilter(),
-        await buildDeliveryAreasFilter("is_deliverable", "client_is_active"),
+        deliveryAreaFilter("is_deliverable", "client_is_active"),
         buildSpecialViewFilter(today),
     ];
 

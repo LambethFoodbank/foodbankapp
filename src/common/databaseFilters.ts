@@ -1,15 +1,8 @@
-import { ServerSideFilterMethod } from "@/components/Tables/Filters";
+import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
 import { displayPostcodeForHomelessClient } from "./format";
 import { DbClientRow, DbParcelRow } from "@/databaseUtils";
 import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/format";
-import {
-    ParcelsFilter,
-    ParcelsFilterMethod,
-    ParcelsTableRow,
-} from "@/app/parcels/parcelsTable/types";
-import supabase from "@/supabaseClient";
-import { logErrorReturnLogId } from "@/logger/logger";
-import { DatabaseError } from "@/app/errorClasses";
+import { ParcelsFilterMethod, ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { serverSideChecklistFilter } from "@/components/Tables/ChecklistFilter";
 
 const textFilterDelimiter = ",";
@@ -117,26 +110,16 @@ export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
     });
 };
 
-export const buildDeliveryAreasFilter = async <DbData extends DbClientRow | DbParcelRow>(
+export function deliveryAreaFilter<DbData extends DbClientRow | DbParcelRow>(
     deliverableColumnLabel: Extract<keyof DbData, "is_deliverable">,
-    clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
-): Promise<ParcelsFilter<string[]>> => {
+    clientIsActiveColumnLabel: string
+): ServerSideFilter<ParcelsTableRow, string[], DbParcelRow> {
     const deliveryAreasSearch: ParcelsFilterMethod<string[]> = (query, state) => {
-        console.log(query, state);
         if (state.length === 0) {
             return query;
         }
         return query.eq(clientIsActiveColumnLabel, true).in(deliverableColumnLabel, state);
     };
-
-    const { error } = await supabase.from("delivery_areas").select("postcode, is_deliverable");
-    if (error) {
-        const logId = await logErrorReturnLogId(
-            "Error with fetch: Delivery area filter options",
-            error
-        );
-        throw new DatabaseError("fetch", "delivery areas filter options", logId);
-    }
 
     const optionsSet = [
         {
@@ -157,4 +140,4 @@ export const buildDeliveryAreasFilter = async <DbData extends DbClientRow | DbPa
         initialCheckedKeys: ["true"],
         method: deliveryAreasSearch,
     });
-};
+}
