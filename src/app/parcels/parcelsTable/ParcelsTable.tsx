@@ -219,7 +219,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const { role } = useContext(RoleUpdateContext);
     
     const onParcelTableRowClick = (row: Row<ParcelsTableRow>): void => {
-        console.log(row.data.isDeliverable, role);
         if (row.data.isDeliverable || role !== null && role !== "volunteer") {
             openParcelModal(row.data.parcelId);
         }
