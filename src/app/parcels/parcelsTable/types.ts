@@ -17,6 +17,7 @@ export interface ParcelsTableRow {
         collectionCentreAcronym: string;
         congestionChargeApplies: boolean;
         listType: ListType | null;
+        isDeliverable: boolean | null;
     };
     packingSlot: string | null;
     collectionDatetime: Date | null;
