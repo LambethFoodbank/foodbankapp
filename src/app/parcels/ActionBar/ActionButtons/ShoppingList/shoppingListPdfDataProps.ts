@@ -94,6 +94,7 @@ const getItemsByDietaryRequirements = async (
 
     for (const row of listData.data ?? []) {
         for (const requirement of dietaryRequirements) {
+            console.log(requirement);
             const value = row[requirement as keyof Tables<"dietary_requirements_plus">];
             if (value === "excluded" && row.item_name) {
                 excludedItems.add(row.item_name);
@@ -110,6 +111,13 @@ const getItemsByDietaryRequirements = async (
     };
 };
 
+function toSnakeCase(str: string): string {
+    return str
+        .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+        .replace(/[\s\-]+/g, "_")
+        .toLowerCase();
+}
+
 export const prepareItemsListForHousehold = async (
     householdSize: number,
     listType: ListType,
@@ -121,10 +129,11 @@ export const prepareItemsListForHousehold = async (
     }
     const itemsList: Item[] = [];
 
-    const itemsByRequirement: Promise<ItemsByRequirement> =
-        getItemsByDietaryRequirements(dietaryRequirements);
+    const mappedDietaryRequirements = dietaryRequirements
+        ? dietaryRequirements.map((dietary) => toSnakeCase(dietary))
+        : null;
 
-    console.log(itemsByRequirement);
+    const itemsByRequirement = await getItemsByDietaryRequirements(mappedDietaryRequirements);
 
     for (const row of listData) {
         if (row.list_type !== listType) {
@@ -139,10 +148,15 @@ export const prepareItemsListForHousehold = async (
         }
 
         if (!["", "0"].includes(listItemData.quantity.trim())) {
-            itemsList.push({
-                description: row.item_name,
-                ...listItemData,
-            });
+            const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
+            const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
+
+            if (isIncluded || !isExcluded) {
+                itemsList.push({
+                    description: row.item_name,
+                    ...listItemData,
+                });
+            }
         }
     }
     return { data: itemsList, error: null };
