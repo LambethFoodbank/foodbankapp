@@ -14,7 +14,6 @@ import supabase from "@/supabaseClient";
 
 const DietaryRequirementsTable: React.FC = () => {
     const [rows, setRows] = useState<DietaryRequirementsTableRow[]>([]);
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -66,21 +65,18 @@ const DietaryRequirementsTable: React.FC = () => {
             headerName: "Dietary Requirement",
             flex: 1,
             width: 200,
-            editable: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
             field: "included",
             headerName: "Included",
             flex: 1,
-            editable: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
             field: "excluded",
             headerName: "Excluded",
             flex: 1,
-            editable: true,
             renderCell: (params) => (
                 <div style={{ whiteSpace: "pre-line" }}>
                     {Array.isArray(params.value) ? params.value.join(", ") : ""}
@@ -106,9 +102,6 @@ const DietaryRequirementsTable: React.FC = () => {
                     aria-label="Dietary Requirements Table"
                     columns={dietaryRequirementsColumns}
                     getRowHeight={() => "auto"}
-                    editMode="row"
-                    rowModesModel={rowModesModel}
-                    onRowModesModelChange={setRowModesModel}
                     loading={isLoading}
                     getRowClassName={(params) =>
                         (params.indexRelativeToCurrentPage + 1) % 2 === 0
