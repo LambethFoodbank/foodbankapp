@@ -44,4 +44,5 @@ export interface ClientsTableRow {
     addressPostcode: string | null;
     phoneNumber: string | null;
     email: string | null;
+    is_deliverable: boolean | null;
 }

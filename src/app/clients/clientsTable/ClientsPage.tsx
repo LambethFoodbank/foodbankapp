@@ -4,11 +4,11 @@ import LinkButton from "@/components/Buttons/LinkButton";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { ButtonsDiv, Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
-import { ServerPaginatedTable } from "@/components/Tables/Table";
+import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import supabase from "@/supabaseClient";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import React, { useEffect, useState, Suspense, useRef, useCallback } from "react";
+import React, { useEffect, useState, Suspense, useRef, useCallback, useContext } from "react";
 import { useTheme } from "styled-components";
 import getClientsDataAndCount from "./getClientsData";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -33,6 +33,8 @@ import { getClientParcelsDetails } from "../getClientParcelsData";
 import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
+import { UserRole } from "@/databaseUtils";
+import { organisationRoles, RoleUpdateContext } from "@/app/roles";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -174,6 +176,16 @@ const ClientsPage: React.FC = () => {
         }
     };
 
+    const { role } = useContext(RoleUpdateContext);
+
+    const onRowClick = (row: Row<ClientsTableRow>) => {
+        if (row.data.is_deliverable || role !== null && role !== "volunteer") {
+            router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
+        } else {
+            router.push(`/clients`);
+        }
+    }
+
     return (
         <>
             {isLoadingForFirstTime ? (
@@ -207,9 +219,7 @@ const ClientsPage: React.FC = () => {
                                 setSortState: setSortState,
                             }}
                             headerKeysAndLabels={clientsHeaders}
-                            onRowClick={(row) => {
-                                router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
-                            }}
+                            onRowClick={onRowClick}
                             filterConfig={{
                                 primaryFiltersShown: true,
                                 primaryFilters: primaryFilters,
