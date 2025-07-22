@@ -5,6 +5,7 @@ which only gets generated after running npx snaplet generate with local database
 
 import { createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
+import { appendFileSync } from "node:fs";
 import { packingSlots } from "./packingSlotsSeed";
 import {
     booleansWeightedToTrue,
@@ -22,6 +23,7 @@ import {
     defaultNotes,
     defaultDeliveryInstructions,
     defaultExtraInformation,
+    possibleDietaryRequirementsStatus,
 } from "./clientsSeed";
 import { genders } from "./families";
 import { collectionCentresWithStringSlots } from "./collectionCentresSeed";
@@ -39,10 +41,11 @@ import {
     eventNamesWithNumberData,
 } from "./eventsSeed";
 import {
-    getFormattedVoucherNumber,
-    possibleReferralAgency,
-    defaultParcelNotes,
+  getFormattedVoucherNumber,
+  possibleReferralAgency,
+  defaultParcelNotes,
 } from "./parcelsSeed";
+import type { Enums } from "../../src/databaseTypesFile";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
@@ -185,8 +188,18 @@ const main = async (): Promise<never> => {
     );
 
     await seed.dietary_requirements(
-        (generate) =>
-            generate(listsSeedRequired.length, {
+        listsSeedRequired.map(() => {
+            const dietaryRequirement: {
+                halal: Enums<"item_dietary_status">;
+                vegetarian: Enums<"item_dietary_status">;
+                vegan: Enums<"item_dietary_status">;
+                meat: Enums<"item_dietary_status">;
+                gluten_free: Enums<"item_dietary_status">;
+                pescatarian: Enums<"item_dietary_status">;
+                dairy_free: Enums<"item_dietary_status">;
+                seafood_allergy: Enums<"item_dietary_status">;
+                pet_food: Enums<"item_dietary_status">;
+            } = {
                 halal: "not_specified",
                 vegetarian: "not_specified",
                 vegan: "not_specified",
@@ -196,7 +209,10 @@ const main = async (): Promise<never> => {
                 dairy_free: "not_specified",
                 seafood_allergy: "not_specified",
                 pet_food: "not_specified",
-            }),
+            };
+
+            return dietaryRequirement;
+        }),
         { connect: true }
     );
 
