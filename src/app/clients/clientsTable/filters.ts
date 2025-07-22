@@ -5,6 +5,7 @@ import {
     fullNameSearch,
     phoneSearch,
     postcodeSearch,
+    deliveryAreaFilter,
 } from "@/common/databaseFilters";
 import { DbClientRow } from "@/databaseUtils";
 
@@ -46,6 +47,7 @@ const clientsFilters: ClientsFilter[] = [
         label: "Phone",
         method: clientsPhoneSearch,
     }),
+    deliveryAreaFilter("is_deliverable", "is_active") as unknown as ClientsFilter,
 ];
 
 export default clientsFilters;

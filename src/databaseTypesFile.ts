@@ -829,6 +829,7 @@ export type Database = {
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
+          is_deliverable: boolean | null
           phone_number: string | null
         }
         Relationships: []

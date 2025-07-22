@@ -50,6 +50,7 @@ const sampleProcessingData: DbParcelRow[] = [
         created_at: "2023-12-31T12:00:00+00:00",
         client_is_active: true,
         client_delivery_instructions: "SOME_DELIVERY_INSTRUCTIONS",
+        is_deliverable: true,
     },
 ];
 
