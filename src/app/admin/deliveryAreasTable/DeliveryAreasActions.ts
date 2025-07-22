@@ -101,31 +101,3 @@ export const updateDbDeliveryAreas = async (
 
     return { error: null };
 };
-
-type SwapRowsResult = {
-    error: {
-        dbError: PostgrestError;
-        logId: string;
-    } | null;
-};
-
-export const swapRows = async (
-    row1: DeliveryAreasRow,
-    row2: DeliveryAreasRow
-): Promise<SwapRowsResult> => {
-    const { error } = await supabase.rpc("delivery_area_order_swap", {
-        id1: row1.id,
-        id2: row2.id,
-    });
-
-    if (error) {
-        const logId = await logErrorReturnLogId("Failed to update delivery area order", {
-            error,
-            deliveryAreas1: row1,
-            deliveryAreas2: row2,
-        });
-        return { error: { dbError: error, logId } };
-    }
-
-    return { error: null };
-};
