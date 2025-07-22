@@ -25,7 +25,6 @@ import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import {
     insertNewDeliveryAreas,
     fetchDeliveryAreas,
-    swapRows,
     updateDbDeliveryAreas,
 } from "@/app/admin/deliveryAreasTable/DeliveryAreasActions";
 import { LinearProgress } from "@mui/material";
@@ -238,7 +237,13 @@ const DeliveryAreasTable: React.FC = () => {
     };
 
     const handleRemoveClick = (id: GridRowId) => () => {
-        setRows((oldRows) => oldRows.filter((row) => row.id !== id));
+        const editedRow = rows.find((row) => row.id === id);
+        if (editedRow != undefined) {
+            editedRow.isDeliverable = false;
+            processRowUpdate(editedRow).then(() =>
+                setRows((oldRows) => oldRows.filter((row) => row.id !== id))
+            );
+        }
     };
 
     const deliveryAreassColumns: GridColDef[] = [
