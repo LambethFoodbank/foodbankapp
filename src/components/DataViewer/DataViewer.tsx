@@ -18,6 +18,9 @@ export const convertDataToDataForDataViewer = (data: Data): DataForDataViewer =>
     const dataForDataViewer: DataForDataViewer = {};
 
     for (const [key, value] of Object.entries(data)) {
+        if (key === "lastUpdated") {
+            continue;
+        }
         dataForDataViewer[key] = { value: value };
     }
 

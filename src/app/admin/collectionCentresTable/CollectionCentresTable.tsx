@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { logErrorReturnLogId } from "@/logger/logger";
-import supabase from "@/supabaseClient";
-import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
+import CancelIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import { LinearProgress } from "@mui/material";
+import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
     GridColDef,
@@ -13,13 +14,7 @@ import {
     GridRowModes,
     GridRowModesModel,
 } from "@mui/x-data-grid";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import Header from "@/app/admin/websiteDataTable/Header";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
-import { LinearProgress } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     CollectionCentresTableRow,
     fetchCollectionCentresForTable,
@@ -29,8 +24,13 @@ import {
     updateDbCollectionCentre,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 import { EditToolbar } from "@/app/admin/collectionCentresTable/CollectionCentresTableToolbar";
-import Button from "@mui/material/Button";
+import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
+import Header from "@/app/admin/websiteDataTable/Header";
+import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
+import { logErrorReturnLogId } from "@/logger/logger";
+import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import supabase from "@/supabaseClient";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
 
 function getBaseAuditLogForCollectionCentreAction(
@@ -46,6 +46,7 @@ function getBaseAuditLogForCollectionCentreAction(
             collectionCentreName: collectionCentreRow.name,
             collectionCentreAcronym: collectionCentreRow.acronym,
             collectionCentreIsShown: collectionCentreRow.isShown,
+            collectionCentreLastUpdated: collectionCentreRow.lastUpdated,
         },
         collectionCentreId: options?.excludeCollectionCentreId ? undefined : collectionCentreRow.id,
     };

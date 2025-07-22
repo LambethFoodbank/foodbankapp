@@ -62,10 +62,12 @@ function getBaseAuditLogForCollectionCentreTimeSlots(
     const timeSlots = Object.fromEntries(
         timeSlotsWithPrimaryKey.timeSlots.map((timeSlot) => [timeSlot.time, timeSlot.isActive])
     );
+    const lastUpdated = timeSlotsWithPrimaryKey.lastUpdated;
     return {
         action,
         content: {
             timeSlots,
+            lastUpdated,
         },
         collectionCentreId: timeSlotsWithPrimaryKey.primaryKey,
     };
@@ -92,6 +94,7 @@ const formatCollectionCentreTimeSlotDbData = (
     return {
         primaryKey: row.id,
         timeSlots: formattedTimeSlots,
+        lastUpdated: row.lastUpdated,
     };
 };
 
@@ -135,6 +138,7 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                 wasSuccess: false,
                 logId: updateTimeSlotError.logId,
             });
+            return;
         }
 
         await sendAuditLog({ ...baseAuditLog, wasSuccess: true });
