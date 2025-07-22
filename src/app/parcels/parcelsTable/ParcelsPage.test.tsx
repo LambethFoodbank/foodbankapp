@@ -83,6 +83,7 @@ describe("Parcels Page", () => {
                         collectionCentreAcronym: "CC",
                         congestionChargeApplies: true,
                         listType: "regular",
+                        isDeliverable: true,
                     },
                     packingSlot: "AM",
                     lastStatus: {
