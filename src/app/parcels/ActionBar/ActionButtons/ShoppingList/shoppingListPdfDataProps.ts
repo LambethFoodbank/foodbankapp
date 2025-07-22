@@ -6,6 +6,7 @@ import { ListType } from "@/common/databaseListTypes";
 import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
+import { Tables } from "@/databaseTypesFile";
 
 export interface Item {
     description: string;
@@ -32,6 +33,11 @@ type PrepareItemsListResult =
           data: null;
           error: { type: FetchListsErrorType | GetQuantityAndNotesErrorType; logId: string };
       };
+
+type ItemsByRequirement = {
+    includedItems: string[];
+    excludedItems: string[];
+};
 
 const allowedFamilySizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 type FamilySize = (typeof allowedFamilySizes)[number];
@@ -74,15 +80,52 @@ const getQuantityAndNotes = async (
     };
 };
 
+const getItemsByDietaryRequirements = async (
+    dietaryRequirements: string[] | null
+): Promise<ItemsByRequirement> => {
+    const includedItems: Set<string> = new Set();
+    const excludedItems: Set<string> = new Set();
+
+    if (!dietaryRequirements) {
+        return { includedItems: [], excludedItems: [] };
+    }
+
+    const listData = await supabase.from("dietary_requirements_plus").select();
+
+    for (const row of listData.data ?? []) {
+        for (const requirement of dietaryRequirements) {
+            const value = row[requirement as keyof Tables<"dietary_requirements_plus">];
+            if (value === "excluded" && row.item_name) {
+                excludedItems.add(row.item_name);
+            }
+            if (value === "included" && row.item_name) {
+                includedItems.add(row.item_name);
+            }
+        }
+    }
+
+    return {
+        includedItems: Array.from(includedItems),
+        excludedItems: Array.from(excludedItems),
+    };
+};
+
 export const prepareItemsListForHousehold = async (
     householdSize: number,
-    listType: ListType
+    listType: ListType,
+    dietaryRequirements: string[] | null
 ): Promise<PrepareItemsListResult> => {
     const { data: listData, error } = await fetchLists(supabase);
     if (error) {
         return { data: null, error: error };
     }
     const itemsList: Item[] = [];
+
+    const itemsByRequirement: Promise<ItemsByRequirement> =
+        getItemsByDietaryRequirements(dietaryRequirements);
+
+    console.log(itemsByRequirement);
+
     for (const row of listData) {
         if (row.list_type !== listType) {
             continue;

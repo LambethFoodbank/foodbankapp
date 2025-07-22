@@ -119,7 +119,8 @@ const getShoppingListDataForSingleParcel = async (
 
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
         familyData.length,
-        parcelInfoAndClientIdData.parcelInfo.listType
+        parcelInfoAndClientIdData.parcelInfo.listType,
+        clientData.dietary_requirements
     );
     if (itemsListError) {
         return { data: null, error: itemsListError };
