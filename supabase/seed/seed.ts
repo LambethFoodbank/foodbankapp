@@ -33,6 +33,7 @@ import {
     eventNamesWithNoData,
     eventNamesWithNumberData,
 } from "./eventsSeed";
+
 import type { Enums } from "../../src/databaseTypesFile";
 
 const main = async (): Promise<never> => {
