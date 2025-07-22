@@ -1,13 +1,14 @@
-import React from "react";
-import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
-import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ErrorText } from "@/components/Form/formStyling";
+import React, { useMemo } from "react";
+import { CollectionCentresLabelsAndValues, DbCollectionCentreType } from "@/common/fetch";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import { CollectionCentresLabelsAndValues } from "@/common/fetch";
+import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
+import { ErrorText } from "@/components/Form/formStyling";
+import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ParcelCardProps } from "../ParcelForm";
 
 interface CollectionCentreCardProps extends ParcelCardProps {
     collectionCentresLabelsAndValues: CollectionCentresLabelsAndValues;
+    availableDays: DbCollectionCentreType[];
 }
 const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     fieldSetter,
@@ -15,7 +16,27 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     formErrors,
     fields,
     collectionCentresLabelsAndValues,
+    availableDays,
 }) => {
+    const availableDaysNamesArray = availableDays?.map((availableDaysObject) => {
+        if (!availableDaysObject) {
+            return "";
+        }
+        return availableDaysObject.available_days
+            ?.map((days) => (days.day == undefined ? "" : days.day))
+            .join(", ");
+    });
+
+    const collectionCentresLabelsAndValuesWithDays: CollectionCentresLabelsAndValues =
+        useMemo(() => {
+            return collectionCentresLabelsAndValues.map((centre, index) => {
+                const [label, value] = centre;
+                const daysString = availableDaysNamesArray?.[index];
+
+                return [label + " - " + daysString, value];
+            });
+        }, [collectionCentresLabelsAndValues, availableDaysNamesArray]);
+
     return (
         <GenericFormCard
             title="Collection Centre"
@@ -25,7 +46,7 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
             <>
                 <ControlledSelect
                     selectLabelId="collection-centre-select-label"
-                    labelsAndValues={collectionCentresLabelsAndValues}
+                    labelsAndValues={collectionCentresLabelsAndValuesWithDays}
                     listTitle="Collection Centre"
                     value={fields.collectionCentre ?? ""}
                     onChange={valueOnChangeDropdownList(
