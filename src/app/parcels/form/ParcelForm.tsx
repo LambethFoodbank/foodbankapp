@@ -8,10 +8,10 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
     CardProps,
     checkErrorOnSubmit,
-    createSetter,
     Errors,
     Fields,
     FormErrors,
+    createSetter,
 } from "@/components/Form/formFunctions";
 import {
     CenterComponent,
@@ -40,9 +40,7 @@ import {
 import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
-    DbCollectionCentreAvailableDaysType,
     getActiveTimeSlotsForCollectionCentre,
-    getAvailableDaysForCollectionCentre,
     PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
 import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
@@ -210,8 +208,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [clientDetails, setClientDetails] = useState<ExpandedClientData | null>(null);
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
-    const [collectionAvailableDays, setAvailableDays] =
-        useState<DbCollectionCentreAvailableDaysType>([]);
+    const [collectionAvailableDays, setAvailableDays] = useState<DbCollectionCentreType[]>([]);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 
@@ -255,25 +252,20 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
 
     useEffect(() => {
         const getAvailableDays = async (): Promise<void> => {
-            if (fields.collectionCentre) {
-                const { data, error } = await getAvailableDaysForCollectionCentre(
-                    fields.collectionCentre,
-                    supabase
-                );
+            const { data, error } = await getAvailableDaysForCollectionCentres(supabase);
 
-                if (error) {
-                    let errorMessage;
-                    switch (error.type) {
-                        case "collectionAvailableDaysFetchFailed":
-                            errorMessage = "Failed to fetch collection time slots";
-                            break;
-                    }
-                    setSubmitErrorMessage(`${errorMessage}. Log ID: ${error.logId}`);
-                    return;
+            if (error) {
+                let errorMessage;
+                switch (error.type) {
+                    case "collectionAvailableDaysFetchFailed":
+                        errorMessage = "Failed to fetch collection available days";
+                        break;
                 }
-
-                setAvailableDays(data);
+                setSubmitErrorMessage(`${errorMessage}. Log ID: ${error.logId}`);
+                return;
             }
+
+            setAvailableDays(data);
         };
 
         void getAvailableDays();
