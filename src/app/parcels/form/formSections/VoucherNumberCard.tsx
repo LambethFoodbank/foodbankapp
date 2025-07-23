@@ -17,7 +17,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
         <GenericFormCard
             title="Voucher Number"
             required={voucherNumberIsRequired}
-            text="This is usually found in the following format: H-00001-00001. If you don't know the voucher number, leave this section blank."
+            text="This is usually found in the following format: E-000000-000000 or E-00000-000000."
         >
             <FreeFormTextInput
                 label="Voucher Number"
