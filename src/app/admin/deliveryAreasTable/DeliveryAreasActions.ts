@@ -104,3 +104,45 @@ export const updateDbDeliveryAreas = async (
 
     return { error: null };
 };
+
+export const updateDbDeliveryAreasByPostcode = async (
+    row: DeliveryAreasRow
+): Promise<UpdateDeliveryAreasResult> => {
+    const processedData = formatExistingRowToDbDeliveryAreas(row);
+    const { error } = await supabase
+        .from("delivery_areas")
+        .update({ is_deliverable: true })
+        .eq("postcode", processedData.postcode);
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Failed to update delivery area", {
+            error,
+            newDeliveryAreasData: processedData,
+        });
+
+        return { error: { dbError: error, logId } };
+    }
+
+    return { error: null };
+};
+
+export const deleteDbDeliveryAreas = async (
+    row: DeliveryAreasRow
+): Promise<UpdateDeliveryAreasResult> => {
+    const processedData = formatExistingRowToDbDeliveryAreas(row);
+    const { error } = await supabase
+        .from("delivery_areas")
+        .update({ is_deliverable: false })
+        .eq("postcode", processedData.postcode);
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Failed to update delivery area", {
+            error,
+            newDeliveryAreasData: processedData,
+        });
+
+        return { error: { dbError: error, logId } };
+    }
+
+    return { error: null };
+};
