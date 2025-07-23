@@ -10,7 +10,7 @@ import { faHamburger } from "@fortawesome/free-solid-svg-icons/faHamburger";
 import { Checkbox, CircularProgress, NoSsr } from "@mui/material";
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import React, { useState } from "react";
-import DataTable, { TableColumn } from "react-data-table-component";
+import DataTable, { TableColumn, TableRow } from "react-data-table-component";
 import { Primitive, SortOrder } from "react-data-table-component/dist/DataTable/types";
 import styled, { useTheme } from "styled-components";
 import {
@@ -146,6 +146,7 @@ export type EditableConfig<Data> =
           onEdit?: (data: number) => void;
           onDelete?: (data: number) => void;
           onSwapRows?: (row1: Data, row2: Data) => Promise<void>;
+          onSwapRowsWithDrag?: (row1: Data, row2: Data) => Promise<void>;
           isDeletable?: (row: Data) => boolean;
       }
     | { editable: false };
@@ -310,6 +311,8 @@ const Table = <
 
     const [isSwapping, setIsSwapping] = useState(false);
 
+    const [draggedRowId, setDraggedRowId] = useState<number | null>(null);
+
     if (editableConfig.editable) {
         const swapRows = (rowIndex1: number, upwards: boolean): void => {
             if (isSwapping) {
@@ -348,6 +351,62 @@ const Table = <
                 clientSideRefresh();
             }
         };
+
+        const swapRowsWithDrag = (rowIndex1: number, rowIndex2: number): void => {
+            if (isSwapping) {
+                return;
+            }
+            setIsSwapping(true);
+
+            if (
+                rowIndex1 < 0 ||
+                rowIndex2 < 0 ||
+                rowIndex1 >= dataPortion.length ||
+                rowIndex2 >= dataPortion.length
+            ) {
+                setIsSwapping(false);
+                return;
+            }
+            const clientSideRefresh = (): void => {
+                // Update viewed table data once specific functions are done (without re-fetch)
+                const newData = [...dataPortion];
+                const temp = newData[rowIndex1];
+                newData[rowIndex1] = newData[rowIndex2];
+                newData[rowIndex2] = temp;
+
+                editableConfig.setDataPortion(newData);
+                setIsSwapping(false);
+            };
+
+            if (editableConfig.onSwapRowsWithDrag) {
+                editableConfig
+                    .onSwapRowsWithDrag(dataPortion[rowIndex1], dataPortion[rowIndex2])
+                    .then(clientSideRefresh);
+            } else {
+                clientSideRefresh();
+            }
+        };
+
+        const onDragStart = (rowId: number): void => {
+            setDraggedRowId(rowId);
+        };
+
+        const onDragOver = (event: React.DragEvent<HTMLElement>): void => {
+            event.preventDefault();
+        };
+
+        const handleDrop = (targetRowId: number): void => {
+            if (draggedRowId == null || draggedRowId === targetRowId) {
+                return;
+            }
+            const row1 = rows.find((r) => r.rowId === draggedRowId);
+            const row2 = rows.find((r) => r.rowId === targetRowId);
+            if (row1?.data && row2?.data) {
+                editableConfig?.onSwapRowsWithDrag?.(row1.data, row2.data);
+            }
+            setDraggedRowId(null);
+        };
+
         columns.unshift({
             name: "",
             cell: (row: Row<Data>) => {
@@ -403,13 +462,10 @@ const Table = <
                         <DragHamburgerDiv>
                             {editableConfig.onSwapRows && (
                                 <StyledIconButton
-                                    draggable={true}
-                                    onDragStart={() => {
-                                        console.log("moving");
-                                    }}
-                                    aria-label="reorder row downwards"
-                                    disabled={isSwapping}
-                                    data-testid={`button-move-row-down-${row.rowId}`}
+                                    draggable
+                                    onDragStart={() => onDragStart(row.rowId)}
+                                    onDragOver={onDragOver}
+                                    onDrop={() => handleDrop(row.rowId)}
                                 >
                                     <StyledIcon icon={faHamburger} />
                                 </StyledIconButton>
