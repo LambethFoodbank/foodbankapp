@@ -1,32 +1,33 @@
 "use client";
 
 import {
-    DistributeClientFilter,
-    DistributeServerFilter,
-    PaginationType as PaginationTypeEnum,
-} from "@/components/Tables/Filters";
-import TableFiltersBar from "@/components/Tables/TableFiltersBar";
-import {
     faAnglesDown,
     faAnglesUp,
     faPenToSquare,
     faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { StyledIcon, StyledIconButton } from "../Icons/IconButton";
+import { faHamburger } from "@fortawesome/free-solid-svg-icons/faHamburger";
 import { Checkbox, CircularProgress, NoSsr } from "@mui/material";
+import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import React, { useState } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
-import styled, { useTheme } from "styled-components";
 import { Primitive, SortOrder } from "react-data-table-component/dist/DataTable/types";
-import { Centerer } from "../Modal/ModalFormStyles";
-import { ClientSideSortMethod, ServerSideSortMethod } from "./sortMethods";
+import styled, { useTheme } from "styled-components";
 import {
     DividingLineStyleOptions,
     getDividingLineStyleOptions,
 } from "@/app/parcels/parcelsTable/conditionalStyling";
-import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
+import {
+    DistributeClientFilter,
+    DistributeServerFilter,
+    PaginationType as PaginationTypeEnum,
+} from "@/components/Tables/Filters";
+import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import { Database } from "@/databaseTypesFile";
 import ColumnTogglePopup from "./ColumnTogglePopup";
+import { ClientSideSortMethod, ServerSideSortMethod } from "./sortMethods";
+import { StyledIcon, StyledIconButton } from "../Icons/IconButton";
+import { Centerer } from "../Modal/ModalFormStyles";
 
 export type TableHeaders<Data> = readonly (readonly [keyof Data, string])[];
 
@@ -354,50 +355,67 @@ const Table = <
                     ? editableConfig.isDeletable(row.data)
                     : true;
                 return (
-                    <EditAndReorderArrowDiv>
-                        {editableConfig.onSwapRows && (
-                            <StyledIconButton
-                                onClick={() => swapRows(row.rowId, true)}
-                                aria-label="reorder row upwards"
-                                disabled={isSwapping}
-                                data-testid={`button-move-row-up-${row.rowId}`}
-                            >
-                                <StyledIcon icon={faAnglesUp} />
-                            </StyledIconButton>
-                        )}
-                        {editableConfig.onEdit && (
-                            <StyledIconButton
-                                onClick={() => editableConfig.onEdit?.(row.rowId)}
-                                aria-label="edit"
-                                data-testid={`button-edit-row-${row.rowId}`}
-                            >
-                                <StyledIcon icon={faPenToSquare} />
-                            </StyledIconButton>
-                        )}
-                        {editableConfig.onSwapRows && (
-                            <StyledIconButton
-                                onClick={() => swapRows(row.rowId, false)}
-                                aria-label="reorder row downwards"
-                                disabled={isSwapping}
-                                data-testid={`button-move-row-down-${row.rowId}`}
-                            >
-                                <StyledIcon icon={faAnglesDown} />
-                            </StyledIconButton>
-                        )}
-                        {editableConfig.onDelete && isRowDeletable && (
-                            <StyledIconButton
-                                onClick={() => {
-                                    if (editableConfig.onDelete) {
-                                        editableConfig.onDelete(row.rowId);
-                                    }
-                                }}
-                                aria-label="delete"
-                                data-testid={`button-delete-row-${row.rowId}`}
-                            >
-                                <StyledIcon icon={faTrashAlt} />
-                            </StyledIconButton>
-                        )}
-                    </EditAndReorderArrowDiv>
+                    <ActionsDiv>
+                        <EditAndReorderArrowDiv>
+                            {editableConfig.onSwapRows && (
+                                <StyledIconButton
+                                    onClick={() => swapRows(row.rowId, true)}
+                                    aria-label="reorder row upwards"
+                                    disabled={isSwapping}
+                                    data-testid={`button-move-row-up-${row.rowId}`}
+                                >
+                                    <StyledIcon icon={faAnglesUp} />
+                                </StyledIconButton>
+                            )}
+                            {editableConfig.onEdit && (
+                                <StyledIconButton
+                                    onClick={() => editableConfig.onEdit?.(row.rowId)}
+                                    aria-label="edit"
+                                    data-testid={`button-edit-row-${row.rowId}`}
+                                >
+                                    <StyledIcon icon={faPenToSquare} />
+                                </StyledIconButton>
+                            )}
+                            {editableConfig.onSwapRows && (
+                                <StyledIconButton
+                                    onClick={() => swapRows(row.rowId, false)}
+                                    aria-label="reorder row downwards"
+                                    disabled={isSwapping}
+                                    data-testid={`button-move-row-down-${row.rowId}`}
+                                >
+                                    <StyledIcon icon={faAnglesDown} />
+                                </StyledIconButton>
+                            )}
+                            {editableConfig.onDelete && isRowDeletable && (
+                                <StyledIconButton
+                                    onClick={() => {
+                                        if (editableConfig.onDelete) {
+                                            editableConfig.onDelete(row.rowId);
+                                        }
+                                    }}
+                                    aria-label="delete"
+                                    data-testid={`button-delete-row-${row.rowId}`}
+                                >
+                                    <StyledIcon icon={faTrashAlt} />
+                                </StyledIconButton>
+                            )}
+                        </EditAndReorderArrowDiv>
+                        <DragHamburgerDiv>
+                            {editableConfig.onSwapRows && (
+                                <StyledIconButton
+                                    draggable={true}
+                                    onDragStart={() => {
+                                        console.log("moving");
+                                    }}
+                                    aria-label="reorder row downwards"
+                                    disabled={isSwapping}
+                                    data-testid={`button-move-row-down-${row.rowId}`}
+                                >
+                                    <StyledIcon icon={faHamburger} />
+                                </StyledIconButton>
+                            )}
+                        </DragHamburgerDiv>
+                    </ActionsDiv>
                 );
             },
             width: "5rem",
@@ -552,6 +570,21 @@ const EditAndReorderArrowDiv = styled.div`
     grid-template-columns: repeat(2, 1fr);
     width: 100%;
     // this transform is necessary to make the buttons visually consistent with the rest of the table without redesigning the layout
+    //transform: translateX(-1.2rem);
+`;
+
+const DragHamburgerDiv = styled.div`
+    display: grid;
+    justify-content: center;
+    width: 100%;
+    // this transform is necessary to make the buttons visually consistent with the rest of the table without redesigning the layout
+    //transform: translateX(-1.2rem);
+`;
+
+const ActionsDiv = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
     transform: translateX(-1.2rem);
 `;
 
