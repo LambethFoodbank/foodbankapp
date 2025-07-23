@@ -332,6 +332,7 @@ const DeliveryAreasTable: React.FC = () => {
                             sortModel: [{ field: "postcode", sort: "asc" }],
                         },
                     }}
+                    sortingOrder={["asc", "desc"]}
                     columns={deliveryAreassColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
