@@ -194,7 +194,7 @@ const DeliveryAreasTable: React.FC = () => {
             }
         } else {
             if (data?.length !== 0) {
-                updateDbDeliveryAreasByPostcode(newRow);
+                await updateDbDeliveryAreasByPostcode(newRow);
             } else {
                 const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(newRow);
                 const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
