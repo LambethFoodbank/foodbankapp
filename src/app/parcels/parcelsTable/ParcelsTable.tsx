@@ -259,6 +259,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 }}
                 editableConfig={{ editable: false }}
                 pointerOnHover={true}
+                reduceRowHeight={true}
             />
         </TableSurface>
     );

@@ -180,6 +180,7 @@ interface Props<Data, DbData extends Record<string, unknown>, PaginationType, Fi
     editableConfig: EditableConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
     pointerOnHover?: boolean;
+    reduceRowHeight?: boolean;
 }
 interface CellProps<Data> {
     row: Row<Data>;
@@ -239,6 +240,7 @@ const Table = <
     paginationConfig,
     editableConfig,
     pointerOnHover,
+    reduceRowHeight,
 }: Props<Data, DbData, PaginationType, FilterState>): React.ReactElement => {
     const [shownHeaderKeys, setShownHeaderKeys] = useState(
         defaultShownHeaders ?? headerKeysAndLabels.map(([key]) => key)
@@ -435,6 +437,14 @@ const Table = <
                 checkboxConfig.displayed && checkboxConfig.isRowChecked(row.data),
             style: {
                 backgroundColor: `${theme.primary.background[1]} !important`,
+            },
+        },
+        {
+            when: () => reduceRowHeight === true,
+            style: {
+                // The default DataTable class has a predefined min-height of 48px for the row-element
+                // for this reason, any value < 48px would not decrease the height.
+                height: "48px",
             },
         },
     ];
