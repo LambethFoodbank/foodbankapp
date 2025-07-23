@@ -1,5 +1,6 @@
 import { dietaryRequirementTypes } from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsActions";
 import { DatabaseEnums } from "@/databaseUtils";
+import FloatingToast from "@/components/FloatingToast";
 import supabase from "@/supabaseClient";
 import {
     Box,
@@ -14,6 +15,7 @@ import {
 import React, { useEffect, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import Alert from "@mui/material/Alert";
+import { sendAuditLog } from "@/server/auditLog";
 
 interface Props {
     isOpen: boolean;
@@ -73,6 +75,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
     const [wasSaved, setWasSaved] = useState<boolean>(false);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
     const [warningSaveMessage, setWarningSaveMessage] = useState<string>("");
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const fetchData = async (selectedType: string): Promise<void> => {
         const { data, error } = await supabase
@@ -166,9 +169,34 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             .from("dietary_requirements")
             .upsert(updates, { onConflict: "id" });
 
+        const auditContent = items
+            .map((item) => ({
+                name: item.item_name,
+                value: updates.find((val) => val.id === item.id)?.[selectedType] ?? "not_specified",
+            }))
+            .filter((item) => item.value !== "not_specified");
+
+        const includedItems = auditContent.filter((item) => item.value === "included");
+        const excludedItems = auditContent.filter((item) => item.value === "excluded");
+
+        const includedItemsName = includedItems.map((item) => item.name);
+        const excludedItemsName = excludedItems.map((item) => item.name);
+
+        await sendAuditLog({
+            action: "update dietary requirements",
+            wasSuccess: !error,
+            content: { included: includedItemsName, excluded: excludedItemsName },
+            dietaryRequirement:
+                dietaryRequirementTypes.find((type) => type.key === selectedType)?.label ??
+                "unknown",
+        });
+
         if (error) {
-            console.error("Error updating dietary requirements:", error);
+            setErrorMessage("Error saving data:" + error.message);
+            return;
         }
+
+        onClose();
 
         setWasSaved(true);
         setHasChanges(false);
@@ -218,99 +246,108 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
     };
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            header="Edit Dietary Requirements"
-            headerId="edit-dietary-requirements-modal"
-            maxWidth="md"
-            footer={
-                <>
-                    <Button onClick={onClose} sx={{ mr: 2 }}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSubmit} variant="contained">
-                        Save
-                    </Button>
-                </>
-            }
-        >
-            <Box mb={3}>
-                <Typography fontWeight="bold" variant="h6">
-                    Select Dietary Requirement Type:
-                </Typography>
-                <Select
-                    fullWidth
-                    value={selectedType}
-                    onChange={(event) =>
-                        handleTypeChange(event.target.value as keyof BaseDietaryRequirements)
-                    }
-                >
-                    {dietaryRequirementTypes.map((dietary) => (
-                        <MenuItem key={dietary.key} value={dietary.key}>
-                            {dietary.label}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </Box>
-
-            {wasSaved && !hasChanges && (
-                <Alert severity="success">
-                    The dietary requirement has been successfully saved.
-                </Alert>
+        <>
+            {errorMessage && (
+                <FloatingToast
+                    message={errorMessage}
+                    severity="warning"
+                    variant="filled"
+                ></FloatingToast>
             )}
+            <Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                header="Edit Dietary Requirements"
+                headerId="edit-dietary-requirements-modal"
+                maxWidth="md"
+                footer={
+                    <>
+                        <Button onClick={onClose} sx={{ mr: 2 }}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSubmit} variant="contained">
+                            Save
+                        </Button>
+                    </>
+                }
+            >
+                <Box mb={3}>
+                    <Typography fontWeight="bold" variant="h6">
+                        Select Dietary Requirement Type:
+                    </Typography>
+                    <Select
+                        fullWidth
+                        value={selectedType}
+                        onChange={(event) =>
+                            handleTypeChange(event.target.value as keyof BaseDietaryRequirements)
+                        }
+                    >
+                        {dietaryRequirementTypes.map((dietary) => (
+                            <MenuItem key={dietary.key} value={dietary.key}>
+                                {dietary.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </Box>
 
-            {hasChanges && (
-                <Alert severity="warning">
-                    Please save your changes before switching the dietary requirement.
-                </Alert>
-            )}
+                {wasSaved && !hasChanges && (
+                    <Alert severity="success">
+                        The dietary requirement has been successfully saved.
+                    </Alert>
+                )}
 
-            {warningSaveMessage && !hasChanges && (
-                <Alert severity="info">{warningSaveMessage}</Alert>
-            )}
+                {hasChanges && (
+                    <Alert severity="warning">
+                        Please save your changes before switching the dietary requirement.
+                    </Alert>
+                )}
 
-            <Box sx={{ mt: 4, mb: 4 }}>
-                <Typography fontWeight="bold" variant="h6" gutterBottom>
-                    Included
-                </Typography>
-                <Grid container spacing={0.5}>
-                    {items.map((item) => (
-                        <Grid item xs={6} sm={4} md={4} key={`included-${item.id}`}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={newIncluded.includes(item.id)}
-                                        onChange={() => handleToggle(item.id, "included")}
-                                    />
-                                }
-                                label={item.item_name || "Unnamed Item"}
-                            />
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+                {warningSaveMessage && !hasChanges && (
+                    <Alert severity="info">{warningSaveMessage}</Alert>
+                )}
 
-            <Box>
-                <Typography fontWeight="bold" variant="h6" gutterBottom>
-                    Excluded
-                </Typography>
-                <Grid container spacing={0.5}>
-                    {items.map((item) => (
-                        <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={newExcluded.includes(item.id)}
-                                        onChange={() => handleToggle(item.id, "excluded")}
-                                    />
-                                }
-                                label={item.item_name || "Unnamed Item"}
-                            />
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
-        </Modal>
+                <Box sx={{ mt: 4, mb: 4 }}>
+                    <Typography fontWeight="bold" variant="h6" gutterBottom>
+                        Included
+                    </Typography>
+                    <Grid container spacing={0.5}>
+                        {items.map((item) => (
+                            <Grid item xs={6} sm={4} md={4} key={`included-${item.id}`}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={newIncluded.includes(item.id)}
+                                            onChange={() => handleToggle(item.id, "included")}
+                                        />
+                                    }
+                                    label={item.item_name || "Unnamed Item"}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+
+                <Box>
+                    <Typography fontWeight="bold" variant="h6" gutterBottom>
+                        Excluded
+                    </Typography>
+                    <Grid container spacing={0.5}>
+                        {items.map((item) => (
+                            <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={newExcluded.includes(item.id)}
+                                            onChange={() => handleToggle(item.id, "excluded")}
+                                        />
+                                    }
+                                    label={item.item_name || "Unnamed Item"}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+            </Modal>
+        </>
     );
 };

@@ -23,6 +23,3 @@ create or replace view "public"."audit_log_plus" as  SELECT audit_log.action,
    FROM (audit_log
      LEFT JOIN profiles ON ((audit_log.actor_profile_id = profiles.primary_key)))
   ORDER BY audit_log.created_at;
-
-
-
