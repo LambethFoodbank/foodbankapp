@@ -178,12 +178,12 @@ const ClientsPage: React.FC = () => {
     const { role } = useContext(RoleUpdateContext);
 
     const onRowClick = (row: Row<ClientsTableRow>): void => {
-        if (row.data.is_deliverable || role !== null && role !== "volunteer") {
-            router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
+        if (row.data.is_deliverable || (role !== null && role !== "volunteer")) {
+            router.push("/clients?${clientIdParam}=${row.data.clientId}");
         } else {
-            router.push(`/clients`);
+            router.push("/clients");
         }
-    }
+    };
 
     return (
         <>
