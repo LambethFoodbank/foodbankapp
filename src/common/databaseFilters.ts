@@ -110,8 +110,8 @@ export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
     });
 };
 
-export function deliveryAreaFilter<DbData extends DbClientRow | DbParcelRow>(
-    deliverableColumnLabel: Extract<keyof DbData, "is_deliverable">,
+export function deliveryAreaFilter(
+    deliverableColumnLabel: string,
     clientIsActiveColumnLabel: string
 ): ServerSideFilter<ParcelsTableRow, string[], DbParcelRow> {
     const deliveryAreasSearch: ParcelsFilterMethod<string[]> = (query, state) => {
