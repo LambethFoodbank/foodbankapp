@@ -1,4 +1,5 @@
 import { ParcelInfo } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getParcelsData";
+import { toSnakeCase } from "@/common/format";
 import { ClientSummary, RequirementSummary } from "@/common/formatClientsData";
 import { HouseholdSummary } from "@/common/formatFamiliesData";
 import { fetchLists, FetchListsErrorType } from "@/common/fetch";
@@ -31,12 +32,25 @@ type PrepareItemsListResult =
       }
     | {
           data: null;
-          error: { type: FetchListsErrorType | GetQuantityAndNotesErrorType; logId: string };
+          error: {
+              type:
+                  | FetchListsErrorType
+                  | FetchDietaryRequirementsErrorType
+                  | GetQuantityAndNotesErrorType;
+              logId: string;
+          };
       };
 
-type ItemsByRequirement = {
+type ItemIncludedPartition = {
     includedItems: string[];
     excludedItems: string[];
+    error?: {
+        type:
+            | FetchListsErrorType
+            | FetchDietaryRequirementsErrorType
+            | GetQuantityAndNotesErrorType;
+        logId: string;
+    };
 };
 
 const allowedFamilySizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
@@ -53,6 +67,12 @@ function numberIsValidFamilySize(value: number): value is FamilySize {
 
 export type GetQuantityAndNotesErrorType = "invalidFamilySize";
 export type GetQuantityAndNotesError = { type: GetQuantityAndNotesErrorType; logId: string };
+
+export type FetchDietaryRequirementsErrorType = "failedToFetchDietaryRequirements";
+export type FetchDietaryRequirementsError = {
+    type: FetchDietaryRequirementsErrorType;
+    logId: string;
+};
 type GetQuantityAndNotesResult =
     | { data: Pick<Item, "quantity" | "notes">; error: null }
     | { data: null; error: GetQuantityAndNotesError };
@@ -81,47 +101,52 @@ const getQuantityAndNotes = async (
 };
 
 const getItemsByDietaryRequirements = async (
-    dietaryRequirements: string[] | null
-): Promise<ItemsByRequirement> => {
-    const includedItems: Set<string> = new Set();
-    const excludedItems: Set<string> = new Set();
-
-    if (!dietaryRequirements) {
+    dietaryRequirements?: string[]
+): Promise<ItemIncludedPartition> => {
+    if (!dietaryRequirements || !dietaryRequirements.length) {
         return { includedItems: [], excludedItems: [] };
     }
 
-    const listData = await supabase.from("dietary_requirements_plus").select();
+    const { data, error } = await supabase.from("dietary_requirements_plus").select();
 
-    for (const row of listData.data ?? []) {
-        for (const requirement of dietaryRequirements) {
-            console.log(requirement);
-            const value = row[requirement as keyof Tables<"dietary_requirements_plus">];
-            if (value === "excluded" && row.item_name) {
-                excludedItems.add(row.item_name);
-            }
-            if (value === "included" && row.item_name) {
-                includedItems.add(row.item_name);
-            }
-        }
+    if (error) {
+        const logId = await logErrorReturnLogId("Failed to fetch dietary requirements", {
+            error,
+            dietaryRequirements,
+        });
+        return {
+            includedItems: [],
+            excludedItems: [],
+            error: { type: "failedToFetchDietaryRequirements", logId },
+        };
     }
 
-    return {
-        includedItems: Array.from(includedItems),
-        excludedItems: Array.from(excludedItems),
-    };
-};
+    return (data ?? []).reduce<ItemIncludedPartition>(
+        (acc, row) => {
+            if (!row.item_name) {
+                return acc;
+            }
 
-function toSnakeCase(str: string): string {
-    return str
-        .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
-        .replace(/[\s-]+/g, "_")
-        .toLowerCase();
-}
+            dietaryRequirements.forEach((requirement) => {
+                const value = row[requirement as keyof Tables<"dietary_requirements_plus">];
+                if (row.item_name) {
+                    if (value === "excluded") {
+                        acc.excludedItems.push(row.item_name);
+                    } else if (value === "included") {
+                        acc.includedItems.push(row.item_name);
+                    }
+                }
+            });
+            return acc;
+        },
+        { includedItems: [], excludedItems: [] }
+    );
+};
 
 export const prepareItemsListForHousehold = async (
     householdSize: number,
     listType: ListType,
-    dietaryRequirements: string[] | null
+    dietaryRequirements: string[]
 ): Promise<PrepareItemsListResult> => {
     const { data: listData, error } = await fetchLists(supabase);
     if (error) {
@@ -129,13 +154,22 @@ export const prepareItemsListForHousehold = async (
     }
     const itemsList: Item[] = [];
 
-    const mappedDietaryRequirements = dietaryRequirements
+    const mappedDietaryRequirements = dietaryRequirements.length
         ? dietaryRequirements.map((dietary) => toSnakeCase(dietary))
         : null;
 
-    const itemsByRequirement = await getItemsByDietaryRequirements(mappedDietaryRequirements);
+    const itemsByRequirement = mappedDietaryRequirements
+        ? await getItemsByDietaryRequirements(mappedDietaryRequirements)
+        : { includedItems: [], excludedItems: [] };
+
+    if (itemsByRequirement.error) {
+        return { data: null, error: itemsByRequirement.error };
+    }
 
     const itemsIncludedPetFood = await getItemsByDietaryRequirements(["pet_food"]);
+    if (itemsIncludedPetFood.error) {
+        return { data: null, error: itemsIncludedPetFood.error };
+    }
 
     for (const row of listData) {
         if (row.list_type !== listType) {
@@ -152,19 +186,19 @@ export const prepareItemsListForHousehold = async (
         if (!["", "0"].includes(listItemData.quantity.trim())) {
             const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
             const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
+            const isPetFood = itemsIncludedPetFood.includedItems.includes(row.item_name);
 
             const currentItem = { description: row.item_name, ...listItemData };
 
-            if (!isExcluded) {
-                if (!itemsIncludedPetFood.includedItems.includes(row.item_name)) {
-                    itemsList.push(currentItem);
-                }
-            }
+            // Add item if:
+            // 1. It's not excluded AND not pet food, OR
+            // 2. It's explicitly included by dietary requirements
+            //
+            // in the future, we will change the logic to include only regular_food items by default
+            const shouldAddItem = (!isExcluded && !isPetFood) || isIncluded;
 
-            if (isIncluded) {
-                if (!itemsList.includes(currentItem)) {
-                    itemsList.push(currentItem);
-                }
+            if (shouldAddItem) {
+                itemsList.push(currentItem);
             }
         }
     }
