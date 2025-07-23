@@ -101,6 +101,7 @@ describe("Parcels Page", () => {
                     },
                     createdAt: new Date("2023-12-31T12:00:00+00:00"),
                     clientIsActive: true,
+                    isDeliverable: false
                 },
             ];
             expect(parcelTableRows).toStrictEqual(expected);
