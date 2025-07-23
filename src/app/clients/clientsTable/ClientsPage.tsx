@@ -33,8 +33,7 @@ import { getClientParcelsDetails } from "../getClientParcelsData";
 import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
-import { UserRole } from "@/databaseUtils";
-import { organisationRoles, RoleUpdateContext } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roles";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -178,7 +177,7 @@ const ClientsPage: React.FC = () => {
 
     const { role } = useContext(RoleUpdateContext);
 
-    const onRowClick = (row: Row<ClientsTableRow>) => {
+    const onRowClick = (row: Row<ClientsTableRow>): void => {
         if (row.data.is_deliverable || role !== null && role !== "volunteer") {
             router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
         } else {
