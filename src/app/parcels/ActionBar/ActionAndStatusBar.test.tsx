@@ -76,6 +76,7 @@ export const mockData: ParcelsTableRow[] = [
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
         email: "john.smith@example.com",
+        isDeliverable: false
     },
     {
         clientId: "primaryKey2",
@@ -114,6 +115,7 @@ export const mockData: ParcelsTableRow[] = [
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
         email: "john.doe@example.com",
+        isDeliverable: false
     },
 ];
 
