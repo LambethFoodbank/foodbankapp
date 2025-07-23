@@ -167,6 +167,7 @@ const DeliveryAreasTable: React.FC = () => {
         }
 
         if (newRow.isNew) {
+            newRow.isDeliverable = true;
             const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
                 await insertNewDeliveryAreas(newRow);
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
