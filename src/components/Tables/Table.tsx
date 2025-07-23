@@ -3,10 +3,10 @@
 import {
     faAnglesDown,
     faAnglesUp,
+    faGripHorizontal,
     faPenToSquare,
     faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { faHamburger } from "@fortawesome/free-solid-svg-icons/faHamburger";
 import { Checkbox, CircularProgress, NoSsr } from "@mui/material";
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import React, { useState } from "react";
@@ -463,14 +463,14 @@ const Table = <
                                     onDragOver={onDragOver}
                                     onDrop={() => handleDrop(row.rowId)}
                                 >
-                                    <StyledIcon icon={faHamburger} />
+                                    <StyledIcon icon={faGripHorizontal} />
                                 </StyledIconButton>
                             )}
                         </DragHamburgerDiv>
                     </ActionsDiv>
                 );
             },
-            width: "5rem",
+            width: "6rem",
         });
     }
 
