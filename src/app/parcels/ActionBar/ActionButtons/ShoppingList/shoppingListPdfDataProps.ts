@@ -135,6 +135,8 @@ export const prepareItemsListForHousehold = async (
 
     const itemsByRequirement = await getItemsByDietaryRequirements(mappedDietaryRequirements);
 
+    const itemsIncludedPetFood = await getItemsByDietaryRequirements(["pet_food"]);
+
     for (const row of listData) {
         if (row.list_type !== listType) {
             continue;
@@ -154,7 +156,7 @@ export const prepareItemsListForHousehold = async (
             const currentItem = { description: row.item_name, ...listItemData };
 
             if (!isExcluded) {
-                if (row.item_name !== "Pet Food Box (only if requested)") {
+                if (!itemsIncludedPetFood.includedItems.includes(row.item_name)) {
                     itemsList.push(currentItem);
                 }
             }
