@@ -6,7 +6,6 @@ import {
     GridActionsCellItem,
     GridColDef,
     GridEventListener,
-    GridRemoveIcon,
     GridRowEditStopReasons,
     GridRowId,
     GridRowModes,
@@ -16,12 +15,9 @@ import {
 } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
-import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import {
     insertNewDeliveryAreas,
     fetchDeliveryAreas,
@@ -34,7 +30,6 @@ import Header from "../websiteDataTable/Header";
 import StyledDataGrid from "../common/StyledDataGrid";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
-import { Delete } from "@mui/icons-material";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
