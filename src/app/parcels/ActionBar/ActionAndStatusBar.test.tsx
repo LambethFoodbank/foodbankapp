@@ -69,6 +69,7 @@ export const mockData: ParcelsTableRow[] = [
         voucherNumber: "123456789",
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
+        notes: "fragile items",
     },
     {
         clientId: "primaryKey2",
@@ -100,6 +101,7 @@ export const mockData: ParcelsTableRow[] = [
         voucherNumber: "123456aaaa789",
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
+        notes: "fragile items",
     },
 ];
 

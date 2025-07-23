@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import {
+    CardProps,
     checkErrorOnSubmit,
+    createSetter,
     Errors,
     Fields,
     FormErrors,
-    createSetter,
-    CardProps,
 } from "@/components/Form/formFunctions";
 import {
     CenterComponent,
@@ -52,6 +52,7 @@ import { getDbDate } from "@/common/format";
 import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
+import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -64,6 +65,7 @@ export interface ParcelFields extends Fields {
     collectionSlot: string | null;
     collectionCentre: string | null;
     lastUpdated: string | undefined;
+    notes: string | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -90,6 +92,7 @@ export const initialParcelFields: ParcelFields = {
     collectionSlot: null,
     collectionCentre: null,
     lastUpdated: undefined,
+    notes: null,
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -124,6 +127,7 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
+    ParcelNotesCard,
 ];
 
 const noCollectionFormSections = [
@@ -132,6 +136,7 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    ParcelNotesCard,
 ];
 
 export const mergeDateAndTime = (date: string, time: string): Dayjs => {
@@ -271,6 +276,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             collection_centre: isDelivery ? deliveryPrimaryKey : fields.collectionCentre,
             collection_datetime: collectionDateTime,
             last_updated: fields.lastUpdated,
+            notes: fields.notes,
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(parcelRecord);

@@ -509,6 +509,7 @@ export type Database = {
           created_at: string
           last_updated: string
           list_type: Database["public"]["Enums"]["list_type"]
+          notes: string | null
           packing_date: string | null
           packing_slot: string | null
           primary_key: string
@@ -521,6 +522,7 @@ export type Database = {
           created_at?: string
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
+          notes?: string | null
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
@@ -533,6 +535,7 @@ export type Database = {
           created_at?: string
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
+          notes?: string | null
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
@@ -888,6 +891,7 @@ export type Database = {
           packing_slot_name: string | null
           packing_slot_order: number | null
           parcel_id: string | null
+          parcel_notes: string | null
           voucher_number: string | null
         }
         Relationships: [

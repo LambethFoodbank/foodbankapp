@@ -48,6 +48,7 @@ const prepareParcelDataForForm = (
         collectionSlot: formatDatetimeAsTime(parcelData.collection_datetime),
         collectionCentre: parcelData.collection_centre?.primary_key ?? null,
         lastUpdated: parcelData.last_updated,
+        notes: parcelData.notes,
     };
 };
 

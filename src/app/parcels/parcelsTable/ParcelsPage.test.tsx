@@ -50,6 +50,7 @@ const sampleProcessingData: DbParcelRow[] = [
         created_at: "2023-12-31T12:00:00+00:00",
         client_is_active: true,
         client_delivery_instructions: "SOME_DELIVERY_INSTRUCTIONS",
+        parcel_notes: "fragile items",
     },
 ];
 
@@ -99,6 +100,7 @@ describe("Parcels Page", () => {
                     },
                     createdAt: new Date("2023-12-31T12:00:00+00:00"),
                     clientIsActive: true,
+                    notes: "fragile items",
                 },
             ];
             expect(parcelTableRows).toStrictEqual(expected);
