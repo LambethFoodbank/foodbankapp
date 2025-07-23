@@ -6,7 +6,6 @@ import {
     GridActionsCellItem,
     GridColDef,
     GridEventListener,
-    GridRemoveIcon,
     GridRowEditStopReasons,
     GridRowId,
     GridRowModes,
@@ -16,16 +15,15 @@ import {
 } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
-import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import {
     insertNewDeliveryAreas,
     fetchDeliveryAreas,
     updateDbDeliveryAreas,
+    updateDbDeliveryAreasByPostcode,
+    deleteDbDeliveryAreas,
 } from "@/app/admin/deliveryAreasTable/DeliveryAreasActions";
 import { LinearProgress } from "@mui/material";
 import { logErrorReturnLogId } from "@/logger/logger";
@@ -34,7 +32,6 @@ import Header from "../websiteDataTable/Header";
 import StyledDataGrid from "../common/StyledDataGrid";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
-import { Delete } from "@mui/icons-material";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -160,6 +157,15 @@ const DeliveryAreasTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
+        const { data } = await supabase
+            .from("delivery_areas")
+            .select()
+            .eq("postcode", newRow.postcode);
+
+        if (data?.length !== 0) {
+            newRow.isNew = false;
+        }
+
         if (newRow.isNew) {
             const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
                 await insertNewDeliveryAreas(newRow);
@@ -187,23 +193,27 @@ const DeliveryAreasTable: React.FC = () => {
                 });
             }
         } else {
-            const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(newRow);
-            const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "update a delivery area",
-                newRow
-            );
-
-            if (updateDeliveryAreasError) {
-                setErrorMessage(
-                    `Failed to update the delivery area. Log ID: ${updateDeliveryAreasError.logId}`
-                );
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    wasSuccess: false,
-                    logId: updateDeliveryAreasError.logId,
-                });
+            if (data?.length !== 0) {
+                updateDbDeliveryAreasByPostcode(newRow);
             } else {
-                void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
+                const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(newRow);
+                const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
+                    "update a delivery area",
+                    newRow
+                );
+
+                if (updateDeliveryAreasError) {
+                    setErrorMessage(
+                        `Failed to update the delivery area. Log ID: ${updateDeliveryAreasError.logId}`
+                    );
+                    void sendAuditLog({
+                        ...baseAuditLog,
+                        wasSuccess: false,
+                        logId: updateDeliveryAreasError.logId,
+                    });
+                } else {
+                    void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
+                }
             }
         }
 
@@ -240,7 +250,7 @@ const DeliveryAreasTable: React.FC = () => {
         const editedRow = rows.find((row) => row.id === id);
         if (editedRow != undefined) {
             editedRow.isDeliverable = false;
-            processRowUpdate(editedRow).then(() =>
+            deleteDbDeliveryAreas(editedRow).then(() =>
                 setRows((oldRows) => oldRows.filter((row) => row.id !== id))
             );
         }
