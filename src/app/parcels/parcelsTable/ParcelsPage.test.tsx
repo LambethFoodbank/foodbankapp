@@ -59,7 +59,7 @@ const sampleProcessingData: DbParcelRow[] = [
         flagged_for_attention: false,
         signposting_call_required: true,
         client_email: "full.name@example.com",
-        is_deliverable: false,
+        is_deliverable: true,
     },
 ];
 
@@ -116,7 +116,7 @@ describe("Parcels Page", () => {
                     createdAt: new Date("2023-12-31T12:00:00+00:00"),
                     clientIsActive: true,
                     email: "full.name@example.com",
-                    isDeliverable: false
+                    isDeliverable: true,
                 },
             ];
             expect(parcelTableRows).toStrictEqual(expected);
