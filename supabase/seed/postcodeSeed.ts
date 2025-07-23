@@ -1,34 +1,18 @@
 export const possibleDeliveryAreas = [
     {
-        postcode: "E1",
+        postcode: "CR0",
         isDeliverable: true,
     },
     {
-        postcode: "E5",
+        postcode: "CR7",
         isDeliverable: true,
     },
     {
-        postcode: "E13",
+        postcode: "SE1",
         isDeliverable: true,
     },
     {
-        postcode: "N13",
-        isDeliverable: true,
-    },
-    {
-        postcode: "N15",
-        isDeliverable: true,
-    },
-    {
-        postcode: "NW6",
-        isDeliverable: true,
-    },
-    {
-        postcode: "SE7",
-        isDeliverable: true,
-    },
-    {
-        postcode: "SE8",
+        postcode: "SE5",
         isDeliverable: true,
     },
     {
@@ -36,11 +20,7 @@ export const possibleDeliveryAreas = [
         isDeliverable: true,
     },
     {
-        postcode: "SE12",
-        isDeliverable: true,
-    },
-    {
-        postcode: "SE15",
+        postcode: "SE19",
         isDeliverable: true,
     },
     {
@@ -52,15 +32,15 @@ export const possibleDeliveryAreas = [
         isDeliverable: true,
     },
     {
-        postcode: "SW1A",
+        postcode: "SE25",
         isDeliverable: true,
     },
     {
-        postcode: "SW1H",
+        postcode: "SE27",
         isDeliverable: true,
     },
     {
-        postcode: "SW1P",
+        postcode: "SW2",
         isDeliverable: true,
     },
     {
@@ -68,67 +48,19 @@ export const possibleDeliveryAreas = [
         isDeliverable: true,
     },
     {
-        postcode: "SW7",
-        isDeliverable: true,
-    },
-    {
-        postcode: "AB2",
-        isDeliverable: true,
-    },
-    {
         postcode: "SW8",
         isDeliverable: true,
     },
     {
-        postcode: "SW10",
+        postcode: "SW9",
         isDeliverable: true,
     },
     {
-        postcode: "SW14",
-        isDeliverable: true,
-    },
-    {
-        postcode: "SW15",
+        postcode: "SW12",
         isDeliverable: true,
     },
     {
         postcode: "SW16",
-        isDeliverable: true,
-    },
-    {
-        postcode: "SW1W",
-        isDeliverable: true,
-    },
-    {
-        postcode: "W1B",
-        isDeliverable: true,
-    },
-    {
-        postcode: "W1C",
-        isDeliverable: true,
-    },
-    {
-        postcode: "W1F",
-        isDeliverable: true,
-    },
-    {
-        postcode: "W1J",
-        isDeliverable: true,
-    },
-    {
-        postcode: "WC1H",
-        isDeliverable: true,
-    },
-    {
-        postcode: "WC1X",
-        isDeliverable: true,
-    },
-    {
-        postcode: "WC2H",
-        isDeliverable: true,
-    },
-    {
-        postcode: "WC2R",
         isDeliverable: true,
     },
 ];
