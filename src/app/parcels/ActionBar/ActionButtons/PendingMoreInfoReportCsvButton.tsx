@@ -1,14 +1,12 @@
 "use client";
 
-import React from "react";
-import supabase from "@/supabaseClient";
-import CsvButton, {
-    formatNumberAsStringForCsv,
-} from "@/components/FileGenerationButtons/CsvButton";
-import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
-import { logErrorReturnLogId } from "@/logger/logger";
-import { formatDatetimeAsDate, getDbDate } from "@/common/format";
 import { Dayjs } from "dayjs";
+import React from "react";
+import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
+import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
+import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
+import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
+import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 import {
     formatAddressFromClientDetails,
     formatBabyProducts,
@@ -18,11 +16,13 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
-import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
-import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { formatDatetimeAsDate, getDbDate } from "@/common/format";
+import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
+import CsvButton, {
+    formatNumberAsStringForCsv,
+} from "@/components/FileGenerationButtons/CsvButton";
+import { logErrorReturnLogId } from "@/logger/logger";
+import supabase from "@/supabaseClient";
 
 type FetchPendingMoreInfoReportResult =
     | {
@@ -77,8 +77,7 @@ const getPendingMoreInfoReportData = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<FetchPendingMoreInfoReportResult> => {
-    // Find IDs of non-deleted parcels in the period. This is done before the complex query because
-    // joining clients and families to the view does not behave as expected.
+    // Find IDs of parcels with the 'Pending More Info' status.
     const { data: idAndStatusList, error: idFetchError } = await supabase
         .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
