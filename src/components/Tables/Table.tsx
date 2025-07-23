@@ -10,7 +10,7 @@ import { faHamburger } from "@fortawesome/free-solid-svg-icons/faHamburger";
 import { Checkbox, CircularProgress, NoSsr } from "@mui/material";
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import React, { useState } from "react";
-import DataTable, { TableColumn, TableRow } from "react-data-table-component";
+import DataTable, { TableColumn } from "react-data-table-component";
 import { Primitive, SortOrder } from "react-data-table-component/dist/DataTable/types";
 import styled, { useTheme } from "styled-components";
 import {
@@ -399,11 +399,7 @@ const Table = <
             if (draggedRowId == null || draggedRowId === targetRowId) {
                 return;
             }
-            const row1 = rows.find((r) => r.rowId === draggedRowId);
-            const row2 = rows.find((r) => r.rowId === targetRowId);
-            if (row1?.data && row2?.data) {
-                editableConfig?.onSwapRowsWithDrag?.(row1.data, row2.data);
-            }
+            swapRowsWithDrag(draggedRowId, targetRowId);
             setDraggedRowId(null);
         };
 
