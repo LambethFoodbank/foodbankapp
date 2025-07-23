@@ -1,7 +1,7 @@
 create table "public"."delivery_areas" (
     "id" uuid not null default gen_random_uuid(),
     "postcode" text not null,
-    "is_deliverable" boolean not null default true
+    "is_deliverable" boolean not null
 );
 
 CREATE UNIQUE INDEX delivery_areas_pkey ON public.delivery_areas USING btree (id);
