@@ -1,3 +1,4 @@
+import { Dayjs } from "dayjs";
 import { phoneNumberFormatSymbolsRegex } from "@/common/format";
 import {
     BooleanGroup,
@@ -5,7 +6,6 @@ import {
     SelectChangeEventHandler,
 } from "@/components/DataInput/inputHandlerFactories";
 import { Database } from "@/databaseTypesFile";
-import { Dayjs } from "dayjs";
 
 export type Setter<SpecificFields extends Fields> = (
     fieldValuesToUpdate: Partial<SpecificFields>
@@ -68,7 +68,7 @@ const getErrorType = (
     additionalCondition?: (value: string) => boolean,
     maxCharacters?: number
 ): Errors => {
-    console.log("input = " + input);
+    console.log(input);
     if (input == "") {
         return required ? Errors.required : Errors.none;
     }
@@ -120,31 +120,6 @@ export const onChangeText = <SpecificFields extends Fields>(
                 [key in keyof SpecificFields]: SpecificFields[key];
             });
         }
-    };
-};
-
-export const onChangeReferralText = <SpecificFields extends Fields>(
-    fieldSetter: Setter<SpecificFields>,
-    errorSetter: Setter<FormErrors<SpecificFields>> | Setter<Required<FormErrors<SpecificFields>>>,
-    key: keyof SpecificFields,
-    options?: OnChangeTextOptions<SpecificFields>
-): SelectChangeEventHandler => {
-    return (event) => {
-        const input = event.target.value;
-        const errorType = getErrorType(
-            key === "telephoneNumber" || key === "phoneNumber"
-                ? input.replaceAll(phoneNumberFormatSymbolsRegex, "")
-                : input,
-            options?.required,
-            options?.regex,
-            options?.additionalCondition,
-            options?.maxCharacters
-        );
-        errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });
-        const newValue = options?.formattingFunction ? options.formattingFunction(input) : input;
-        fieldSetter({ [key]: newValue } as {
-            [key in keyof SpecificFields]: SpecificFields[key];
-        });
     };
 };
 
