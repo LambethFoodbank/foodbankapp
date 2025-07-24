@@ -27,12 +27,12 @@ export interface ParcelsTableRow {
         workflowOrder: number;
     } | null;
     allStatuses: string[] | null;
-    voucherNumber: string | undefined;
+    voucherNumber: string | null;
     listType: ListType | null;
-    referralAgency: string | undefined;
-    referrerName: string | undefined;
-    referrerEmail: string | undefined;
-    referrerPhone: string | undefined;
+    referralAgency: string | null;
+    referrerName: string | null;
+    referrerEmail: string | null;
+    referrerPhone: string | null;
     iconsColumn: {
         flaggedForAttention: boolean;
         requiresFollowUpPhoneCall: boolean;
