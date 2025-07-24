@@ -17,7 +17,11 @@ import ExpandedClientDetailsFallback from "@/app/clients/ExpandedClientDetailsFa
 import { CircularProgress } from "@mui/material";
 import { ErrorSecondaryText } from "../../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { displayPostcodeForHomelessClient } from "@/common/format";
+import {
+    displayPostcodeForHomelessClient,
+    formatDateTime,
+    formatDatetimeAsDate,
+} from "@/common/format";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import DeleteButton from "@/components/Buttons/DeleteButton";
 import deleteClient from "../deleteClient";
@@ -34,6 +38,8 @@ import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
 import { RoleUpdateContext } from "@/app/roles";
+import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
+import { clientTableColumnStyleOptions } from "@/app/clients/clientsTable/styles";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -178,11 +184,32 @@ const ClientsPage: React.FC = () => {
     const { role } = useContext(RoleUpdateContext);
 
     const onRowClick = (row: Row<ClientsTableRow>): void => {
-        if (row.data.is_deliverable || (role !== null && role !== "volunteer")) {
+        if (row.data.isDeliverable || (role !== null && role !== "volunteer")) {
             router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
         } else {
             router.push("/clients");
         }
+    };
+
+    const RowToIconsColumn = ({
+        isDeliverable,
+    }: ClientsTableRow["iconsColumn"]): React.ReactElement => {
+        const icons: React.ReactNode[] = [];
+        console.log(isDeliverable);
+        if (!isDeliverable) {
+            icons.push(
+                <>
+                    <ClientOutsideDeliveryAreaIcon />
+                </>
+            );
+        }
+
+        return <>{icons}</>;
+    };
+
+    const clientTableColumnDisplayFunctions = {
+        iconsColumn: RowToIconsColumn,
+        addressPostcode: formatNullPostcode,
     };
 
     return (
@@ -229,7 +256,8 @@ const ClientsPage: React.FC = () => {
                             editableConfig={{ editable: false }}
                             isLoading={isLoading}
                             pointerOnHover={true}
-                            columnDisplayFunctions={{ addressPostcode: formatNullPostcode }}
+                            columnDisplayFunctions={clientTableColumnDisplayFunctions}
+                            columnStyleOptions={clientTableColumnStyleOptions}
                         />
                     </TableSurface>
 

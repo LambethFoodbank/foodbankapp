@@ -1,7 +1,8 @@
 import { TableHeaders } from "@/components/Tables/Table";
 import { ClientsTableRow } from "./types";
 
-const clientsHeaders: TableHeaders<ClientsTableRow> = [
+export const clientsHeaders: TableHeaders<ClientsTableRow> = [
+    ["iconsColumn", ""],
     ["fullName", "Name"],
     ["familyCategory", "Family Size"],
     ["addressPostcode", "Postcode"],
