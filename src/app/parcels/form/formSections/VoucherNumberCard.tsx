@@ -1,15 +1,10 @@
 import React from "react";
-import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import {
-    errorExists,
-    getErrorText,
-    onChangeReferralText,
-    onChangeText,
-} from "@/components/Form/formFunctions";
-import GenericFormCard from "@/components/Form/GenericFormCard";
-import { GappedDiv } from "@/components/Form/formStyling";
-import { ParcelCardProps } from "../ParcelForm";
 import { emailRegex, phoneNumberRegex } from "@/common/format";
+import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
+import { errorExists, getErrorText, onChangeText } from "@/components/Form/formFunctions";
+import { GappedDiv } from "@/components/Form/formStyling";
+import GenericFormCard from "@/components/Form/GenericFormCard";
+import { ParcelCardProps } from "../ParcelForm";
 
 const voucherNumberIsRequired = true;
 
@@ -17,7 +12,6 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
     errorSetter,
     fieldSetter,
     formErrors,
-    fields,
 }) => {
     return (
         <GenericFormCard
@@ -33,21 +27,18 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                     onChange={onChangeText(fieldSetter, errorSetter, "voucherNumber", {
                         required: voucherNumberIsRequired,
                     })}
-                    value={fields.voucherNumber ?? ""}
                 />
                 <FreeFormTextInput
                     label="Referral Agency"
                     onChange={onChangeText(fieldSetter, errorSetter, "referralAgency", {
                         required: false,
                     })}
-                    value={fields.referralAgency ?? ""}
                 />
                 <FreeFormTextInput
                     label="Referrer Name"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerName", {
                         required: false,
                     })}
-                    value={fields.referrerName ?? ""}
                 />
                 <FreeFormTextInput
                     label="Referrer Email"
@@ -57,11 +48,10 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                             ? getErrorText(formErrors.referrerEmail)
                             : undefined
                     }
-                    onChange={onChangeReferralText(fieldSetter, errorSetter, "referrerEmail", {
+                    onChange={onChangeText(fieldSetter, errorSetter, "referrerEmail", {
                         required: false,
                         regex: emailRegex,
                     })}
-                    value={fields.referrerEmail ?? ""}
                 />
                 <FreeFormTextInput
                     label="Referrer Phone"
@@ -71,11 +61,10 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                             ? getErrorText(formErrors.referrerPhone)
                             : undefined
                     }
-                    onChange={onChangeReferralText(fieldSetter, errorSetter, "referrerPhone", {
+                    onChange={onChangeText(fieldSetter, errorSetter, "referrerPhone", {
                         required: false,
                         regex: phoneNumberRegex,
                     })}
-                    value={fields.referrerPhone ?? ""}
                 />
             </GappedDiv>
         </GenericFormCard>
