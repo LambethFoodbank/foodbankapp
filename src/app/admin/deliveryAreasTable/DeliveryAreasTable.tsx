@@ -51,6 +51,9 @@ const formatPostcode = (value: string): string => {
     if (!value.charAt(0).match(/[A-Z]/)) {
         value = value.slice(0, 0);
     }
+    if (!value.charAt(value.length - 1).match(/[A-Z0-9]/)) {
+        value = value.slice(0, value.length - 1);
+    }
     return value;
 };
 
@@ -269,6 +272,7 @@ const DeliveryAreasTable: React.FC = () => {
                 return formatPostcode(params);
             },
             renderHeader: (params) => <Header {...params} />,
+            disableColumnMenu: true,
         },
         {
             field: "actions",
@@ -354,6 +358,7 @@ const DeliveryAreasTable: React.FC = () => {
                             : "datagrid-row-odd"
                     }
                     hideFooter
+                    
                 />
             )}
         </>
