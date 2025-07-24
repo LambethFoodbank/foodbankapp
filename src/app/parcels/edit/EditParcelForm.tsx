@@ -37,7 +37,7 @@ const prepareParcelDataForForm = (
     return {
         clientId: parcelData.client_id,
         listType: parcelData.list_type,
-        voucherNumber: parcelData.voucher_number,
+        voucherNumber: parcelData.voucher_number ?? "",
         packingDate: parcelData.packing_date,
         packingSlot: parcelData.packing_slot?.primary_key,
         shippingMethod:
@@ -48,11 +48,11 @@ const prepareParcelDataForForm = (
         collectionSlot: formatDatetimeAsTime(parcelData.collection_datetime),
         collectionCentre: parcelData.collection_centre?.primary_key ?? null,
         lastUpdated: parcelData.last_updated,
-        referralAgency: parcelData.referral_agency ?? null,
-        referrerName: parcelData.referrer_name ?? null,
-        referrerEmail: parcelData.referrer_email ?? null,
-        referrerPhone: parcelData.referrer_phone ?? null,
         notes: parcelData.notes,
+        referralAgency: parcelData.referral_agency ?? "",
+        referrerName: parcelData.referrer_name ?? "",
+        referrerEmail: parcelData.referrer_email ?? "",
+        referrerPhone: parcelData.referrer_phone ?? "",
     };
 };
 

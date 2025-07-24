@@ -114,10 +114,10 @@ export const initialParcelFormErrors: ParcelErrors = {
     collectionDate: Errors.initial,
     collectionSlot: Errors.initial,
     collectionCentre: Errors.initial,
-    referralAgency: Errors.initial,
-    referrerName: Errors.initial,
-    referrerEmail: Errors.initial,
-    referrerPhone: Errors.initial,
+    referralAgency: Errors.none,
+    referrerName: Errors.none,
+    referrerEmail: Errors.none,
+    referrerPhone: Errors.none,
 };
 
 interface ParcelFormProps {
