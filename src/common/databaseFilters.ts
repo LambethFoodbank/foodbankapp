@@ -116,8 +116,7 @@ export function deliveryAreaFilter(
         key: deliverableColumnLabel,
         filterLabel: "Delivery Area",
         itemLabelsAndKeys: optionsSet.map((option) => [option.key, String(option.value)]),
-        initialCheckedKeys: [],
+        initialCheckedKeys: ["true"],
         method: deliveryAreasSearch,
-        isRadio: true,
     });
 }

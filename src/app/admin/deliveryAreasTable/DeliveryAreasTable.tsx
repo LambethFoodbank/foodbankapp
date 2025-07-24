@@ -22,7 +22,6 @@ import {
     insertNewDeliveryAreas,
     fetchDeliveryAreas,
     updateDbDeliveryAreas,
-    updateDbDeliveryAreasByPostcode,
     deleteDbDeliveryAreas,
 } from "@/app/admin/deliveryAreasTable/DeliveryAreasActions";
 import { LinearProgress } from "@mui/material";
@@ -42,7 +41,6 @@ interface EditToolbarProps {
 export interface DeliveryAreasRow {
     id: string;
     postcode: string;
-    isDeliverable: boolean;
     isNew: boolean;
 }
 
@@ -160,17 +158,7 @@ const DeliveryAreasTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
-        const { data } = await supabase
-            .from("delivery_areas")
-            .select()
-            .eq("postcode", newRow.postcode);
-
-        if (data?.length !== 0) {
-            newRow.isNew = false;
-        }
-
         if (newRow.isNew) {
-            newRow.isDeliverable = true;
             const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
                 await insertNewDeliveryAreas(newRow);
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
@@ -197,27 +185,23 @@ const DeliveryAreasTable: React.FC = () => {
                 });
             }
         } else {
-            if (data?.length !== 0) {
-                await updateDbDeliveryAreasByPostcode(newRow);
-            } else {
-                const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(newRow);
-                const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                    "update a delivery area",
-                    newRow
-                );
+            const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(newRow);
+            const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
+                "update a delivery area",
+                newRow
+            );
 
-                if (updateDeliveryAreasError) {
-                    setErrorMessage(
-                        `Failed to update the delivery area. Log ID: ${updateDeliveryAreasError.logId}`
-                    );
-                    void sendAuditLog({
-                        ...baseAuditLog,
-                        wasSuccess: false,
-                        logId: updateDeliveryAreasError.logId,
-                    });
-                } else {
-                    void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
-                }
+            if (updateDeliveryAreasError) {
+                setErrorMessage(
+                    `Failed to update the delivery area. Log ID: ${updateDeliveryAreasError.logId}`
+                );
+                void sendAuditLog({
+                    ...baseAuditLog,
+                    wasSuccess: false,
+                    logId: updateDeliveryAreasError.logId,
+                });
+            } else {
+                void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
             }
         }
 
@@ -253,7 +237,6 @@ const DeliveryAreasTable: React.FC = () => {
     const handleRemoveClick = (id: GridRowId) => () => {
         const editedRow = rows.find((row) => row.id === id);
         if (editedRow != undefined) {
-            editedRow.isDeliverable = false;
             deleteDbDeliveryAreas(editedRow).then(() =>
                 setRows((oldRows) => oldRows.filter((row) => row.id !== id))
             );
