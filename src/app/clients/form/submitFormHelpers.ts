@@ -71,7 +71,6 @@ export const formatDeliveryAreaRecord = (
     fields: ClientFields
 ): DeliveryAreaDatabaseInsertRecord => {
     return {
-        is_deliverable: true,
         postcode: fields.addressPostcode.split(/\s+/)[0],
     };
 };
