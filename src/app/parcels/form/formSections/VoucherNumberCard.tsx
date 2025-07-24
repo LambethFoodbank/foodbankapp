@@ -8,11 +8,7 @@ import { ParcelCardProps } from "../ParcelForm";
 
 const voucherNumberIsRequired = true;
 
-const VoucherNumberCard: React.FC<ParcelCardProps> = ({
-    errorSetter,
-    fieldSetter,
-    formErrors,
-}) => {
+const VoucherNumberCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter, formErrors }) => {
     return (
         <GenericFormCard
             title="Voucher Number"
