@@ -179,7 +179,7 @@ const ClientsPage: React.FC = () => {
 
     const onRowClick = (row: Row<ClientsTableRow>): void => {
         if (row.data.is_deliverable || (role !== null && role !== "volunteer")) {
-            router.push("/clients?${clientIdParam}=${row.data.clientId}");
+            router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
         } else {
             router.push("/clients");
         }
