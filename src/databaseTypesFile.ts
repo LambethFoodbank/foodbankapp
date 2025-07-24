@@ -17,8 +17,8 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
+          delivery_areas_id: string | null
           event_id: string | null
-          list_hotel_id: string | null
           list_id: string | null
           log_id: string | null
           packing_slot_id: string | null
@@ -28,6 +28,7 @@ export type Database = {
           status_order: string | null
           wasSuccess: boolean
           website_data: string | null
+          wiki_id: string | null
         }
         Insert: {
           action: string
@@ -36,8 +37,8 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           event_id?: string | null
-          list_hotel_id?: string | null
           list_id?: string | null
           log_id?: string | null
           packing_slot_id?: string | null
@@ -47,6 +48,7 @@ export type Database = {
           status_order?: string | null
           wasSuccess: boolean
           website_data?: string | null
+          wiki_id?: string | null
         }
         Update: {
           action?: string
@@ -55,8 +57,8 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           event_id?: string | null
-          list_hotel_id?: string | null
           list_id?: string | null
           log_id?: string | null
           packing_slot_id?: string | null
@@ -66,6 +68,7 @@ export type Database = {
           status_order?: string | null
           wasSuccess?: boolean
           website_data?: string | null
+          wiki_id?: string | null
         }
         Relationships: [
           {
@@ -74,13 +77,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "audit_log_actor_profile_id_fkey"
-            columns: ["actor_profile_id"]
-            isOneToOne: false
-            referencedRelation: "users_plus"
-            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "audit_log_client_id_fkey"
@@ -104,6 +100,13 @@ export type Database = {
             referencedColumns: ["client_id"]
           },
           {
+            foreignKeyName: "audit_log_delivery_areas_id_fkey"
+            columns: ["delivery_areas_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_areas"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "audit_log_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
@@ -125,13 +128,6 @@ export type Database = {
             referencedColumns: ["primary_key"]
           },
           {
-            foreignKeyName: "public_audit_log_list_hotel_id_fkey"
-            columns: ["list_hotel_id"]
-            isOneToOne: false
-            referencedRelation: "lists_hotel"
-            referencedColumns: ["primary_key"]
-          },
-          {
             foreignKeyName: "public_audit_log_packing_slot_id_fkey"
             columns: ["packing_slot_id"]
             isOneToOne: false
@@ -142,15 +138,15 @@ export type Database = {
             foreignKeyName: "public_audit_log_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "last_status"
-            referencedColumns: ["parcel_id"]
+            referencedRelation: "parcels"
+            referencedColumns: ["primary_key"]
           },
           {
             foreignKeyName: "public_audit_log_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "parcels"
-            referencedColumns: ["primary_key"]
+            referencedRelation: "parcels_events"
+            referencedColumns: ["parcel_id"]
           },
           {
             foreignKeyName: "public_audit_log_parcel_id_fkey"
@@ -167,13 +163,6 @@ export type Database = {
             referencedColumns: ["primary_key"]
           },
           {
-            foreignKeyName: "public_audit_log_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "users_plus"
-            referencedColumns: ["profile_id"]
-          },
-          {
             foreignKeyName: "public_audit_log_status_order_fkey"
             columns: ["status_order"]
             isOneToOne: false
@@ -187,6 +176,13 @@ export type Database = {
             referencedRelation: "website_data"
             referencedColumns: ["name"]
           },
+          {
+            foreignKeyName: "public_audit_log_wiki_id_fkey"
+            columns: ["wiki_id"]
+            isOneToOne: false
+            referencedRelation: "wiki"
+            referencedColumns: ["wiki_key"]
+          },
         ]
       }
       clients: {
@@ -196,20 +192,29 @@ export type Database = {
           address_county: string | null
           address_postcode: string | null
           address_town: string | null
-          baby_food: boolean | null
+          baby_food: string | null
+          baby_formula: string | null
+          baby_nappies: string | null
+          baby_other_items: string[] | null
+          cooking_facilities: string[] | null
+          default_list: Database["public"]["Enums"]["list_type"]
           delivery_instructions: string | null
           dietary_requirements: string[] | null
           extra_information: string | null
           family_id: string
-          feminine_products: string[] | null
           flagged_for_attention: boolean | null
           full_name: string | null
+          hygiene_other_items: string[] | null
+          hygiene_pads: string | null
+          hygiene_tampons: string | null
           is_active: boolean
           last_updated: string
+          notes: string | null
           other_items: string[] | null
           pet_food: string[] | null
           phone_number: string | null
           primary_key: string
+          signposting_call_reasons: string[] | null
           signposting_call_required: boolean | null
         }
         Insert: {
@@ -218,20 +223,29 @@ export type Database = {
           address_county?: string | null
           address_postcode?: string | null
           address_town?: string | null
-          baby_food?: boolean | null
+          baby_food?: string | null
+          baby_formula?: string | null
+          baby_nappies?: string | null
+          baby_other_items?: string[] | null
+          cooking_facilities?: string[] | null
+          default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
           extra_information?: string | null
           family_id?: string
-          feminine_products?: string[] | null
           flagged_for_attention?: boolean | null
           full_name?: string | null
+          hygiene_other_items?: string[] | null
+          hygiene_pads?: string | null
+          hygiene_tampons?: string | null
           is_active?: boolean
           last_updated?: string
+          notes?: string | null
           other_items?: string[] | null
           pet_food?: string[] | null
           phone_number?: string | null
           primary_key?: string
+          signposting_call_reasons?: string[] | null
           signposting_call_required?: boolean | null
         }
         Update: {
@@ -240,20 +254,29 @@ export type Database = {
           address_county?: string | null
           address_postcode?: string | null
           address_town?: string | null
-          baby_food?: boolean | null
+          baby_food?: string | null
+          baby_formula?: string | null
+          baby_nappies?: string | null
+          baby_other_items?: string[] | null
+          cooking_facilities?: string[] | null
+          default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
           extra_information?: string | null
           family_id?: string
-          feminine_products?: string[] | null
           flagged_for_attention?: boolean | null
           full_name?: string | null
+          hygiene_other_items?: string[] | null
+          hygiene_pads?: string | null
+          hygiene_tampons?: string | null
           is_active?: boolean
           last_updated?: string
+          notes?: string | null
           other_items?: string[] | null
           pet_food?: string[] | null
           phone_number?: string | null
           primary_key?: string
+          signposting_call_reasons?: string[] | null
           signposting_call_required?: boolean | null
         }
         Relationships: []
@@ -291,9 +314,26 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_areas: {
+        Row: {
+          id: string
+          is_deliverable: boolean
+          postcode: string
+        }
+        Insert: {
+          id?: string
+          is_deliverable?: boolean
+          postcode: string
+        }
+        Update: {
+          id?: string
+          is_deliverable?: boolean
+          postcode?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
-          client_id: string | null
           event_data: string | null
           new_parcel_status: string
           parcel_id: string
@@ -301,7 +341,6 @@ export type Database = {
           timestamp: string
         }
         Insert: {
-          client_id?: string | null
           event_data?: string | null
           new_parcel_status: string
           parcel_id: string
@@ -309,7 +348,6 @@ export type Database = {
           timestamp?: string
         }
         Update: {
-          client_id?: string | null
           event_data?: string | null
           new_parcel_status?: string
           parcel_id?: string
@@ -317,27 +355,6 @@ export type Database = {
           timestamp?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "public_events_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "public_events_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients_plus"
-            referencedColumns: ["client_id"]
-          },
-          {
-            foreignKeyName: "public_events_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "parcels_plus"
-            referencedColumns: ["client_id"]
-          },
           {
             foreignKeyName: "public_events_new_parcel_status_fkey"
             columns: ["new_parcel_status"]
@@ -349,15 +366,15 @@ export type Database = {
             foreignKeyName: "public_events_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "last_status"
-            referencedColumns: ["parcel_id"]
+            referencedRelation: "parcels"
+            referencedColumns: ["primary_key"]
           },
           {
             foreignKeyName: "public_events_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "parcels"
-            referencedColumns: ["primary_key"]
+            referencedRelation: "parcels_events"
+            referencedColumns: ["parcel_id"]
           },
           {
             foreignKeyName: "public_events_parcel_id_fkey"
@@ -371,24 +388,27 @@ export type Database = {
       families: {
         Row: {
           birth_month: number | null
-          birth_year: number
+          birth_year: number | null
           family_id: string
-          gender: Database["public"]["Enums"]["gender"]
+          gender: Database["public"]["Enums"]["gender"] | null
           primary_key: string
+          recorded_as_child: boolean | null
         }
         Insert: {
           birth_month?: number | null
-          birth_year: number
+          birth_year?: number | null
           family_id: string
-          gender?: Database["public"]["Enums"]["gender"]
+          gender?: Database["public"]["Enums"]["gender"] | null
           primary_key?: string
+          recorded_as_child?: boolean | null
         }
         Update: {
           birth_month?: number | null
-          birth_year?: number
+          birth_year?: number | null
           family_id?: string
-          gender?: Database["public"]["Enums"]["gender"]
+          gender?: Database["public"]["Enums"]["gender"] | null
           primary_key?: string
+          recorded_as_child?: boolean | null
         }
         Relationships: [
           {
@@ -410,6 +430,7 @@ export type Database = {
       lists: {
         Row: {
           item_name: string
+          list_type: Database["public"]["Enums"]["list_type"]
           notes_for_1: string | null
           notes_for_10: string | null
           notes_for_2: string | null
@@ -435,6 +456,7 @@ export type Database = {
         }
         Insert: {
           item_name?: string
+          list_type?: Database["public"]["Enums"]["list_type"]
           notes_for_1?: string | null
           notes_for_10?: string | null
           notes_for_2?: string | null
@@ -460,84 +482,7 @@ export type Database = {
         }
         Update: {
           item_name?: string
-          notes_for_1?: string | null
-          notes_for_10?: string | null
-          notes_for_2?: string | null
-          notes_for_3?: string | null
-          notes_for_4?: string | null
-          notes_for_5?: string | null
-          notes_for_6?: string | null
-          notes_for_7?: string | null
-          notes_for_8?: string | null
-          notes_for_9?: string | null
-          primary_key?: string
-          quantity_for_1?: string
-          quantity_for_10?: string
-          quantity_for_2?: string
-          quantity_for_3?: string
-          quantity_for_4?: string
-          quantity_for_5?: string
-          quantity_for_6?: string
-          quantity_for_7?: string
-          quantity_for_8?: string
-          quantity_for_9?: string
-          row_order?: number
-        }
-        Relationships: []
-      }
-      lists_hotel: {
-        Row: {
-          item_name: string
-          notes_for_1: string | null
-          notes_for_10: string | null
-          notes_for_2: string | null
-          notes_for_3: string | null
-          notes_for_4: string | null
-          notes_for_5: string | null
-          notes_for_6: string | null
-          notes_for_7: string | null
-          notes_for_8: string | null
-          notes_for_9: string | null
-          primary_key: string
-          quantity_for_1: string
-          quantity_for_10: string
-          quantity_for_2: string
-          quantity_for_3: string
-          quantity_for_4: string
-          quantity_for_5: string
-          quantity_for_6: string
-          quantity_for_7: string
-          quantity_for_8: string
-          quantity_for_9: string
-          row_order: number
-        }
-        Insert: {
-          item_name?: string
-          notes_for_1?: string | null
-          notes_for_10?: string | null
-          notes_for_2?: string | null
-          notes_for_3?: string | null
-          notes_for_4?: string | null
-          notes_for_5?: string | null
-          notes_for_6?: string | null
-          notes_for_7?: string | null
-          notes_for_8?: string | null
-          notes_for_9?: string | null
-          primary_key?: string
-          quantity_for_1?: string
-          quantity_for_10?: string
-          quantity_for_2?: string
-          quantity_for_3?: string
-          quantity_for_4?: string
-          quantity_for_5?: string
-          quantity_for_6?: string
-          quantity_for_7?: string
-          quantity_for_8?: string
-          quantity_for_9?: string
-          row_order?: number
-        }
-        Update: {
-          item_name?: string
+          list_type?: Database["public"]["Enums"]["list_type"]
           notes_for_1?: string | null
           notes_for_10?: string | null
           notes_for_2?: string | null
@@ -591,6 +536,7 @@ export type Database = {
           collection_datetime: string | null
           created_at: string
           last_updated: string
+          list_type: Database["public"]["Enums"]["list_type"]
           packing_date: string | null
           packing_slot: string | null
           primary_key: string
@@ -602,6 +548,7 @@ export type Database = {
           collection_datetime?: string | null
           created_at?: string
           last_updated?: string
+          list_type?: Database["public"]["Enums"]["list_type"]
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
@@ -613,6 +560,7 @@ export type Database = {
           collection_datetime?: string | null
           created_at?: string
           last_updated?: string
+          list_type?: Database["public"]["Enums"]["list_type"]
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
@@ -658,38 +606,42 @@ export type Database = {
       }
       profiles: {
         Row: {
+          created_at: string | null
+          email: string | null
           first_name: string | null
           last_name: string | null
+          last_sign_in_at: string | null
           primary_key: string
           role: Database["public"]["Enums"]["role"]
           telephone_number: string | null
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          created_at?: string | null
+          email?: string | null
           first_name?: string | null
           last_name?: string | null
+          last_sign_in_at?: string | null
           primary_key?: string
           role: Database["public"]["Enums"]["role"]
           telephone_number?: string | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          created_at?: string | null
+          email?: string | null
           first_name?: string | null
           last_name?: string | null
+          last_sign_in_at?: string | null
           primary_key?: string
           role?: Database["public"]["Enums"]["role"]
           telephone_number?: string | null
+          updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users_plus"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
       }
       status_order: {
         Row: {
@@ -724,6 +676,27 @@ export type Database = {
         }
         Relationships: []
       }
+      wiki: {
+        Row: {
+          content: string
+          row_order: number
+          title: string
+          wiki_key: string
+        }
+        Insert: {
+          content?: string
+          row_order?: number
+          title?: string
+          wiki_key?: string
+        }
+        Update: {
+          content?: string
+          row_order?: number
+          title?: string
+          wiki_key?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       audit_log_plus: {
@@ -738,7 +711,6 @@ export type Database = {
           content: Json | null
           created_at: string | null
           event_id: string | null
-          list_hotel_id: string | null
           list_id: string | null
           log_id: string | null
           packing_slot_id: string | null
@@ -756,13 +728,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "audit_log_actor_profile_id_fkey"
-            columns: ["actor_profile_id"]
-            isOneToOne: false
-            referencedRelation: "users_plus"
-            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "audit_log_client_id_fkey"
@@ -800,24 +765,10 @@ export type Database = {
             referencedColumns: ["primary_key"]
           },
           {
-            foreignKeyName: "profiles_user_id_fkey"
-            columns: ["actor_user_id"]
-            isOneToOne: true
-            referencedRelation: "users_plus"
-            referencedColumns: ["user_id"]
-          },
-          {
             foreignKeyName: "public_audit_log_collection_centre_id_fkey"
             columns: ["collection_centre_id"]
             isOneToOne: false
             referencedRelation: "collection_centres"
-            referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "public_audit_log_list_hotel_id_fkey"
-            columns: ["list_hotel_id"]
-            isOneToOne: false
-            referencedRelation: "lists_hotel"
             referencedColumns: ["primary_key"]
           },
           {
@@ -831,15 +782,15 @@ export type Database = {
             foreignKeyName: "public_audit_log_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "last_status"
-            referencedColumns: ["parcel_id"]
+            referencedRelation: "parcels"
+            referencedColumns: ["primary_key"]
           },
           {
             foreignKeyName: "public_audit_log_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "parcels"
-            referencedColumns: ["primary_key"]
+            referencedRelation: "parcels_events"
+            referencedColumns: ["parcel_id"]
           },
           {
             foreignKeyName: "public_audit_log_parcel_id_fkey"
@@ -854,13 +805,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "public_audit_log_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "users_plus"
-            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "public_audit_log_status_order_fkey"
@@ -885,6 +829,7 @@ export type Database = {
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
+          is_deliverable: boolean | null
           phone_number: string | null
         }
         Relationships: []
@@ -901,15 +846,15 @@ export type Database = {
             foreignKeyName: "public_events_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "last_status"
-            referencedColumns: ["parcel_id"]
+            referencedRelation: "parcels"
+            referencedColumns: ["primary_key"]
           },
           {
             foreignKeyName: "public_events_parcel_id_fkey"
             columns: ["parcel_id"]
             isOneToOne: false
-            referencedRelation: "parcels"
-            referencedColumns: ["primary_key"]
+            referencedRelation: "parcels_events"
+            referencedColumns: ["parcel_id"]
           },
           {
             foreignKeyName: "public_events_parcel_id_fkey"
@@ -927,18 +872,19 @@ export type Database = {
         }
         Relationships: []
       }
-      last_status: {
+      parcels_events: {
         Row: {
-          event_data: string | null
-          event_name: string | null
+          all_events: string[] | null
+          last_event_data: string | null
+          last_event_name: string | null
+          last_event_timestamp: string | null
+          last_event_workflow_order: number | null
           parcel_id: string | null
-          timestamp: string | null
-          workflow_order: number | null
         }
         Relationships: [
           {
             foreignKeyName: "public_events_new_parcel_status_fkey"
-            columns: ["event_name"]
+            columns: ["last_event_name"]
             isOneToOne: false
             referencedRelation: "status_order"
             referencedColumns: ["event_name"]
@@ -947,7 +893,9 @@ export type Database = {
       }
       parcels_plus: {
         Row: {
+          all_events: string[] | null
           client_address_postcode: string | null
+          client_delivery_instructions: string | null
           client_flagged_for_attention: boolean | null
           client_full_name: string | null
           client_id: string | null
@@ -959,11 +907,13 @@ export type Database = {
           collection_datetime: string | null
           created_at: string | null
           family_count: number | null
+          is_deliverable: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
           last_status_timestamp: string | null
           last_status_workflow_order: number | null
+          list_type: Database["public"]["Enums"]["list_type"] | null
           packing_date: string | null
           packing_slot_name: string | null
           packing_slot_order: number | null
@@ -1001,20 +951,6 @@ export type Database = {
         }
         Relationships: []
       }
-      users_plus: {
-        Row: {
-          created_at: string | null
-          email: string | null
-          first_name: string | null
-          last_name: string | null
-          profile_id: string | null
-          role: Database["public"]["Enums"]["role"] | null
-          telephone_number: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
     }
     Functions: {
       deactivateClient: {
@@ -1037,6 +973,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      swap_two_wiki_rows: {
+        Args: {
+          key1: string
+          key2: string
+        }
+        Returns: undefined
+      }
       update_client_and_family: {
         Args: {
           clientrecord: Json
@@ -1049,6 +992,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      user_is_admin_or_manager: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       user_is_admin_or_manager_or_staff: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -1056,6 +1003,7 @@ export type Database = {
     }
     Enums: {
       gender: "male" | "female" | "other"
+      list_type: "regular" | "hotel"
       role: "volunteer" | "admin" | "manager" | "staff"
     }
     CompositeTypes: {
