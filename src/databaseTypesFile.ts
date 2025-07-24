@@ -344,7 +344,7 @@ export type Database = {
         }
         Insert: {
           id?: string
-          is_deliverable?: boolean
+          is_deliverable: boolean
           postcode: string
         }
         Update: {
