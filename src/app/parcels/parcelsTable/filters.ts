@@ -340,7 +340,11 @@ export const updateFiltersFromQueryParams = (
                     ...filter,
                     state: paramValForFilter,
                 } as ParcelsFilter<string>;
-            } else if (["deliveryCollection", "packingSlot", "lastStatus"].includes(filter.key)) {
+            } else if (
+                ["deliveryCollection", "packingSlot", "lastStatus", "is_deliverable"].includes(
+                    filter.key
+                )
+            ) {
                 return {
                     ...filter,
                     state: paramValForFilter,
