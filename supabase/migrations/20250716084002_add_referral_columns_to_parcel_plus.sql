@@ -34,6 +34,3 @@ create or replace view "public"."parcels_plus" as  SELECT parcels.primary_key AS
      LEFT JOIN family_count ON ((family_count.family_id = clients.family_id)))
      LEFT JOIN parcels_events ON ((parcels_events.parcel_id = parcels.primary_key)))
   ORDER BY parcels.packing_date DESC;
-
-
-
