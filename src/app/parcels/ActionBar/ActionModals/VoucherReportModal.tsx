@@ -3,15 +3,15 @@
 import React, { useState } from "react";
 import GeneralActionModal, { ActionModalProps } from "./GeneralActionModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import VoucherReportCsvButton, {
-    FetchVoucherReportError,
-} from "../ActionButtons/VoucherReportCsvButton";
+import MissingVoucherNumberReportCsvButton, {
+    FetchMissingVoucherNumberReportError,
+} from "../ActionButtons/VoucherNumberReportCsvButton";
 import dayjs from "dayjs";
 import DateRangeInputs, { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { sendAuditLog } from "@/server/auditLog";
 import styled from "styled-components";
 
-interface VoucherReportInputProps {
+interface MissingVoucherNumberReportInputProps {
     dateRange: DateRangeState;
     setRange: (range: DateRangeState) => void;
 }
@@ -21,7 +21,7 @@ interface ContentProps {
     setRange: (range: DateRangeState) => void;
     isInputValid: boolean;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (csvError: FetchVoucherReportError) => void;
+    onFileCreationFailed: (csvError: FetchMissingVoucherNumberReportError) => void;
 }
 
 const InputContainer = styled.div`
@@ -30,7 +30,7 @@ const InputContainer = styled.div`
     gap: 1rem;
 `;
 
-const VoucherReportInput: React.FC<VoucherReportInputProps> = (props) => {
+const MissingVoucherNumberReportInput: React.FC<MissingVoucherNumberReportInputProps> = (props) => {
     return (
         <InputContainer>
             <DateRangeInputs range={props.dateRange} setRange={props.setRange} />
@@ -38,7 +38,7 @@ const VoucherReportInput: React.FC<VoucherReportInputProps> = (props) => {
     );
 };
 
-const VoucherReportModalContent: React.FC<ContentProps> = ({
+const MissingVoucherNumberReportModalContent: React.FC<ContentProps> = ({
     dateRange,
     setRange,
     isInputValid,
@@ -47,9 +47,9 @@ const VoucherReportModalContent: React.FC<ContentProps> = ({
 }) => {
     return (
         <form>
-            <VoucherReportInput dateRange={dateRange} setRange={setRange} />
+            <MissingVoucherNumberReportInput dateRange={dateRange} setRange={setRange} />
             <Centerer>
-                <VoucherReportCsvButton
+                <MissingVoucherNumberReportCsvButton
                     fromDate={dateRange.from}
                     toDate={dateRange.to}
                     onFileCreationCompleted={onFileCreationCompleted}
@@ -61,7 +61,7 @@ const VoucherReportModalContent: React.FC<ContentProps> = ({
     );
 };
 
-const VoucherReportModal: React.FC<ActionModalProps> = (props) => {
+const MissingVoucherNumberReportModal: React.FC<ActionModalProps> = (props) => {
     const [actionCompleted, setActionCompleted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -90,7 +90,7 @@ const VoucherReportModal: React.FC<ActionModalProps> = (props) => {
         props.postSuccessCallback();
     };
 
-    const onFileCreationFailed = (csvError: FetchVoucherReportError): void => {
+    const onFileCreationFailed = (csvError: FetchMissingVoucherNumberReportError): void => {
         setErrorMessage("Failed to fetch Voucher report data");
         setActionCompleted(true);
         void sendAuditLog({
@@ -112,7 +112,7 @@ const VoucherReportModal: React.FC<ActionModalProps> = (props) => {
             successMessage={successMessage}
         >
             {!actionCompleted && (
-                <VoucherReportModalContent
+                <MissingVoucherNumberReportModalContent
                     dateRange={dateRange}
                     setRange={setDateRange}
                     isInputValid={isInputValid}
@@ -124,4 +124,4 @@ const VoucherReportModal: React.FC<ActionModalProps> = (props) => {
     );
 };
 
-export default VoucherReportModal;
+export default MissingVoucherNumberReportModal;

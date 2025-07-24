@@ -24,22 +24,25 @@ import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 
-type FetchVoucherReportResult =
+type FetchMissingVoucherNumberReportResult =
     | {
           data: VoucherReportRow[];
           error: null;
       }
     | {
           data: null;
-          error: FetchVoucherReportError;
+          error: FetchMissingVoucherNumberReportError;
       };
 
-export interface FetchVoucherReportError {
-    type: FetchVoucherReportErrorType;
+export interface FetchMissingVoucherNumberReportError {
+    type: FetchMissingVoucherNumberReportErrorType;
     logId: string;
 }
 
-type FetchVoucherReportErrorType = "failedToFetchVoucherRows" | "failedToFetchVoucherParcelIds";
+type FetchMissingVoucherNumberReportErrorType =
+    | "failedToFetchMissingVoucherNumberRows"
+    | "failedToFetchMissingVoucherNumberParcelIds"
+    | "noParcelsFound";
 
 type VoucherReportRow = {
     voucherNumber: string;
@@ -70,10 +73,10 @@ type VoucherReportRow = {
     recordCreatedOn: string;
 };
 
-const getVoucherReportData = async (
+const getMissingVoucherNumberReportData = async (
     fromDate: Dayjs,
     toDate: Dayjs
-): Promise<FetchVoucherReportResult> => {
+): Promise<FetchMissingVoucherNumberReportResult> => {
     // Find IDs of non-deleted parcels in the period. This is done before the complex query because
     // joining clients and families to the view does not behave as expected.
     const { data: idAndStatusList, error: idFetchError } = await supabase
@@ -82,7 +85,7 @@ const getVoucherReportData = async (
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
-        .or("voucher_number.not.ilike.E%, voucher_number.is.null")
+        .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
         .not("client_full_name", "ilike", "%Deleted Client%")
         .eq("client_is_active", true);
 
@@ -93,7 +96,7 @@ const getVoucherReportData = async (
         return {
             data: null,
             error: {
-                type: "failedToFetchVoucherParcelIds",
+                type: "failedToFetchMissingVoucherNumberParcelIds",
                 logId,
             },
         };
@@ -159,13 +162,29 @@ const getVoucherReportData = async (
         .order("client_id");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch Voucher rows", {
+        const logId = await logErrorReturnLogId("Failed to fetch missing voucher number rows", {
             error: parcelFetchError,
         });
         return {
             data: null,
             error: {
-                type: "failedToFetchVoucherRows",
+                type: "failedToFetchMissingVoucherNumberRows",
+                logId,
+            },
+        };
+    }
+
+    if (!rawParcelList || rawParcelList.length === 0) {
+        const logId = await logErrorReturnLogId(
+            "No parcels with current selection to create missing voucher report",
+            {
+                error: parcelFetchError,
+            }
+        );
+        return {
+            data: null,
+            error: {
+                type: "noParcelsFound",
                 logId,
             },
         };
@@ -251,11 +270,11 @@ interface ButtonProps {
     fromDate: Dayjs;
     toDate: Dayjs;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (error: FetchVoucherReportError) => void;
+    onFileCreationFailed: (error: FetchMissingVoucherNumberReportError) => void;
     disabled: boolean;
 }
 
-const VoucherReportCsvButton = ({
+const MissingVoucherNumberReportCsvButton = ({
     fromDate,
     toDate,
     onFileCreationCompleted,
@@ -263,13 +282,22 @@ const VoucherReportCsvButton = ({
     disabled,
 }: ButtonProps): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
-        FileGenerationDataFetchResponse<VoucherReportRow[], FetchVoucherReportErrorType>
+        FileGenerationDataFetchResponse<
+            VoucherReportRow[],
+            FetchMissingVoucherNumberReportErrorType
+        >
     > => {
-        const { data: requiredData, error } = await getVoucherReportData(fromDate, toDate);
+        const { data: requiredData, error } = await getMissingVoucherNumberReportData(
+            fromDate,
+            toDate
+        );
         if (error) {
             return { data: null, error };
         }
-        return { data: { fileData: requiredData, fileName: "VoucherReport.csv" }, error: null };
+        return {
+            data: { fileData: requiredData, fileName: "MissingVoucherNumberReport.csv" },
+            error: null,
+        };
     };
 
     return (
@@ -284,4 +312,4 @@ const VoucherReportCsvButton = ({
     );
 };
 
-export default VoucherReportCsvButton;
+export default MissingVoucherNumberReportCsvButton;
