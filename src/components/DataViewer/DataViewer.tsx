@@ -1,10 +1,10 @@
 "use client";
 
+import Button from "@mui/material/Button";
 import React, { ChangeEvent } from "react";
 import styled from "styled-components";
 import { formatCamelCaseKey } from "@/common/format";
 import FreeFormTextInput from "../DataInput/FreeFormTextInput";
-import Button from "@mui/material/Button";
 
 type ValueType = string[] | string | number | boolean | null;
 
@@ -123,7 +123,13 @@ const DataViewer: React.FC<DataViewerProps> = ({ data }) => {
     return (
         <DataViewerContainer>
             {Object.entries(data).map(([key, value]) => {
-                if (!value.hide && value.value !== "") {
+                const isAHiddenReferralField = (key: string, value: ValueConfig): boolean => {
+                    return (
+                        (key.includes("referral") || key.includes("referrer")) && value.value === ""
+                    );
+                };
+
+                if (!value.hide && !isAHiddenReferralField(key, value)) {
                     return (
                         <DataViewerItem key={key}>
                             <Key>{formatCamelCaseKey(key)}</Key>
