@@ -12,7 +12,7 @@ export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
     const { data, error } = await supabase
         .from("delivery_areas")
         .select()
-        .eq("is_deliverable", true);
+
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Delivery areas", error);
         throw new DatabaseError("fetch", "delivery areas", logId);
@@ -22,7 +22,6 @@ export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
         (row): DeliveryAreasRow => ({
             id: row.id,
             postcode: row.postcode,
-            isDeliverable: row.is_deliverable,
             isNew: false,
         })
     );
@@ -32,15 +31,11 @@ const formatExistingRowToDbDeliveryAreas = (row: DeliveryAreasRow): DbDeliveryAr
     return {
         id: row.id,
         postcode: row.postcode,
-        is_deliverable: row.isDeliverable,
     };
 };
 
 const formatNewRowToDbDeliveryAreas = (newRow: DeliveryAreasRow): NewDbDeliveryAreas => {
-    return {
-        postcode: newRow.postcode,
-        is_deliverable: newRow.isDeliverable,
-    };
+    return { postcode: newRow.postcode,};
 };
 
 type InsertDeliveryAreasResult =
@@ -105,34 +100,13 @@ export const updateDbDeliveryAreas = async (
     return { error: null };
 };
 
-export const updateDbDeliveryAreasByPostcode = async (
-    row: DeliveryAreasRow
-): Promise<UpdateDeliveryAreasResult> => {
-    const processedData = formatExistingRowToDbDeliveryAreas(row);
-    const { error } = await supabase
-        .from("delivery_areas")
-        .update({ is_deliverable: true })
-        .eq("postcode", processedData.postcode);
-
-    if (error) {
-        const logId = await logErrorReturnLogId("Failed to update delivery area", {
-            error,
-            newDeliveryAreasData: processedData,
-        });
-
-        return { error: { dbError: error, logId } };
-    }
-
-    return { error: null };
-};
-
 export const deleteDbDeliveryAreas = async (
     row: DeliveryAreasRow
 ): Promise<UpdateDeliveryAreasResult> => {
     const processedData = formatExistingRowToDbDeliveryAreas(row);
     const { error } = await supabase
         .from("delivery_areas")
-        .update({ is_deliverable: false })
+        .delete()
         .eq("postcode", processedData.postcode);
 
     if (error) {

@@ -26,7 +26,7 @@ select
   parcels_events.all_events,
   clients.delivery_instructions as client_delivery_instructions,
   parcels.list_type,
-  delivery_areas.is_deliverable as is_deliverable
+  (delivery_areas.postcode is not null) as is_deliverable
 from
    ((((((parcels
   left join collection_centres on ((parcels.collection_centre = collection_centres.primary_key)))

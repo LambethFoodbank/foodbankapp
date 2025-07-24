@@ -7,7 +7,7 @@ select
     clients.phone_number,
     clients.is_active,
     family_count.family_count,
-    delivery_areas.is_deliverable
+    (delivery_areas.postcode is not null) as is_deliverable
 from
     ((clients
     left join family_count on ((clients.family_id = family_count.family_id)))
