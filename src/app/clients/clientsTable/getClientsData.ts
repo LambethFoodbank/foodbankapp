@@ -66,7 +66,10 @@ const getClientsDataAndCount = async (
             familyCategory: familyCountToFamilyCategory(client.family_count ?? 0),
             addressPostcode: client.address_postcode,
             phoneNumber: client.phone_number,
-            is_deliverable: client.is_deliverable,
+            isDeliverable: client.is_deliverable,
+            iconsColumn: {
+                isDeliverable: client.is_deliverable,
+            },
         };
     });
 
