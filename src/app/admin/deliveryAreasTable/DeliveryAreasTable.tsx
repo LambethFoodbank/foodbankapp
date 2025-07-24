@@ -62,7 +62,7 @@ function EditToolbar(props: EditToolbarProps): React.JSX.Element {
         setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
         setRowModesModel((oldModel) => ({
             ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: "postcode" },
         }));
     };
 
