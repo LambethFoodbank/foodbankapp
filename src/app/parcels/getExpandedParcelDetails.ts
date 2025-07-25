@@ -16,7 +16,6 @@ import {
     Data,
     DataForDataViewer,
     convertDataToDataForDataViewer,
-    ValueConfig,
 } from "@/components/DataViewer/DataViewer";
 import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
