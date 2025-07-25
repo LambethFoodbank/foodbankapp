@@ -77,10 +77,10 @@ const MissingVoucherNumberReportModal: React.FC<ActionModalProps> = (props) => {
     };
 
     const onFileCreationCompleted = async (): Promise<void> => {
-        setSuccessMessage("Voucher Report Created");
+        setSuccessMessage("Missing Voucher Number Report Created");
         setActionCompleted(true);
         void sendAuditLog({
-            action: "generate Voucher report",
+            action: "generate missing voucher number report",
             wasSuccess: true,
             content: {
                 fromDate: dateRange.from.toString(),
@@ -91,10 +91,10 @@ const MissingVoucherNumberReportModal: React.FC<ActionModalProps> = (props) => {
     };
 
     const onFileCreationFailed = (csvError: FetchMissingVoucherNumberReportError): void => {
-        setErrorMessage("Failed to fetch Voucher report data");
+        setErrorMessage("Failed to fetch missing voucher number report data");
         setActionCompleted(true);
         void sendAuditLog({
-            action: "generate Voucher report",
+            action: "generate missing voucher number report",
             wasSuccess: false,
             content: {
                 fromDate: dateRange.from.toString(),

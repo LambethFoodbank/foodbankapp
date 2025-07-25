@@ -86,7 +86,8 @@ const getMissingVoucherNumberReportData = async (
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
-        .not("client_full_name", "ilike", "%Deleted Client%")
+        // eslint-disable-next-line quotes
+        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
         .eq("client_is_active", true);
 
     if (idFetchError) {
