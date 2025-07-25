@@ -72,15 +72,15 @@ export const getDividingLineStyleOptions = (theme: DefaultTheme): DividingLineSt
     return {
         dateAndSlotPrimary: {
             colour: theme.primary.background[3],
-            thickness: "5pt",
+            thickness: "7pt",
         },
         dateAndSlotSecondary: {
             colour: theme.primary.background[2],
-            thickness: "2.5pt",
+            thickness: "4pt",
         },
         slotPrimary: {
             colour: theme.primary.background[3],
-            thickness: "5pt",
+            thickness: "7pt",
         },
     };
 };
