@@ -8,7 +8,7 @@ import FreeFormTextInput from "../DataInput/FreeFormTextInput";
 
 type ValueType = string[] | string | number | boolean | null;
 
-type ValueConfig = {
+export type ValueConfig = {
     value: ValueType;
     hide?: boolean;
     editFunctions?: EditFunctions;
@@ -123,13 +123,7 @@ const DataViewer: React.FC<DataViewerProps> = ({ data }) => {
     return (
         <DataViewerContainer>
             {Object.entries(data).map(([key, value]) => {
-                const isAHiddenReferralField = (key: string, value: ValueConfig): boolean => {
-                    return (
-                        (key.includes("referral") || key.includes("referrer")) && value.value === ""
-                    );
-                };
-
-                if (!value.hide && !isAHiddenReferralField(key, value)) {
+                if (!value.hide) {
                     return (
                         <DataViewerItem key={key}>
                             <Key>{formatCamelCaseKey(key)}</Key>

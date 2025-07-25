@@ -16,6 +16,7 @@ import {
     Data,
     DataForDataViewer,
     convertDataToDataForDataViewer,
+    ValueConfig,
 } from "@/components/DataViewer/DataViewer";
 import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
@@ -354,6 +355,23 @@ export const getExpandedParcelDataForDataViewer = (
     parcelDetailsForDataViewer["listType"] = {
         value: capitaliseWords(parcelDetails["listType"]),
     };
+    parcelDetailsForDataViewer["referralAgency"] = {
+        value: parcelDetails["referralAgency"],
+        hide: !parcelDetails["referralAgency"],
+    };
+    parcelDetailsForDataViewer["referrerName"] = {
+        value: parcelDetails["referrerName"],
+        hide: !parcelDetails["referrerName"],
+    };
+    parcelDetailsForDataViewer["referrerEmail"] = {
+        value: parcelDetails["referrerEmail"],
+        hide: !parcelDetails["referrerEmail"],
+    };
+    parcelDetailsForDataViewer["referrerPhone"] = {
+        value: parcelDetails["referrerPhone"],
+        hide: !parcelDetails["referrerPhone"],
+    };
+
     return parcelDetailsForDataViewer;
 };
 
