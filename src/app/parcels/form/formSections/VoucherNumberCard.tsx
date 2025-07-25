@@ -8,7 +8,12 @@ import { ParcelCardProps } from "../ParcelForm";
 
 const voucherNumberIsRequired = true;
 
-const VoucherNumberCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter, formErrors }) => {
+const VoucherNumberCard: React.FC<ParcelCardProps> = ({
+    errorSetter,
+    fieldSetter,
+    formErrors,
+    fields,
+}) => {
     return (
         <GenericFormCard
             title="Voucher Number"
@@ -23,18 +28,21 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter
                     onChange={onChangeText(fieldSetter, errorSetter, "voucherNumber", {
                         required: voucherNumberIsRequired,
                     })}
+                    defaultValue={fields.voucherNumber}
                 />
                 <FreeFormTextInput
                     label="Referral Agency"
                     onChange={onChangeText(fieldSetter, errorSetter, "referralAgency", {
                         required: false,
                     })}
+                    defaultValue={fields.referralAgency}
                 />
                 <FreeFormTextInput
                     label="Referrer Name"
                     onChange={onChangeText(fieldSetter, errorSetter, "referrerName", {
                         required: false,
                     })}
+                    defaultValue={fields.referrerName}
                 />
                 <FreeFormTextInput
                     label="Referrer Email"
@@ -48,6 +56,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter
                         required: false,
                         regex: emailRegex,
                     })}
+                    defaultValue={fields.referrerEmail}
                 />
                 <FreeFormTextInput
                     label="Referrer Phone"
@@ -61,6 +70,7 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter
                         required: false,
                         regex: phoneNumberRegex,
                     })}
+                    defaultValue={fields.referrerPhone}
                 />
             </GappedDiv>
         </GenericFormCard>
