@@ -1,45 +1,40 @@
 "use client";
 
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { CircularProgress } from "@mui/material";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { Suspense, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useTheme } from "styled-components";
+import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import ExpandedClientDetailsFallback from "@/app/clients/ExpandedClientDetailsFallback";
+import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
+import { RoleUpdateContext } from "@/app/roles";
+import { displayPostcodeForHomelessClient } from "@/common/format";
+import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
+import DeleteButton from "@/components/Buttons/DeleteButton";
+import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import LinkButton from "@/components/Buttons/LinkButton";
+import FloatingToast from "@/components/FloatingToast";
+import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
 import Icon from "@/components/Icons/Icon";
+import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import Modal from "@/components/Modal/Modal";
 import { ButtonsDiv, Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
 import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
-import supabase from "@/supabaseClient";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
-import React, { useEffect, useState, Suspense, useRef, useCallback, useContext } from "react";
-import { useTheme } from "styled-components";
-import getClientsDataAndCount from "./getClientsData";
-import { useSearchParams, useRouter } from "next/navigation";
-import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
-import ExpandedClientDetailsFallback from "@/app/clients/ExpandedClientDetailsFallback";
-import { CircularProgress } from "@mui/material";
-import { ErrorSecondaryText } from "../../errorStylingandMessages";
-import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import {
-    displayPostcodeForHomelessClient,
-    formatDateTime,
-    formatDatetimeAsDate,
-} from "@/common/format";
-import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
-import DeleteButton from "@/components/Buttons/DeleteButton";
-import deleteClient from "../deleteClient";
-import { getIsClientActive } from "../getExpandedClientDetails";
-import clientsFilters from "./filters";
-import clientsSortableColumns from "./sortableColumns";
-import clientsHeaders from "./headers";
-import { ClientsTableRow, ClientsSortState, ClientsFilter } from "./types";
 import { DbClientRow } from "@/databaseUtils";
+import supabase from "@/supabaseClient";
 import { clientIdParam } from "./constants";
-import { getIsClientActiveErrorMessage, getDeleteClientErrorMessage } from "./format";
+import clientsFilters from "./filters";
+import { getDeleteClientErrorMessage, getIsClientActiveErrorMessage } from "./format";
+import getClientsDataAndCount from "./getClientsData";
+import clientsHeaders from "./headers";
+import clientsSortableColumns from "./sortableColumns";
+import { ClientsFilter, ClientsSortState, ClientsTableRow } from "./types";
+import { ErrorSecondaryText } from "../../errorStylingandMessages";
+import deleteClient from "../deleteClient";
 import { getClientParcelsDetails } from "../getClientParcelsData";
-import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
-import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
-import FloatingToast from "@/components/FloatingToast";
-import { RoleUpdateContext } from "@/app/roles";
-import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
-import { clientTableColumnStyleOptions } from "@/app/clients/clientsTable/styles";
+import { getIsClientActive } from "../getExpandedClientDetails";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -155,7 +150,7 @@ const ClientsPage: React.FC = () => {
         })();
     }, [clientId]);
 
-    const formatNullPostcode = (postcodeData: ClientsTableRow["addressPostcode"]): string => {
+    const formatNullPostcode = (postcodeData: string | null): string => {
         return postcodeData ?? displayPostcodeForHomelessClient;
     };
 
@@ -192,24 +187,23 @@ const ClientsPage: React.FC = () => {
     };
 
     const RowToIconsColumn = ({
+        addressPostcode,
         isDeliverable,
-    }: ClientsTableRow["iconsColumn"]): React.ReactElement => {
-        const icons: React.ReactNode[] = [];
-        console.log(isDeliverable);
+    }: ClientsTableRow["addressColumn"]): React.ReactElement => {
+        const postcodeRow: React.ReactNode[] = [];
+        postcodeRow.push(formatNullPostcode(addressPostcode));
         if (!isDeliverable) {
-            icons.push(
+            postcodeRow.push(
                 <>
                     <ClientOutsideDeliveryAreaIcon />
                 </>
             );
         }
-
-        return <>{icons}</>;
+        return <>{postcodeRow}</>;
     };
 
     const parcelTableColumnDisplayFunctions = {
-        iconsColumn: RowToIconsColumn,
-        addressPostcode: formatNullPostcode,
+        addressColumn: RowToIconsColumn,
     };
 
     return (
@@ -257,7 +251,6 @@ const ClientsPage: React.FC = () => {
                             isLoading={isLoading}
                             pointerOnHover={true}
                             columnDisplayFunctions={parcelTableColumnDisplayFunctions}
-                            columnStyleOptions={clientTableColumnStyleOptions}
                         />
                     </TableSurface>
 

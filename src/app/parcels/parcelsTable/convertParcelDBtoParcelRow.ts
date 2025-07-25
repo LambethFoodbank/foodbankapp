@@ -1,8 +1,8 @@
-import { CongestionChargeDetails, ParcelsTableRow } from "./types";
 import { familyCountToFamilyCategory } from "@/app/clients/getExpandedClientDetails";
-import { logErrorReturnLogId } from "@/logger/logger";
 import { DbParcelRow, ViewSchema } from "@/databaseUtils";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { parcelsPageDeletedClientDisplayName } from "./format";
+import { CongestionChargeDetails, ParcelsTableRow } from "./types";
 
 export type ProcessParcelDataResult =
     | {
@@ -47,6 +47,11 @@ const convertParcelDbtoParcelRow = async (
                 familyCategory: clientActive
                     ? familyCountToFamilyCategory(parcel.family_count ?? 0)
                     : "-",
+                addressColumn: {
+                    addressPostcode: clientActive ? parcel.client_address_postcode : "-",
+                    isDeliverable: parcel.is_deliverable,
+                    clientIsActive: parcel.client_is_active ?? false,
+                },
                 addressPostcode: clientActive ? parcel.client_address_postcode : "-",
                 phoneNumber: clientActive ? parcel.client_phone_number ?? "" : "-",
                 deliveryCollection: {
@@ -54,7 +59,6 @@ const convertParcelDbtoParcelRow = async (
                     collectionCentreAcronym: parcel.collection_centre_acronym ?? "-",
                     congestionChargeApplies: congestionCharge[index].congestionCharge,
                     listType: parcel.list_type,
-                    isDeliverable: parcel.is_deliverable,
                 },
                 collectionDatetime: parcel.collection_datetime
                     ? new Date(parcel.collection_datetime)

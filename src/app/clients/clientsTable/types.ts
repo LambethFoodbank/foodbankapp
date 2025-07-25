@@ -41,10 +41,11 @@ export interface ClientsTableRow {
     clientId: Schema["clients"]["primary_key"];
     fullName: Schema["clients"]["full_name"];
     familyCategory: string;
+    addressColumn: {
+        addressPostcode: Schema["clients"]["address_postcode"];
+        isDeliverable: boolean | null;
+    };
     addressPostcode: Schema["clients"]["address_postcode"];
     phoneNumber: Schema["clients"]["phone_number"];
     isDeliverable: boolean | null;
-    iconsColumn: {
-        isDeliverable: boolean | null;
-    };
 }
