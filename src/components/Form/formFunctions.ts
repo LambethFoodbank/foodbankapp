@@ -68,7 +68,6 @@ const getErrorType = (
     additionalCondition?: (value: string) => boolean,
     maxCharacters?: number
 ): Errors => {
-    console.log(input);
     if (input == "") {
         return required ? Errors.required : Errors.none;
     }

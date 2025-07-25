@@ -1,3 +1,4 @@
+import { emailRegex } from "@/common/format";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
@@ -7,7 +8,6 @@ import {
 import React from "react";
 import { UserFormProps } from "@/app/admin/createUser/CreateUserForm";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-const emailRegex = /^\S+@\S+$/;
 
 const AccountDetailsCard: React.FC<UserFormProps> = ({
     fields,
