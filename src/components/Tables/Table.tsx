@@ -309,10 +309,6 @@ const Table = <
         }
     };
 
-    const [isSwapping, setIsSwapping] = useState(false);
-
-    const [draggedRowId, setDraggedRowId] = useState<number | null>(null);
-
     if (editableConfig.editable) {
         const swapRows = (rowIndex1: number, upwards: boolean): void => {
             if (isSwapping) {
@@ -350,57 +346,6 @@ const Table = <
             } else {
                 clientSideRefresh();
             }
-        };
-
-        const swapRowsWithDrag = (rowIndex1: number, rowIndex2: number): void => {
-            if (isSwapping) {
-                return;
-            }
-            setIsSwapping(true);
-
-            if (
-                rowIndex1 < 0 ||
-                rowIndex2 < 0 ||
-                rowIndex1 >= dataPortion.length ||
-                rowIndex2 >= dataPortion.length
-            ) {
-                setIsSwapping(false);
-                return;
-            }
-            const clientSideRefresh = (): void => {
-                // Update viewed table data once specific functions are done (without re-fetch)
-                const newData = [...dataPortion];
-                const temp = newData[rowIndex1];
-                newData[rowIndex1] = newData[rowIndex2];
-                newData[rowIndex2] = temp;
-
-                editableConfig.setDataPortion(newData);
-                setIsSwapping(false);
-            };
-
-            if (editableConfig.onSwapRowsWithDrag) {
-                editableConfig
-                    .onSwapRowsWithDrag(dataPortion[rowIndex1], dataPortion[rowIndex2])
-                    .then(clientSideRefresh);
-            } else {
-                clientSideRefresh();
-            }
-        };
-
-        const onDragStart = (rowId: number): void => {
-            setDraggedRowId(rowId);
-        };
-
-        const onDragOver = (event: React.DragEvent<HTMLElement>): void => {
-            event.preventDefault();
-        };
-
-        const handleDrop = (targetRowId: number): void => {
-            if (draggedRowId == null || draggedRowId === targetRowId) {
-                return;
-            }
-            swapRowsWithDrag(draggedRowId, targetRowId);
-            setDraggedRowId(null);
         };
 
         columns.unshift({
@@ -499,6 +444,69 @@ const Table = <
 
     const rows = dataPortion.map((data, index) => ({ rowId: index, data }));
 
+    const [isSwapping, setIsSwapping] = useState(false);
+
+    const [draggedRowId, setDraggedRowId] = useState<number | null>(null);
+
+    const swapRowsWithDrag = (rowIndex1: number, rowIndex2: number): void => {
+        if (isSwapping) {
+            return;
+        }
+        setIsSwapping(true);
+
+        if (
+            rowIndex1 < 0 ||
+            rowIndex2 < 0 ||
+            rowIndex1 >= dataPortion.length ||
+            rowIndex2 >= dataPortion.length
+        ) {
+            setIsSwapping(false);
+            return;
+        }
+        const clientSideRefresh = (): void => {
+            // Update viewed table data once specific functions are done (without re-fetch)
+            const newData = [...dataPortion];
+            const temp = newData[rowIndex1];
+            newData[rowIndex1] = newData[rowIndex2];
+            newData[rowIndex2] = temp;
+
+            if (editableConfig.editable) {
+                editableConfig.setDataPortion(newData);
+            }
+            setIsSwapping(false);
+        };
+
+        if (editableConfig.editable) {
+            if (editableConfig.onSwapRowsWithDrag) {
+                editableConfig
+                    .onSwapRowsWithDrag(dataPortion[rowIndex1], dataPortion[rowIndex2])
+                    .then(clientSideRefresh);
+            } else {
+                clientSideRefresh();
+            }
+        }
+    };
+
+    const onDragStart = (rowId: number): void => {
+        setDraggedRowId(rowId);
+        console.log("start");
+    };
+
+    const onDragOver = (event: React.DragEvent<HTMLElement>): void => {
+        event.preventDefault();
+        console.log("over");
+    };
+
+    const handleDrop = (targetRowId: number): void => {
+        if (draggedRowId == null || draggedRowId === targetRowId) {
+            return;
+        }
+        console.log("drop");
+
+        swapRowsWithDrag(draggedRowId, targetRowId);
+        setDraggedRowId(null);
+    };
+
     const conditionalRowStyles = [
         {
             when: (row: Row<Data>) =>
@@ -506,6 +514,12 @@ const Table = <
             style: {
                 backgroundColor: `${theme.primary.background[1]} !important`,
             },
+            props: (row: Row<Data>) => ({
+                draggable: true,
+                onDragStart: () => onDragStart(row.rowId),
+                onDragOver: onDragOver,
+                onDrop: () => handleDrop(row.rowId),
+            }),
         },
     ];
 
