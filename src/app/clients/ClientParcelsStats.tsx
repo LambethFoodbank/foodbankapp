@@ -13,8 +13,8 @@ export interface ClientParcelStatsRow {
 
 const headers: TableHeaders<ClientParcelStatsRow> = [
     ["totalParcels", "Total Parcels"],
-    ["totalSuccessful", "Successful Parceles"],
-    ["lastSixMonthsSuccessful", "Successful in the last 6 months"],
+    ["totalSuccessful", "Total Successful Parcels"],
+    ["lastSixMonthsSuccessful", "Total Successful Parcels in last 6 months"],
 ];
 
 export interface ClientParcelStatsProps {

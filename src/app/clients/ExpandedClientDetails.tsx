@@ -5,9 +5,7 @@ import ClientParcelsTable from "@/app/clients/ClientParcelsTable";
 import ClientParcelStats from "@/app/clients/ClientParcelsStats";
 import {
     ExpandedClientParcelDetails,
-    ExpandedClientParcelStats,
     getClientParcelsDetails,
-    getClientParcelsStats,
 } from "@/app/clients/getClientParcelsData";
 import getExpandedClientDetails, {
     ExpandedClientData,
@@ -20,6 +18,7 @@ import DataViewer, {
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { updateClientNotes } from "./updateClientNotes";
 import { ErrorSecondaryText } from "../errorStylingandMessages";
+import { ExpandedClientParcelStats, getClientParcelsStats } from "./getClientParcelsStats";
 
 interface Props {
     clientId: string;
