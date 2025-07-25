@@ -1,6 +1,37 @@
 "use client";
 
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import InfoIcon from "@mui/icons-material/Info";
+import { Button, IconButton } from "@mui/material";
+import dayjs, { Dayjs } from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { useTheme } from "styled-components";
+import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
+import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
+import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
+import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
+import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
+import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
+import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
+import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
+import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
+import {
+    WriteParcelToDatabaseErrors,
+    WriteParcelToDatabaseFunction,
+} from "@/app/parcels/form/submitFormHelpers";
+import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
+import {
+    CollectionCentresLabelsAndValues,
+    CollectionTimeSlotsLabelsAndValues,
+    getActiveTimeSlotsForCollectionCentre,
+    PackingSlotsLabelsAndValues,
+} from "@/common/fetch";
+import { getDbDate } from "@/common/format";
 import {
     CardProps,
     checkErrorOnSubmit,
@@ -15,44 +46,11 @@ import {
     StyledForm,
     StyledName,
 } from "@/components/Form/formStyling";
-
-import { useRouter } from "next/navigation";
-
-import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
-import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
-import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
-import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
-import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
-import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
-import {
-    WriteParcelToDatabaseErrors,
-    WriteParcelToDatabaseFunction,
-} from "@/app/parcels/form/submitFormHelpers";
-import { Button, IconButton } from "@mui/material";
-import { Schema } from "@/databaseUtils";
-import dayjs, { Dayjs } from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import {
-    CollectionCentresLabelsAndValues,
-    CollectionTimeSlotsLabelsAndValues,
-    getActiveTimeSlotsForCollectionCentre,
-    PackingSlotsLabelsAndValues,
-} from "@/common/fetch";
-import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
-import Modal from "@/components/Modal/Modal";
-import InfoIcon from "@mui/icons-material/Info";
 import Icon from "@/components/Icons/Icon";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { useTheme } from "styled-components";
-import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
-import { getDbDate } from "@/common/format";
-import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import Modal from "@/components/Modal/Modal";
+import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
-import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -236,6 +234,26 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
 
         void getTimeSlots();
     }, [fields.collectionCentre, initialFormErrors]);
+
+    useEffect(() => {
+        // If the Shipping Method changes, errors for collection date and slot should be reset
+        if (fields.shippingMethod == "Collection") {
+            // The collection centre fields initially have 'Delivery' default values
+            setFormErrors((prevErrors) => ({
+                ...prevErrors,
+                collectionCentre:
+                    fields.collectionCentre == deliveryPrimaryKey ? Errors.initial : Errors.none,
+                collectionDate: fields.collectionDate == null ? Errors.initial : Errors.none,
+                collectionSlot: fields.collectionSlot == "-" ? Errors.initial : Errors.none,
+            }));
+        }
+    }, [
+        deliveryPrimaryKey,
+        fields.collectionCentre,
+        fields.collectionDate,
+        fields.collectionSlot,
+        fields.shippingMethod,
+    ]);
 
     const formSections =
         fields.shippingMethod === "Collection"
