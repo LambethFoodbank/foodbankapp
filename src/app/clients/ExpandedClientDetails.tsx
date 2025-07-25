@@ -2,9 +2,12 @@ import { CircularProgress } from "@mui/material";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import ClientParcelsTable from "@/app/clients/ClientParcelsTable";
+import ClientParcelStats from "@/app/clients/ClientParcelsStats";
 import {
     ExpandedClientParcelDetails,
+    ExpandedClientParcelStats,
     getClientParcelsDetails,
+    getClientParcelsStats,
 } from "@/app/clients/getClientParcelsData";
 import getExpandedClientDetails, {
     ExpandedClientData,
@@ -36,6 +39,9 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
     const [clientParcelsDetails, setClientParcelsDetails] = useState<
         ExpandedClientParcelDetails[] | null
     >(null);
+    const [clientParcelsStats, setClientParcelsStats] = useState<
+        ExpandedClientParcelStats[] | null
+    >(null);
 
     const [originalNotes, setOriginalNotes] = useState<string | null>("");
     const [notes, setNotes] = useState<string | null>("");
@@ -51,6 +57,9 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
                 displayClientsParcels ? await getClientParcelsDetails(clientId) : null
             );
             setOriginalNotes(clientDetails?.notes ? clientDetails?.notes : "");
+            setClientParcelsStats(
+                displayClientsParcels ? await getClientParcelsStats(clientId) : null
+            )
             setIsLoading(false);
         })();
     }, [clientId, displayClientsParcels, clientDetails?.notes]);
@@ -129,6 +138,9 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
                 <ErrorSecondaryText>{errorMessage}</ErrorSecondaryText>
                 {clientParcelsDetails && displayClientsParcels && (
                     <ClientParcelsTable parcelsData={clientParcelsDetails} />
+                )}
+                {clientParcelsStats && displayClientsParcels && (
+                    <ClientParcelStats parcelsData={clientParcelsStats} />
                 )}
             </>
         )
