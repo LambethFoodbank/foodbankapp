@@ -39,7 +39,6 @@ import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
 import { RoleUpdateContext } from "@/app/roles";
 import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
-import { clientTableColumnStyleOptions } from "@/app/clients/clientsTable/styles";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -155,7 +154,7 @@ const ClientsPage: React.FC = () => {
         })();
     }, [clientId]);
 
-    const formatNullPostcode = (postcodeData: ClientsTableRow["addressPostcode"]): string => {
+    const formatNullPostcode = (postcodeData: string | null): string => {
         return postcodeData ?? displayPostcodeForHomelessClient;
     };
 
@@ -192,24 +191,23 @@ const ClientsPage: React.FC = () => {
     };
 
     const RowToIconsColumn = ({
+        addressPostcode,
         isDeliverable,
-    }: ClientsTableRow["iconsColumn"]): React.ReactElement => {
-        const icons: React.ReactNode[] = [];
-        console.log(isDeliverable);
+    }: ClientsTableRow["addressColumn"]): React.ReactElement => {
+        const postcodeRow: React.ReactNode[] = [];
+        postcodeRow.push(formatNullPostcode(addressPostcode));
         if (!isDeliverable) {
-            icons.push(
+            postcodeRow.push(
                 <>
                     <ClientOutsideDeliveryAreaIcon />
                 </>
             );
         }
-
-        return <>{icons}</>;
+        return <>{postcodeRow}</>;
     };
 
     const clientTableColumnDisplayFunctions = {
-        iconsColumn: RowToIconsColumn,
-        addressPostcode: formatNullPostcode,
+        addressColumn: RowToIconsColumn,
     };
 
     return (
@@ -257,7 +255,6 @@ const ClientsPage: React.FC = () => {
                             isLoading={isLoading}
                             pointerOnHover={true}
                             columnDisplayFunctions={clientTableColumnDisplayFunctions}
-                            columnStyleOptions={clientTableColumnStyleOptions}
                         />
                     </TableSurface>
 

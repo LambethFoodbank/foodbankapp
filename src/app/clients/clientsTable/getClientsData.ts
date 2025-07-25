@@ -64,15 +64,16 @@ const getClientsDataAndCount = async (
             clientId: client.client_id ?? "",
             fullName: client.full_name ?? "",
             familyCategory: familyCountToFamilyCategory(client.family_count ?? 0),
+            addressColumn: {
+                addressPostcode: client.address_postcode,
+                isDeliverable: client.is_deliverable,
+            },
             addressPostcode: client.address_postcode,
             phoneNumber: [client.phone_number, client.additional_phone_numbers_text]
                 .filter((phone) => phone && phone.length > 0)
                 .join(", "),
             email: client.email,
             isDeliverable: client.is_deliverable,
-            iconsColumn: {
-                isDeliverable: client.is_deliverable,
-            },
         };
     });
 

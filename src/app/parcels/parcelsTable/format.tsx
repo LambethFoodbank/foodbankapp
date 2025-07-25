@@ -1,23 +1,23 @@
 import React from "react";
+import { useTheme } from "styled-components";
 import {
     displayNameForDeletedClient,
+    displayPostcodeForHomelessClient,
     formatDateTime,
     formatDatetimeAsDate,
-    displayPostcodeForHomelessClient,
 } from "@/common/format";
+import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
+import CollectionIcon from "@/components/Icons/CollectionIcon";
+import CongestionChargeAppliesIcon from "@/components/Icons/CongestionChargeAppliesIcon";
+import DeliveryIcon from "@/components/Icons/DeliveryIcon";
+import FlaggedForAttentionIcon from "@/components/Icons/FlaggedForAttentionIcon";
+import HotelIcon from "@/components/Icons/HotelIcon";
+import PhoneIcon from "@/components/Icons/PhoneIcon";
 import {
     FetchClientIdAndIsActiveError,
     GetParcelDataAndCountErrorType,
     ParcelsTableRow,
 } from "./types";
-import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
-import CongestionChargeAppliesIcon from "@/components/Icons/CongestionChargeAppliesIcon";
-import DeliveryIcon from "@/components/Icons/DeliveryIcon";
-import FlaggedForAttentionIcon from "@/components/Icons/FlaggedForAttentionIcon";
-import PhoneIcon from "@/components/Icons/PhoneIcon";
-import CollectionIcon from "@/components/Icons/CollectionIcon";
-import { useTheme } from "styled-components";
-import HotelIcon from "@/components/Icons/HotelIcon";
 
 const RowToIconsColumn = ({
     flaggedForAttention,
@@ -36,27 +36,14 @@ const RowToDeliveryCollectionColumn = (
     collectionData: ParcelsTableRow["deliveryCollection"]
 ): React.ReactElement => {
     const theme = useTheme();
-    const {
-        collectionCentreName,
-        collectionCentreAcronym,
-        congestionChargeApplies,
-        listType,
-        isDeliverable,
-    } = collectionData;
+    const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies, listType } =
+        collectionData;
     const icons: React.ReactNode[] = [];
 
     if (listType === "hotel") {
         icons.push(
             <>
                 <HotelIcon color={theme.main.largeForeground[0]} />
-            </>
-        );
-    }
-
-    if (!isDeliverable) {
-        icons.push(
-            <>
-                <ClientOutsideDeliveryAreaIcon />
             </>
         );
     }
@@ -93,8 +80,26 @@ const rowToLastStatusColumn = (data: ParcelsTableRow["lastStatus"] | null): stri
     );
 };
 
-const formatNullPostcode = (postcodeData: ParcelsTableRow["addressPostcode"]): string => {
+const formatNullPostcode = (postcodeData: string | null): string => {
     return postcodeData ?? displayPostcodeForHomelessClient;
+};
+
+const rowToAddressColumn = ({
+    addressPostcode,
+    isDeliverable,
+    clientIsActive,
+}: ParcelsTableRow["addressColumn"]): React.ReactElement => {
+    const postcodeRow: React.ReactNode[] = [];
+    postcodeRow.push(formatNullPostcode(addressPostcode));
+    console.log(clientIsActive);
+    if (!isDeliverable && clientIsActive) {
+        postcodeRow.push(
+            <>
+                <ClientOutsideDeliveryAreaIcon />
+            </>
+        );
+    }
+    return <>{postcodeRow}</>;
 };
 
 export const parcelTableColumnDisplayFunctions = {
@@ -102,7 +107,7 @@ export const parcelTableColumnDisplayFunctions = {
     deliveryCollection: RowToDeliveryCollectionColumn,
     packingDate: formatDatetimeAsDate,
     lastStatus: rowToLastStatusColumn,
-    addressPostcode: formatNullPostcode,
+    addressColumn: rowToAddressColumn,
     createdAt: formatDateTime,
 };
 
