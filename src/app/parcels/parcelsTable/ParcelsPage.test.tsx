@@ -25,7 +25,6 @@ jest.mock("@/logger/logger", () => ({
 
 const sampleProcessingData: DbParcelRow[] = [
     {
-        list_type: "regular",
         parcel_id: "PRIMARY_KEY",
         collection_centre_name: "COLLECTION_CENTRE",
         collection_centre_acronym: "CC",
@@ -50,6 +49,11 @@ const sampleProcessingData: DbParcelRow[] = [
         created_at: "2023-12-31T12:00:00+00:00",
         client_is_active: true,
         client_delivery_instructions: "SOME_DELIVERY_INSTRUCTIONS",
+        list_type: "regular",
+        referrer_email: "example@example.com",
+        referrer_name: "John Smith",
+        referrer_phone: "0987 654321",
+        referral_agency: "Agency 1",
         parcel_notes: "fragile items",
     },
 ];
@@ -93,6 +97,11 @@ describe("Parcels Page", () => {
                     },
                     allStatuses: ["LAST_EVENT"],
                     voucherNumber: "VOUCHER_1",
+                    listType: "regular",
+                    referralAgency: "Agency 1",
+                    referrerEmail: "example@example.com",
+                    referrerName: "John Smith",
+                    referrerPhone: "0987 654321",
                     packingDate: new Date("2023-08-04T13:30:00+00:00"),
                     iconsColumn: {
                         flaggedForAttention: false,

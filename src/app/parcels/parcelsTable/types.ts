@@ -28,6 +28,11 @@ export interface ParcelsTableRow {
     } | null;
     allStatuses: string[] | null;
     voucherNumber: string | null;
+    listType: ListType | null;
+    referralAgency: string | null;
+    referrerName: string | null;
+    referrerEmail: string | null;
+    referrerPhone: string | null;
     iconsColumn: {
         flaggedForAttention: boolean;
         requiresFollowUpPhoneCall: boolean;

@@ -1,14 +1,14 @@
 "use client";
 
+import Button from "@mui/material/Button";
 import React, { ChangeEvent } from "react";
 import styled from "styled-components";
 import { formatCamelCaseKey } from "@/common/format";
 import FreeFormTextInput from "../DataInput/FreeFormTextInput";
-import Button from "@mui/material/Button";
 
 type ValueType = string[] | string | number | boolean | null;
 
-type ValueConfig = {
+export type ValueConfig = {
     value: ValueType;
     hide?: boolean;
     editFunctions?: EditFunctions;

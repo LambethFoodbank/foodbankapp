@@ -57,7 +57,11 @@ import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 export interface ParcelFields extends Fields {
     clientId: string | null;
     listType?: ListType;
-    voucherNumber: string | null;
+    voucherNumber: string | undefined;
+    referralAgency: string | undefined;
+    referrerName: string | undefined;
+    referrerEmail: string | undefined;
+    referrerPhone: string | undefined;
     packingDate: string | null;
     packingSlot: string | undefined;
     shippingMethod: string | null;
@@ -77,6 +81,8 @@ export interface ParcelErrors extends FormErrors<ParcelFields> {
     collectionDate: Errors;
     collectionSlot: Errors;
     collectionCentre: Errors;
+    referrerEmail: Errors;
+    referrerPhone: Errors;
 }
 
 export type ParcelCardProps = CardProps<ParcelFields, ParcelErrors>;
@@ -85,6 +91,10 @@ export const initialParcelFields: ParcelFields = {
     clientId: null,
     listType: undefined,
     voucherNumber: "",
+    referralAgency: "",
+    referrerName: "",
+    referrerEmail: "",
+    referrerPhone: "",
     packingDate: null,
     packingSlot: "",
     shippingMethod: null,
@@ -96,7 +106,7 @@ export const initialParcelFields: ParcelFields = {
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
-    listType: Errors.none,
+    listType: Errors.initial,
     voucherNumber: Errors.initial,
     packingDate: Errors.initial,
     packingSlot: Errors.initial,
@@ -104,6 +114,10 @@ export const initialParcelFormErrors: ParcelErrors = {
     collectionDate: Errors.initial,
     collectionSlot: Errors.initial,
     collectionCentre: Errors.initial,
+    referralAgency: Errors.none,
+    referrerName: Errors.none,
+    referrerEmail: Errors.none,
+    referrerPhone: Errors.none,
 };
 
 interface ParcelFormProps {
@@ -240,6 +254,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         } else {
             inputError = checkErrorOnSubmit(formErrors, setFormErrors, [
                 "voucherNumber",
+                "referrerEmail",
+                "referrerPhone",
                 "packingDate",
                 "packingSlot",
                 "shippingMethod",
@@ -276,6 +292,10 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             collection_centre: isDelivery ? deliveryPrimaryKey : fields.collectionCentre,
             collection_datetime: collectionDateTime,
             last_updated: fields.lastUpdated,
+            referral_agency: fields.referralAgency,
+            referrer_name: fields.referrerName,
+            referrer_email: fields.referrerEmail,
+            referrer_phone: fields.referrerPhone,
             notes: fields.notes,
         };
 

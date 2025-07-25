@@ -37,7 +37,7 @@ const prepareParcelDataForForm = (
     return {
         clientId: parcelData.client_id,
         listType: parcelData.list_type,
-        voucherNumber: parcelData.voucher_number,
+        voucherNumber: parcelData.voucher_number ?? "",
         packingDate: parcelData.packing_date,
         packingSlot: parcelData.packing_slot?.primary_key,
         shippingMethod:
@@ -49,6 +49,10 @@ const prepareParcelDataForForm = (
         collectionCentre: parcelData.collection_centre?.primary_key ?? null,
         lastUpdated: parcelData.last_updated,
         notes: parcelData.notes,
+        referralAgency: parcelData.referral_agency ?? "",
+        referrerName: parcelData.referrer_name ?? "",
+        referrerEmail: parcelData.referrer_email ?? "",
+        referrerPhone: parcelData.referrer_phone ?? "",
     };
 };
 
@@ -181,6 +185,8 @@ const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement =
         collectionDate: Errors.none,
         collectionSlot: Errors.none,
         collectionCentre: collectionCentreIsShown ? Errors.none : Errors.invalidCollectionCentre,
+        referrerEmail: Errors.none,
+        referrerPhone: Errors.none,
     };
 
     return (
