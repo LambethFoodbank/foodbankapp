@@ -16,8 +16,6 @@ create table "public"."dietary_requirements" (
 
 alter table "public"."dietary_requirements" enable row level security;
 
-alter table "public"."parcels" add column "notes" text;
-
 CREATE UNIQUE INDEX dietary_requirements_pkey ON public.dietary_requirements USING btree (id);
 
 alter table "public"."dietary_requirements" add constraint "dietary_requirements_pkey" PRIMARY KEY using index "dietary_requirements_pkey";
