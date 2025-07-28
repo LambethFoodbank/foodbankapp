@@ -47,6 +47,7 @@ export interface PackingSlotRow {
     order: number;
     isNew: boolean;
     lastUpdated: string;
+    originalLastUpdated: string;
 }
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
@@ -97,6 +98,7 @@ const PackingSlotsTable: React.FC = () => {
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const originalTimestampsRef = React.useRef<Record<string, string>>({});
 
     useEffect(() => {
         setErrorMessage(null);
@@ -148,6 +150,9 @@ const PackingSlotsTable: React.FC = () => {
     }, []);
 
     const handleSaveClick = (id: GridRowId) => () => {
+        if (errorMessage) {
+            return;
+        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View },
@@ -158,56 +163,82 @@ const PackingSlotsTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
-        if (newRow.isNew) {
-            const { data: createdPackingSlot, error: insertPackingSlotError } =
-                await insertNewPackingSlot(newRow);
-            const baseAuditLog = getBaseAuditLogForPackingSlotAction(
-                "add a new packing slot",
-                newRow,
-                { excludePackingSlotId: true }
-            );
+        const originalLastUpdated = originalTimestampsRef.current[newRow.id];
+        const rowWithOriginal = {
+            ...newRow,
+            originalLastUpdated,
+        };
 
-            if (insertPackingSlotError) {
-                setErrorMessage(
-                    `Failed to add the packing slot. Log ID: ${insertPackingSlotError.logId}`
-                );
-                setRows((rows) => rows.slice(0, -1));
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    wasSuccess: false,
-                    logId: insertPackingSlotError.logId,
-                });
-            } else {
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    packingSlotId: createdPackingSlot.packingSlotId,
-                    wasSuccess: true,
-                });
-            }
-        } else {
-            const { error: updatePackingSlotError } = await updateDbPackingSlot(newRow);
-            const baseAuditLog = getBaseAuditLogForPackingSlotAction(
-                "update a packing slot",
-                newRow
-            );
+        try {
+            if (newRow.isNew) {
+                const { data: createdPackingSlot, error: insertPackingSlotError } =
+                    await insertNewPackingSlot(newRow);
 
-            if (updatePackingSlotError) {
-                setErrorMessage(
-                    `Failed to update the packing slot. Log ID: ${updatePackingSlotError.logId}`
+                const baseAuditLog = getBaseAuditLogForPackingSlotAction(
+                    "add a new packing slot",
+                    newRow,
+                    { excludePackingSlotId: true }
                 );
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    wasSuccess: false,
-                    logId: updatePackingSlotError.logId,
-                });
+
+                if (insertPackingSlotError) {
+                    setRows((rows) => rows.slice(0, -1)); // elimină rândul adăugat
+                    setErrorMessage(
+                        `Failed to add the packing slot. Log ID: ${insertPackingSlotError.logId}`
+                    );
+
+                    void sendAuditLog({
+                        ...baseAuditLog,
+                        wasSuccess: false,
+                        logId: insertPackingSlotError.logId,
+                    });
+
+                    throw new Error("Insert failed");
+                } else {
+                    void sendAuditLog({
+                        ...baseAuditLog,
+                        packingSlotId: createdPackingSlot.packingSlotId,
+                        wasSuccess: true,
+                    });
+                }
             } else {
-                void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
+                const { error: updatePackingSlotError } =
+                    await updateDbPackingSlot(rowWithOriginal);
+
+                const baseAuditLog = getBaseAuditLogForPackingSlotAction(
+                    "update a packing slot",
+                    newRow
+                );
+
+                if (updatePackingSlotError) {
+                    let message = `Failed to update the packing slot. Log ID: ${updatePackingSlotError.logId}`;
+
+                    if (updatePackingSlotError.type === "ConcurrentEdit") {
+                        message =
+                            "This packing slot was modified by someone else.\n" +
+                            `Log ID: ${updatePackingSlotError.logId}`;
+                    }
+
+                    setErrorMessage(message);
+
+                    void sendAuditLog({
+                        ...baseAuditLog,
+                        wasSuccess: false,
+                        logId: updatePackingSlotError.logId,
+                    });
+
+                    throw new Error("Update failed");
+                } else {
+                    void sendAuditLog({
+                        ...baseAuditLog,
+                        wasSuccess: true,
+                    });
+                }
             }
+
+            return { ...newRow, isNew: false };
+        } finally {
+            setIsLoading(false);
         }
-
-        setIsLoading(false);
-
-        return newRow;
     };
 
     const handleRowEditStop: GridEventListener<"rowEditStop"> = (params, event) => {
@@ -218,6 +249,10 @@ const PackingSlotsTable: React.FC = () => {
     };
 
     const handleEditClick = (id: GridRowId) => () => {
+        const row = rows.find((slot) => slot.id === id);
+        if (row) {
+            originalTimestampsRef.current[id] = row.lastUpdated;
+        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.Edit },
@@ -435,7 +470,21 @@ const PackingSlotsTable: React.FC = () => {
                     columns={packingSlotsColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
-                    onRowModesModelChange={setRowModesModel}
+                    onProcessRowUpdateError={(error) => {
+                        console.error("Error while updating row:", error);
+                        // Sau orice notificare custom aici
+                    }}
+                    onRowModesModelChange={(newModel) => {
+                        setRowModesModel(newModel);
+
+                        const isEditing = Object.values(newModel).some(
+                            (mode) => mode.mode === GridRowModes.Edit
+                        );
+
+                        if (!isEditing) {
+                            setErrorMessage(null);
+                        }
+                    }}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
                     slots={{

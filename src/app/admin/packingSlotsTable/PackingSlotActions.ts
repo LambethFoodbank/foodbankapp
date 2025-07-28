@@ -24,6 +24,7 @@ export const fetchPackingSlots = async (): Promise<PackingSlotRow[]> => {
             order: row.order,
             isNew: false,
             lastUpdated: row.last_updated,
+            originalLastUpdated: row.last_updated,
         })
     );
 };
@@ -83,7 +84,7 @@ export const insertNewPackingSlot = async (
 
 type UpdatePackingSlotResult = {
     error: {
-        type: "UpdatePackingSlotsFailed";
+        type: "UpdatePackingSlotsFailed" | "ConcurrentEdit";
         logId: string;
     } | null;
 };
@@ -96,42 +97,33 @@ export const updateDbPackingSlot = async (
         action: "update packing slots information",
         content: { data: processedData },
     };
+    const lastUpdated = row.originalLastUpdated;
 
     const { error, count } = await supabase
         .from("packing_slots")
-        .update(processedData, { count: "exact" })
+        .update(
+            {
+                name: processedData.name,
+                is_shown: processedData.is_shown,
+                order: processedData.order,
+            },
+            { count: "exact" }
+        )
         .eq("primary_key", processedData.primary_key)
-        .eq("last_updated", processedData.last_updated)
+        .eq("last_updated", lastUpdated)
         .select();
 
-    const { data } = await supabase
-        .from("packing_slots")
-        .select("last_updated")
-        .eq("primary_key", processedData.primary_key)
-        .single();
-    //console.log("after update" + data?.last_updated);
-
-    console.log("Comparare exactă last_updated:");
-    console.log("Local: ", processedData.last_updated);
-    console.log("Din DB: ", data?.last_updated);
-    console.log("Sunt egale? ", processedData.last_updated === data?.last_updated);
-
-    if (error) {
+    if (count === 0) {
+        const logId = await logWarningReturnLogId("Concurrent editing of packing slots");
+        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
+        return { error: { type: "ConcurrentEdit", logId } };
+    } else if (error) {
         const logId = await logErrorReturnLogId("Failed to update packing slot", {
             error,
             newPackingSlotData: processedData,
         });
 
         return { error: { type: "UpdatePackingSlotsFailed", logId } };
-    }
-
-    if (count === 0) {
-        console.log("countbun");
-        const logId = await logWarningReturnLogId("Concurrent editing of packing slots");
-        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
-        return { error: { type: "UpdatePackingSlotsFailed", logId } };
-    } else {
-        console.log(count);
     }
 
     return { error: null };
