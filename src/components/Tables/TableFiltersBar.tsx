@@ -3,7 +3,12 @@
 import React, { Fragment, useState } from "react";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
-import { FilterAltOffOutlined, FilterAltOutlined } from "@mui/icons-material";
+import {
+    FilterAlt,
+    FilterAltOff,
+    FilterAltOffOutlined,
+    FilterAltOutlined,
+} from "@mui/icons-material";
 import { FilterBase } from "@/components/Tables/Filters";
 import { MENU_BREAKPOINT } from "@/common/sharedConstants";
 
@@ -114,10 +119,30 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
         return <></>;
     }
 
+    const hasActiveFilters = (filters: Filter[] | undefined): boolean => {
+        if (!filters) {
+            return false;
+        }
+        return filters.some(
+            (filter) =>
+                !filter.isDisabled &&
+                !filter.areStatesIdentical(filter.state, filter.initialState) &&
+                filter.key !== "listType"
+        );
+    };
+
+    const hasActiveAdditionalFilters: boolean = hasActiveFilters(props.additionalFilters);
+
+    const hasActivePrimaryFilters: boolean = hasActiveFilters(props.primaryFilters);
+
     return (
         <>
             <FiltersAndIconContainer>
-                {hasPrimaryFilters && <FilterAltOutlined />}
+                {hasPrimaryFilters && hasActivePrimaryFilters ? (
+                    <FilterAlt />
+                ) : (
+                    <FilterAltOutlined />
+                )}
                 <FiltersSingleRowContainer>
                     <>
                         {props.primaryFilters &&
@@ -132,7 +157,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                             <StyledButton
                                 variant="outlined"
                                 onClick={handleToggleAdditional}
-                                color="inherit"
+                                color={hasActiveAdditionalFilters ? "primary" : "inherit"}
                                 startIcon={<FilterAltOutlined />}
                             >
                                 {showMoreFilters ? "Less" : "More"}
@@ -142,8 +167,18 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                             <StyledButton
                                 variant="outlined"
                                 onClick={handleClear}
-                                color="inherit"
-                                startIcon={<FilterAltOffOutlined />}
+                                color={
+                                    hasActivePrimaryFilters || hasActiveAdditionalFilters
+                                        ? "primary"
+                                        : "inherit"
+                                }
+                                startIcon={
+                                    hasActivePrimaryFilters || hasActiveAdditionalFilters ? (
+                                        <FilterAltOff />
+                                    ) : (
+                                        <FilterAltOffOutlined />
+                                    )
+                                }
                             >
                                 Clear
                             </StyledButton>
@@ -154,7 +189,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
             {hasAdditionalFilters && showMoreFilters && (
                 <>
                     <FiltersAndIconContainer>
-                        <FilterAltOutlined />
+                        {hasActiveAdditionalFilters ? <FilterAlt /> : <FilterAltOutlined />}
                         <FiltersSingleRowContainer>
                             {props.additionalFilters &&
                                 props.additionalFilters.length !== 0 &&
