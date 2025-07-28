@@ -198,9 +198,11 @@ const ClientsPage: React.FC = () => {
         postcodeRow.push(formatNullPostcode(addressPostcode));
         if (!isDeliverable) {
             postcodeRow.push(
-                <>
-                    <ClientOutsideDeliveryAreaIcon />
-                </>
+                <span style={{ paddingLeft: "0.3rem" }}>
+                    <>
+                        <ClientOutsideDeliveryAreaIcon />
+                    </>
+                </span>
             );
         }
         return <>{postcodeRow}</>;
