@@ -147,7 +147,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.other_items,
             otherRequirementOptions
         ),
-        extraInformation: client.extra_information ?? "",
+        extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,
         signpostingCallReasons:
             client.signposting_call_required === true
@@ -175,6 +175,10 @@ export const formatAddressFromClientDetails = (
         client.address_postcode,
         false
     );
+};
+
+export const formatExtraInformation = (extraInformation: string | null): string => {
+    return extraInformation ? extraInformation.replace(/[\r\n]+/g, "\n") : "";
 };
 
 export const formatHouseholdFromFamilyDetails = (
