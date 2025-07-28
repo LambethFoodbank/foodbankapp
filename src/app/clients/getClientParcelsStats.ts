@@ -18,11 +18,9 @@ interface ParcelStatsInfo extends Data {
 const getParcelIdList = async (clientId: string): Promise<string[]> => {
     const parcelsData: ExpandedClientParcelDetails[] = await getClientParcelsDetails(clientId);
     return parcelsData.map((clientDetails) => clientDetails.parcelId);
-}
-
+};
 
 const getAllClientParcelsStats = async (parcelIdList: string[]): Promise<ParcelStatsInfo[]> => {
-
     const { data, error } = await supabase
         .from("parcels_events")
         .select(
@@ -33,41 +31,45 @@ const getAllClientParcelsStats = async (parcelIdList: string[]): Promise<ParcelS
         )
         .in("parcel_id", parcelIdList);
 
-        if (error) {
+    if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Client parcels details", error);
         throw new DatabaseError("fetch", "client parcels", logId);
     }
 
     return data;
-}
+};
 
-export const getClientParcelsStats = async (clientId: string): Promise<ExpandedClientParcelStats[]> => {
-    
+export const getClientParcelsStats = async (
+    clientId: string
+): Promise<ExpandedClientParcelStats[]> => {
     const idList = await getParcelIdList(clientId);
 
     const parcelData = await getAllClientParcelsStats(idList);
 
-    const deliveredParcels = parcelData.filter((parcel) =>
-        parcel.all_events?.includes("Delivered") ||
-        parcel.all_events?.includes("Parcel Collected") ||
-        parcel.all_events?.includes("Fulfilled with Trussell")
+    const deliveredParcels = parcelData.filter(
+        (parcel) =>
+            parcel.all_events?.includes("Delivered") ||
+            parcel.all_events?.includes("Parcel Collected") ||
+            parcel.all_events?.includes("Fulfilled with Trussell")
     );
 
     const todayTime = new Date().getTime();
-    let sixMonthsAgo = new Date();
+    const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(new Date().getMonth() - 6);
     const sixMonthsAgoTime = sixMonthsAgo.getTime();
 
     const deliveredLastSixMonths = deliveredParcels.filter((parcel) => {
-        if(!parcel.last_event_timestamp) return false;
-        let time = Date.parse(parcel.last_event_timestamp);
-        return time >= sixMonthsAgoTime && time <= todayTime;
+        if (!parcel.last_event_timestamp) {
+            return false;
         }
-    );
-    return [{
-        totalParcels: parcelData.length,
-        totalSuccessful: deliveredParcels.length,
-        lastSixMonthsSuccessful: deliveredLastSixMonths.length
-    }];
-
-}
+        const time = Date.parse(parcel.last_event_timestamp);
+        return time >= sixMonthsAgoTime && time <= todayTime;
+    });
+    return [
+        {
+            totalParcels: parcelData.length,
+            totalSuccessful: deliveredParcels.length,
+            lastSixMonthsSuccessful: deliveredLastSixMonths.length,
+        },
+    ];
+};

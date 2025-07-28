@@ -64,4 +64,3 @@ export const rawDataToClientParcelsDetails = (
         collectionCentre: parcel.collection_centre?.name ?? "-",
     };
 };
-

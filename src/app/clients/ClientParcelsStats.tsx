@@ -3,7 +3,6 @@
 import React from "react";
 import { ClientPaginatedTable, TableHeaders } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
-import { useRouter } from "next/navigation";
 
 export interface ClientParcelStatsRow {
     totalParcels: number;
@@ -22,7 +21,6 @@ export interface ClientParcelStatsProps {
 }
 
 const ClientParcelStats: React.FC<ClientParcelStatsProps> = (props) => {
-    const router = useRouter();
     return (
         <TableSurface>
             <ClientPaginatedTable

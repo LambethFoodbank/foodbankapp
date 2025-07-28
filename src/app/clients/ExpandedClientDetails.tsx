@@ -58,7 +58,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
             setOriginalNotes(clientDetails?.notes ? clientDetails?.notes : "");
             setClientParcelsStats(
                 displayClientsParcels ? await getClientParcelsStats(clientId) : null
-            )
+            );
             setIsLoading(false);
         })();
     }, [clientId, displayClientsParcels, clientDetails?.notes]);

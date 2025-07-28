@@ -22,7 +22,7 @@ const ExpandedClientDetailsFallback: React.FC = () => {
         <>
             <DataViewerFallback fieldPlaceholders={clientDetailFields} />;
             <ClientParcelsTable parcelsData={[]} />
-            <ClientParcelStats parcelsData={[]}/>
+            <ClientParcelStats parcelsData={[]} />
         </>
     );
 };
