@@ -486,18 +486,21 @@ export type Database = {
       packing_slots: {
         Row: {
           is_shown: boolean
+          last_updated: string
           name: string
           order: number
           primary_key: string
         }
         Insert: {
           is_shown: boolean
+          last_updated?: string
           name: string
           order: number
           primary_key?: string
         }
         Update: {
           is_shown?: boolean
+          last_updated?: string
           name?: string
           order?: number
           primary_key?: string
