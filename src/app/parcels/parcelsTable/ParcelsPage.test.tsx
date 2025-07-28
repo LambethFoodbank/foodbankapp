@@ -86,13 +86,17 @@ describe("Parcels Page", () => {
                     familyCategory: "Family of 3",
                     addressPostcode: "SW1A 2AA",
                     phoneNumber: "08642 123",
+                    addressColumn: {
+                        addressPostcode: "SW1A 2AA",
+                        isDeliverable: true,
+                        clientIsActive: true,
+                    },
                     collectionDatetime: new Date("2023-08-04T13:30:00+00:00"),
                     deliveryCollection: {
                         collectionCentreName: "COLLECTION_CENTRE",
                         collectionCentreAcronym: "CC",
                         congestionChargeApplies: true,
                         listType: "regular",
-                        isDeliverable: true,
                     },
                     packingSlot: "AM",
                     lastStatus: {
