@@ -120,16 +120,15 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
     }
 
     const hasActiveFilters = (filters: Filter[] | undefined): boolean => {
-        if (filters) {
-            return filters.some(
-                (filter) =>
-                    !filter.isDisabled &&
-                    !filter.areStatesIdentical(filter.state, filter.initialState) &&
-                    filter.key !== "listType"
-            );
-        } else {
+        if (!filters) {
             return false;
         }
+        return filters.some(
+            (filter) =>
+                !filter.isDisabled &&
+                !filter.areStatesIdentical(filter.state, filter.initialState) &&
+                filter.key !== "listType"
+        );
     };
 
     const hasActiveAdditionalFilters: boolean = hasActiveFilters(props.additionalFilters);
