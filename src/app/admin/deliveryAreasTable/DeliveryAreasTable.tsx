@@ -341,7 +341,6 @@ const DeliveryAreasTable: React.FC = () => {
                             : "datagrid-row-odd"
                     }
                     hideFooter
-                    
                 />
             )}
         </>
