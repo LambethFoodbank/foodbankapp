@@ -8,10 +8,12 @@ import { ParcelsTableRow } from "../parcelsTable/types";
 import SelectedParcelsOverview from "./SelectedParcelsOverview";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
+import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 
 interface StatusesModalProps extends React.ComponentProps<typeof Modal> {
     selectedParcels: ParcelsTableRow[];
-    onSubmit: (date: Dayjs) => void;
+    onSubmit: (date: Dayjs, callNoResponseStatuses: string[]) => void;
+    selectedStatus?: string | null;
     errorText: string | null;
 }
 
@@ -52,6 +54,18 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
 
     const maxParcelsToShow = 5;
 
+    const [callNoResponseStatuses, setCallNoResponseStatuses] = useState<string[]>([]);
+
+    const toggleCallNoResponseStatuses = (newNoResponseStatus: string): void => {
+        setCallNoResponseStatuses((prevCallNoResponseStatuses) =>
+            prevCallNoResponseStatuses.includes(newNoResponseStatus)
+                ? prevCallNoResponseStatuses.filter(
+                      (prevStatus) => prevStatus !== newNoResponseStatus
+                  )
+                : [...prevCallNoResponseStatuses, newNoResponseStatus]
+        );
+    };
+
     return (
         <Modal {...props}>
             <ModalInner>
@@ -73,8 +87,43 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                     parcels={props.selectedParcels}
                     maxParcelsToShow={maxParcelsToShow}
                 />
+                {props.selectedStatus === "Called and No Response" && (
+                    <FormGroup>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={callNoResponseStatuses.includes("Voicemail")}
+                                    onChange={() => toggleCallNoResponseStatuses("Voicemail")}
+                                />
+                            }
+                            label="Voicemail"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={callNoResponseStatuses.includes("Text")}
+                                    onChange={() => toggleCallNoResponseStatuses("Text")}
+                                />
+                            }
+                            label="Text"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={callNoResponseStatuses.includes("Email")}
+                                    onChange={() => toggleCallNoResponseStatuses("Email")}
+                                />
+                            }
+                            label="Email"
+                        />
+                    </FormGroup>
+                )}
                 <Centerer>
-                    <Button type="button" variant="contained" onClick={() => props.onSubmit(date)}>
+                    <Button
+                        type="button"
+                        variant="contained"
+                        onClick={() => props.onSubmit(date, callNoResponseStatuses)}
+                    >
                         Submit
                     </Button>
                 </Centerer>
