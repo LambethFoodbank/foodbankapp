@@ -78,8 +78,7 @@ const getParcelsForSelectedParcelsReport = async (
     const { data: idAndStatusList, error: idFetchError } = await supabase
         .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
-        // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
+        .in("parcel_id", parcelIds);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
