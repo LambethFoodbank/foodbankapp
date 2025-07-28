@@ -9,9 +9,7 @@ type DbDeliveryAreas = Tables<"delivery_areas">;
 type NewDbDeliveryAreas = Omit<DbDeliveryAreas, "id">;
 
 export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
-    const { data, error } = await supabase
-        .from("delivery_areas")
-        .select()
+    const { data, error } = await supabase.from("delivery_areas").select();
 
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Delivery areas", error);
@@ -35,7 +33,7 @@ const formatExistingRowToDbDeliveryAreas = (row: DeliveryAreasRow): DbDeliveryAr
 };
 
 const formatNewRowToDbDeliveryAreas = (newRow: DeliveryAreasRow): NewDbDeliveryAreas => {
-    return { postcode: newRow.postcode,};
+    return { postcode: newRow.postcode };
 };
 
 type InsertDeliveryAreasResult =
