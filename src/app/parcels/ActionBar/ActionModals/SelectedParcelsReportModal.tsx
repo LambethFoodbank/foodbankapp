@@ -58,7 +58,6 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
         props.postSuccessCallback();
     };
 
-    // need to change error
     const onFileCreationFailed = (csvError: FetchSelectedParcelsReportError): void => {
         setErrorMessage("Failed to fetch signposting report data");
         setActionShown(false);
