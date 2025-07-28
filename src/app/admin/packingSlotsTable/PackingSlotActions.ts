@@ -1,10 +1,10 @@
-import supabase from "@/supabaseClient";
-import { DatabaseError } from "@/app/errorClasses";
+import { PostgrestError } from "@supabase/supabase-js";
 import { PackingSlotRow } from "@/app/admin/packingSlotsTable/PackingSlotsTable";
+import { DatabaseError } from "@/app/errorClasses";
 import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
-import { PostgrestError } from "@supabase/supabase-js";
 import { sendAuditLog } from "@/server/auditLog";
+import supabase from "@/supabaseClient";
 
 type DbPackingSlot = Tables<"packing_slots">;
 type NewDbPackingSlot = Omit<DbPackingSlot, "primary_key">;
@@ -96,27 +96,25 @@ export const updateDbPackingSlot = async (
         action: "update packing slots information",
         content: { data: processedData },
     };
-    console.log(processedData.last_updated);
+
     const { error, count } = await supabase
         .from("packing_slots")
-        .update(
-            {
-                last_updated: new Date().toISOString(),
-                is_shown: processedData.is_shown,
-                name: processedData.name,
-                order: processedData.order,
-            },
-            { count: "exact" }
-        )
+        .update(processedData, { count: "exact" })
         .eq("primary_key", processedData.primary_key)
-        .eq("last_updated", processedData.last_updated);
+        .eq("last_updated", processedData.last_updated)
+        .select();
 
     const { data } = await supabase
         .from("packing_slots")
         .select("last_updated")
         .eq("primary_key", processedData.primary_key)
         .single();
-    console.log(data?.last_updated);
+    //console.log("after update" + data?.last_updated);
+
+    console.log("Comparare exactă last_updated:");
+    console.log("Local: ", processedData.last_updated);
+    console.log("Din DB: ", data?.last_updated);
+    console.log("Sunt egale? ", processedData.last_updated === data?.last_updated);
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update packing slot", {

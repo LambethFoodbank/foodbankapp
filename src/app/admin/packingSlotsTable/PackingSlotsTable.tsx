@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import supabase from "@/supabaseClient";
+import AddIcon from "@mui/icons-material/Add";
+import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
+import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import CancelIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import { LinearProgress } from "@mui/material";
+import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
     GridColDef,
@@ -13,26 +19,20 @@ import {
     GridRowsProp,
     GridToolbarContainer,
 } from "@mui/x-data-grid";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
-import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import React, { useEffect, useState } from "react";
 import {
-    insertNewPackingSlot,
     fetchPackingSlots,
+    insertNewPackingSlot,
     swapRows,
     updateDbPackingSlot,
 } from "@/app/admin/packingSlotsTable/PackingSlotActions";
-import { LinearProgress } from "@mui/material";
-import { logErrorReturnLogId } from "@/logger/logger";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import Header from "../websiteDataTable/Header";
-import StyledDataGrid from "../common/StyledDataGrid";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
+import { logErrorReturnLogId } from "@/logger/logger";
+import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import supabase from "@/supabaseClient";
+import StyledDataGrid from "../common/StyledDataGrid";
+import Header from "../websiteDataTable/Header";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
