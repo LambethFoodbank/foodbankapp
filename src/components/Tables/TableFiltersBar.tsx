@@ -119,55 +119,27 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
         return <></>;
     }
 
-    const hasActiveAdditionalFillters = (): boolean => {
-        let hasAdditionalFilters = false;
-        if (props.additionalFilters) {
-            for (
-                let indexFilter = 0;
-                indexFilter < props.additionalFilters?.length;
-                indexFilter++
-            ) {
-                if (
-                    props.additionalFilters[indexFilter].state !=
-                        props.additionalFilters[indexFilter].initialState &&
-                    !props.additionalFilters[indexFilter].isDisabled
-                ) {
-                    hasAdditionalFilters = true;
-                    break;
-                }
-            }
+    const hasActiveFilters = (filters: Filter[] | undefined): boolean => {
+        let activeFilters: Filter[] = [];
+        if (filters) {
+            activeFilters = filters.filter(
+                (filter) =>
+                    !filter.isDisabled &&
+                    !filter.areStatesIdentical(filter.state, filter.initialState) &&
+                    filter.key !== "listType"
+            );
         }
-        return hasAdditionalFilters;
+        return activeFilters.length > 0;
     };
 
-    const hasActivePrimaryFilters = (): boolean => {
-        let hasPrimaryFilters = false;
-        if (props.primaryFilters) {
-            for (let indexFilter = 0; indexFilter < props.primaryFilters?.length; indexFilter++) {
-                if (
-                    props.primaryFilters[indexFilter].key === "view" ||
-                    props.primaryFilters[indexFilter].key === "packingDate" ||
-                    props.primaryFilters[indexFilter].key === "listType"
-                ) {
-                    continue;
-                }
-                if (
-                    props.primaryFilters[indexFilter].state !=
-                        props.primaryFilters[indexFilter].initialState &&
-                    !props.primaryFilters[indexFilter].isDisabled
-                ) {
-                    hasPrimaryFilters = true;
-                    break;
-                }
-            }
-        }
-        return hasPrimaryFilters;
-    };
+    const hasActiveAdditionalFilters: boolean = hasActiveFilters(props.additionalFilters);
+
+    const hasActivePrimaryFilters: boolean = hasActiveFilters(props.primaryFilters);
 
     return (
         <>
             <FiltersAndIconContainer>
-                {hasPrimaryFilters && hasActivePrimaryFilters() ? (
+                {hasPrimaryFilters && hasActivePrimaryFilters ? (
                     <FilterAlt />
                 ) : (
                     <FilterAltOutlined />
@@ -186,7 +158,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                             <StyledButton
                                 variant="outlined"
                                 onClick={handleToggleAdditional}
-                                color={hasActiveAdditionalFillters() ? "primary" : "inherit"}
+                                color={hasActiveAdditionalFilters ? "primary" : "inherit"}
                                 startIcon={<FilterAltOutlined />}
                             >
                                 {showMoreFilters ? "Less" : "More"}
@@ -197,12 +169,12 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                                 variant="outlined"
                                 onClick={handleClear}
                                 color={
-                                    hasActivePrimaryFilters() || hasActiveAdditionalFillters()
+                                    hasActivePrimaryFilters || hasActiveAdditionalFilters
                                         ? "primary"
                                         : "inherit"
                                 }
                                 startIcon={
-                                    hasActivePrimaryFilters() || hasActiveAdditionalFillters() ? (
+                                    hasActivePrimaryFilters || hasActiveAdditionalFilters ? (
                                         <FilterAltOff />
                                     ) : (
                                         <FilterAltOffOutlined />
@@ -218,7 +190,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
             {hasAdditionalFilters && showMoreFilters && (
                 <>
                     <FiltersAndIconContainer>
-                        {hasActiveAdditionalFillters() ? <FilterAlt /> : <FilterAltOutlined />}
+                        {hasActiveAdditionalFilters ? <FilterAlt /> : <FilterAltOutlined />}
                         <FiltersSingleRowContainer>
                             {props.additionalFilters &&
                                 props.additionalFilters.length !== 0 &&
