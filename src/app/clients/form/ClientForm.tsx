@@ -89,8 +89,8 @@ export interface ClientFields extends Fields {
 
 export interface ClientErrors extends FormErrors<ClientFields> {
     fullName: Errors;
-    email: Errors;
     phoneNumber: Errors;
+    email: Errors;
     addressLine1: Errors;
     addressPostcode: Errors;
     numberOfAdults: Errors;
@@ -105,8 +105,8 @@ export type ClientCardProps = CardProps<ClientFields, ClientErrors>;
 
 const formSections = [
     FullNameCard,
-    EmailCard,
     PhoneNumberCard,
+    EmailCard,
     AddressCard,
     NumberAdultsCard,
     NumberChildrenCard,

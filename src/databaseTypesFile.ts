@@ -190,6 +190,7 @@ export type Database = {
           default_list: Database["public"]["Enums"]["list_type"]
           delivery_instructions: string | null
           dietary_requirements: string[] | null
+          email: string | null
           extra_information: string | null
           family_id: string
           flagged_for_attention: boolean | null
@@ -203,7 +204,6 @@ export type Database = {
           other_items: string[] | null
           pet_food: string[] | null
           phone_number: string | null
-          email: string | null
           primary_key: string
           signposting_call_reasons: string[] | null
           signposting_call_required: boolean | null
@@ -222,6 +222,7 @@ export type Database = {
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
+          email?: string | null
           extra_information?: string | null
           family_id?: string
           flagged_for_attention?: boolean | null
@@ -235,7 +236,6 @@ export type Database = {
           other_items?: string[] | null
           pet_food?: string[] | null
           phone_number?: string | null
-          email?: string | null
           primary_key?: string
           signposting_call_reasons?: string[] | null
           signposting_call_required?: boolean | null
@@ -254,6 +254,7 @@ export type Database = {
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
+          email?: string | null
           extra_information?: string | null
           family_id?: string
           flagged_for_attention?: boolean | null
@@ -267,7 +268,6 @@ export type Database = {
           other_items?: string[] | null
           pet_food?: string[] | null
           phone_number?: string | null
-          email?: string | null
           primary_key?: string
           signposting_call_reasons?: string[] | null
           signposting_call_required?: boolean | null
@@ -820,7 +820,6 @@ export type Database = {
           full_name: string | null
           is_active: boolean | null
           phone_number: string | null
-          email: string | null
         }
         Relationships: []
       }
@@ -891,7 +890,6 @@ export type Database = {
           client_id: string | null
           client_is_active: boolean | null
           client_phone_number: string | null
-          client_email: string | null
           client_signposting_call_required: boolean | null
           collection_centre_acronym: string | null
           collection_centre_name: string | null

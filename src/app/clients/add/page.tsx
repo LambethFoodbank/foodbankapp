@@ -10,8 +10,8 @@ import { Errors } from "@/components/Form/formFunctions";
 const AddClients: () => React.ReactElement = () => {
     const initialFields: ClientFields = {
         fullName: "",
-        email: "",
         phoneNumber: "",
+        email: "",
         addressLine1: "",
         addressLine2: "",
         addressTown: "",
