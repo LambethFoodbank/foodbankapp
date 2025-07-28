@@ -46,6 +46,7 @@ export interface PackingSlotRow {
     isShown: boolean;
     order: number;
     isNew: boolean;
+    lastUpdated: string;
 }
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
@@ -85,6 +86,7 @@ function getBaseAuditLogForPackingSlotAction(
             currentPackingSlotOrder: packingSlotRow.order,
             packingSlotName: packingSlotRow.name,
             packingSlotIsShown: packingSlotRow.isShown,
+            packingSlotLastUpdated: packingSlotRow.lastUpdated,
         },
         packingSlotId: options?.excludePackingSlotId ? undefined : packingSlotRow.id,
     };
