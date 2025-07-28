@@ -8,7 +8,7 @@ import { ParcelsTableRow } from "../parcelsTable/types";
 import SelectedParcelsOverview from "./SelectedParcelsOverview";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { Checkbox, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
 
 interface StatusesModalProps extends React.ComponentProps<typeof Modal> {
     selectedParcels: ParcelsTableRow[];
@@ -89,6 +89,17 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                 />
                 {props.selectedStatus === "Called and No Response" && (
                     <FormGroup>
+                        <FormLabel
+                            component="p"
+                            style={{
+                                fontSize: 18,
+                                marginBottom: 8,
+                                marginTop: 8,
+                                color: "inherit",
+                            }}
+                        >
+                            Did you send any of the following?
+                        </FormLabel>
                         <FormControlLabel
                             control={
                                 <Checkbox
