@@ -1,7 +1,8 @@
 import { GridColDef, GridPreProcessEditCellProps, GridRenderCellParams } from "@mui/x-data-grid";
 import { BatchActionType, BatchTableDataState } from "@/app/batch-create/types";
 import { Button } from "@mui/material";
-import { isPhoneNumberValid } from "@/app/batch-create/helpers/fieldValidationFunctions";
+import { isEmailValid, isPhoneNumberValid } from "@/app/batch-create/helpers/fieldValidationFunctions";
+
 import {
     ADDRESS_WIDTH,
     MULTILINE_POPOVER_WIDTH,
@@ -97,7 +98,7 @@ const getCenteredBatchGridDisplayColumns = (
             width: EMAIL_WIDTH,
             editable: true,
             preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-                const hasError = false;
+                const hasError: boolean = isEmailValid(params);
                 if (!hasError) {
                     dispatch({
                         type: "update_cell",
