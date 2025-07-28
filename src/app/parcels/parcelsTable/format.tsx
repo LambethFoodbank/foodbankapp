@@ -94,9 +94,11 @@ const rowToAddressColumn = ({
     console.log(clientIsActive);
     if (!isDeliverable && clientIsActive) {
         postcodeRow.push(
-            <>
-                <ClientOutsideDeliveryAreaIcon />
-            </>
+            <span style={{ paddingLeft: "0.3rem" }}>
+                <>
+                    <ClientOutsideDeliveryAreaIcon />
+                </>
+            </span>
         );
     }
     return <>{postcodeRow}</>;
