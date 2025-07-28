@@ -9,4 +9,4 @@ export const isPhoneNumberValid = (params: GridPreProcessEditCellProps): boolean
 export const isEmailValid = (params: GridPreProcessEditCellProps): boolean => {
     const unformattedInput = params.props.value.replaceAll(emailFormatSymbolsRegex, "");
     return unformattedInput.match(emailRegex) === null;
-}
+};
