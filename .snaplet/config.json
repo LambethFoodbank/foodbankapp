@@ -1,6 +1,0 @@
-{
-  "adapter": "postgres",
-  "module": "ESNext",
-  "moduleResolution": "node",    
-  "type": "module"
-}
