@@ -19,6 +19,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { DirectionString } from "@/app/info/WikiItems";
 import { deleteItemInWikiTable, updateItemInWikiTable } from "@/app/info/supabaseHelpers";
 import { useTheme } from "styled-components";
+import supabase from "@/supabaseClient";
 
 interface WikiItemEditProps {
     rowData: DbWikiRow;
@@ -75,6 +76,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
 
     const cancelWikiItemEdit = (): void => {
         !rowData.title && !rowData.content ? deleteWikiItem() : setIsInEditMode(false);
+        setErrorMessage("");
     };
 
     const updateWikiItem = async (newTitle: string, newContent: string): Promise<void> => {
@@ -85,53 +87,80 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
             if (deleteUpdateConfirmation) {
                 deleteWikiItem();
             }
-        } else {
-            const updateConfirmation: boolean = confirm("Confirm update of this item?");
-            if (updateConfirmation) {
-                const updateError = await updateItemInWikiTable(
-                    newTitle,
-                    newContent,
-                    rowData.wiki_key
-                );
-
-                const auditLog = {
-                    action: "edit a wiki item",
-                    wikiId: rowData.wiki_key,
-                    content: {
-                        itemTitle: newTitle,
-                        itemContent: newContent,
-                        rowOrder: rowData.row_order,
-                    },
-                } as const satisfies Partial<AuditLog>;
-                if (updateError) {
-                    const logId = await logErrorReturnLogId(
-                        "error updating wiki row item",
-                        updateError
-                    );
-                    setErrorMessage(`Failed to update wiki item. Log ID: ${logId}`);
-                    void sendAuditLog({
-                        ...auditLog,
-                        wasSuccess: false,
-                        logId: logId,
-                    });
-                } else {
-                    const updatedRow: DbWikiRow = {
-                        title: newTitle,
-                        content: newContent,
-                        row_order: rowData.row_order,
-                        wiki_key: rowData.wiki_key,
-                    };
-                    const index: number = removeRow(rowData);
-                    setRowData(updatedRow);
-                    appendNewRow(updatedRow, index);
-                    void sendAuditLog({
-                        ...auditLog,
-                        wasSuccess: true,
-                    });
-                }
-            }
-            setIsInEditMode(false);
+            return;
         }
+
+        const updateConfirmation: boolean = confirm("Confirm update of this item?");
+        if (!updateConfirmation) {
+            return;
+        }
+
+        const { data: latestRow, error: fetchError } = await supabase
+            .from("wiki")
+            .select("*")
+            .eq("wiki_key", rowData.wiki_key)
+            .single();
+
+        if (fetchError || !latestRow) {
+            const logId = await logErrorReturnLogId("error fetching latest wiki row", fetchError);
+            setErrorMessage(`Could not validate latest version. Log ID: ${logId}`);
+            return;
+        }
+
+        const dbLastUpdated = latestRow.last_updated;
+
+        if (dbLastUpdated !== rowData.last_updated) {
+            setErrorMessage(
+                "This wiki item was modified by someone else. Please exit the edit form."
+            );
+            const index: number = removeRow(rowData);
+            setRowData(latestRow);
+            console.log(latestRow);
+            appendNewRow(latestRow, index);
+            return;
+        }
+
+        const updateError = await updateItemInWikiTable(newTitle, newContent, rowData.wiki_key);
+
+        const auditLog = {
+            action: "edit a wiki item",
+            wikiId: rowData.wiki_key,
+            content: {
+                itemTitle: newTitle,
+                itemContent: newContent,
+                rowOrder: rowData.row_order,
+                lastUpdated: rowData.last_updated,
+            },
+        } as const satisfies Partial<AuditLog>;
+
+        if (updateError) {
+            const logId = await logErrorReturnLogId("error updating wiki row item", updateError);
+            setErrorMessage(`Failed to update wiki item. Log ID: ${logId}`);
+            void sendAuditLog({
+                ...auditLog,
+                wasSuccess: false,
+                logId: logId,
+            });
+        } else {
+            const updatedRow: DbWikiRow = {
+                title: newTitle,
+                content: newContent,
+                row_order: rowData.row_order,
+                wiki_key: rowData.wiki_key,
+                last_updated: dbLastUpdated,
+            };
+            const index: number = removeRow(rowData);
+            setRowData(updatedRow);
+            console.log(updatedRow);
+            appendNewRow(updatedRow, index);
+            void sendAuditLog({
+                ...auditLog,
+                wasSuccess: true,
+            });
+        }
+
+        setIsInEditMode(false);
+        setErrorMessage("");
     };
 
     const deleteWikiItemWithConfirmation = async (): Promise<void> => {
