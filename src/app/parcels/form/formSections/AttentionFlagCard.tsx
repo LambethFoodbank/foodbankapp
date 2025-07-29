@@ -2,14 +2,14 @@ import React from "react";
 import { onChangeRadioGroup } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import RadioGroupInput from "@/components/DataInput/RadioGroupInput";
-import { ClientCardProps } from "../ClientForm";
+import { ParcelCardProps } from "@/app/parcels/form/ParcelForm";
 
-const AttentionFlagCard: React.FC<ClientCardProps> = ({ fieldSetter, fields }) => {
+const AttentionFlagCard: React.FC<ParcelCardProps> = ({ fieldSetter, fields }) => {
     return (
         <GenericFormCard
             title="Flag For Attention"
             required={true}
-            text="Click Yes if you'd like to flag this client for attention. For example, if someone is only home at certain times, needs a delivery to an alternative address, or have sensitive information (i.e. domestic violence)."
+            text="Click Yes if you'd like to flag this parcel for attention. For example, if someone is only home at certain times, needs a delivery to an alternative address, or have sensitive information (i.e. domestic violence)."
         >
             <RadioGroupInput
                 labelsAndValues={[
