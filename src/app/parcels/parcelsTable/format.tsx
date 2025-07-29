@@ -91,8 +91,7 @@ const rowToAddressColumn = ({
 }: ParcelsTableRow["addressColumn"]): React.ReactElement => {
     const postcodeRow: React.ReactNode[] = [];
     postcodeRow.push(formatNullPostcode(addressPostcode));
-    console.log(clientIsActive);
-    if (!isDeliverable && clientIsActive) {
+    if (!isDeliverable && clientIsActive && addressPostcode !== null) {
         postcodeRow.push(
             <span style={{ paddingLeft: "0.3rem" }}>
                 <>

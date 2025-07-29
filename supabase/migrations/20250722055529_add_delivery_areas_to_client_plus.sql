@@ -1,6 +1,6 @@
 create or replace view
     "public"."clients_plus" with (security_invoker = true) as
-select
+select distinct
     clients.primary_key as client_id,
     clients.full_name,
     clients.address_postcode,
@@ -11,6 +11,6 @@ select
 from
     ((clients
     left join family_count on ((clients.family_id = family_count.family_id)))
-    left join delivery_areas on ((split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode)))
+    left join delivery_areas on ((split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode) or clients.address_postcode is NULL))
 order by
     clients.full_name;

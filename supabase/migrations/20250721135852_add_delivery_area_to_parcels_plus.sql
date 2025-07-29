@@ -1,6 +1,6 @@
 create or replace view
   "public"."parcels_plus" with (security_invoker = true) as
-select
+select distinct
   parcels.primary_key as parcel_id,
   parcels.collection_datetime,
   parcels.packing_date,
@@ -34,6 +34,6 @@ from
   left join packing_slots on ((parcels.packing_slot = packing_slots.primary_key)))
   left join family_count on ((family_count.family_id = clients.family_id)))
   left join parcels_events on ((parcels_events.parcel_id = parcels.primary_key)))
-  left join delivery_areas on ((split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode)))
+  left join delivery_areas on ((split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode) or clients.address_postcode is NULL))
 order by
   parcels.packing_date desc;
