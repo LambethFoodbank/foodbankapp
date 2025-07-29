@@ -61,6 +61,7 @@ const CollectionCentresTable: React.FC = () => {
     const [timeSlotModalIsOpen, setTimeSlotModalIsOpen] = useState<boolean>(false);
     const [selectedRowForTimeSlotEdit, setSelectedRowForTimeSlotEdit] =
         useState<CollectionCentresTableRow | null>(null);
+    const originalTimestampsRef = React.useRef<Record<string, string>>({});
 
     const getCollectionCentresForTable = useCallback(async () => {
         setErrorMessage(null);
@@ -141,7 +142,13 @@ const CollectionCentresTable: React.FC = () => {
     const updateCollectionCentre = async (
         newRow: CollectionCentresTableRow
     ): Promise<UpdateCollectionCentreResult> => {
-        const { error: updateCollectionCentreError } = await updateDbCollectionCentre(newRow);
+        const originalLastUpdated = originalTimestampsRef.current[newRow.id];
+        const rowWithOriginal = {
+            ...newRow,
+            originalLastUpdated,
+        };
+        const { error: updateCollectionCentreError } =
+            await updateDbCollectionCentre(rowWithOriginal);
         const baseAuditLog = getBaseAuditLogForCollectionCentreAction(
             "update a collection centre",
             newRow
@@ -202,6 +209,10 @@ const CollectionCentresTable: React.FC = () => {
 
     const handleEditClick = (id: GridRowId) => () => {
         const existingRowIndex = rows.map((row) => row.id).indexOf(id.toString());
+        const row = rows.find((slot) => slot.id === id);
+        if (row) {
+            originalTimestampsRef.current[id] = row.lastUpdated;
+        }
         setExistingRowData(rows[existingRowIndex]);
         setRowModesModel((currentValue) => ({
             ...currentValue,

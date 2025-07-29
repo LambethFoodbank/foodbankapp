@@ -1,9 +1,9 @@
-import supabase from "@/supabaseClient";
-import { Tables } from "@/databaseTypesFile";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
+import { Tables } from "@/databaseTypesFile";
 import { Schema } from "@/databaseUtils";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { sendAuditLog } from "@/server/auditLog";
+import supabase from "@/supabaseClient";
 
 export interface CollectionCentresTableRow {
     acronym: Schema["collection_centres"]["acronym"];
@@ -148,12 +148,13 @@ export const updateDbCollectionCentre = async (
         action: "update collection centres information",
         content: { data: processedData },
     };
+    console.log(processedData.last_updated);
     const { error, count } = await supabase
         .from("collection_centres")
         .update(processedData, { count: "exact" })
         .eq("primary_key", processedData.primary_key)
         .eq("last_updated", processedData.last_updated);
-
+    console.log(processedData.last_updated);
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update collection centre", {
             error,
@@ -181,15 +182,13 @@ export const updateDbCollectionCentreTimeSlots = async (
         action: "update collection centres time slots",
         content: { data: processedData },
     };
+    console.log(timeSlotsWithPrimaryKey.lastUpdated);
     const { error, count } = await supabase
         .from("collection_centres")
-        .update(
-            { time_slots: processedData, last_updated: new Date().toISOString() },
-            { count: "exact" }
-        )
+        .update({ time_slots: processedData }, { count: "exact" })
         .eq("primary_key", timeSlotsWithPrimaryKey.primaryKey)
         .eq("last_updated", timeSlotsWithPrimaryKey.lastUpdated);
-
+    console.log(timeSlotsWithPrimaryKey.lastUpdated);
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update collection centre time slots", {
             error,
