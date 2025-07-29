@@ -50,7 +50,7 @@ const main = async (): Promise<never> => {
         generate(750, {
             full_name: (ctx) => copycat.fullName(ctx.seed),
             phone_number: (ctx) => copycat.phoneNumber(ctx.seed),
-            // email: (ctx) => copycat.email(ctx.seed),
+            email: (ctx) => copycat.email(ctx.seed),
             address_1: (ctx) => copycat.streetAddress(ctx.seed),
             address_2: (ctx) => copycat.streetAddress(ctx.seed),
             address_town: (ctx) => copycat.city(ctx.seed),
