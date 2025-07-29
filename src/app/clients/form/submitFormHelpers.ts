@@ -59,7 +59,6 @@ export const formatClientRecord = (
         pet_food: checkboxGroupToArray(fields.petFood),
         other_items: checkboxGroupToArray(fields.otherItems),
         delivery_instructions: fields.deliveryInstructions,
-        extra_information: fields.extraInformation,
         last_updated: fields.lastUpdated,
         notes: fields.notes,
     };
