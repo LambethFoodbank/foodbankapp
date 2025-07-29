@@ -64,7 +64,6 @@ export const formatClientRecord = (
             fields.signpostingCall && fields.signpostingCallReasons !== null
                 ? checkboxGroupToArray(fields.signpostingCallReasons)
                 : null,
-        flagged_for_attention: fields.attentionFlag,
         last_updated: fields.lastUpdated,
         notes: fields.notes,
     };
