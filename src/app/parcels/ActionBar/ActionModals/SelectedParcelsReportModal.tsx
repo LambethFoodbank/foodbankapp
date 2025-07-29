@@ -56,6 +56,11 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
             content: { parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId) },
         });
         props.postSuccessCallback();
+
+        // Delay closing the modal to allow user to handle file explorer dialog
+        setTimeout(() => {
+            props.onClose();
+        }, 3000); // 3-second delay
     };
 
     const onFileCreationFailed = (csvError: FetchSelectedParcelsReportError): void => {

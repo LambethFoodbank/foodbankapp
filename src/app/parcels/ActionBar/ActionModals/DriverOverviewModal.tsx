@@ -190,6 +190,11 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
             },
         });
         props.postSuccessCallback();
+
+        // Delay closing the modal to allow user to handle file explorer dialog
+        setTimeout(() => {
+            props.onClose();
+        }, 3000); // 3-second delay
     };
 
     const onPdfCreationFailed = (pdfError: DriverOverviewError): void => {

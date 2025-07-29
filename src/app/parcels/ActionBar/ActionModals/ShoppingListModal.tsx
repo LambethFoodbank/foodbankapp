@@ -113,7 +113,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
         // Delay closing the modal to allow user to handle file explorer dialog
         setTimeout(() => {
             props.onClose();
-        }, 4000); // 4 second delay
+        }, 3000); // 3-second delay
     };
 
     const onPdfCreationFailed = (pdfError: ShoppingListPdfError): void => {
