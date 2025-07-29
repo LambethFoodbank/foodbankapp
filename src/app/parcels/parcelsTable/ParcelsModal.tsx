@@ -55,7 +55,7 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
     };
 
     const postSetStatusCallback = (): void => {
-        // refreshDetails();
+        refreshDetails();
     };
 
     return (
@@ -123,10 +123,9 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                                 parcelId={selectedParcelId}
                                 setParcelClientId={setParcelClientId}
                                 setIsClientActive={setIsClientActive}
-                                refreshCallback={() => console.log("refresh")}
-                                // refreshCallback={(refresh) => {
-                                //     refreshParcelDetailsRef.current = refresh;
-                                // }}
+                                refreshCallback={(refresh) => {
+                                    refreshParcelDetailsRef.current = refresh;
+                                }}
                             />
                         </Suspense>
                     </ContentDiv>

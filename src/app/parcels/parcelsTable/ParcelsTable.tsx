@@ -25,6 +25,7 @@ import { getParcelsTableDataAndAllIds } from "@/app/parcels/parcelsTable/fetchPa
 import supabase from "@/supabaseClient";
 import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
+import { event } from "cypress/types/jquery";
 
 interface ParcelsTableProps {
     checkedParcelIds: string[];
@@ -125,13 +126,15 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         }
     }, [areFiltersLoadingForFirstTime, fetchAndDisplayParcelsData]);
 
-    const loadCountAndDataWithTimer = (): void => {
+    const loadCountAndDataWithTimer = (table_name: string): void => {
         if (fetchParcelsTimer.current) {
             clearTimeout(fetchParcelsTimer.current);
             fetchParcelsTimer.current = null;
         }
+        if (table_name !== "events") {
 
-        setIsLoading(true);
+            setIsLoading(true);
+        }
         fetchParcelsTimer.current = setTimeout(() => {
             void fetchAndDisplayParcelsData();
         }, 500);
@@ -143,27 +146,27 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "parcels" },
-                loadCountAndDataWithTimer
+                () => loadCountAndDataWithTimer("parcels")
             )
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "events" },
-                loadCountAndDataWithTimer
+                () => loadCountAndDataWithTimer("events")
             )
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "families" },
-                loadCountAndDataWithTimer
+                () => loadCountAndDataWithTimer("families")
             )
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "collection_centres" },
-                loadCountAndDataWithTimer
+                () => loadCountAndDataWithTimer("collection_centres")
             )
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "clients" },
-                loadCountAndDataWithTimer
+                () => loadCountAndDataWithTimer("clients")
             )
             .subscribe((status, err) => {
                 if (subscriptionStatusRequiresErrorMessage(status, err, "parcels and related")) {
