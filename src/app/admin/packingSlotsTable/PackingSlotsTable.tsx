@@ -181,7 +181,7 @@ const PackingSlotsTable: React.FC = () => {
                 );
 
                 if (insertPackingSlotError) {
-                    setRows((rows) => rows.slice(0, -1)); // elimină rândul adăugat
+                    setRows((rows) => rows.slice(0, -1));
                     setErrorMessage(
                         `Failed to add the packing slot. Log ID: ${insertPackingSlotError.logId}`
                     );
