@@ -129,6 +129,6 @@ describe("StatusesModal component", () => {
         const mockDate = dayjs("2024-01-01 12:00:00");
         fireEvent.click(screen.getByText("Submit"));
 
-        expect(mockOnSubmit).toHaveBeenCalledWith(mockDate);
+        expect(mockOnSubmit).toHaveBeenCalledWith(mockDate, []);
     });
 });
