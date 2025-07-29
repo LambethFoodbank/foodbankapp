@@ -115,7 +115,6 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
             );
             const index: number = removeRow(rowData);
             setRowData(latestRow);
-            console.log(latestRow);
             appendNewRow(latestRow, index);
             return;
         }
@@ -151,7 +150,6 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
             };
             const index: number = removeRow(rowData);
             setRowData(updatedRow);
-            console.log(updatedRow);
             appendNewRow(updatedRow, index);
             void sendAuditLog({
                 ...auditLog,
