@@ -10,7 +10,7 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 import { emailRegex, formatEmail } from "@/common/format";
 
-const emailIsRequired = true;
+const emailIsRequired = false;
 
 const EmailCard: React.FC<ClientCardProps> = ({ formErrors, errorSetter, fieldSetter, fields }) => {
     return (

@@ -45,7 +45,7 @@ const AddClients: () => React.ReactElement = () => {
     const initialFormErrors: ClientErrors = {
         fullName: Errors.initial,
         phoneNumber: Errors.none,
-        email: Errors.initial,
+        email: Errors.none,
         addressLine1: Errors.initial,
         addressPostcode: Errors.initial,
         numberOfAdults: Errors.initial,
