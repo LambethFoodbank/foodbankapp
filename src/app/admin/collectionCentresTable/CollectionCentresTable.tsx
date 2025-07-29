@@ -100,6 +100,9 @@ const CollectionCentresTable: React.FC = () => {
     }, [getCollectionCentresForTable]);
 
     const handleSaveClick = (id: GridRowId) => () => {
+        if (errorMessage) {
+            return;
+        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View },
@@ -178,25 +181,33 @@ const CollectionCentresTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
-        if (newRow.isNew) {
-            const { data: newCollectionCentreData, error: newCollectionCentreError } =
-                await addNewCollectionCentre({
-                    ...newRow,
-                });
-            if (newCollectionCentreError) {
-                return { ...newRow, name: "", acronym: "", isShown: false };
-            }
-            return { ...newRow, id: newCollectionCentreData.collectionCentreId, isNew: false };
-        } else {
-            const { error: updateCollectionCentreError } = await updateCollectionCentre(newRow);
-            if (updateCollectionCentreError) {
-                if (existingRowData) {
-                    const rowToReturn = { ...existingRowData };
-                    setExistingRowData(null);
-                    return rowToReturn;
+        try {
+            if (newRow.isNew) {
+                const { data: newCollectionCentreData, error: newCollectionCentreError } =
+                    await addNewCollectionCentre({
+                        ...newRow,
+                    });
+                if (newCollectionCentreError) {
+                    return { ...newRow, name: "", acronym: "", isShown: false };
+                }
+                return { ...newRow, id: newCollectionCentreData.collectionCentreId, isNew: false };
+            } else {
+                const { error: updateCollectionCentreError } = await updateCollectionCentre(newRow);
+                if (updateCollectionCentreError) {
+                    let message = `Failed to update the collection centre. Log ID: ${updateCollectionCentreError.logId}`;
+
+                    if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {
+                        message =
+                            "This packing slot was modified by someone else.\n" +
+                            `Log ID: ${updateCollectionCentreError.logId}`;
+                    }
+                    setErrorMessage(message);
+                    throw new Error("Update failed");
                 }
             }
             return newRow;
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -349,7 +360,20 @@ const CollectionCentresTable: React.FC = () => {
                     columns={collectionCentreColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
-                    onRowModesModelChange={setRowModesModel}
+                    onProcessRowUpdateError={(error) => {
+                        console.error("Error while updating row:", error);
+                    }}
+                    onRowModesModelChange={(newModel) => {
+                        setRowModesModel(newModel);
+
+                        const isEditing = Object.values(newModel).some(
+                            (mode) => mode.mode === GridRowModes.Edit
+                        );
+
+                        if (!isEditing) {
+                            setErrorMessage(null);
+                        }
+                    }}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
                     slots={{
