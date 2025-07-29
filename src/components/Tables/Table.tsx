@@ -442,8 +442,9 @@ const Table = <
         },
         {
             when: (row: Row<Data>) =>
-                checkboxConfig.displayed && checkboxConfig.isRowChecked(row.data),
+              checkboxConfig.displayed && checkboxConfig.isRowChecked(row.data),
             style: {
+                ...(reduceRowHeight === true && { height: "48px" }),
                 backgroundColor: `${theme.primary.background[1]} !important`,
             },
         },
