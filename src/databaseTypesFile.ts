@@ -901,10 +901,16 @@ export type Database = {
           last_status_event_name: string | null
           last_status_timestamp: string | null
           last_status_workflow_order: number | null
+          list_type: Database["public"]["Enums"]["list_type"] | null
           packing_date: string | null
           packing_slot_name: string | null
           packing_slot_order: number | null
           parcel_id: string | null
+          parcel_notes: string | null
+          referral_agency: string | null
+          referrer_email: string | null
+          referrer_name: string | null
+          referrer_phone: string | null
           voucher_number: string | null
         }
         Relationships: [

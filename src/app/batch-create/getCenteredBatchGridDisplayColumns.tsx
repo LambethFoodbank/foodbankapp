@@ -1,7 +1,10 @@
 import { GridColDef, GridPreProcessEditCellProps, GridRenderCellParams } from "@mui/x-data-grid";
 import { BatchActionType, BatchTableDataState } from "@/app/batch-create/types";
 import { Button } from "@mui/material";
-import { isEmailValid, isPhoneNumberValid } from "@/app/batch-create/helpers/fieldValidationFunctions";
+import {
+    isEmailValid,
+    isPhoneNumberValid,
+} from "@/app/batch-create/helpers/fieldValidationFunctions";
 
 import {
     ADDRESS_WIDTH,
