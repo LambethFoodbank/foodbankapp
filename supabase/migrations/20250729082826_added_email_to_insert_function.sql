@@ -135,5 +135,3 @@ BEGIN
     RETURN inserted_client_id;
 END;$function$
 ;
-
-

@@ -117,5 +117,3 @@ BEGIN
     RETURN return_values;
 END;$function$
 ;
-
-
