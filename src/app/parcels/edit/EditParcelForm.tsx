@@ -49,6 +49,7 @@ const prepareParcelDataForForm = (
         collectionCentre: parcelData.collection_centre?.primary_key ?? null,
         lastUpdated: parcelData.last_updated,
         notes: parcelData.notes,
+        attentionFlag: parcelData.flagged_for_attention,
         referralAgency: parcelData.referral_agency ?? "",
         referrerName: parcelData.referrer_name ?? "",
         referrerEmail: parcelData.referrer_email ?? "",

@@ -42,6 +42,7 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     referrer_email: string | null;
     referrer_phone: string | null;
     notes: string | null;
+    flagged_for_attention: boolean | null;
 }
 
 export type FetchParcelResponse =
