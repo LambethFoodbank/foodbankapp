@@ -59,10 +59,10 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
     };
 
     const onFileCreationFailed = (csvError: FetchSelectedParcelsReportError): void => {
-        setErrorMessage("Failed to fetch signposting report data");
+        setErrorMessage("Failed to fetch selected parcels report data");
         setActionShown(false);
         void sendAuditLog({
-            action: "create day overview pdf",
+            action: "create selected parcels report csv",
             wasSuccess: false,
             content: { parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId) },
             logId: csvError.logId,
