@@ -146,6 +146,7 @@ const main = async (): Promise<never> => {
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
                 list_type: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
                 created_at: parcelCreationDateTime,
+                flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
             }),
         { connect: true }
     );
