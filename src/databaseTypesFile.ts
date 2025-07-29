@@ -737,14 +737,17 @@ export type Database = {
       }
       website_data: {
         Row: {
+          last_updated: string
           name: string
           value: string
         }
         Insert: {
+          last_updated?: string
           name?: string
           value?: string
         }
         Update: {
+          last_updated?: string
           name?: string
           value?: string
         }
