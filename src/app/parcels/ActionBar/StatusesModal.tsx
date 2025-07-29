@@ -56,6 +56,12 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
 
     const [callNoResponseStatuses, setCallNoResponseStatuses] = useState<string[]>([]);
 
+    useEffect(() => {
+        if (props.isOpen) {
+            setCallNoResponseStatuses([]);
+        }
+    }, [props.isOpen]);
+
     const toggleCallNoResponseStatuses = (newNoResponseStatus: string): void => {
         setCallNoResponseStatuses((prevCallNoResponseStatuses) =>
             prevCallNoResponseStatuses.includes(newNoResponseStatus)
