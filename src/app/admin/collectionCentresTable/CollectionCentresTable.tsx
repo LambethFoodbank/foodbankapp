@@ -57,7 +57,6 @@ const CollectionCentresTable: React.FC = () => {
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [existingRowData, setExistingRowData] = useState<CollectionCentresTableRow | null>(null);
     const [timeSlotModalIsOpen, setTimeSlotModalIsOpen] = useState<boolean>(false);
     const [selectedRowForTimeSlotEdit, setSelectedRowForTimeSlotEdit] =
         useState<CollectionCentresTableRow | null>(null);
@@ -219,12 +218,10 @@ const CollectionCentresTable: React.FC = () => {
     };
 
     const handleEditClick = (id: GridRowId) => () => {
-        const existingRowIndex = rows.map((row) => row.id).indexOf(id.toString());
         const row = rows.find((slot) => slot.id === id);
         if (row) {
             originalTimestampsRef.current[id] = row.lastUpdated;
         }
-        setExistingRowData(rows[existingRowIndex]);
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.Edit },
@@ -246,7 +243,6 @@ const CollectionCentresTable: React.FC = () => {
         } else if (editedRow.isNew) {
             setRows((currentValue) => currentValue.filter((row) => row.id !== id));
         }
-        setExistingRowData(null);
     };
 
     const collectionCentreColumns: GridColDef[] = [
