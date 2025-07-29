@@ -173,6 +173,7 @@ const main = async (): Promise<never> => {
                             ctx.seed
                         ),
                     list_type: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
+                    flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
 
                     referral_agency: () => agency,
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
