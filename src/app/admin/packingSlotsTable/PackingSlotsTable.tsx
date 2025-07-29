@@ -472,7 +472,6 @@ const PackingSlotsTable: React.FC = () => {
                     rowModesModel={rowModesModel}
                     onProcessRowUpdateError={(error) => {
                         console.error("Error while updating row:", error);
-                        // Sau orice notificare custom aici
                     }}
                     onRowModesModelChange={(newModel) => {
                         setRowModesModel(newModel);
