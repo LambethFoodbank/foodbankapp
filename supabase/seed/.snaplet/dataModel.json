@@ -4558,6 +4558,20 @@
           "maxLength": null
         },
         {
+          "id": "public.parcels.flagged_for_attention",
+          "name": "flagged_for_attention",
+          "columnName": "flagged_for_attention",
+          "type": "bool",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "clients",
           "type": "clients",
           "isRequired": true,
