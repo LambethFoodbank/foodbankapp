@@ -18,6 +18,6 @@ function openClientModal(): void {
 }
 
 function assertAdultsRowDisplayedSuccessfully(): void {
-    cy.contains("Client Details", { matchCase: false, timeout: 10000 });
+    cy.contains("Client Details", { matchCase: false });
     cy.contains("Adults", { matchCase: false, timeout: 10000 }).should("be.visible");
 }
