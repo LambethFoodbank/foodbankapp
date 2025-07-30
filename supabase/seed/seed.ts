@@ -3,7 +3,7 @@ This file is not type checked / linted in the pipeline as createSeedClient requi
 which only gets generated after running npx snaplet generate with local database running.
  */
 
-import { createSeedClient } from "@snaplet/seed";
+import { clientsScalars, ColumnValueCallbackContext, createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
 import { packingSlots } from "./packingSlotsSeed";
 import {
@@ -22,6 +22,7 @@ import {
     defaultNotes,
     defaultDeliveryInstructions,
     defaultExtraInformation,
+    possiblePhoneNumbers,
 } from "./clientsSeed";
 import { genders } from "./families";
 import { collectionCentresWithStringSlots } from "./collectionCentresSeed";
@@ -72,6 +73,12 @@ const main = async (): Promise<never> => {
                 delivery_instructions: () => copycat.oneOf(ctx.seed, defaultDeliveryInstructions),
                 family_id: () => copycat.uuid(ctx.seed),
                 default_list: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
+                additional_phone_numbers: (ctx) =>
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possiblePhoneNumbers.length],
+                        possiblePhoneNumbers
+                    ),
                 cooking_facilities: () =>
                     copycat.someOf(
                         ctx.seed,
