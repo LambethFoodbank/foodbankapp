@@ -62,14 +62,14 @@ export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
 };
 
 export const emailSearch = <DbData extends DbClientRow | DbParcelRow>(
-    emailColumnLabel: string,
-    clientIsActiveColumnLabel: string
+    emailColumnLabel: Extract<keyof DbData, "email">,
+    clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
-        if ("-".includes(substring.toLowerCase())) {
-            return `or(${clientIsActiveColumnLabel}.is.false, ${emailColumnLabel}.ilike.%${substring}%)`;
+        if (substring === "-") {
+            return `${clientIsActiveColumnLabel}.is.false`;
         }
-        return `and(${clientIsActiveColumnLabel}.is.true, ${emailColumnLabel}.ilike.%${substring}%)`;
+        return `and(${clientIsActiveColumnLabel}.is.true, ${emailColumnLabel}.ilike.%${substring.toLowerCase()}%)`;
     });
 };
 

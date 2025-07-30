@@ -816,6 +816,7 @@ export type Database = {
         Row: {
           address_postcode: string | null
           client_id: string | null
+          email: string | null
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
