@@ -16,3 +16,16 @@ export function getFormattedVoucherNumber(seed: string): string {
 
     return `E-${firstPart}-${secondPart}`;
 }
+
+export const possibleReferralAgency = [
+    "Hope Community Services",
+    "St. Vincent Outreach",
+    "United Family Aid",
+    "Helping Hands Network",
+    "Goodwill Support Centre",
+    "Bridge to Care",
+    "Sunrise Social Services",
+    "Compassion Connect",
+    "Neighborhood Relief Agency",
+    "FaithWorks Resource Center",
+];

@@ -33,7 +33,7 @@ import {
     eventNamesWithNoData,
     eventNamesWithNumberData,
 } from "./eventsSeed";
-import { getFormattedVoucherNumber } from "./parcelsVoucherNumberSeed";
+import { getFormattedVoucherNumber, possibleReferralAgency } from "./parcelsSeed";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
@@ -146,6 +146,10 @@ const main = async (): Promise<never> => {
                 collection_datetime: (ctx) =>
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
                 list_type: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
+                referral_agency: (ctx) => copycat.oneOf(ctx.seed, possibleReferralAgency),
+                referrer_name: (ctx) => copycat.fullName(ctx.seed),
+                referrer_email: (ctx) => copycat.email(ctx.seed),
+                referrer_phone: (ctx) => copycat.phoneNumber(ctx.seed),
                 created_at: parcelCreationDateTime,
             }),
         { connect: true }
