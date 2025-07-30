@@ -50,6 +50,12 @@ const convertParcelDbtoParcelRow = async (
                 addressPostcode: clientActive ? parcel.client_address_postcode : "-",
                 phoneNumber: clientActive ? parcel.client_phone_number ?? "" : "-",
                 email: clientActive ? parcel.client_email ?? "" : "-",
+                additionalPhoneNumber:
+                    clientActive &&
+                    Array.isArray(parcel?.client_additional_phone_numbers) &&
+                    parcel.client_additional_phone_numbers.length > 0
+                        ? `${parcel.client_additional_phone_numbers[0]}${parcel.client_additional_phone_numbers.length > 1 ? "..." : ""}`
+                        : null,
                 deliveryCollection: {
                     collectionCentreName: parcel.collection_centre_name ?? "-",
                     collectionCentreAcronym: parcel.collection_centre_acronym ?? "-",
