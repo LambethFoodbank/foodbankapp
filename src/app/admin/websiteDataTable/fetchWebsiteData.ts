@@ -37,6 +37,7 @@ export const fetchWebsiteData = async (): Promise<FetchWebsiteDataErrorReturn> =
             readableName: getReadableWebsiteDataName(row.name),
             value: row.value,
             id: row.name,
+            lastUpdated: row.last_updated,
         })
     );
 
@@ -44,17 +45,20 @@ export const fetchWebsiteData = async (): Promise<FetchWebsiteDataErrorReturn> =
 };
 
 export const updateDbWebsiteData = async (
-    row: WebsiteDataRow
+    newRow: WebsiteDataRow,
+    oldTimestamp: string | undefined
 ): Promise<UpdateWebsiteDataErrorReturn> => {
     const processedData: DbWebsiteData = {
-        name: row.dbName,
-        value: row.value,
+        name: newRow.dbName,
+        value: newRow.value,
+        last_updated: newRow.lastUpdated,
     };
 
     const { data: updatedWebsiteData, error } = await supabase
         .from("website_data")
-        .update(processedData)
+        .update({ value: processedData.value })
         .eq("name", processedData.name)
+        .eq("last_updated", oldTimestamp)
         .select()
         .single();
 

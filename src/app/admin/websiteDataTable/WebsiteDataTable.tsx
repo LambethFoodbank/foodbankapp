@@ -30,6 +30,7 @@ export interface WebsiteDataRow {
     readableName: string;
     id: string;
     value: string;
+    lastUpdated: string;
 }
 
 const WebsiteDataTable: React.FC = () => {
@@ -38,6 +39,7 @@ const WebsiteDataTable: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const dataGridRef = useGridApiRef();
+    const [lastEditedRowTimestamp, setLastEditedRowTimestamp] = useState<string | undefined>("");
 
     const fetchAndSetWebsiteData = useCallback(async () => {
         setIsLoading(true);
@@ -94,7 +96,7 @@ const WebsiteDataTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
-        const { error } = await updateDbWebsiteData(newRow);
+        const { error } = await updateDbWebsiteData(newRow, lastEditedRowTimestamp);
 
         if (error) {
             switch (error.type) {
@@ -123,6 +125,17 @@ const WebsiteDataTable: React.FC = () => {
             ...currentValue,
             [id]: { mode: GridRowModes.Edit },
         }));
+
+        const editedRow = rows.find((row) => row.id === id);
+        if (editedRow === undefined) {
+            {
+                void logErrorReturnLogId(
+                    "Edited row in website data admin table is undefined onEditClick"
+                );
+                setErrorMessage("Table error, please try again");
+            }
+        }
+        setLastEditedRowTimestamp(editedRow?.lastUpdated);
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
