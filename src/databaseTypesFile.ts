@@ -485,7 +485,9 @@ export type Database = {
       }
       lists: {
         Row: {
+          is_available: boolean | null
           item_name: string
+          item_type: Database["public"]["Enums"]["item_type"] | null
           list_type: Database["public"]["Enums"]["list_type"]
           notes_for_1: string | null
           notes_for_10: string | null
@@ -511,7 +513,9 @@ export type Database = {
           row_order: number
         }
         Insert: {
+          is_available?: boolean | null
           item_name?: string
+          item_type?: Database["public"]["Enums"]["item_type"] | null
           list_type?: Database["public"]["Enums"]["list_type"]
           notes_for_1?: string | null
           notes_for_10?: string | null
@@ -537,7 +541,9 @@ export type Database = {
           row_order?: number
         }
         Update: {
+          is_available?: boolean | null
           item_name?: string
+          item_type?: Database["public"]["Enums"]["item_type"] | null
           list_type?: Database["public"]["Enums"]["list_type"]
           notes_for_1?: string | null
           notes_for_10?: string | null
@@ -1079,6 +1085,14 @@ export type Database = {
     Enums: {
       gender: "male" | "female" | "other"
       item_dietary_status: "included" | "excluded" | "not_specified"
+      item_type:
+        | "regular_food"
+        | "alternative_food"
+        | "pet_food"
+        | "hygiene_product"
+        | "baby_product"
+        | "seasonal_product"
+        | "others"
       list_type: "regular" | "hotel"
       role: "volunteer" | "admin" | "manager" | "staff"
     }
