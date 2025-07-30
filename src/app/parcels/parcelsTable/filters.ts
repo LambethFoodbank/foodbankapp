@@ -23,6 +23,7 @@ import { UrlQueryParamsRecord } from "@/common/urlQueryParams";
 import { DbParcelRow } from "@/databaseUtils";
 import {
     dbFilterWithSubstringQueries,
+    emailSearch,
     familySearch,
     fullNameSearch,
     phoneSearch,
@@ -51,6 +52,10 @@ const parcelsFamilySearchMethod: ParcelsFilterMethod<string> = familySearch(
 
 const parcelsPhoneSearchMethod: ParcelsFilterMethod<string> = phoneSearch<DbParcelRow>(
     "client_phone_number",
+    "client_is_active"
+);
+const parcelsEmailSearchMethod: ParcelsFilterMethod<string> = emailSearch<DbParcelRow>(
+    "client_email",
     "client_is_active"
 );
 
@@ -269,6 +274,11 @@ export const buildParcelFilters = async (
             method: parcelsPhoneSearchMethod,
         }),
         buildServerSideTextFilter({
+            key: "email",
+            label: "Email",
+            method: parcelsEmailSearchMethod,
+        }),
+        buildServerSideTextFilter({
             key: "voucherNumber",
             label: "Voucher",
             method: voucherSearchMethod,
@@ -352,7 +362,7 @@ export const updateFiltersFromQueryParams = (
     additionalFilters = additionalFilters.map((filter) => {
         const paramValForFilter = filter.readStateFromUrlQueryParams(urlParams);
         if (paramValForFilter !== null) {
-            if (["familyCategory", "phoneNumber", "voucherNumber"].includes(filter.key)) {
+            if (["familyCategory", "phoneNumber", "email", "voucherNumber"].includes(filter.key)) {
                 return {
                     ...filter,
                     state: paramValForFilter,

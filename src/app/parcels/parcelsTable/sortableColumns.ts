@@ -55,6 +55,19 @@ const parcelsSortableColumns: SortOptions<ParcelsTableRow, ParcelsSortMethod>[] 
                 .order("parcel_id"),
     },
     {
+        key: "email",
+        sortMethod: (sortDirection, query) =>
+            query
+                .order("client_is_active", { ascending: sortDirection !== "asc" })
+                .order("client_email", { ascending: sortDirection === "asc" })
+                .order("packing_date")
+                .order("packing_slot_order")
+                .order("is_delivery", { ascending: false })
+                .order("collection_centre_name")
+                .order("client_address_postcode")
+                .order("parcel_id"),
+    },
+    {
         key: "voucherNumber",
         sortMethod: (sortDirection, query) =>
             query
