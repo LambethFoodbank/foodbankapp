@@ -36,6 +36,7 @@ const getRawClientDetails = async (clientId: string) => {
             full_name,
             phone_number,
             email,
+            additional_phone_numbers,
             delivery_instructions,
             address_1,
             address_2,
@@ -94,6 +95,7 @@ export interface ExpandedClientData {
     address: string;
     deliveryInstructions: string;
     phoneNumber: string;
+    additionalPhoneNumbers: string;
     email: string;
     household: string;
     adults: string;
@@ -116,6 +118,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         address: formatAddressFromClientDetails(client),
         deliveryInstructions: client.delivery_instructions ?? "",
         phoneNumber: client.phone_number ?? "",
+        additionalPhoneNumbers: formatAdditionalPhoneNumbers(client.additional_phone_numbers),
         email: client.email ?? "",
         defaultList: client.default_list,
         household: formatHouseholdFromFamilyDetails(client.family),
@@ -165,6 +168,13 @@ export const formatAddressFromClientDetails = (
         client.address_postcode,
         false
     );
+};
+
+export const formatAdditionalPhoneNumbers = (phoneNumbers: string[] | null): string => {
+    if (phoneNumbers === null || phoneNumbers.length === 0) {
+        return "None";
+    }
+    return phoneNumbers.sort().join(", ");
 };
 
 export const formatHouseholdFromFamilyDetails = (
