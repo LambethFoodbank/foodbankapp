@@ -1,5 +1,5 @@
 import React from "react";
-import { ParcelCardProps } from "@/app/parcels/form/ParcelForm";
+import { CommonCardProps } from "@/app/parcels/form/ParcelForm";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
@@ -11,7 +11,7 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 
 export const MAX_CHARACTERS = 380;
 
-const DeliveryInstructionsCard: React.FC<ParcelCardProps> = ({
+const DeliveryInstructionsCard: React.FC<CommonCardProps> = ({
     formErrors,
     errorSetter,
     fieldSetter,
