@@ -187,7 +187,7 @@ export type Database = {
       }
       clients: {
         Row: {
-          additional_phone_numbers: string[]
+          additional_phone_numbers: string[] | null
           address_1: string | null
           address_2: string | null
           address_county: string | null
@@ -220,7 +220,7 @@ export type Database = {
           signposting_call_required: boolean | null
         }
         Insert: {
-          additional_phone_numbers?: string[]
+          additional_phone_numbers?: string[] | null
           address_1?: string | null
           address_2?: string | null
           address_county?: string | null
@@ -253,7 +253,7 @@ export type Database = {
           signposting_call_required?: boolean | null
         }
         Update: {
-          additional_phone_numbers?: string[]
+          additional_phone_numbers?: string[] | null
           address_1?: string | null
           address_2?: string | null
           address_county?: string | null

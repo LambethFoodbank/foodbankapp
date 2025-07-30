@@ -36,12 +36,14 @@ const AddClients: () => React.ReactElement = () => {
         deliveryInstructions: "",
         notes: "",
         lastUpdated: undefined,
+        additionalPhoneNumbers: [],
     };
 
     const initialFormErrors: ClientErrors = {
         fullName: Errors.initial,
         phoneNumber: Errors.none,
         email: Errors.none,
+        additionalPhoneNumbers: Errors.none,
         addressLine1: Errors.initial,
         addressPostcode: Errors.initial,
         numberOfAdults: Errors.initial,
