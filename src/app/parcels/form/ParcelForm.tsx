@@ -53,6 +53,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "styled-components";
 import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
 import getExpandedClientDetails, {
     ExpandedClientData,
 } from "@/app/clients/getExpandedClientDetails";
@@ -130,7 +131,11 @@ export interface ParcelErrors extends FormErrors<ParcelFields> {
     referrerPhone: Errors;
 }
 
+export type CommonFields = ParcelFields | ClientFields;
+export type CommonErrors = ParcelErrors | ClientErrors;
+
 export type ParcelCardProps = CardProps<ParcelFields, ParcelErrors>;
+export type CommonCardProps = CardProps<CommonFields, CommonErrors>;
 
 export const initialParcelFields: ParcelFields = {
     clientId: null,
