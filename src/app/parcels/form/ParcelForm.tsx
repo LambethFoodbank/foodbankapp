@@ -5,32 +5,6 @@ import InfoIcon from "@mui/icons-material/Info";
 import { Button, IconButton } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import React, { useEffect, useState } from "react";
-import { useTheme } from "styled-components";
-import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
-import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
-import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
-import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
-import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
-import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
-import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
-import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
-import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
-import {
-    WriteParcelToDatabaseErrors,
-    WriteParcelToDatabaseFunction,
-} from "@/app/parcels/form/submitFormHelpers";
-import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
-import {
-    CollectionCentresLabelsAndValues,
-    CollectionTimeSlotsLabelsAndValues,
-    getActiveTimeSlotsForCollectionCentre,
-    PackingSlotsLabelsAndValues,
-} from "@/common/fetch";
-import { getDbDate } from "@/common/format";
 import {
     CardProps,
     checkErrorOnSubmit,
@@ -77,21 +51,6 @@ import {
     PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
 import { getDbDate } from "@/common/format";
-import {
-    CardProps,
-    checkErrorOnSubmit,
-    createSetter,
-    Errors,
-    Fields,
-    FormErrors,
-} from "@/components/Form/formFunctions";
-import {
-    CenterComponent,
-    FormErrorText,
-    StyledForm,
-    StyledName,
-} from "@/components/Form/formStyling";
-
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { Schema } from "@/databaseUtils";
