@@ -33,6 +33,7 @@ import {
     eventNamesWithNoData,
     eventNamesWithNumberData,
 } from "./eventsSeed";
+import { getFormattedVoucherNumber } from "./parcelsVoucherNumberSeed";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
@@ -139,8 +140,7 @@ const main = async (): Promise<never> => {
     await seed.parcels(
         (generate) =>
             generate(7500, {
-                voucher_number: (ctx) =>
-                    copycat.word(ctx.seed, { capitalize: true, minSyllables: 3 }),
+                voucher_number: (ctx) => getFormattedVoucherNumber(ctx.seed),
                 packing_date: (ctx) =>
                     getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
                 collection_datetime: (ctx) =>
