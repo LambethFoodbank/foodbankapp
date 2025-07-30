@@ -51,7 +51,7 @@ const prepareParcelDataForForm = (
         deliveryInstructions:
             parcelData.clientWithDeliveryInstructions?.delivery_instructions ?? null,
         notes: parcelData.notes,
-        attentionFlag: parcelData.flagged_for_attention,
+        attentionFlag: parcelData.flagged_for_attention ?? false,
         referralAgency: parcelData.referral_agency ?? "",
         referrerName: parcelData.referrer_name ?? "",
         referrerEmail: parcelData.referrer_email ?? "",
