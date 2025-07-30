@@ -60,7 +60,7 @@ import getExpandedClientDetails, {
 import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
 import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
 import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
-import DeliveryInstructionsCard from "@/app/parcels/form/formSections/DeliveryInstructionsCard";
+import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
 import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
 import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
 import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";

@@ -31,7 +31,7 @@ import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProducts
 import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
-import DeliveryInstructionsCard from "@/app/parcels/form/formSections/DeliveryInstructionsCard";
+import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
 import ExtraInformationCard from "@/app/clients/form/formSections/ExtraInformationCard";
 import AttentionFlagCard from "@/app/clients/form/formSections/AttentionFlagCard";
 import SignpostingCallCard from "@/app/clients/form/formSections/SignpostingCallCard";
