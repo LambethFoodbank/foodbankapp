@@ -991,6 +991,7 @@ export type Database = {
           packing_date: string | null
           packing_slot_name: string | null
           packing_slot_order: number | null
+          parcel_flagged_for_attention: boolean | null
           parcel_id: string | null
           referral_agency: string | null
           referrer_email: string | null

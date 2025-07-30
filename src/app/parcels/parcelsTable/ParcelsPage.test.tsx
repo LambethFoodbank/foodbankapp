@@ -55,6 +55,7 @@ const sampleProcessingData: DbParcelRow[] = [
         referrer_name: "John Smith",
         referrer_phone: "0987 654321",
         referral_agency: "Agency 1",
+        parcel_flagged_for_attention: false,
         client_email: "full.name@example.com",
     },
 ];
