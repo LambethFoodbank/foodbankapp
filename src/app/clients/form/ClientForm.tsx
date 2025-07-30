@@ -31,7 +31,7 @@ import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProducts
 import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
-import DeliveryInstructionsCard from "@/app/clients/form/formSections/DeliveryInstructionsCard";
+import DeliveryInstructionsCard from "@/app/parcels/form/formSections/DeliveryInstructionsCard";
 import ExtraInformationCard from "@/app/clients/form/formSections/ExtraInformationCard";
 import AttentionFlagCard from "@/app/clients/form/formSections/AttentionFlagCard";
 import SignpostingCallCard from "@/app/clients/form/formSections/SignpostingCallCard";
@@ -66,7 +66,7 @@ export interface ClientFields extends Fields {
     numberOfAdults: number;
     children: Person[];
     numberOfChildren: number;
-    listType: ListType | null;
+    listType?: ListType;
     cookingFacilities: BooleanGroup | null;
     dietaryRequirements: BooleanGroup | null;
     hygieneProductsTampons: string | null;
@@ -78,7 +78,7 @@ export interface ClientFields extends Fields {
     babyOtherItems: BooleanGroup;
     petFood: BooleanGroup;
     otherItems: BooleanGroup;
-    deliveryInstructions: string;
+    deliveryInstructions: string | null | undefined;
     extraInformation: string;
     attentionFlag: boolean;
     signpostingCall: boolean;
