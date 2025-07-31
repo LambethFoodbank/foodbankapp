@@ -1079,6 +1079,43 @@ export type Database = {
         }
         Returns: undefined
       }
+      search_by_additional_phone_number: {
+        Args: {
+          search_number: string
+        }
+        Returns: {
+          additional_phone_numbers: string[] | null
+          address_1: string | null
+          address_2: string | null
+          address_county: string | null
+          address_postcode: string | null
+          address_town: string | null
+          baby_food: string | null
+          baby_formula: string | null
+          baby_nappies: string | null
+          baby_other_items: string[] | null
+          cooking_facilities: string[] | null
+          default_list: Database["public"]["Enums"]["list_type"]
+          delivery_instructions: string | null
+          dietary_requirements: string[] | null
+          extra_information: string | null
+          family_id: string
+          flagged_for_attention: boolean | null
+          full_name: string | null
+          hygiene_other_items: string[] | null
+          hygiene_pads: string | null
+          hygiene_tampons: string | null
+          is_active: boolean
+          last_updated: string
+          notes: string | null
+          other_items: string[] | null
+          pet_food: string[] | null
+          phone_number: string | null
+          primary_key: string
+          signposting_call_reasons: string[] | null
+          signposting_call_required: boolean | null
+        }[]
+      }
       swap_two_wiki_rows: {
         Args: {
           key1: string

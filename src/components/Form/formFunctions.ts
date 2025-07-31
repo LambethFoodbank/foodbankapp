@@ -95,6 +95,44 @@ interface OnChangeTextOptions<SpecificFields> {
     maxCharacters?: number;
 }
 
+export const onChangeAdditionalFields = <SpecificFields extends Fields>(
+    fieldSetter: Setter<SpecificFields>,
+    currentAdditionalPhoneNumbers: string[] | null,
+    errorSetter: Setter<FormErrors<SpecificFields>> | Setter<Required<FormErrors<SpecificFields>>>,
+    key: keyof SpecificFields,
+    index: number,
+    options?: OnChangeTextOptions<SpecificFields>
+): SelectChangeEventHandler => {
+    return (event) => {
+        const input = event.target.value;
+        const errorType = getErrorType(
+            key === "additionalPhoneNumbers"
+                ? input.replaceAll(phoneNumberFormatSymbolsRegex, "")
+                : input,
+            options?.required,
+            options?.regex,
+            options?.additionalCondition,
+            options?.maxCharacters
+        );
+
+        console.log(errorType);
+        errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });
+
+        if (errorType === Errors.none) {
+            const newValue = options?.formattingFunction
+                ? options.formattingFunction(input)
+                : input;
+
+            const updatedArray = [...currentAdditionalPhoneNumbers];
+            updatedArray[index] = newValue;
+
+            fieldSetter({ [key]: updatedArray } as {
+                [key in keyof SpecificFields]: SpecificFields[key];
+            });
+        }
+    };
+};
+
 export const onChangeText = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     errorSetter: Setter<FormErrors<SpecificFields>> | Setter<Required<FormErrors<SpecificFields>>>,

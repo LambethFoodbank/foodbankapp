@@ -83,9 +83,10 @@ END,
 END,
         additional_phone_numbers =
            CASE
-                        WHEN jsonb_typeof(clientRecord->'additional_phone_numbers') = 'array'
-                            THEN ARRAY(SELECT * FROM jsonb_array_elements_text(clientRecord->' additional_phone_numbers'))
-                        ELSE NULL
+                WHEN jsonb_typeof(clientRecord->'additional_phone_numbers') = 'array'
+                    THEN ARRAY(SELECT * FROM jsonb_array_elements_text(clientRecord->'additional_phone_numbers'))
+                ELSE NULL
+END
 WHERE
         primary_key = clientId
         AND last_updated = (clientRecord->>'last_updated')::timestamp with time zone;

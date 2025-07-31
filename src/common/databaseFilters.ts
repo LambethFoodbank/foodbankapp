@@ -2,6 +2,9 @@ import { ServerSideFilterMethod } from "@/components/Tables/Filters";
 import { displayPostcodeForHomelessClient } from "./format";
 import { DbClientRow, DbParcelRow } from "@/databaseUtils";
 import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/format";
+import supabase from "@/supabaseClient";
+import { useState, useEffect } from "react";
+import { searchByAdditionalPhoneNumber } from "@/app/info/supabaseHelpers";
 
 const textFilterDelimiter = ",";
 const defaultQueryFilterRegex = /[^a-zA-Z0-9 '\-+?]/g;
@@ -54,13 +57,21 @@ export const postcodeSearch = <DbData extends DbClientRow | DbParcelRow>(
 
 export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
     phoneColumnLabel: Extract<keyof DbData, "phone_number" | "client_phone_number">,
+    additionalPhoneColumnLabel: Extract<
+        keyof DbData,
+        "additional_phone_numbers" | "client_additional_phone_numbers"
+    >,
     clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
         if ("-".includes(substring.toLowerCase())) {
-            return `or(${clientIsActiveColumnLabel}.is.false, ${phoneColumnLabel}.ilike.%${substring}%)`;
+            const phoneColumnQueryInactiveClient = `or(${clientIsActiveColumnLabel}.is.false, ${phoneColumnLabel}.ilike.%${substring}%)`;
+            const additionalPhoneColumnQueryInactiveClient = `or(${clientIsActiveColumnLabel}.is.false, ${additionalPhoneColumnLabel}.cs.{${substring}})`;
+            return `or(${phoneColumnQueryInactiveClient}, ${additionalPhoneColumnQueryInactiveClient})`;
         }
-        return `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
+        const phoneColumnQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
+        const additionalPhoneQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${additionalPhoneColumnLabel}.cs.{${substring}})`;
+        return `or(${phoneColumnQueryActiveClient}, ${additionalPhoneQueryActiveClient})`;
     });
 };
 
