@@ -58,6 +58,8 @@ export interface ExpandedClientParcelDetails extends Data {
     voucherNumber: string;
     packingDate: string;
     collectionCentre: string;
+    signpostingCallRequired: boolean;
+    signpostingCallReasons: string;
 }
 
 export const rawDataToClientParcelsDetails = (
