@@ -33,7 +33,6 @@ import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
 import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
 import ExtraInformationCard from "@/app/clients/form/formSections/ExtraInformationCard";
-import SignpostingCallCard from "@/app/clients/form/formSections/SignpostingCallCard";
 import Button from "@mui/material/Button";
 import { submitAddClientForm, submitEditClientForm } from "@/app/clients/form/submitFormHelpers";
 import Title from "@/components/Title/Title";
@@ -79,8 +78,6 @@ export interface ClientFields extends Fields {
     otherItems: BooleanGroup;
     deliveryInstructions: string | null;
     extraInformation: string;
-    signpostingCall: boolean;
-    signpostingCallReasons: BooleanGroup | null;
     lastUpdated: string | undefined;
     notes: string | null;
 }
@@ -116,7 +113,6 @@ const formSections = [
     PetFoodCard,
     OtherItemsCard,
     DeliveryInstructionsCard,
-    SignpostingCallCard,
     ExtraInformationCard,
     ClientNotesCard,
 ];

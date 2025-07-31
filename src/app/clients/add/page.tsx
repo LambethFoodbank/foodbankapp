@@ -35,8 +35,6 @@ const AddClients: () => React.ReactElement = () => {
         otherItems: {},
         deliveryInstructions: "",
         extraInformation: "",
-        signpostingCall: false,
-        signpostingCallReasons: null,
         notes: "",
         lastUpdated: undefined,
     };
