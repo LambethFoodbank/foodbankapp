@@ -110,12 +110,12 @@ const getParcelsForSelectedParcelsReport = async (
                 is_shown
             ),
             list_type,
+            flagged_for_attention,
 
             client:clients(
                 full_name,
                 is_active,
                 signposting_call_required,
-                flagged_for_attention,
                 phone_number,
                 signposting_call_reasons,
                 delivery_instructions,
@@ -168,7 +168,7 @@ const getParcelsForSelectedParcelsReport = async (
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
                     signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
-                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
+                    flaggedForAttention: rawParcel.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
