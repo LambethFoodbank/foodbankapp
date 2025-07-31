@@ -19,6 +19,7 @@ import { ErrorSecondaryText } from "../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { clientSideButtonGroupFilter, filterRowbyButton } from "@/components/Tables/ButtonFilter";
 import { buildClientSideTextFilter, filterRowByText } from "@/components/Tables/TextFilter";
+import { clientSideDropdownFilter } from "@/components/Tables/DropdownFilter";
 
 interface FetchedListsData {
     listsData: Schema["lists"][];
@@ -81,18 +82,16 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
                             },
                         ])
                 ),
-            }) as ListRow // this cast is needed here as the type system can't infer what Object.fromEntries will return
+            }) as ListRow
     );
 };
 
-// Filter to match availability state. "all" means no filtering.
 const filterRowByAvailability = <Data,>(row: Data, state: string, rowKey?: keyof Data): boolean => {
     if (state === "all" || !rowKey) {
         return true;
     }
     const desired = state === "true"; // "true" for Available, "false" for Not available
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (row as any)[rowKey] === desired;
+    return (row as never)[rowKey] === desired;
 };
 
 const filters: ListFilter[] = [
@@ -103,25 +102,25 @@ const filters: ListFilter[] = [
         method: filterRowByText,
     }),
     clientSideButtonGroupFilter({
-        key: "availability",
-        rowKey: "is_available",
-        filterLabel: "",
-        itemLabelsAndKeys: [
-            ["All", "all"],
-            ["Available", "true"],
-            ["Not available", "false"],
-        ],
-        initialActiveFilter: "all",
-        method: filterRowByAvailability,
-        shouldPersistOnClear: true,
-    }),
-    clientSideButtonGroupFilter({
         key: "listType",
         rowKey: "listType",
         filterLabel: "",
         itemLabelsAndKeys: LIST_TYPES_ARRAY.map((type) => [type, type]),
         initialActiveFilter: "regular",
         method: filterRowbyButton,
+        shouldPersistOnClear: true,
+    }),
+    clientSideDropdownFilter({
+        key: "availability",
+        rowKey: "is_available",
+        label: "Availability",
+        itemLabelsAndKeys: [
+            ["All", "all"],
+            ["Available", "true"],
+            ["Not available", "false"],
+        ],
+        initialSelected: "all",
+        method: filterRowByAvailability,
         shouldPersistOnClear: true,
     }),
 ];
