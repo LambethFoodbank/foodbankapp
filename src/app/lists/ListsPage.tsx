@@ -85,12 +85,35 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
     );
 };
 
+// Filter to match availability state. "all" means no filtering.
+const filterRowByAvailability = <Data,>(row: Data, state: string, rowKey?: keyof Data): boolean => {
+    if (state === "all" || !rowKey) {
+        return true;
+    }
+    const desired = state === "true"; // "true" for Available, "false" for Not available
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (row as any)[rowKey] === desired;
+};
+
 const filters: ListFilter[] = [
     buildClientSideTextFilter({
         key: "itemName",
         rowKey: "itemName",
         label: "Item",
         method: filterRowByText,
+    }),
+    clientSideButtonGroupFilter({
+        key: "availability",
+        rowKey: "is_available",
+        filterLabel: "",
+        itemLabelsAndKeys: [
+            ["All", "all"],
+            ["Available", "true"],
+            ["Not available", "false"],
+        ],
+        initialActiveFilter: "all",
+        method: filterRowByAvailability,
+        shouldPersistOnClear: true,
     }),
     clientSideButtonGroupFilter({
         key: "listType",
