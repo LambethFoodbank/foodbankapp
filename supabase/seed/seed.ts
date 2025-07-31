@@ -19,6 +19,9 @@ import {
     possibleSignpostingCallReasons,
     possibleBabyFoods,
     possibleBabyFormula,
+    defaultNotes,
+    defaultDeliveryInstructions,
+    defaultExtraInformation,
 } from "./clientsSeed";
 import { genders } from "./families";
 import { collectionCentresWithStringSlots } from "./collectionCentresSeed";
@@ -35,7 +38,11 @@ import {
     eventNamesWithNoData,
     eventNamesWithNumberData,
 } from "./eventsSeed";
-import { getFormattedVoucherNumber, possibleReferralAgency } from "./parcelsSeed";
+import {
+    defaultParcelNotes,
+    getFormattedVoucherNumber,
+    possibleReferralAgency,
+} from "./parcelsSeed";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
@@ -59,7 +66,7 @@ const main = async (): Promise<never> => {
             address_town: (ctx) => copycat.city(ctx.seed),
             address_county: (ctx) => copycat.state(ctx.seed),
             address_postcode: (ctx) => copycat.oneOf(ctx.seed, possiblePostCodes),
-            delivery_instructions: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
+            delivery_instructions: (ctx) => copycat.oneOf(ctx.seed, defaultDeliveryInstructions),
             family_id: (ctx) => copycat.uuid(ctx.seed),
             default_list: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
             cooking_facilities: (ctx) =>
@@ -94,7 +101,7 @@ const main = async (): Promise<never> => {
                 ),
             other_items: (ctx) =>
                 copycat.someOf(ctx.seed, [0, possibleOtherItems.length], possibleOtherItems),
-            extra_information: (ctx) => copycat.sentence(ctx.seed, { maxWords: 20 }),
+            extra_information: (ctx) => copycat.oneOf(ctx.seed, defaultExtraInformation),
             flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
             signposting_call_required: (ctx) => copycat.bool(ctx.seed),
             signposting_call_reasons: (ctx) =>
@@ -118,7 +125,7 @@ const main = async (): Promise<never> => {
                         gender: (ctx) => copycat.oneOf(ctx.seed, genders),
                     }
                 ),
-            notes: (ctx) => copycat.sentence(ctx.seed, { maxWords: 25 }),
+            notes: (ctx) => copycat.oneOf(ctx.seed, defaultNotes),
         })
     );
 

@@ -128,4 +128,19 @@ export const possibleBabyFormula = [
     "Other",
 ];
 
+export const defaultNotes = [
+    "E.g., Family prefers canned goods over dry items. Please avoid spicy products.",
+    null,
+];
+
+export const defaultDeliveryInstructions = [
+    "E.g., Leave the package at the back gate if no one answers the door.",
+    null,
+];
+
+export const defaultExtraInformation = [
+    "E.g., One family member has a gluten intolerance. Diabetic-friendly items preferred.",
+    null,
+];
+
 export const booleansWeightedToTrue = Array(9).fill(true).concat(Array(1).fill(false));
