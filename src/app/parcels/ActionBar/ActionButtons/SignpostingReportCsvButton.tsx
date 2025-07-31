@@ -22,7 +22,7 @@ import { dietaryRequirementOptions } from "@/app/clients/form/formSections/Dieta
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { signpostingCallOptions } from "@/app/parcels/form/formSections/SignpostingCallCard";
 
 type FetchSignpostingReportResult =
     | {
@@ -116,14 +116,14 @@ const getSignpostingReportData = async (
                 is_shown
             ),
             list_type,
+            signposting_call_required,
+            signposting_call_reasons,
             flagged_for_attention,
 
             client:clients(
                 full_name,
                 is_active,
-                signposting_call_required,
                 phone_number,
-                signposting_call_reasons,
                 delivery_instructions,
                 extra_information,
                 notes,
@@ -159,7 +159,7 @@ const getSignpostingReportData = async (
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
         .eq("client.is_active", true)
-        .eq("client.signposting_call_required", true)
+        .eq("signposting_call_required", true)
         .order("packing_date")
         .order("client_id");
 
@@ -185,13 +185,13 @@ const getSignpostingReportData = async (
                     voucherNumber: rawParcel.voucher_number ?? "",
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
-                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
+                    signpostingCallRequired: rawParcel.signposting_call_required ?? false,
                     flaggedForAttention: rawParcel.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
                     signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? null,
+                        rawParcel.signposting_call_reasons ?? null,
                         signpostingCallOptions
                     ),
                     address: rawParcel.client

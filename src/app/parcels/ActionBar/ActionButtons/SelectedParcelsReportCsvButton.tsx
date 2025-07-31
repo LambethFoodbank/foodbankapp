@@ -18,7 +18,7 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { signpostingCallOptions } from "@/app/parcels/form/formSections/SignpostingCallCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
