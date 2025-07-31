@@ -17,6 +17,8 @@ import {
     possiblePostCodes,
     possiblePets,
     possibleSignpostingCallReasons,
+    possibleBabyFoods,
+    possibleBabyFormula,
 } from "./clientsSeed";
 import { genders } from "./families";
 import { collectionCentresWithStringSlots } from "./collectionCentresSeed";
@@ -82,10 +84,8 @@ const main = async (): Promise<never> => {
                     possibleHygieneOtherItems
                 ),
             baby_nappies: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
-            baby_formula: (ctx) =>
-                copycat.oneOf(ctx.seed, [null, copycat.sentence(ctx.seed, { maxWords: 3 })]),
-            baby_food: (ctx) =>
-                copycat.oneOf(ctx.seed, [null, copycat.sentence(ctx.seed, { maxWords: 5 })]),
+            baby_formula: (ctx) => copycat.oneOf(ctx.seed, possibleBabyFormula),
+            baby_food: (ctx) => copycat.oneOf(ctx.seed, possibleBabyFoods),
             baby_other_items: (ctx) =>
                 copycat.someOf(
                     ctx.seed,
