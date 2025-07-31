@@ -1,6 +1,6 @@
 "use client";
 
-import { ItemType } from "@/common/databaseItemTypes";
+import { getItemTypeLabel, ItemType } from "@/common/databaseItemTypes";
 import {
     ClientPaginatedTable,
     ColumnDisplayFunctions,
@@ -23,6 +23,8 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ClientSideFilter } from "@/components/Tables/Filters";
 import { ListType } from "@/common/databaseListTypes";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
+import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export type ListFilter = ClientSideFilter<ListRow, string>;
 
@@ -62,7 +64,7 @@ interface ListDataViewProps {
 
 export const listsHeaderKeysAndLabels = [
     ["itemName", "Description"],
-    ["is_available", "Available"],
+    ["is_available", "Availability"],
     ["item_type", "Item Type"],
     ["1", "Single"],
     ["2", "Family of 2"],
@@ -109,11 +111,15 @@ const displayQuantityAndNotes = (data: QuantityAndNotes): React.ReactElement => 
     return <TooltipCell cellValue={data.quantity} tooltipValue={data.notes ?? ""} />;
 };
 
-const displayBoolean = (value: boolean): string => (value ? "Yes" : "No");
+const displayBoolean = (value: boolean): React.ReactElement => {
+    const icon = value ? faCheck : faXmark;
+    const color = value ? "green" : "red";
+    return <FontAwesomeIcon icon={icon} style={{ color }} />;
+};
 
 const listDataViewColumnDisplayFunctions = {
     is_available: (value: boolean) => displayBoolean(value),
-    item_type: (value: ItemType) => value,
+    item_type: (value: ItemType) => getItemTypeLabel[value] ?? value,
     ...Object.fromEntries(
         listsHeaderKeysAndLabels
             .slice(1)
@@ -130,7 +136,7 @@ const listsColumnStyleOptions: ColumnStyles<ListRow> = {
         listsHeaderKeysAndLabels.slice(1).map(([key]) => [
             key,
             {
-                minWidth: "10rem",
+                minWidth: "6rem",
                 center: true,
             },
         ])
