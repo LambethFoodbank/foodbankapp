@@ -19,6 +19,7 @@ import SignPostingReportModal from "./ActionModals/SignpostingReportModal";
 import PendingMoreInfoReportModal from "./ActionModals/PendingMoreInfoReportModal";
 import VoucherReportModal from "@/app/parcels/ActionBar/ActionModals/VoucherReportModal";
 import SelectedParcelsReportModal from "@/app/parcels/ActionBar/ActionModals/SelectedParcelsReportModal";
+import ReportModal from "./ActionModals/ReportModal";
 
 const isNotAtLeastOne = (value: number): boolean => {
     return value < 1;
@@ -159,13 +160,17 @@ const getActionModal = (
         case "Delete Parcel":
             return <DeleteParcelModal key={elementKey} {...actionModalProps} />;
         case "Download Signposting Report":
-            return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
         case "Download Missing Voucher Report":
-            return <VoucherReportModal key={elementKey} {...actionModalProps} />;
         case "Download Pending More Info Report":
-            return <PendingMoreInfoReportModal key={elementKey} {...actionModalProps} />;
         case "Download Selected Parcels Report":
-            return <SelectedParcelsReportModal key={elementKey} {...actionModalProps} />;
+            return <ReportModal key={elementKey} {...actionModalProps} />
+            // return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
+        // case "Download Missing Voucher Report":
+        //     return <VoucherReportModal key={elementKey} {...actionModalProps} />;
+        // case "Download Pending More Info Report":
+        //     return <PendingMoreInfoReportModal key={elementKey} {...actionModalProps} />;
+        // case "Download Selected Parcels Report":
+        //     return <SelectedParcelsReportModal key={elementKey} {...actionModalProps} />;
     }
 };
 
