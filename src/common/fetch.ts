@@ -43,6 +43,8 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     referrer_phone: string | null;
     notes: string | null;
     flagged_for_attention: boolean | null;
+    signposting_call_required: boolean | null;
+    signposting_call_reasons: string[] | null;
 }
 
 export type FetchParcelResponse =

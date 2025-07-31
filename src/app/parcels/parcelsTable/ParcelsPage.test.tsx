@@ -57,6 +57,7 @@ const sampleProcessingData: DbParcelRow[] = [
         referral_agency: "Agency 1",
         parcel_notes: "fragile items",
         parcel_flagged_for_attention: false,
+        parcel_signposting_call_required: true,
     },
 ];
 

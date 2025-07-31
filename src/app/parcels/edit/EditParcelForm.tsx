@@ -25,6 +25,7 @@ import { formatDatetimeAsTime, capitaliseWords } from "@/common/format";
 import { useSearchParams } from "next/navigation";
 import { parseQueryParams } from "@/common/urlQueryParams";
 import { returnPathQueryParam } from "@/common/constants";
+import { arrayToBooleanGroup } from "@/app/clients/edit/[id]/autofill";
 
 interface EditParcelFormProps {
     parcelId: string;
@@ -54,6 +55,11 @@ const prepareParcelDataForForm = (
         referrerName: parcelData.referrer_name ?? "",
         referrerEmail: parcelData.referrer_email ?? "",
         referrerPhone: parcelData.referrer_phone ?? "",
+        signpostingCall: parcelData.signposting_call_required ?? false,
+        signpostingCallReasons:
+            parcelData.signposting_call_reasons !== null
+                ? arrayToBooleanGroup(parcelData.signposting_call_reasons)
+                : null,
     };
 };
 

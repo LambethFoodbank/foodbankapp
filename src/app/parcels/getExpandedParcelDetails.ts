@@ -23,7 +23,7 @@ import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/Cookin
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { signpostingCallOptions } from "@/app/parcels/form/formSections/SignpostingCallCard";
 
 type FetchExpandedParcelDetailsResult =
     | {
@@ -60,6 +60,8 @@ const getExpandedParcelDetails = async (
         created_at,
         collection_datetime,
         list_type,
+        signposting_call_required,
+        signposting_call_reasons,
         notes,
         packing_slot: packing_slots (
             name
@@ -92,8 +94,6 @@ const getExpandedParcelDetails = async (
             pet_food,
             other_items,
             extra_information,
-            signposting_call_required,
-            signposting_call_reasons,
             notes,
 
             family:families(
@@ -201,8 +201,8 @@ const getExpandedParcelDetails = async (
                     ),
                     extraInformation: client.extra_information ?? "",
                     signpostingCall: formatSignpostingCall(
-                        client.signposting_call_required,
-                        client.signposting_call_reasons
+                        rawParcelDetails.signposting_call_required,
+                        rawParcelDetails.signposting_call_reasons
                     ),
                     clientNotes: client.notes ?? "",
                     createdAt: formatDateTime(rawParcelDetails.created_at),
@@ -224,6 +224,10 @@ const getExpandedParcelDetails = async (
                 referrerPhone: rawParcelDetails.referrer_phone ?? "",
                 listType: rawParcelDetails.list_type,
                 clientNotes: client.notes,
+                signpostingCall: formatSignpostingCall(
+                    rawParcelDetails.signposting_call_required,
+                    rawParcelDetails.signposting_call_reasons
+                ),
                 notes: rawParcelDetails.notes,
                 packingDateAndSlot: formatPackingDateAndSlot(
                     rawParcelDetails.packing_date,
@@ -253,6 +257,7 @@ interface ParcelDataIndependentOfClient extends Data {
     referrerName: string;
     referrerEmail: string;
     referrerPhone: string;
+    signpostingCall: string;
     notes: string | null;
 }
 
@@ -278,7 +283,6 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     petFood: string;
     otherRequirements: string;
     extraInformation: string;
-    signpostingCall: string;
     clientNotes: string;
 }
 
