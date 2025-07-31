@@ -4,7 +4,7 @@ import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
 import { getFormattedPeople } from "@/common/formatFamiliesData";
 
-const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
+export const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
     const reverted: BooleanGroup = {};
     data.forEach((value) => (reverted[value] = true));
     return reverted;
