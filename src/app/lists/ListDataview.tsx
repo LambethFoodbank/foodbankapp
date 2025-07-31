@@ -1,5 +1,6 @@
 "use client";
 
+import { ItemType } from "@/common/databaseItemTypes";
 import {
     ClientPaginatedTable,
     ColumnDisplayFunctions,
@@ -30,6 +31,8 @@ export interface ListRow {
     rowOrder: number;
     itemName: string;
     listType: ListType;
+    is_available: boolean;
+    item_type: ItemType;
     "1": QuantityAndNotes;
     "2": QuantityAndNotes;
     "3": QuantityAndNotes;
@@ -59,6 +62,8 @@ interface ListDataViewProps {
 
 export const listsHeaderKeysAndLabels = [
     ["itemName", "Description"],
+    ["is_available", "Available"],
+    ["item_type", "Item Type"],
     ["1", "Single"],
     ["2", "Family of 2"],
     ["3", "Family of 3"],
@@ -96,15 +101,24 @@ export const listRowToListDB = (listRow: ListRow): Schema["lists"] => ({
     primary_key: listRow.primaryKey,
     row_order: listRow.rowOrder,
     list_type: listRow.listType,
+    item_type: listRow.item_type,
+    is_available: listRow.is_available,
 });
 
 const displayQuantityAndNotes = (data: QuantityAndNotes): React.ReactElement => {
     return <TooltipCell cellValue={data.quantity} tooltipValue={data.notes ?? ""} />;
 };
 
+const displayBoolean = (value: boolean): string => (value ? "Yes" : "No");
+
 const listDataViewColumnDisplayFunctions = {
+    is_available: (value: boolean) => displayBoolean(value),
+    item_type: (value: ItemType) => value,
     ...Object.fromEntries(
-        listsHeaderKeysAndLabels.slice(1).map(([key]) => [key, displayQuantityAndNotes])
+        listsHeaderKeysAndLabels
+            .slice(1)
+            .filter(([key]) => !["is_available", "item_type"].includes(key))
+            .map(([key]) => [key, displayQuantityAndNotes])
     ),
 } satisfies ColumnDisplayFunctions<ListRow>;
 
