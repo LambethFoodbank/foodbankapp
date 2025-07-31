@@ -75,6 +75,15 @@ const GenerateMapModal: React.FC<ActionModalProps> = (props) => {
 
     const mapsLinkForSelectedParcels = `https://www.google.com/maps/dir/${uniquePostcodes.join("/")}//`;
 
+    const postSuccessCallback = (): void => {
+        props.postSuccessCallback();
+
+        // Auto-close the modal after 3 seconds
+        setTimeout(() => {
+            props.onClose();
+        }, 3000); // 3-second delay
+    };
+
     return (
         <GeneralActionModal
             {...props}
@@ -89,7 +98,7 @@ const GenerateMapModal: React.FC<ActionModalProps> = (props) => {
                     setActionCompleted={setActionCompleted}
                     mapsLinkForSelectedParcels={mapsLinkForSelectedParcels}
                     setSuccessMessage={setSuccessMessage}
-                    postSuccessCallback={props.postSuccessCallback}
+                    postSuccessCallback={postSuccessCallback}
                 />
             )}
         </GeneralActionModal>
