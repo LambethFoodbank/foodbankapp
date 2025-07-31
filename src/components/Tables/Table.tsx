@@ -474,21 +474,20 @@ const Table = <
                             ? filterConfig.setAdditionalFilters
                             : undefined
                     }
+                    columnTogglePopup={
+                        toggleableHeaders.length > 0 ? (
+                            <ColumnTogglePopup
+                                toggleableHeaders={toggleableHeaders}
+                                shownHeaderKeys={shownHeaderKeys}
+                                setShownHeaderKeys={setShownHeaderKeys}
+                                headers={headerKeysAndLabels}
+                            />
+                        ) : undefined
+                    }
                 />
             )}
 
             <RelativeContainerForTable>
-                {toggleableHeaders.length > 0 && (
-                    <ColumnSelectorContainer>
-                        <ColumnTogglePopup
-                            toggleableHeaders={toggleableHeaders}
-                            shownHeaderKeys={shownHeaderKeys}
-                            setShownHeaderKeys={setShownHeaderKeys}
-                            headers={headerKeysAndLabels}
-                        />
-                    </ColumnSelectorContainer>
-                )}
-
                 <TableStyling
                     $rowBreakPointConfigs={rowBreakPointConfigs ?? []}
                     $dividingLineStyleOptions={getDividingLineStyleOptions(theme)}
@@ -565,13 +564,6 @@ const EditAndReorderArrowDiv = styled.div`
 
 const RelativeContainerForTable = styled.div`
     position: relative;
-`;
-
-const ColumnSelectorContainer = styled.div`
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    z-index: 900;
 `;
 
 const TableStyling = styled.div<{
