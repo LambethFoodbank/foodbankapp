@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./GeneralActionModal";
 import { sendAuditLog } from "@/server/auditLog";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
@@ -41,10 +41,21 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
     const [actionShown, setActionShown] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [allClientsDeleted, setAllClientsDeleted] = useState(false);
+
+    useEffect(() => {
+        const allDeleted = props.selectedParcels.every((parcel) => !parcel.clientIsActive);
+        if (allDeleted && props.selectedParcels.length > 0) {
+            setErrorMessage("All selected parcels belong to deleted clients.");
+            setActionShown(false);
+            setAllClientsDeleted(true);
+        }
+    }, [props.selectedParcels]);
 
     const onClose = (): void => {
         props.onClose();
         setErrorMessage(null);
+        setAllClientsDeleted(false);
     };
 
     const onFileCreationCompleted = async (): Promise<void> => {
@@ -76,7 +87,7 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
             errorMessage={errorMessage}
             successMessage={successMessage}
         >
-            {actionShown && (
+            {actionShown && !allClientsDeleted && (
                 <SelectedParcelsReportModalContent
                     selectedParcels={props.selectedParcels}
                     maxParcelsToShow={maxParcelsToShow}
