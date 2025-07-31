@@ -80,14 +80,13 @@ const getReportData = async (
     toDate?: Dayjs,
     parcelIds?: string[]
 ): Promise<FetchReportResult> => {
-    return fromDate && toDate ? getReportDataByDate(reportType, fromDate, toDate) : getReportDatabyList(parcelIds)
-};
 
-const getReportDatabyList = async (
-    parcelIds: string[] | undefined
-): Promise<FetchReportResult> => {
-    if (parcelIds === undefined) {
-        const logId = "Couldn't get parcel Ids";
+    const idAndStatusList = await getParcelIdsAndStatus(reportType, fromDate, toDate, parcelIds);
+
+    const rawParcelList = await getRawParcelList(reportType, idAndStatusList, parcelIds);
+
+    if (typeof rawParcelList === "string") {
+        const logId = "Failed to fetch parcel IDs and statuses";
         return {
             data: null,
             error: {
@@ -96,29 +95,129 @@ const getReportDatabyList = async (
             },
         };
     }
-    const { data: idAndStatusList, error: idFetchError } = await supabase
-        .from("parcels_plus")
-        .select("parcel_id, last_status_event_name")
-        .in("parcel_id", parcelIds);
+    return convertRawParcelListToReportResult(rawParcelList, idAndStatusList);
+};
 
-    if (idFetchError) {
+interface idAndStatus {
+    parcel_id: string | null;
+    last_status_event_name: string | null;
+};
+
+const getParcelIdsAndStatus = async (
+    reportType: string,
+    fromDate?: Dayjs,
+    toDate?: Dayjs,
+    parcelIds?: string[]
+): Promise<idAndStatus[]> => {
+    let query = supabase
+    .from("parcels_plus")
+    .select("parcel_id, last_status_event_name");
+    
+    switch (reportType) {
+        case "signposting":
+            if (!fromDate || !toDate) {
+                return [];
+            }
+            query = query
+            .gte("packing_date", getDbDate(fromDate))
+            .lte("packing_date", getDbDate(toDate))
+            .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
+            break;
+        case "pendingMoreInfo":
+            if (!fromDate || !toDate) {
+                return [];
+            }
+            query = query
+            .gte("packing_date", getDbDate(fromDate))
+            .lte("packing_date", getDbDate(toDate))
+            .or('last_status_event_name.eq."Pending More Info"');
+            break;
+        case "voucherNumber":
+            if (!fromDate || !toDate) {
+                return [];
+            }
+            query = query
+            .gte("packing_date", getDbDate(fromDate))
+            .lte("packing_date", getDbDate(toDate))
+            .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
+            .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
+            .eq("client_is_active", true);
+            break;
+        case "selectedParcels":
+            if (!parcelIds) {
+                return [];
+            }
+            query = query.in("parcel_id", parcelIds);
+            break;
+        default:
+            break;
+    }
+
+    const {data: idAndStatus, error: idFetchError} = await query;
+     if (idFetchError) {
         const logId = await logErrorReturnLogId(
             "Failed to fetch parcel IDs and statuses",
             {
                 error: idFetchError,
             }
         );
-        return {
-            data: null,
-            error: {
-                type: "failedToFetchParcelIds",
-                logId,
-            },
-        };
+        return [];
     }
+    return idAndStatus;
+}
 
-    const { data, error } = await supabase
-        .from("parcels")
+interface rawParcel {
+    primary_key: string;
+    voucher_number: string | null;
+    packing_date: string | null;
+    created_at: string;
+    collection_datetime: string | null;
+    collection_centre: {
+        name: string;
+        is_shown: boolean;
+    } | null;
+    list_type: "regular" | "hotel";
+    client: {
+        full_name: string | null;
+        is_active: boolean;
+        signposting_call_required: boolean | null;
+        flagged_for_attention: boolean | null;
+        phone_number: string | null;
+        signposting_call_reasons: string[] | null;
+        delivery_instructions: string | null;
+        extra_information: string | null;
+        notes: string | null;
+        address_1: string | null;
+        address_2: string | null;
+        address_town: string | null;
+        address_county: string | null;
+        address_postcode: string | null;
+        cooking_facilities: string[] | null;
+        dietary_requirements: string[] | null;
+        hygiene_tampons: string | null;
+        hygiene_pads: string | null;
+        hygiene_other_items: string[] | null;
+        baby_food: string | null;
+        baby_formula: string | null;
+        baby_nappies: string | null;
+        baby_other_items: string[] | null;
+        pet_food: string[] | null;
+        other_items: string[] | null;
+        family: {
+            birth_year: number | null;
+            birth_month: number | null;
+            gender: "male" | "female" | "other" | null;
+            recorded_as_child: boolean | null;
+        }[];
+    } | null;
+};
+
+const getRawParcelList = async (
+    reportType: string,
+    idAndStatusList: idAndStatus[],
+    parcelIds?: string[],
+): Promise<rawParcel[] | string> => {
+    let query = supabase.from("parcels")
         .select(
             `
             primary_key,
@@ -168,227 +267,65 @@ const getReportDatabyList = async (
             )
             `
         )
-        .limit(1, { foreignTable: "clients" })
-        .eq("client.is_active", true)
-        .in("primary_key", parcelIds)
-        .order("packing_date")
-        .order("primary_key");
+        .limit(1, { foreignTable: "clients" });
 
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: Parcel", error);
-        return { data: null, error: { type: "failedToFetchRows", logId: logId } };
-    }
-
-    return {
-        error: null,
-        data: data
-            .filter((rawParcel) => !!rawParcel.client)
-            .map((rawParcel): ReportRow => {
-                return {
-                    voucherNumber: rawParcel.voucher_number ?? "",
-                    packingDate: formatDatetimeAsDate(rawParcel.packing_date),
-                    fullName: rawParcel.client?.full_name ?? "(error)",
-                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
-                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
-                    phoneNumber: rawParcel.client
-                        ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
-                        : "",
-                    signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? null,
-                        signpostingCallOptions
-                    ),
-                    address: rawParcel.client
-                        ? formatAddressFromClientDetails(rawParcel.client)
-                        : "",
-                    parcelStatus:
-                        idAndStatusList.find(
-                            (idAndStatus) => idAndStatus.parcel_id === rawParcel.primary_key
-                        )?.last_status_event_name ?? "(none)",
-                    deliveryOrCollection: rawParcel.collection_centre?.is_shown
-                        ? rawParcel.collection_centre?.name
-                        : `${rawParcel.collection_centre?.name} (inactive)`,
-                    deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
-                    deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
-                    extraInformation: rawParcel.client?.extra_information ?? "",
-                    notes: rawParcel.client?.notes ?? "",
-                    cookingFacilities: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.cooking_facilities ?? null,
-                        cookingFacilitiesOptions
-                    ),
-                    dietaryRequirements: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.dietary_requirements ?? null,
-                        dietaryRequirementOptions
-                    ),
-                    hygieneProducts: formatHygieneProducts(
-                        rawParcel.client?.hygiene_tampons ?? null,
-                        rawParcel.client?.hygiene_pads ?? null,
-                        rawParcel.client?.hygiene_other_items ?? []
-                    ),
-                    babyProducts: formatBabyProducts(
-                        rawParcel.client?.baby_food ?? null,
-                        rawParcel.client?.baby_formula ?? null,
-                        rawParcel.client?.baby_nappies ?? null,
-                        rawParcel.client?.baby_other_items ?? []
-                    ),
-                    petFood: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.pet_food ?? null,
-                        petFoodOptions
-                    ),
-                    otherItems: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.other_items ?? null,
-                        otherRequirementOptions
-                    ),
-                    household: rawParcel.client
-                        ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    adults: rawParcel.client
-                        ? formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    children: rawParcel.client
-                        ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    parcelListType: rawParcel.list_type,
-                    clientIsActive: rawParcel.client?.is_active ?? false,
-                    recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
-                };
-            }),
-    };
-}
-
-const getReportDataByDate = async (
-    reportType: string,
-    fromDate: Dayjs,
-    toDate: Dayjs
-): Promise<FetchReportResult> => {
-    let query = supabase
-    .from("parcels_plus")
-    .select("parcel_id, last_status_event_name")
-    .gte("packing_date", getDbDate(fromDate))
-    .lte("packing_date", getDbDate(toDate));
-    
     switch (reportType) {
         case "signposting":
-            query = query.or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
+            query = query
+                .in(
+                    "primary_key",
+                    idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
+                    )
+                .eq("client.is_active", true)
+                .eq("client.signposting_call_required", true)
+                .order("packing_date")
+                .order("client_id");
             break;
         case "pendingMoreInfo":
-            query = query.or('last_status_event_name.eq."Pending More Info"');
+            query = query
+                .in(
+                    "primary_key",
+                    idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
+                    )
+                .eq("client.is_active", true)
+                .order("packing_date")
+                .order("client_id");
             break;
         case "voucherNumber":
-            query = query.or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
-                .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
-                .eq("client_is_active", true);
+            query = query
+                .in(
+                    "primary_key",
+                    idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
+                    )
+                .order("packing_date")
+                .order("client_id");
+            break;
+        case "selectedParcels":
+            if (!parcelIds) {
+                return "error";
+            }
+            query = query
+                .eq("client.is_active", true)
+                .in("primary_key", parcelIds)
+                .order("packing_date")
+                .order("primary_key");
             break;
         default:
             break;
     }
-
-    const {data: idAndStatusList, error: idFetchError} = await query;
-     if (idFetchError) {
-        const logId = await logErrorReturnLogId(
-            "Failed to fetch parcel IDs and statuses",
-            {
-                error: idFetchError,
-            }
-        );
-        return {
-            data: null,
-            error: {
-                type: "failedToFetchParcelIds",
-                logId,
-            },
-        };
-    }
-
-    let second_query = supabase
-        .from("parcels") 
-        .select(
-            `
-            primary_key,
-            voucher_number,
-            packing_date,
-            created_at,
-            collection_datetime,
-            collection_centre:collection_centres(
-                name,
-                is_shown
-            ),
-            list_type,
-
-            client:clients(
-                full_name,
-                is_active,
-                signposting_call_required,
-                flagged_for_attention,
-                phone_number,
-                signposting_call_reasons,
-                delivery_instructions,
-                extra_information,
-                notes,
-                address_1,
-                address_2,
-                address_town,
-                address_county,
-                address_postcode,
-                cooking_facilities,
-                dietary_requirements,
-                hygiene_tampons,
-                hygiene_pads,
-                hygiene_other_items,
-                baby_food,
-                baby_formula,
-                baby_nappies,
-                baby_other_items,
-                pet_food,
-                other_items,
-
-                family:families(
-                    birth_year,
-                    birth_month,
-                    gender,
-                    recorded_as_child
-                )
-            )
-            `
-        ) // email field should be added to this after VFB-395 is merged
-        .limit(1, { foreignTable: "clients" })
-        .in(
-            "primary_key",
-            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
-        );
-        switch (reportType) {
-            case "signposting":
-                second_query = second_query.eq("client.is_active", true)
-                    .eq("client.signposting_call_required", true)
-                    .order("packing_date")
-                    .order("client_id");
-                break;
-            case "pendingMoreInfo":
-                second_query = second_query.eq("client.is_active", true)
-                    .order("packing_date")
-                    .order("client_id");
-                break;
-            case "voucherNumber":
-                second_query = second_query.order("packing_date")
-                    .order("client_id");
-                break;
-            default:
-                break;
-        }
     
-    const { data: rawParcelList, error: parcelFetchError } = await second_query;
-
-    if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch rows", {
-            error: parcelFetchError,
-        });
-        return {
-            data: null,
-            error: {
-                type: "failedToFetchRows",
-                logId,
-            },
-        };
+    const { data: rawParcel, error: parcelFetchError } = await query;
+    if (parcelFetchError) { 
+        return "error with supabase";
     }
+
+    return rawParcel;
+};
+
+const convertRawParcelListToReportResult = (
+    rawParcelList: rawParcel[],
+    idAndStatusList: idAndStatus[]
+): FetchReportResult => {
     return {
         error: null,
         data: rawParcelList
@@ -466,7 +403,7 @@ const getReportDataByDate = async (
                 };
             }),
     };
-};
+}
 
 interface ButtonProps {
     reportType: string;
