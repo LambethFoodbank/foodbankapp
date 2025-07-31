@@ -110,14 +110,14 @@ const getParcelsForSelectedParcelsReport = async (
                 is_shown
             ),
             list_type,
+            signposting_call_required,
+            signposting_call_reasons,
             flagged_for_attention,
 
             client:clients(
                 full_name,
                 is_active,
-                signposting_call_required,
                 phone_number,
-                signposting_call_reasons,
                 delivery_instructions,
                 extra_information,
                 notes,
@@ -167,13 +167,13 @@ const getParcelsForSelectedParcelsReport = async (
                     voucherNumber: rawParcel.voucher_number ?? "",
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
-                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
+                    signpostingCallRequired: rawParcel.signposting_call_required ?? false,
                     flaggedForAttention: rawParcel.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
                     signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? null,
+                        rawParcel.signposting_call_reasons ?? null,
                         signpostingCallOptions
                     ),
                     address: rawParcel.client
