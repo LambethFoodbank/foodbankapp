@@ -57,75 +57,80 @@ const main = async (): Promise<never> => {
     const thisYear = today.getFullYear();
 
     await seed.clients((generate) =>
-        generate(750, {
-            full_name: (ctx) => copycat.fullName(ctx.seed),
-            phone_number: (ctx) => copycat.phoneNumber(ctx.seed),
-            email: (ctx) => copycat.email(ctx.seed),
-            address_1: (ctx) => copycat.streetAddress(ctx.seed),
-            address_2: (ctx) => copycat.streetAddress(ctx.seed),
-            address_town: (ctx) => copycat.city(ctx.seed),
-            address_county: (ctx) => copycat.state(ctx.seed),
-            address_postcode: (ctx) => copycat.oneOf(ctx.seed, possiblePostCodes),
-            delivery_instructions: (ctx) => copycat.oneOf(ctx.seed, defaultDeliveryInstructions),
-            family_id: (ctx) => copycat.uuid(ctx.seed),
-            default_list: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
-            cooking_facilities: (ctx) =>
-                copycat.someOf(
-                    ctx.seed,
-                    [0, possibleCookingFacilities.length],
-                    possibleCookingFacilities
-                ),
-            dietary_requirements: (ctx) =>
-                copycat.someOf(
-                    ctx.seed,
-                    [0, possibleDietaryRequirements.length],
-                    possibleDietaryRequirements
-                ),
-            pet_food: (ctx) => copycat.someOf(ctx.seed, [0, possiblePets.length], possiblePets),
-            hygiene_pads: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
-            hygiene_tampons: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
-            hygiene_other_items: (ctx) =>
-                copycat.someOf(
-                    ctx.seed,
-                    [0, possibleHygieneOtherItems.length],
-                    possibleHygieneOtherItems
-                ),
-            baby_nappies: (ctx) => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
-            baby_formula: (ctx) => copycat.oneOf(ctx.seed, possibleBabyFormula),
-            baby_food: (ctx) => copycat.oneOf(ctx.seed, possibleBabyFoods),
-            baby_other_items: (ctx) =>
-                copycat.someOf(
-                    ctx.seed,
-                    [0, possibleBabyOtherItems.length],
-                    possibleBabyOtherItems
-                ),
-            other_items: (ctx) =>
-                copycat.someOf(ctx.seed, [0, possibleOtherItems.length], possibleOtherItems),
-            extra_information: (ctx) => copycat.oneOf(ctx.seed, defaultExtraInformation),
-            flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
-            signposting_call_required: (ctx) => copycat.bool(ctx.seed),
-            signposting_call_reasons: (ctx) =>
-                copycat.someOf(
-                    ctx.seed,
-                    [0, possibleSignpostingCallReasons.length],
-                    possibleSignpostingCallReasons
-                ),
-            is_active: (ctx) => copycat.oneOf(ctx.seed, booleansWeightedToTrue),
-            families: (generateFamily) =>
-                generateFamily(
-                    { min: 1, max: 8 },
-                    {
-                        birth_year: (ctx) =>
-                            copycat.int(ctx.seed, { min: thisYear - 120, max: thisYear }),
-                        birth_month: (ctx) =>
-                            copycat.oneOf(ctx.seed, [
-                                null,
-                                copycat.int(ctx.seed, { min: 1, max: 12 }),
-                            ]),
-                        gender: (ctx) => copycat.oneOf(ctx.seed, genders),
-                    }
-                ),
-            notes: (ctx) => copycat.oneOf(ctx.seed, defaultNotes),
+        generate(750, (ctx) => {
+            const callRequired = copycat.bool(ctx.seed);
+
+            return {
+                full_name: () => copycat.fullName(ctx.seed),
+                phone_number: () => copycat.phoneNumber(ctx.seed),
+                address_1: () => copycat.streetAddress(ctx.seed),
+                address_2: () => copycat.streetAddress(ctx.seed),
+                address_town: () => copycat.city(ctx.seed),
+                address_county: () => copycat.state(ctx.seed),
+                address_postcode: () => copycat.oneOf(ctx.seed, possiblePostCodes),
+                delivery_instructions: () => copycat.oneOf(ctx.seed, defaultDeliveryInstructions),
+                family_id: () => copycat.uuid(ctx.seed),
+                default_list: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
+                cooking_facilities: () =>
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleCookingFacilities.length],
+                        possibleCookingFacilities
+                    ),
+                dietary_requirements: () =>
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleDietaryRequirements.length],
+                        possibleDietaryRequirements
+                    ),
+                pet_food: () => copycat.someOf(ctx.seed, [0, possiblePets.length], possiblePets),
+                hygiene_pads: () => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
+                hygiene_tampons: () => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
+                hygiene_other_items: () =>
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleHygieneOtherItems.length],
+                        possibleHygieneOtherItems
+                    ),
+                baby_nappies: () => copycat.oneOf(ctx.seed, [null, copycat.digit(ctx.seed)]),
+                baby_formula: () => copycat.oneOf(ctx.seed, possibleBabyFormula),
+                baby_food: () => copycat.oneOf(ctx.seed, possibleBabyFoods),
+                baby_other_items: () =>
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleBabyOtherItems.length],
+                        possibleBabyOtherItems
+                    ),
+                other_items: () =>
+                    copycat.someOf(ctx.seed, [0, possibleOtherItems.length], possibleOtherItems),
+                extra_information: () => copycat.oneOf(ctx.seed, defaultExtraInformation),
+                flagged_for_attention: () => copycat.bool(ctx.seed),
+                signposting_call_required: () => callRequired,
+                signposting_call_reasons: () =>
+                    callRequired
+                        ? copycat.someOf(
+                              ctx.seed,
+                              [1, Math.min(3, possibleSignpostingCallReasons.length)],
+                              possibleSignpostingCallReasons
+                          )
+                        : [],
+                is_active: () => copycat.oneOf(ctx.seed, booleansWeightedToTrue),
+                families: (generateFamily) =>
+                    generateFamily(
+                        { min: 1, max: 8 },
+                        {
+                            birth_year: (ctx) =>
+                                copycat.int(ctx.seed, { min: thisYear - 120, max: thisYear }),
+                            birth_month: (ctx) =>
+                                copycat.oneOf(ctx.seed, [
+                                    null,
+                                    copycat.int(ctx.seed, { min: 1, max: 12 }),
+                                ]),
+                            gender: (ctx) => copycat.oneOf(ctx.seed, genders),
+                        }
+                    ),
+                notes: () => copycat.oneOf(ctx.seed, defaultNotes),
+            };
         })
     );
 
