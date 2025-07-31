@@ -357,10 +357,10 @@ const getReportDataByDate = async (
         );
         switch (reportType) {
             case "signposting":
-                second_query = second_query.or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
-                    // eslint-disable-next-line quotes
-                    .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
-                    .eq("client_is_active", true);
+                second_query = second_query.eq("client.is_active", true)
+                    .eq("client.signposting_call_required", true)
+                    .order("packing_date")
+                    .order("client_id");
                 break;
             case "pendingMoreInfo":
                 second_query = second_query.eq("client.is_active", true)
