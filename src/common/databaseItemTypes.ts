@@ -2,7 +2,7 @@ import { Database } from "@/databaseTypesFile";
 
 export type ItemType = Database["public"]["Enums"]["item_type"];
 
-export const getItemTypeLabel = {
+export const itemTypeLabels = {
     regular_food: "Regular Food",
     alternative_food: "Alternative Food",
     pet_food: "Pet Food",

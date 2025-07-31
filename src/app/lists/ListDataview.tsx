@@ -1,6 +1,6 @@
 "use client";
 
-import { getItemTypeLabel, ItemType } from "@/common/databaseItemTypes";
+import { itemTypeLabels, ItemType } from "@/common/databaseItemTypes";
 import {
     ClientPaginatedTable,
     ColumnDisplayFunctions,
@@ -119,7 +119,7 @@ const displayBoolean = (value: boolean): React.ReactElement => {
 
 const listDataViewColumnDisplayFunctions = {
     is_available: (value: boolean) => displayBoolean(value),
-    item_type: (value: ItemType) => getItemTypeLabel[value] ?? value,
+    item_type: (value: ItemType) => itemTypeLabels[value] ?? value,
     ...Object.fromEntries(
         listsHeaderKeysAndLabels
             .slice(1)
