@@ -151,19 +151,35 @@ const main = async (): Promise<never> => {
 
     await seed.parcels(
         (generate) =>
-            generate(7500, {
-                voucher_number: (ctx) => getFormattedVoucherNumber(ctx.seed),
-                packing_date: (ctx) =>
-                    getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
-                collection_datetime: (ctx) =>
-                    getPseudoRandomDateBetween(earliestParcelOrEventDate, farFutureDate, ctx.seed),
-                list_type: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
-                referral_agency: (ctx) => copycat.oneOf(ctx.seed, possibleReferralAgency),
-                referrer_name: (ctx) => copycat.fullName(ctx.seed),
-                referrer_email: (ctx) => copycat.email(ctx.seed),
-                referrer_phone: (ctx) => copycat.phoneNumber(ctx.seed),
-                notes: (ctx) => copycat.oneOf(ctx.seed, defaultParcelNotes),
-                created_at: parcelCreationDateTime,
+            generate(7500, (ctx) => {
+                const agency = copycat.bool(ctx.seed)
+                    ? copycat.oneOf(ctx.seed, possibleReferralAgency)
+                    : "";
+
+                return {
+                    voucher_number: () => getFormattedVoucherNumber(ctx.seed),
+                    packing_date: () =>
+                        getPseudoRandomDateBetween(
+                            earliestParcelOrEventDate,
+                            farFutureDate,
+                            ctx.seed
+                        ),
+                    collection_datetime: () =>
+                        getPseudoRandomDateBetween(
+                            earliestParcelOrEventDate,
+                            farFutureDate,
+                            ctx.seed
+                        ),
+                    list_type: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
+
+                    referral_agency: () => agency,
+                    referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
+                    referrer_email: () => (agency ? copycat.email(ctx.seed) : ""),
+                    referrer_phone: () => (agency ? copycat.phoneNumber(ctx.seed) : ""),
+
+                    notes: () => copycat.oneOf(ctx.seed, defaultParcelNotes),
+                    created_at: parcelCreationDateTime,
+                };
             }),
         { connect: true }
     );
