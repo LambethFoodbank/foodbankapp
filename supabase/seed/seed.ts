@@ -147,6 +147,13 @@ const main = async (): Promise<never> => {
                 list_type: (ctx) => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
                 created_at: parcelCreationDateTime,
                 flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
+                signposting_call_required: (ctx) => copycat.bool(ctx.seed),
+                signposting_call_reasons: (ctx) =>
+                    copycat.someOf(
+                        ctx.seed,
+                        [0, possibleSignpostingCallReasons.length],
+                        possibleSignpostingCallReasons
+                    ),
             }),
         { connect: true }
     );
