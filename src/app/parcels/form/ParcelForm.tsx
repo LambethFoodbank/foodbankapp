@@ -7,6 +7,7 @@ import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
     CardProps,
+    checkboxGroupToArray,
     checkErrorOnSubmit,
     createSetter,
     Errors,
@@ -55,6 +56,8 @@ import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 import AttentionFlagCard from "@/app/parcels/form/formSections/AttentionFlagCard";
+import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
+import SignpostingCallCard from "@/app/parcels/form/formSections/SignpostingCallCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -74,6 +77,8 @@ export interface ParcelFields extends Fields {
     deliveryInstructions: string | null;
     notes: string | null;
     attentionFlag: boolean | null;
+    signpostingCall: boolean;
+    signpostingCallReasons: BooleanGroup | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -114,6 +119,8 @@ export const initialParcelFields: ParcelFields = {
     deliveryInstructions: null,
     notes: null,
     attentionFlag: null,
+    signpostingCall: false,
+    signpostingCallReasons: null,
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -154,6 +161,7 @@ const withCollectionFormSections = [
     CollectionDateCard,
     CollectionSlotCard,
     AttentionFlagCard,
+    SignpostingCallCard,
     ParcelNotesCard,
 ];
 
@@ -164,6 +172,7 @@ const noCollectionFormSections = [
     PackingSlotsCard,
     ShippingMethodCard,
     AttentionFlagCard,
+    SignpostingCallCard,
     DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
@@ -341,6 +350,11 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             referrer_phone: fields.referrerPhone,
             notes: fields.notes,
             flagged_for_attention: fields.attentionFlag,
+            signposting_call_required: fields.signpostingCall,
+            signposting_call_reasons:
+                fields.signpostingCall && fields.signpostingCallReasons !== null
+                    ? checkboxGroupToArray(fields.signpostingCallReasons)
+                    : null,
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(

@@ -25,6 +25,7 @@ import { Errors } from "@/components/Form/formFunctions";
 import Title from "@/components/Title/Title";
 import supabase from "@/supabaseClient";
 import ParcelForm, { initialParcelFields, ParcelErrors, ParcelFields } from "../form/ParcelForm";
+import { arrayToBooleanGroup } from "@/app/clients/edit/[id]/autofill";
 
 interface EditParcelFormProps {
     parcelId: string;
@@ -56,6 +57,11 @@ const prepareParcelDataForForm = (
         referrerName: parcelData.referrer_name ?? "",
         referrerEmail: parcelData.referrer_email ?? "",
         referrerPhone: parcelData.referrer_phone ?? "",
+        signpostingCall: parcelData.signposting_call_required ?? false,
+        signpostingCallReasons:
+            parcelData.signposting_call_reasons !== null
+                ? arrayToBooleanGroup(parcelData.signposting_call_reasons)
+                : null,
     };
 };
 
