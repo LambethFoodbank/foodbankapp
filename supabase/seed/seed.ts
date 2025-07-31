@@ -38,11 +38,7 @@ import {
     eventNamesWithNoData,
     eventNamesWithNumberData,
 } from "./eventsSeed";
-import {
-    defaultParcelNotes,
-    getFormattedVoucherNumber,
-    possibleReferralAgency,
-} from "./parcelsSeed";
+import { getFormattedVoucherNumber, possibleReferralAgency } from "./parcelsSeed";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
