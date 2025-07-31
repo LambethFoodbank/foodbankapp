@@ -113,6 +113,7 @@ export const possibleBabyFoods = [
     "Pear Mash",
     "Mixed Vegetable Puree",
     "Other",
+    null,
 ];
 
 export const possibleBabyFormula = [
@@ -126,6 +127,7 @@ export const possibleBabyFormula = [
     "Bobbie Organic Infant Formula",
     "Parent’s Choice Infant Formula",
     "Other",
+    null,
 ];
 
 export const defaultNotes = [
