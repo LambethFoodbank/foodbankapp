@@ -316,7 +316,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             signposting_call_reasons:
                 fields.signpostingCall && fields.signpostingCallReasons !== null
                     ? checkboxGroupToArray(fields.signpostingCallReasons)
-                    : null,
+                    : [],
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(parcelRecord);
