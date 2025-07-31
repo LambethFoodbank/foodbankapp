@@ -652,10 +652,12 @@ const TableStyling = styled.div<{
     & .rdt_TableHeadRow,
     & .rdt_TableCol,
     & .rdt_Table {
-        text-align: start;
+        //text-align: start;
         font-size: 1rem;
         background-color: transparent;
         color: ${(props) => props.theme.main.foreground[2]};
+        text-align: center;
+        justify-content: center;
     }
 
     & .rdt_Table {
@@ -693,7 +695,7 @@ const TableStyling = styled.div<{
     }
 
     & .rdt_TableRow {
-        text-align: start;
+        text-align: center;
         font-size: 1rem;
         background-color: ${(props) => props.theme.main.background[1]};
     }
