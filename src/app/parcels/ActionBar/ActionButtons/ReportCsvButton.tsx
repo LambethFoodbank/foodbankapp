@@ -23,8 +23,11 @@ import CsvButton, {
 import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { PostgrestSingleResponse } from "@supabase/supabase-js";
+import { queryByTestId } from "@testing-library/dom";
+import { ParcelsTableRow } from "../../parcelsTable/types";
 
-type FetchReportResult =
+export type FetchReportResult =
     | {
           data: ReportRow[];
           error: null;
@@ -39,12 +42,12 @@ export interface FetchReportError {
     logId: string;
 }
 
-type FetchReportErrorType =
+export type FetchReportErrorType =
     | "failedToFetchRows"
     | "noRowsForInterval"
     | "failedToFetchParcelIds";
 
-type ReportRow = {
+export type ReportRow = {
     voucherNumber: string;
     packingDate: string;
     fullName: string;
@@ -74,99 +77,32 @@ type ReportRow = {
     recordCreatedOn: string;
 };
 
-const getReportData = async (
-    reportType: string,
-    fromDate?: Dayjs,
-    toDate?: Dayjs,
-    parcelIds?: string[]
-): Promise<FetchReportResult> => {
-
-    const idAndStatusList = await getParcelIdsAndStatus(reportType, fromDate, toDate, parcelIds);
-
-    const rawParcelList = await getRawParcelList(reportType, idAndStatusList, parcelIds);
-
-    if (typeof rawParcelList === "string") {
-        const logId = "Failed to fetch parcel IDs and statuses";
-        return {
-            data: null,
-            error: {
-                type: "failedToFetchParcelIds",
-                logId,
-            },
-        };
-    }
-    return convertRawParcelListToReportResult(rawParcelList, idAndStatusList);
-};
-
-interface idAndStatus {
+export interface idAndStatus {
     parcel_id: string | null;
     last_status_event_name: string | null;
 };
 
-const getParcelIdsAndStatus = async (
-    reportType: string,
+export const getParcelIdsAndStatusQuery = (
     fromDate?: Dayjs,
     toDate?: Dayjs,
-    parcelIds?: string[]
-): Promise<idAndStatus[]> => {
+    parcelIds?: string[] 
+): typeof query => {
     let query = supabase
     .from("parcels_plus")
     .select("parcel_id, last_status_event_name");
-    
-    switch (reportType) {
-        case "signposting":
-            if (!fromDate || !toDate) {
-                return [];
-            }
-            query = query
-            .gte("packing_date", getDbDate(fromDate))
-            .lte("packing_date", getDbDate(toDate))
-            .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
-            break;
-        case "pendingMoreInfo":
-            if (!fromDate || !toDate) {
-                return [];
-            }
-            query = query
-            .gte("packing_date", getDbDate(fromDate))
-            .lte("packing_date", getDbDate(toDate))
-            .or('last_status_event_name.eq."Pending More Info"');
-            break;
-        case "voucherNumber":
-            if (!fromDate || !toDate) {
-                return [];
-            }
-            query = query
-            .gte("packing_date", getDbDate(fromDate))
-            .lte("packing_date", getDbDate(toDate))
-            .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
-            .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
-            .eq("client_is_active", true);
-            break;
-        case "selectedParcels":
-            if (!parcelIds) {
-                return [];
-            }
-            query = query.in("parcel_id", parcelIds);
-            break;
-        default:
-            break;
-    }
 
-    const {data: idAndStatus, error: idFetchError} = await query;
-     if (idFetchError) {
-        const logId = await logErrorReturnLogId(
-            "Failed to fetch parcel IDs and statuses",
-            {
-                error: idFetchError,
-            }
-        );
-        return [];
+    if (fromDate && toDate) {
+        query = query
+        .gte("packing_date", getDbDate(fromDate))
+        .lte("packing_date", getDbDate(toDate));
+    } else if (parcelIds) {
+        query = query
+        .in("parcel_id", parcelIds);
     }
-    return idAndStatus;
+    return query;
 }
 
-interface rawParcel {
+export interface rawParcel {
     primary_key: string;
     voucher_number: string | null;
     packing_date: string | null;
@@ -212,11 +148,7 @@ interface rawParcel {
     } | null;
 };
 
-const getRawParcelList = async (
-    reportType: string,
-    idAndStatusList: idAndStatus[],
-    parcelIds?: string[],
-): Promise<rawParcel[] | string> => {
+export const getRawParcelListQuery = (): typeof query => {
     let query = supabase.from("parcels")
         .select(
             `
@@ -269,60 +201,10 @@ const getRawParcelList = async (
         )
         .limit(1, { foreignTable: "clients" });
 
-    switch (reportType) {
-        case "signposting":
-            query = query
-                .in(
-                    "primary_key",
-                    idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
-                    )
-                .eq("client.is_active", true)
-                .eq("client.signposting_call_required", true)
-                .order("packing_date")
-                .order("client_id");
-            break;
-        case "pendingMoreInfo":
-            query = query
-                .in(
-                    "primary_key",
-                    idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
-                    )
-                .eq("client.is_active", true)
-                .order("packing_date")
-                .order("client_id");
-            break;
-        case "voucherNumber":
-            query = query
-                .in(
-                    "primary_key",
-                    idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
-                    )
-                .order("packing_date")
-                .order("client_id");
-            break;
-        case "selectedParcels":
-            if (!parcelIds) {
-                return "error";
-            }
-            query = query
-                .eq("client.is_active", true)
-                .in("primary_key", parcelIds)
-                .order("packing_date")
-                .order("primary_key");
-            break;
-        default:
-            break;
-    }
-    
-    const { data: rawParcel, error: parcelFetchError } = await query;
-    if (parcelFetchError) { 
-        return "error with supabase";
-    }
-
-    return rawParcel;
+    return query;
 };
 
-const convertRawParcelListToReportResult = (
+export const convertRawParcelListToReportResult = (
     rawParcelList: rawParcel[],
     idAndStatusList: idAndStatus[]
 ): FetchReportResult => {
@@ -405,44 +287,29 @@ const convertRawParcelListToReportResult = (
     };
 }
 
-interface ButtonProps {
-    reportType: string;
-    fromDate: Dayjs;
-    toDate: Dayjs;
+export interface ButtonProps {
+    fromDate?: Dayjs;
+    toDate?: Dayjs;
+    parcels?: ParcelsTableRow[];
     onFileCreationCompleted: () => void;
     onFileCreationFailed: (error: FetchReportError) => void;
-    disabled: boolean;
+    disabled?: boolean;
+    getReportDataByDate?: (fromDate: Dayjs, toDate: Dayjs) => Promise<FetchReportResult>;
+    getReportDataByList?: (parcels: string[]) => Promise<FetchReportResult>;
+    fileName: string;
 }
 
-const formatReportType = (actionName: string): string => {
-    if (actionName.includes("Signposting")) {
-        return "signposting";
-    } else if (actionName.includes("Pending")) {
-        return "pendingMoreInfo";
-    } else if (actionName.includes("Voucher")) {
-        return "voucherNumber";
-    }
-    return "selectedParcels";
-}
-
-const formatFileName = (reportType: string): string => {
-    if (reportType === "signposting") {
-        return "SignpostingReport.csv";
-    } else if (reportType === "pendingMoreInfo") {
-        return "PendingMoreInfoReport.csv";
-    } else if (reportType === "voucherNumber") {
-        return "MissingVoucherNumberReport.csv";
-    }
-    return "SelectedParcelsReport.csv";
-}
 
 const ReportCsvButton = ({
-    reportType,
     fromDate,
     toDate,
+    parcels,
     onFileCreationCompleted,
     onFileCreationFailed,
     disabled,
+    getReportDataByDate,
+    getReportDataByList,
+    fileName,
 }: ButtonProps): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<
@@ -450,19 +317,41 @@ const ReportCsvButton = ({
             FetchReportErrorType
         >
     > => {
-        reportType = formatReportType(reportType);
-        const { data: requiredData, error } = await getReportData(
-            reportType,
-            fromDate,
-            toDate
-        );
-        if (error) {
-            return { data: null, error };
+        if (fromDate && toDate && getReportDataByDate) {
+            const { data: requiredData, error } = await getReportDataByDate(
+                fromDate,
+                toDate
+            )
+            if (error) {
+                return { data: null, error };
+            }
+            return {
+                data: { fileData: requiredData, fileName: fileName },
+                error: null,
+            };
+        } else if (parcels && getReportDataByList) {
+            const parcelIds = parcels.map((parcel) => {
+                return parcel.parcelId;
+            });
+            const { data: requiredData, error } = await getReportDataByList(
+                parcelIds
+            )
+            if (error) {
+                return { data: null, error };
+            }
+            return {
+                data: { fileData: requiredData, fileName: fileName },
+                error: null,
+            };
+        } else {
+            return {
+                data: null,
+                error: {
+                    type: "failedToFetchParcelIds",
+                    logId: "No selected Rows"
+                } 
+            };
         }
-        return {
-            data: { fileData: requiredData, fileName: formatFileName(reportType) },
-            error: null,
-        };
     };
 
     return (

@@ -3,15 +3,15 @@
 import React, { useState } from "react";
 import GeneralActionModal, { ActionModalProps } from "./GeneralActionModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import PendingMoreInfoReportCsvButton, {
-    FetchPendingMoreInfoReportError,
-} from "../ActionButtons/PendingMoreInfoReportCsvButton";
+import MissingVoucherNumberReportCsvButton, {
+    FetchMissingVoucherNumberReportError,
+} from "../ActionButtons/VoucherNumberReportCsvButton";
 import dayjs from "dayjs";
 import DateRangeInputs, { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { sendAuditLog } from "@/server/auditLog";
 import styled from "styled-components";
 
-interface PendingMoreInfoReportInputProps {
+interface MissingVoucherNumberReportInputProps {
     dateRange: DateRangeState;
     setRange: (range: DateRangeState) => void;
 }
@@ -21,7 +21,7 @@ interface ContentProps {
     setRange: (range: DateRangeState) => void;
     isInputValid: boolean;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (csvError: FetchPendingMoreInfoReportError) => void;
+    onFileCreationFailed: (csvError: FetchMissingVoucherNumberReportError) => void;
 }
 
 const InputContainer = styled.div`
@@ -30,7 +30,7 @@ const InputContainer = styled.div`
     gap: 1rem;
 `;
 
-const PendingMoreInfoReportInput: React.FC<PendingMoreInfoReportInputProps> = (props) => {
+const MissingVoucherNumberReportInput: React.FC<MissingVoucherNumberReportInputProps> = (props) => {
     return (
         <InputContainer>
             <DateRangeInputs range={props.dateRange} setRange={props.setRange} />
@@ -38,7 +38,7 @@ const PendingMoreInfoReportInput: React.FC<PendingMoreInfoReportInputProps> = (p
     );
 };
 
-const PendingMoreInfoReportModalContent: React.FC<ContentProps> = ({
+const MissingVoucherNumberReportModalContent: React.FC<ContentProps> = ({
     dateRange,
     setRange,
     isInputValid,
@@ -47,9 +47,9 @@ const PendingMoreInfoReportModalContent: React.FC<ContentProps> = ({
 }) => {
     return (
         <form>
-            <PendingMoreInfoReportInput dateRange={dateRange} setRange={setRange} />
+            <MissingVoucherNumberReportInput dateRange={dateRange} setRange={setRange} />
             <Centerer>
-                <PendingMoreInfoReportCsvButton
+                <MissingVoucherNumberReportCsvButton
                     fromDate={dateRange.from}
                     toDate={dateRange.to}
                     onFileCreationCompleted={onFileCreationCompleted}
@@ -61,7 +61,7 @@ const PendingMoreInfoReportModalContent: React.FC<ContentProps> = ({
     );
 };
 
-const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
+const MissingVoucherNumberReportModal: React.FC<ActionModalProps> = (props) => {
     const [actionCompleted, setActionCompleted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -77,10 +77,10 @@ const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
     };
 
     const onFileCreationCompleted = async (): Promise<void> => {
-        setSuccessMessage("PendingMoreInfo Report Created");
+        setSuccessMessage("Missing Voucher Number Report Created");
         setActionCompleted(true);
         void sendAuditLog({
-            action: "generate pendingMoreInfo report",
+            action: "generate missing voucher number report",
             wasSuccess: true,
             content: {
                 fromDate: dateRange.from.toString(),
@@ -90,15 +90,11 @@ const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
         props.postSuccessCallback();
     };
 
-    const onFileCreationFailed = (csvError: FetchPendingMoreInfoReportError): void => {
-        if (csvError.type == "noPendingMoreInfoRowsForInterval") {
-            setErrorMessage("No parcels with specified status to create Pending More Info report");
-        } else {
-            setErrorMessage("Failed to fetch pendingMoreInfo report data");
-        }
+    const onFileCreationFailed = (csvError: FetchMissingVoucherNumberReportError): void => {
+        setErrorMessage("Failed to fetch missing voucher number report data");
         setActionCompleted(true);
         void sendAuditLog({
-            action: "generate pendingMoreInfo report",
+            action: "generate missing voucher number report",
             wasSuccess: false,
             content: {
                 fromDate: dateRange.from.toString(),
@@ -116,7 +112,7 @@ const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
             successMessage={successMessage}
         >
             {!actionCompleted && (
-                <PendingMoreInfoReportModalContent
+                <MissingVoucherNumberReportModalContent
                     dateRange={dateRange}
                     setRange={setDateRange}
                     isInputValid={isInputValid}
@@ -128,4 +124,4 @@ const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
     );
 };
 
-export default PendingMoreInfoReportModal;
+export default MissingVoucherNumberReportModal;

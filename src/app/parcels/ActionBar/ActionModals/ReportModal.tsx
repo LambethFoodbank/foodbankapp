@@ -15,7 +15,6 @@ interface ReportInputProps {
 }
 
 interface ContentProps {
-    reportType: string;
     dateRange: DateRangeState;
     setRange: (range: DateRangeState) => void;
     isInputValid: boolean;
@@ -38,7 +37,6 @@ const ReportInput: React.FC<ReportInputProps> = (props) => {
 };
 
 const ReportModalContent: React.FC<ContentProps> = ({
-    reportType,
     dateRange,
     setRange,
     isInputValid,
@@ -50,12 +48,12 @@ const ReportModalContent: React.FC<ContentProps> = ({
             <ReportInput dateRange={dateRange} setRange={setRange} />
             <Centerer>
                 <ReportCsvButton
-                    reportType={reportType}
                     fromDate={dateRange.from}
                     toDate={dateRange.to}
                     onFileCreationCompleted={onFileCreationCompleted}
                     onFileCreationFailed={onFileCreationFailed}
                     disabled={!isInputValid}
+                    fileName=""
                 />
             </Centerer>
         </form>
@@ -68,7 +66,6 @@ const ReportModal: React.FC<ActionModalProps> = (props) => {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const [dateRange, setDateRange] = useState<DateRangeState>({ from: dayjs(), to: dayjs() });
-    // const [reportType, setReportType] = useState<string>("");
     const isInputValid = dateRange.from <= dateRange.to;
 
     const onClose = (): void => {
@@ -114,7 +111,6 @@ const ReportModal: React.FC<ActionModalProps> = (props) => {
         >
             {!actionCompleted && (
                 <ReportModalContent
-                    reportType={props.actionName}
                     dateRange={dateRange}
                     setRange={setDateRange}
                     isInputValid={isInputValid}
