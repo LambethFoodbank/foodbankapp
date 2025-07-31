@@ -60,6 +60,7 @@ const getSignpostingRawParcelList = async (
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
+        .eq("signposting_call_required", true)
         .order("packing_date")
         .order("client_id");
     if (parcelFetchError) {
