@@ -605,6 +605,8 @@ export type Database = {
           referrer_email: string | null
           referrer_name: string | null
           referrer_phone: string | null
+          signposting_call_reasons: string[] | null
+          signposting_call_required: boolean | null
           voucher_number: string | null
         }
         Insert: {
@@ -623,6 +625,8 @@ export type Database = {
           referrer_email?: string | null
           referrer_name?: string | null
           referrer_phone?: string | null
+          signposting_call_reasons?: string[] | null
+          signposting_call_required?: boolean | null
           voucher_number?: string | null
         }
         Update: {
@@ -641,6 +645,8 @@ export type Database = {
           referrer_email?: string | null
           referrer_name?: string | null
           referrer_phone?: string | null
+          signposting_call_reasons?: string[] | null
+          signposting_call_required?: boolean | null
           voucher_number?: string | null
         }
         Relationships: [
@@ -993,6 +999,8 @@ export type Database = {
           packing_slot_name: string | null
           packing_slot_order: number | null
           parcel_id: string | null
+          parcel_notes: string | null
+          parcel_signposting_call_required: boolean | null
           referral_agency: string | null
           referrer_email: string | null
           referrer_name: string | null
