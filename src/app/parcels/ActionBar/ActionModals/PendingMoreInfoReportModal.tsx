@@ -3,13 +3,12 @@
 import React, { useState } from "react";
 import GeneralActionModal, { ActionModalProps } from "./GeneralActionModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import PendingMoreInfoReportCsvButton, {
-    FetchPendingMoreInfoReportError,
-} from "../ActionButtons/PendingMoreInfoReportCsvButton";
+import PendingMoreInfoReportCsvButton from "../ActionButtons/PendingMoreInfoReportCsvButton";
 import dayjs from "dayjs";
 import DateRangeInputs, { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { sendAuditLog } from "@/server/auditLog";
 import styled from "styled-components";
+import { FetchReportError } from "../ActionButtons/ReportCsvButton";
 
 interface PendingMoreInfoReportInputProps {
     dateRange: DateRangeState;
@@ -21,7 +20,7 @@ interface ContentProps {
     setRange: (range: DateRangeState) => void;
     isInputValid: boolean;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (csvError: FetchPendingMoreInfoReportError) => void;
+    onFileCreationFailed: (csvError: FetchReportError) => void;
 }
 
 const InputContainer = styled.div`
@@ -55,6 +54,7 @@ const PendingMoreInfoReportModalContent: React.FC<ContentProps> = ({
                     onFileCreationCompleted={onFileCreationCompleted}
                     onFileCreationFailed={onFileCreationFailed}
                     disabled={!isInputValid}
+                    fileName=""
                 />
             </Centerer>
         </form>

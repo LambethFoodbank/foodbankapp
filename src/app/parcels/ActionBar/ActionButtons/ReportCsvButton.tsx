@@ -20,11 +20,8 @@ import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButt
 import CsvButton, {
     formatNumberAsStringForCsv,
 } from "@/components/FileGenerationButtons/CsvButton";
-import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
-import { PostgrestSingleResponse } from "@supabase/supabase-js";
-import { queryByTestId } from "@testing-library/dom";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 
 export type FetchReportResult =
@@ -80,27 +77,24 @@ export type ReportRow = {
 export interface idAndStatus {
     parcel_id: string | null;
     last_status_event_name: string | null;
-};
+}
 
 export const getParcelIdsAndStatusQuery = (
     fromDate?: Dayjs,
     toDate?: Dayjs,
-    parcelIds?: string[] 
+    parcelIds?: string[]
 ): typeof query => {
-    let query = supabase
-    .from("parcels_plus")
-    .select("parcel_id, last_status_event_name");
+    let query = supabase.from("parcels_plus").select("parcel_id, last_status_event_name");
 
     if (fromDate && toDate) {
         query = query
-        .gte("packing_date", getDbDate(fromDate))
-        .lte("packing_date", getDbDate(toDate));
+            .gte("packing_date", getDbDate(fromDate))
+            .lte("packing_date", getDbDate(toDate));
     } else if (parcelIds) {
-        query = query
-        .in("parcel_id", parcelIds);
+        query = query.in("parcel_id", parcelIds);
     }
     return query;
-}
+};
 
 export interface rawParcel {
     primary_key: string;
@@ -146,10 +140,11 @@ export interface rawParcel {
             recorded_as_child: boolean | null;
         }[];
     } | null;
-};
+}
 
 export const getRawParcelListQuery = (): typeof query => {
-    let query = supabase.from("parcels")
+    const query = supabase
+        .from("parcels")
         .select(
             `
             primary_key,
@@ -285,7 +280,7 @@ export const convertRawParcelListToReportResult = (
                 };
             }),
     };
-}
+};
 
 export interface ButtonProps {
     fromDate?: Dayjs;
@@ -299,7 +294,6 @@ export interface ButtonProps {
     fileName: string;
 }
 
-
 const ReportCsvButton = ({
     fromDate,
     toDate,
@@ -312,16 +306,10 @@ const ReportCsvButton = ({
     fileName,
 }: ButtonProps): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
-        FileGenerationDataFetchResponse<
-            ReportRow[],
-            FetchReportErrorType
-        >
+        FileGenerationDataFetchResponse<ReportRow[], FetchReportErrorType>
     > => {
         if (fromDate && toDate && getReportDataByDate) {
-            const { data: requiredData, error } = await getReportDataByDate(
-                fromDate,
-                toDate
-            )
+            const { data: requiredData, error } = await getReportDataByDate(fromDate, toDate);
             if (error) {
                 return { data: null, error };
             }
@@ -333,9 +321,7 @@ const ReportCsvButton = ({
             const parcelIds = parcels.map((parcel) => {
                 return parcel.parcelId;
             });
-            const { data: requiredData, error } = await getReportDataByList(
-                parcelIds
-            )
+            const { data: requiredData, error } = await getReportDataByList(parcelIds);
             if (error) {
                 return { data: null, error };
             }
@@ -348,8 +334,8 @@ const ReportCsvButton = ({
                 data: null,
                 error: {
                     type: "failedToFetchParcelIds",
-                    logId: "No selected Rows"
-                } 
+                    logId: "No selected Rows",
+                },
             };
         }
     };
@@ -366,4 +352,4 @@ const ReportCsvButton = ({
     );
 };
 
-export default ReportCsvButton;;
+export default ReportCsvButton;

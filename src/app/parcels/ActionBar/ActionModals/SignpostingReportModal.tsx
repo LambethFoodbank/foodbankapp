@@ -3,13 +3,12 @@
 import React, { useState } from "react";
 import GeneralActionModal, { ActionModalProps } from "./GeneralActionModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import SignpostingReportCsvButton, {
-    FetchSignpostingReportError,
-} from "../ActionButtons/SignpostingReportCsvButton";
+import SignpostingReportCsvButton from "../ActionButtons/SignpostingReportCsvButton";
 import dayjs from "dayjs";
 import DateRangeInputs, { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { sendAuditLog } from "@/server/auditLog";
 import styled from "styled-components";
+import { FetchReportError } from "../ActionButtons/ReportCsvButton";
 
 interface SignpostingReportInputProps {
     dateRange: DateRangeState;
@@ -21,7 +20,7 @@ interface ContentProps {
     setRange: (range: DateRangeState) => void;
     isInputValid: boolean;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (csvError: FetchSignpostingReportError) => void;
+    onFileCreationFailed: (csvError: FetchReportError) => void;
 }
 
 const InputContainer = styled.div`
@@ -55,6 +54,7 @@ const SignpostingReportModalContent: React.FC<ContentProps> = ({
                     onFileCreationCompleted={onFileCreationCompleted}
                     onFileCreationFailed={onFileCreationFailed}
                     disabled={!isInputValid}
+                    fileName=""
                 />
             </Centerer>
         </form>
@@ -90,7 +90,7 @@ const SignPostingReportModal: React.FC<ActionModalProps> = (props) => {
         props.postSuccessCallback();
     };
 
-    const onFileCreationFailed = (csvError: FetchSignpostingReportError): void => {
+    const onFileCreationFailed = (csvError: FetchReportError): void => {
         setErrorMessage("Failed to fetch signposting report data");
         setActionCompleted(true);
         void sendAuditLog({

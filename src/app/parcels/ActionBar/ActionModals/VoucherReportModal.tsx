@@ -3,13 +3,12 @@
 import React, { useState } from "react";
 import GeneralActionModal, { ActionModalProps } from "./GeneralActionModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import MissingVoucherNumberReportCsvButton, {
-    FetchMissingVoucherNumberReportError,
-} from "../ActionButtons/VoucherNumberReportCsvButton";
+import MissingVoucherNumberReportCsvButton from "../ActionButtons/VoucherNumberReportCsvButton";
 import dayjs from "dayjs";
 import DateRangeInputs, { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { sendAuditLog } from "@/server/auditLog";
 import styled from "styled-components";
+import { FetchReportError } from "../ActionButtons/ReportCsvButton";
 
 interface MissingVoucherNumberReportInputProps {
     dateRange: DateRangeState;
@@ -21,7 +20,7 @@ interface ContentProps {
     setRange: (range: DateRangeState) => void;
     isInputValid: boolean;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (csvError: FetchMissingVoucherNumberReportError) => void;
+    onFileCreationFailed: (csvError: FetchReportError) => void;
 }
 
 const InputContainer = styled.div`
@@ -55,6 +54,7 @@ const MissingVoucherNumberReportModalContent: React.FC<ContentProps> = ({
                     onFileCreationCompleted={onFileCreationCompleted}
                     onFileCreationFailed={onFileCreationFailed}
                     disabled={!isInputValid}
+                    fileName=""
                 />
             </Centerer>
         </form>
@@ -90,7 +90,7 @@ const MissingVoucherNumberReportModal: React.FC<ActionModalProps> = (props) => {
         props.postSuccessCallback();
     };
 
-    const onFileCreationFailed = (csvError: FetchMissingVoucherNumberReportError): void => {
+    const onFileCreationFailed = (csvError: FetchReportError): void => {
         setErrorMessage("Failed to fetch missing voucher number report data");
         setActionCompleted(true);
         void sendAuditLog({

@@ -1,33 +1,41 @@
 "use client";
 
 import React from "react";
-import CsvButton from "@/components/FileGenerationButtons/CsvButton";
-import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { Dayjs } from "dayjs";
-import ReportCsvButton, { ButtonProps, convertRawParcelListToReportResult, FetchReportError, FetchReportErrorType, FetchReportResult, getParcelIdsAndStatusQuery, getRawParcelListQuery, idAndStatus, rawParcel, ReportRow } from "./ReportCsvButton";
+import ReportCsvButton, {
+    ButtonProps,
+    convertRawParcelListToReportResult,
+    FetchReportError,
+    FetchReportResult,
+    getParcelIdsAndStatusQuery,
+    getRawParcelListQuery,
+    idAndStatus,
+    rawParcel,
+} from "./ReportCsvButton";
 
 const getSignpostingParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<idAndStatus[] | FetchReportError> => {
-    const {data: idAndStatusList, error: idFetchError} = await getParcelIdsAndStatusQuery(fromDate, toDate)
+    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
+        fromDate,
+        toDate
+    )
+        // eslint-disable-next-line quotes
         .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
 
     if (idFetchError) {
-        const logId = await logErrorReturnLogId(
-            "Failed to fetch parcel IDs and statuses",
-            {
-                error: idFetchError,
-            }
-        );
+        const logId = await logErrorReturnLogId("Failed to fetch parcel IDs and statuses", {
+            error: idFetchError,
+        });
         return {
             type: "failedToFetchParcelIds",
             logId,
         };
     }
     return idAndStatusList;
-}
+};
 
 const getSignpostingRawParcelList = async (
     idAndStatusList: idAndStatus[]
@@ -36,19 +44,16 @@ const getSignpostingRawParcelList = async (
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
-            )
+        )
         .eq("client.is_active", true)
         .eq("client.signposting_call_required", true)
         .order("packing_date")
         .order("client_id");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId(
-            "Failed to fetch parcel data",
-            {
-                error: parcelFetchError,
-            }
-        );
+        const logId = await logErrorReturnLogId("Failed to fetch parcel data", {
+            error: parcelFetchError,
+        });
         return {
             type: "failedToFetchRows",
             logId,
@@ -56,8 +61,6 @@ const getSignpostingRawParcelList = async (
     }
     return rawParcelList;
 };
-
-
 
 const getSignpostingReportData = async (
     fromDate: Dayjs,
@@ -68,7 +71,7 @@ const getSignpostingReportData = async (
     if ("type" in idAndStatusList) {
         return {
             data: null,
-            error: idAndStatusList
+            error: idAndStatusList,
         };
     }
 
@@ -77,7 +80,7 @@ const getSignpostingReportData = async (
     if ("type" in rawParcelList) {
         return {
             data: null,
-            error: rawParcelList
+            error: rawParcelList,
         };
     }
 

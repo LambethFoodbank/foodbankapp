@@ -2,13 +2,25 @@
 
 import React from "react";
 import { logErrorReturnLogId } from "@/logger/logger";
-import ReportCsvButton, { ButtonProps, convertRawParcelListToReportResult, FetchReportError, FetchReportErrorType, FetchReportResult, getParcelIdsAndStatusQuery, getRawParcelListQuery, idAndStatus, rawParcel, ReportRow } from "./ReportCsvButton";
+import ReportCsvButton, {
+    ButtonProps,
+    convertRawParcelListToReportResult,
+    FetchReportError,
+    FetchReportResult,
+    getParcelIdsAndStatusQuery,
+    getRawParcelListQuery,
+    idAndStatus,
+    rawParcel,
+} from "./ReportCsvButton";
 
 const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
 ): Promise<idAndStatus[] | FetchReportError> => {
-    const {data: idAndStatusList, error: idFetchError} = await getParcelIdsAndStatusQuery(undefined, undefined, parcelIds)
-        .in("parcel_id", parcelIds);
+    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
+        undefined,
+        undefined,
+        parcelIds
+    ).in("parcel_id", parcelIds);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -23,7 +35,6 @@ const getSelectedParcelsParcelIdsAndStatus = async (
         };
     }
     return idAndStatusList;
-
 };
 const getSelectedParcelsRawParcelList = async (
     parcelIds: string[]
@@ -34,12 +45,9 @@ const getSelectedParcelsRawParcelList = async (
         .order("primary_key");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId(
-            "Failed to fetch parcel data",
-            {
-                error: parcelFetchError,
-            }
-        );
+        const logId = await logErrorReturnLogId("Failed to fetch parcel data", {
+            error: parcelFetchError,
+        });
         return {
             type: "failedToFetchRows",
             logId,
@@ -47,29 +55,27 @@ const getSelectedParcelsRawParcelList = async (
     }
     return rawParcelList;
 };
-const getSelectedParcelsReportData = async(
-    parcelIds: string[]
-): Promise<FetchReportResult> => {
+const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchReportResult> => {
     const idAndStatusList = await getSelectedParcelsParcelIdsAndStatus(parcelIds);
 
     if ("type" in idAndStatusList) {
-            return {
-                data: null,
-                error: idAndStatusList
-            };
-        }
-    
-        const rawParcelList = await getSelectedParcelsRawParcelList(parcelIds);
-    
-        if ("type" in rawParcelList) {
-            return {
-                data: null,
-                error: rawParcelList
-            };
-        }
-    
-        return convertRawParcelListToReportResult(rawParcelList, idAndStatusList);
-}
+        return {
+            data: null,
+            error: idAndStatusList,
+        };
+    }
+
+    const rawParcelList = await getSelectedParcelsRawParcelList(parcelIds);
+
+    if ("type" in rawParcelList) {
+        return {
+            data: null,
+            error: rawParcelList,
+        };
+    }
+
+    return convertRawParcelListToReportResult(rawParcelList, idAndStatusList);
+};
 const SelectedParcelsReportCsvButton = ({
     onFileCreationCompleted,
     onFileCreationFailed,

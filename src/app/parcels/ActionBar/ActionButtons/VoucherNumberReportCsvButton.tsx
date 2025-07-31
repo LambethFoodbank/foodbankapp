@@ -1,35 +1,44 @@
 "use client";
 
 import React from "react";
-import CsvButton from "@/components/FileGenerationButtons/CsvButton";
-import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { Dayjs } from "dayjs";
-import ReportCsvButton, { ButtonProps, convertRawParcelListToReportResult, FetchReportError, FetchReportErrorType, FetchReportResult, getParcelIdsAndStatusQuery, getRawParcelListQuery, idAndStatus, rawParcel, ReportRow } from "./ReportCsvButton";
+import ReportCsvButton, {
+    ButtonProps,
+    convertRawParcelListToReportResult,
+    FetchReportError,
+    FetchReportResult,
+    getParcelIdsAndStatusQuery,
+    getRawParcelListQuery,
+    idAndStatus,
+    rawParcel,
+} from "./ReportCsvButton";
 
 const getMissingVoucherNumberParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<idAndStatus[] | FetchReportError> => {
-    const {data: idAndStatusList, error: idFetchError} = await getParcelIdsAndStatusQuery(fromDate, toDate)
+    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
+        fromDate,
+        toDate
+    )
+        // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
+        // eslint-disable-next-line quotes
         .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
         .eq("client_is_active", true);
 
     if (idFetchError) {
-        const logId = await logErrorReturnLogId(
-            "Failed to fetch parcel IDs and statuses",
-            {
-                error: idFetchError,
-            }
-        );
+        const logId = await logErrorReturnLogId("Failed to fetch parcel IDs and statuses", {
+            error: idFetchError,
+        });
         return {
             type: "failedToFetchParcelIds",
             logId,
         };
     }
     return idAndStatusList;
-}
+};
 
 const getMissingVoucherNumberRawParcelList = async (
     idAndStatusList: idAndStatus[]
@@ -38,17 +47,14 @@ const getMissingVoucherNumberRawParcelList = async (
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
-            )
+        )
         .order("packing_date")
         .order("client_id");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId(
-            "Failed to fetch parcel data",
-            {
-                error: parcelFetchError,
-            }
-        );
+        const logId = await logErrorReturnLogId("Failed to fetch parcel data", {
+            error: parcelFetchError,
+        });
         return {
             type: "failedToFetchRows",
             logId,
@@ -66,7 +72,7 @@ const getMissingVoucherNumberReportData = async (
     if ("type" in idAndStatusList) {
         return {
             data: null,
-            error: idAndStatusList
+            error: idAndStatusList,
         };
     }
 
@@ -75,7 +81,7 @@ const getMissingVoucherNumberReportData = async (
     if ("type" in rawParcelList) {
         return {
             data: null,
-            error: rawParcelList
+            error: rawParcelList,
         };
     }
 
@@ -89,7 +95,6 @@ const MissingVoucherNumberReportCsvButton = ({
     onFileCreationFailed,
     disabled,
 }: ButtonProps): React.ReactElement => {
-
     const props: ButtonProps = {
         fromDate: fromDate,
         toDate: toDate,

@@ -9,15 +9,14 @@ import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./Genera
 import { sendAuditLog } from "@/server/auditLog";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import SelectedParcelsReportCsvButton, {
-    FetchSelectedParcelsReportError,
-} from "@/app/parcels/ActionBar/ActionButtons/SelectedParcelsReportCsvButton";
+import SelectedParcelsReportCsvButton from "@/app/parcels/ActionBar/ActionButtons/SelectedParcelsReportCsvButton";
+import { FetchReportError } from "../ActionButtons/ReportCsvButton";
 
 interface ContentProps {
     selectedParcels: ParcelsTableRow[];
     maxParcelsToShow: number;
     onFileCreationCompleted: () => void;
-    onFileCreationFailed: (csvError: FetchSelectedParcelsReportError) => void;
+    onFileCreationFailed: (csvError: FetchReportError) => void;
 }
 
 const SelectedParcelsReportModalContent: React.FC<ContentProps> = ({
@@ -36,6 +35,7 @@ const SelectedParcelsReportModalContent: React.FC<ContentProps> = ({
                 parcels={selectedParcels}
                 onFileCreationCompleted={onFileCreationCompleted}
                 onFileCreationFailed={onFileCreationFailed}
+                fileName=""
             />
         </>
     );
@@ -78,7 +78,7 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
         }, 3000);
     };
 
-    const onFileCreationFailed = (csvError: FetchSelectedParcelsReportError): void => {
+    const onFileCreationFailed = (csvError: FetchReportError): void => {
         setErrorMessage("Failed to fetch selected parcels report data");
         setActionShown(false);
         void sendAuditLog({

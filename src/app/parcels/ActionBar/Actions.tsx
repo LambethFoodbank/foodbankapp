@@ -15,7 +15,6 @@ import ShippingLabelModal from "./ActionModals/ShippingLabelModal";
 import ShoppingListModal from "./ActionModals/ShoppingListModal";
 import DateChangeModal from "./ActionModals/DateChangeModal";
 import SlotChangeModal from "./ActionModals/SlotChangeModal";
-import ReportModal from "./ActionModals/ReportModal";
 import SignPostingReportModal from "./ActionModals/SignpostingReportModal";
 import MissingVoucherNumberReportModal from "./ActionModals/VoucherReportModal";
 import PendingMoreInfoReportModal from "./ActionModals/PendingMoreInfoReportModal";
@@ -160,11 +159,11 @@ const getActionModal = (
         case "Delete Parcel":
             return <DeleteParcelModal key={elementKey} {...actionModalProps} />;
         case "Download Signposting Report":
-            return <SignPostingReportModal key={elementKey} {...actionModalProps} />
+            return <SignPostingReportModal key={elementKey} {...actionModalProps} />;
         case "Download Missing Voucher Report":
-            return <MissingVoucherNumberReportModal key={elementKey} {...actionModalProps} />
+            return <MissingVoucherNumberReportModal key={elementKey} {...actionModalProps} />;
         case "Download Pending More Info Report":
-            return <PendingMoreInfoReportModal key={elementKey} {...actionModalProps} />
+            return <PendingMoreInfoReportModal key={elementKey} {...actionModalProps} />;
         case "Download Selected Parcels Report":
             return <SelectedParcelsReportModal key={elementKey} {...actionModalProps} />;
     }
