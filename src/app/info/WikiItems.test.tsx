@@ -60,18 +60,21 @@ describe("Wiki items component", () => {
                 content: "Test content 1",
                 wiki_key: "058049b5-7a7f-4f81-bf56-6dc9654e5a40",
                 row_order: 1,
+                last_updated: new Date().toISOString(),
             },
             {
                 title: "Test 3",
                 content: "Test content 3",
                 wiki_key: "9bc00a7c-e552-40e5-889b-e6ae2cb184g3",
                 row_order: 3,
+                last_updated: new Date().toISOString(),
             },
             {
                 title: "Test 2",
                 content: "Test content 2",
                 wiki_key: "731280a7-eb99-4229-aa49-84dbb112641c",
                 row_order: 2,
+                last_updated: new Date().toISOString(),
             },
         ];
     });
