@@ -40,7 +40,6 @@ export interface ParcelsTableRow {
     packingDate: Date | null;
     createdAt: Date | null;
     clientIsActive: boolean;
-    notes: string | null;
 }
 
 export type GetParcelDataAndIdsResult =
@@ -69,6 +68,7 @@ export interface CollectionCentresOptions {
     key: string;
     value: string;
 }
+
 export interface StatusResponseRow {
     event_name: string;
 }
@@ -120,6 +120,7 @@ export interface packingSlotOptionsSet {
 }
 
 type FetchClientIdAndIsActiveErrorType = "failedClientIdAndIsActiveFetch" | "noMatchingClient";
+
 export interface FetchClientIdAndIsActiveError {
     type: FetchClientIdAndIsActiveErrorType;
     logId: string;
