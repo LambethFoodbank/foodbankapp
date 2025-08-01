@@ -820,37 +820,6 @@ export type Database = {
         }
         Relationships: []
       }
-      completed_parcels: {
-        Row: {
-          completed_timestamp: string | null
-          family_count: number | null
-          parcel_id: string | null
-          pet_food: string[] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels"
-            referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels_events"
-            referencedColumns: ["parcel_id"]
-          },
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels_plus"
-            referencedColumns: ["parcel_id"]
-          },
-        ]
-      }
       family_count: {
         Row: {
           family_count: number | null
@@ -862,6 +831,7 @@ export type Database = {
         Row: {
           all_events: string[] | null
           last_event_data: string | null
+          last_event_is_successfully_completed: boolean | null
           last_event_name: string | null
           last_event_timestamp: string | null
           last_event_workflow_order: number | null
@@ -896,6 +866,7 @@ export type Database = {
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
+          last_status_is_successfully_completed: boolean | null
           last_status_timestamp: string | null
           last_status_workflow_order: number | null
           list_type: Database["public"]["Enums"]["list_type"] | null
