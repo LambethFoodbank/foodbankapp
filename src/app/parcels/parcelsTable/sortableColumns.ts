@@ -30,7 +30,7 @@ const parcelsSortableColumns: SortOptions<ParcelsTableRow, ParcelsSortMethod>[] 
                 .order("parcel_id"),
     },
     {
-        key: "addressPostcode",
+        key: "addressColumn",
         sortMethod: (sortDirection, query) =>
             query
                 .order("client_is_active", { ascending: sortDirection !== "asc" })

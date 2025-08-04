@@ -75,7 +75,6 @@ describe("Parcels Page", () => {
                     clientId: "PRIMARY_KEY2",
                     fullName: "CLIENT_NAME",
                     familyCategory: "Family of 3",
-                    addressPostcode: "SW1A 2AA",
                     phoneNumber: "08642 123",
                     addressColumn: {
                         addressPostcode: "SW1A 2AA",
@@ -104,8 +103,6 @@ describe("Parcels Page", () => {
                         requiresFollowUpPhoneCall: true,
                     },
                     createdAt: new Date("2023-12-31T12:00:00+00:00"),
-                    clientIsActive: true,
-                    isDeliverable: true,
                 },
             ];
             expect(parcelTableRows).toStrictEqual(expected);
