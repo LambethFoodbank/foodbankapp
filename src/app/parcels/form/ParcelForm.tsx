@@ -75,7 +75,7 @@ export interface ParcelFields extends Fields {
     lastUpdated: string | undefined;
     notes: string | null;
     attentionFlag: boolean | null;
-    signpostingCall: boolean;
+    signpostingCall: boolean | null;
     signpostingCallReasons: BooleanGroup | null;
 }
 
@@ -111,7 +111,7 @@ export const initialParcelFields: ParcelFields = {
     lastUpdated: undefined,
     notes: null,
     attentionFlag: null,
-    signpostingCall: false,
+    signpostingCall: null,
     signpostingCallReasons: null,
 };
 
