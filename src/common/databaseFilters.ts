@@ -6,12 +6,14 @@ import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/
 const textFilterDelimiter = ",";
 
 export const dbFilterWithSubstringQueries = <DbData extends DbClientRow | DbParcelRow>(
-    substringToSubqueryMap: (value: string) => string
+    substringToSubqueryMap: (value: string) => string,
+    customRegex?: RegExp
 ): ServerSideFilterMethod<DbData, string> => {
     return (query, state) => {
+        const regex = customRegex ? customRegex : /[^a-zA-Z0-9 '\-+?]/g;
         const substrings = state
             .split(textFilterDelimiter)
-            .map((substring) => substring.trim().replace(/[^a-zA-Z0-9 '\-+?]/g, ""))
+            .map((substring) => substring.trim().replace(regex, ""))
             .filter((substring) => substring.length > 0);
 
         if (substrings.length === 0) {
@@ -70,7 +72,7 @@ export const emailSearch = <DbData extends DbClientRow | DbParcelRow>(
             return `${clientIsActiveColumnLabel}.is.false`;
         }
         return `and(${clientIsActiveColumnLabel}.is.true, ${emailColumnLabel}.ilike.%${substring.toLowerCase()}%)`;
-    });
+    }, /[^a-zA-Z0-9 '\-@.+?]/g);
 };
 
 export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
