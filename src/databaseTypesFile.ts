@@ -591,6 +591,10 @@ export type Database = {
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
+          referral_agency?: string | null
+          referrer_email?: string | null
+          referrer_name?: string | null
+          referrer_phone?: string | null
           voucher_number?: string | null
         }
         Update: {
@@ -876,37 +880,6 @@ export type Database = {
           phone_number: string | null
         }
         Relationships: []
-      }
-      completed_parcels: {
-        Row: {
-          completed_timestamp: string | null
-          family_count: number | null
-          parcel_id: string | null
-          pet_food: string[] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels"
-            referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels_events"
-            referencedColumns: ["parcel_id"]
-          },
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels_plus"
-            referencedColumns: ["parcel_id"]
-          },
-        ]
       }
       dietary_requirements_plus: {
         Row: {
