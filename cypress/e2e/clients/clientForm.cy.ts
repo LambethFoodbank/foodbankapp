@@ -7,6 +7,7 @@ describe("Add client form", () => {
     it("Add a client with no address", () => {
         fillName(fullName);
         fillPhoneNumber(phoneNumber);
+        fillEmail(email);
         fillNumberAdults("1");
         fillNumberChildren("0");
         chooseListType();
@@ -21,6 +22,7 @@ describe("Add client form", () => {
     it("Submit a client with empty address fields but No Address unchecked", () => {
         fillName(fullName);
         fillPhoneNumber(phoneNumber);
+        fillEmail(email);
         fillNumberAdults("1");
         fillNumberChildren("0");
 
@@ -40,6 +42,7 @@ describe("Add client form", () => {
 
 const fullName = "First Last";
 const phoneNumber = "01234567890";
+const email = "abc@example.com";
 const noAddressText = "No Address";
 const postcode = "N11AA";
 
@@ -53,6 +56,10 @@ function fillName(value: string): void {
 
 function fillPhoneNumber(value: string): void {
     fillTextboxWithId("client-phone-number", value);
+}
+
+function fillEmail(value: string): void {
+    fillTextboxWithId("client-email", value);
 }
 
 function fillNumberAdults(value: string): void {

@@ -33,6 +33,7 @@ export const formatClientRecord = (
 ): ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord => {
     return {
         full_name: fields.fullName,
+        email: fields.email,
         phone_number: fields.phoneNumber,
         address_1: fields.addressLine1,
         address_2: fields.addressLine2,
@@ -128,7 +129,6 @@ export const submitEditClientForm = async (
 ): Promise<editClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
-
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
         "update_client_and_family",
         {

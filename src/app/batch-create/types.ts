@@ -39,6 +39,7 @@ export interface OverrideClient {
         | BooleanGroup
         | boolean;
     phoneNumber: string | null;
+    email: string | null;
     address: Address | null;
     adultInfo: AdultInfo | null;
     childrenInfo: ChildrenInfo | null;

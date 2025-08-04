@@ -88,6 +88,7 @@ describe("reducer", () => {
                     client: {
                         fullName: null,
                         phoneNumber: null,
+                        email: null,
                         address: null,
                         adultInfo: null,
                         childrenInfo: null,
@@ -146,6 +147,7 @@ describe("reducer", () => {
                         client: {
                             fullName: null,
                             phoneNumber: null,
+                            email: null,
                             address: {
                                 addressLine1: "new group address",
                                 addressLine2: null,
@@ -202,6 +204,7 @@ describe("reducer", () => {
                         client: {
                             fullName: null,
                             phoneNumber: null,
+                            email: null,
                             address: {
                                 addressLine1: "new group address",
                                 addressLine2: null,
@@ -285,6 +288,7 @@ describe("reducer", () => {
                         client: {
                             fullName: null,
                             phoneNumber: null,
+                            email: null,
                             address: {
                                 addressLine1: "new group address",
                                 addressLine2: null,

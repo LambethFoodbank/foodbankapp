@@ -15,6 +15,7 @@ export interface ClientSummary {
     name: string;
     contact: string;
     address: string;
+    email: string;
     extraInformation: string;
 }
 
@@ -36,6 +37,7 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
         address_postcode,
         full_name,
         phone_number,
+        email,
         extra_information,
     } = clientData;
 
@@ -50,6 +52,7 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
     return {
         name: full_name ?? "",
         contact: phone_number ?? "",
+        email: email ?? "",
         address: address_postcode ? formattedAddress : displayPostcodeForHomelessClient,
         extraInformation: formatExtraInformation(extra_information),
     };

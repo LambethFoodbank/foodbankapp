@@ -46,7 +46,7 @@ const initialFieldValues: InviteUserFields = {
 };
 
 const initialFormErrors: InviteUserErrors = {
-    email: Errors.initial,
+    email: Errors.none,
     role: Errors.none,
     firstName: Errors.initial,
     lastName: Errors.initial,

@@ -31,6 +31,7 @@ const batchClientToClientRecord = (client: BatchClient): ClientDatabaseInsertRec
     return {
         full_name: client.fullName,
         phone_number: client.phoneNumber,
+        email: client.email,
         address_1: client.address && client.address.addressLine1,
         address_2: client.address && client.address.addressLine2,
         address_town: client.address && client.address.addressTown,

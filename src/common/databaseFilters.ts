@@ -61,6 +61,18 @@ export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
     });
 };
 
+export const emailSearch = <DbData extends DbClientRow | DbParcelRow>(
+    emailColumnLabel: Extract<keyof DbData, "email" | "client_email">,
+    clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
+): ServerSideFilterMethod<DbData, string> => {
+    return dbFilterWithSubstringQueries((substring) => {
+        if (substring === "-") {
+            return `${clientIsActiveColumnLabel}.is.false`;
+        }
+        return `and(${clientIsActiveColumnLabel}.is.true, ${emailColumnLabel}.ilike.%${substring.toLowerCase()}%)`;
+    });
+};
+
 export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
     familyCountColumnLabel: Extract<keyof DbData, "family_count">,
     clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">

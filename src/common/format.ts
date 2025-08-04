@@ -18,11 +18,17 @@ export const displayNameForNullDriverName = "Unknown Driver";
 export const phoneNumberFormatSymbolsRegex = /[\s-()]/g;
 // Following characters excluded from regex as are removed before checking format matches: ( ) - \s
 export const phoneNumberRegex = /^((0|\+44)\d{9,11}|\+(?!44)\d{7,15})?$/;
+
+export const emailFormatSymbolsRegex = /[\s]/g;
 export const emailRegex = /^\S+@\S+$/;
 
 export const formatPhoneNumber = (value: string): string => {
     const numericInput = value.replace(/(\D)/g, "");
     return numericInput[0] === "0" ? "+44" + numericInput.slice(1) : "+" + numericInput;
+};
+
+export const formatEmail = (value: string): string => {
+    return value.toLowerCase();
 };
 
 export const formatCamelCaseKey = (objectKey: string): string => {

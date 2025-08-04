@@ -4,6 +4,7 @@ import {
     familySearch,
     fullNameSearch,
     phoneSearch,
+    emailSearch,
     postcodeSearch,
 } from "@/common/databaseFilters";
 import { DbClientRow } from "@/databaseUtils";
@@ -22,6 +23,8 @@ const clientsPhoneSearch: ClientsFilterMethod = phoneSearch<DbClientRow>(
     "phone_number",
     "is_active"
 );
+
+const clientsEmailSearch: ClientsFilterMethod = emailSearch<DbClientRow>("email", "is_active");
 
 const clientsFamilySearch: ClientsFilterMethod = familySearch("family_count", "is_active");
 
@@ -45,6 +48,11 @@ const clientsFilters: ClientsFilter[] = [
         key: "phoneNumber",
         label: "Phone",
         method: clientsPhoneSearch,
+    }),
+    buildServerSideTextFilter({
+        key: "email",
+        label: "Email",
+        method: clientsEmailSearch,
     }),
 ];
 

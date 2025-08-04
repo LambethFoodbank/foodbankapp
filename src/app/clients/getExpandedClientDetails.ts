@@ -36,6 +36,7 @@ const getRawClientDetails = async (clientId: string) => {
             `
             full_name,
             phone_number,
+            email,
             delivery_instructions,
             address_1,
             address_2,
@@ -96,6 +97,7 @@ export interface ExpandedClientData {
     address: string;
     deliveryInstructions: string;
     phoneNumber: string;
+    email: string;
     household: string;
     adults: string;
     children: string;
@@ -119,6 +121,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         address: formatAddressFromClientDetails(client),
         deliveryInstructions: client.delivery_instructions ?? "",
         phoneNumber: client.phone_number ?? "",
+        email: client.email ?? "",
         defaultList: client.default_list,
         household: formatHouseholdFromFamilyDetails(client.family),
         adults: formatBreakdownOfAdultsFromFamilyDetails(client.family),

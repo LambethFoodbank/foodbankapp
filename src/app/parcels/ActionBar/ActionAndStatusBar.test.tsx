@@ -74,6 +74,7 @@ export const mockData: ParcelsTableRow[] = [
         referrerPhone: "0987 654000",
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
+        email: "john.smith@example.com",
     },
     {
         clientId: "primaryKey2",
@@ -110,6 +111,7 @@ export const mockData: ParcelsTableRow[] = [
         referrerPhone: "0987 654000",
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
+        email: "john.doe@example.com",
     },
 ];
 

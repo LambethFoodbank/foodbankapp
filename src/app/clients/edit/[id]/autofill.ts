@@ -23,6 +23,7 @@ const autofill = (
     return {
         fullName: clientData.full_name ?? "",
         phoneNumber: clientData.phone_number ?? "",
+        email: clientData.email ?? "",
         addressLine1: noPostcode ? "" : clientData.address_1 ?? "",
         addressLine2: noPostcode ? "" : clientData.address_2 ?? "",
         addressTown: noPostcode ? "" : clientData.address_town ?? "",

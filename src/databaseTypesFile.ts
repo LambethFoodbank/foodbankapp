@@ -190,6 +190,7 @@ export type Database = {
           default_list: Database["public"]["Enums"]["list_type"]
           delivery_instructions: string | null
           dietary_requirements: string[] | null
+          email: string | null
           extra_information: string | null
           family_id: string
           flagged_for_attention: boolean | null
@@ -221,6 +222,7 @@ export type Database = {
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
+          email?: string | null
           extra_information?: string | null
           family_id?: string
           flagged_for_attention?: boolean | null
@@ -252,6 +254,7 @@ export type Database = {
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
+          email?: string | null
           extra_information?: string | null
           family_id?: string
           flagged_for_attention?: boolean | null
@@ -813,6 +816,7 @@ export type Database = {
         Row: {
           address_postcode: string | null
           client_id: string | null
+          email: string | null
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
@@ -852,6 +856,7 @@ export type Database = {
           all_events: string[] | null
           client_address_postcode: string | null
           client_delivery_instructions: string | null
+          client_email: string | null
           client_flagged_for_attention: boolean | null
           client_full_name: string | null
           client_id: string | null

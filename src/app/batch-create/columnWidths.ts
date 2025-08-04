@@ -12,5 +12,6 @@ export const PERSON_WIDTH = 200;
 export const ROW_NUMBER_WIDTH = 150;
 export const FULL_NAME_WIDTH = 150;
 export const PHONE_NUMBER_WIDTH = 150;
+export const EMAIL_WIDTH = 200;
 export const VOUCHER_NUMBER_WIDTH = 150;
 export const PACKING_DATE_WIDTH = 200;

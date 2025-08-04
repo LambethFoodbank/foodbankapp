@@ -1,7 +1,11 @@
 import { GridColDef, GridPreProcessEditCellProps, GridRenderCellParams } from "@mui/x-data-grid";
 import { BatchActionType, BatchTableDataState } from "@/app/batch-create/types";
 import { Button } from "@mui/material";
-import { isPhoneNumberValid } from "@/app/batch-create/helpers/fieldValidationFunctions";
+import {
+    isEmailValid,
+    isPhoneNumberValid,
+} from "@/app/batch-create/helpers/fieldValidationFunctions";
+
 import {
     ADDRESS_WIDTH,
     MULTILINE_POPOVER_WIDTH,
@@ -17,6 +21,7 @@ import {
     ROW_NUMBER_WIDTH,
     FULL_NAME_WIDTH,
     PHONE_NUMBER_WIDTH,
+    EMAIL_WIDTH,
     VOUCHER_NUMBER_WIDTH,
     PACKING_DATE_WIDTH,
 } from "@/app/batch-create/columnWidths";
@@ -80,6 +85,32 @@ const getCenteredBatchGridDisplayColumns = (
                                 type: "client",
                                 newValue: params.props.value,
                                 fieldName: "phoneNumber",
+                            },
+                        },
+                    });
+                }
+                return {
+                    ...params.props,
+                    error: hasError,
+                };
+            },
+        },
+        {
+            field: "email",
+            headerName: "Email",
+            width: EMAIL_WIDTH,
+            editable: true,
+            preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+                const hasError: boolean = isEmailValid(params);
+                if (!hasError) {
+                    dispatch({
+                        type: "update_cell",
+                        updateCellPayload: {
+                            rowId: params.id as number,
+                            newValueAndFieldName: {
+                                type: "client",
+                                newValue: params.props.value,
+                                fieldName: "email",
                             },
                         },
                     });

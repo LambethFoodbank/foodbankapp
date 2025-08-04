@@ -40,6 +40,7 @@ export interface ParcelsTableRow {
     packingDate: Date | null;
     createdAt: Date | null;
     clientIsActive: boolean;
+    email: string | null;
 }
 
 export type GetParcelDataAndIdsResult =

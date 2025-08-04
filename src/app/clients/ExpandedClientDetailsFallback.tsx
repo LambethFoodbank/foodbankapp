@@ -7,6 +7,7 @@ const clientDetailFields = [
     "FULL NAME",
     "ADDRESS",
     "PHONE NUMBER",
+    "EMAIL",
     "DELIVERY_INSTRUCTIONS",
     "HOUSEHOLD",
     "CHILDREN",

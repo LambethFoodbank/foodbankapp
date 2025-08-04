@@ -16,6 +16,7 @@ export interface BatchGridDisplayRow {
     id: number;
     fullName: string;
     phoneNumber: string;
+    email: string;
     address: string;
     adults: number | null;
     children: number | null;

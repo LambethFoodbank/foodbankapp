@@ -42,6 +42,7 @@ import ClientNotesCard from "@/app/clients/form/formSections/ClientNotes";
 import ListTypeCard from "@/app/clients/form/formSections/ListTypeCard";
 import { ListType } from "@/common/databaseListTypes";
 import CookingFacilitiesCard from "./formSections/CookingFacilitiesCard";
+import EmailCard from "@/app/clients/form/formSections/EmailCard";
 
 interface Props {
     initialFields: ClientFields;
@@ -54,6 +55,7 @@ type EditConfig = { editMode: true; clientID: string } | { editMode: false };
 
 export interface ClientFields extends Fields {
     fullName: string;
+    email: string;
     phoneNumber: string | null;
     addressLine1: string;
     addressLine2: string;
@@ -88,6 +90,7 @@ export interface ClientFields extends Fields {
 export interface ClientErrors extends FormErrors<ClientFields> {
     fullName: Errors;
     phoneNumber: Errors;
+    email: Errors;
     addressLine1: Errors;
     addressPostcode: Errors;
     numberOfAdults: Errors;
@@ -103,6 +106,7 @@ export type ClientCardProps = CardProps<ClientFields, ClientErrors>;
 const formSections = [
     FullNameCard,
     PhoneNumberCard,
+    EmailCard,
     AddressCard,
     NumberAdultsCard,
     NumberChildrenCard,
