@@ -31,11 +31,11 @@ select
     parcels.referrer_name,
     parcels.referrer_email,
     parcels.referrer_phone,
-    parcels.flagged_for_attention as parcel_flagged_for_attention
-from parcels
-         left join collection_centres on parcels.collection_centre = collection_centres.primary_key
-         left join clients on parcels.client_id = clients.primary_key
-         left join packing_slots on parcels.packing_slot = packing_slots.primary_key
-         left join family_count on family_count.family_id = clients.family_id
-         left join parcels_events on parcels_events.parcel_id = parcels.primary_key
-order by parcels.packing_date desc;
+    clients.email as client_email
+   from parcels
+     left join collection_centres on parcels.collection_centre = collection_centres.primary_key
+     left join clients on parcels.client_id = clients.primary_key
+     left join packing_slots on parcels.packing_slot = packing_slots.primary_key
+     left join family_count on family_count.family_id = clients.family_id
+     left join parcels_events on parcels_events.parcel_id = parcels.primary_key
+  order by parcels.packing_date desc;
