@@ -4,8 +4,10 @@ import React from "react";
 
 const DataGridStyling = styled(DataGrid)`
     &.dietary-table {
-        & .MuiDataGrid-row {
-            min-height: 56px !important;
+        & .MuiDataGrid-cellContent {
+            padding: 0.5rem;
+            min-height: 56px;
+            align-content: center;
         }
     }
 
