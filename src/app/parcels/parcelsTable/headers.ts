@@ -14,7 +14,6 @@ export const parcelTableHeaderKeysAndLabels: TableHeaders<ParcelsTableRow> = [
     ["packingSlot", "Packing Slot"],
     ["lastStatus", "Last Status"],
     ["createdAt", "Created At"],
-    ["notes", "Notes"],
 ];
 
 export const parcelTableDefaultShownHeaders: (keyof ParcelsTableRow)[] = [
@@ -40,5 +39,4 @@ export const parcelTableToggleableHeaders: (keyof ParcelsTableRow)[] = [
     "packingSlot",
     "lastStatus",
     "createdAt",
-    "notes",
 ];

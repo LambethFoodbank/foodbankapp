@@ -45,6 +45,7 @@ const sampleProcessingData: DbParcelRow[] = [
         last_status_event_data: "SOME_RELATED_DATA",
         last_status_timestamp: "2023-08-04T13:30:00+00:00",
         last_status_workflow_order: 1,
+        last_status_is_successfully_completed: false,
         all_events: ["LAST_EVENT"],
         created_at: "2023-12-31T12:00:00+00:00",
         client_is_active: true,
@@ -56,6 +57,7 @@ const sampleProcessingData: DbParcelRow[] = [
         referral_agency: "Agency 1",
         parcel_notes: "fragile items",
         client_email: "full.name@example.com",
+
     },
 ];
 
@@ -112,6 +114,7 @@ describe("Parcels Page", () => {
                     clientIsActive: true,
                     notes: "fragile items",
                     email: "full.name@example.com",
+
                 },
             ];
             expect(parcelTableRows).toStrictEqual(expected);

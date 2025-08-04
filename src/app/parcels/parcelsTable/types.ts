@@ -70,6 +70,7 @@ export interface CollectionCentresOptions {
     key: string;
     value: string;
 }
+
 export interface StatusResponseRow {
     event_name: string;
 }
@@ -121,6 +122,7 @@ export interface packingSlotOptionsSet {
 }
 
 type FetchClientIdAndIsActiveErrorType = "failedClientIdAndIsActiveFetch" | "noMatchingClient";
+
 export interface FetchClientIdAndIsActiveError {
     type: FetchClientIdAndIsActiveErrorType;
     logId: string;

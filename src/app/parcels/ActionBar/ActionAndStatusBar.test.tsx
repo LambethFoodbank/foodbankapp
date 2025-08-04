@@ -76,6 +76,7 @@ export const mockData: ParcelsTableRow[] = [
         clientIsActive: true,
         notes: "fragile items",
         email: "john.smith@example.com",
+
     },
     {
         clientId: "primaryKey2",
@@ -114,6 +115,7 @@ export const mockData: ParcelsTableRow[] = [
         clientIsActive: true,
         notes: "fragile items",
         email: "john.doe@example.com",
+
     },
 ];
 
