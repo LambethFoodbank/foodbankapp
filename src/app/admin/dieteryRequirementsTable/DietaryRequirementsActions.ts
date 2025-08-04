@@ -92,8 +92,8 @@ function getFormattedData(rawData: DietaryRequirementsRawData[]): DietaryRequire
         return {
             id: type.key,
             dietary_requirement: type.label,
-            included, // array of ids
-            excluded, // array of ids
+            included,
+            excluded,
             isNew: false,
         };
     });
