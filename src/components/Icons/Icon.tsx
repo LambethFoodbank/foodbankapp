@@ -14,7 +14,7 @@ interface Props {
     onTooltipClose?: () => void;
 }
 
-export const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
+const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
     width: 1em;
     height: 1em;
     margin: 0.125em;

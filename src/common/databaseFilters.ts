@@ -132,7 +132,6 @@ export function deliveryAreaFilter(
         },
     ];
 
-    optionsSet.sort();
     return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
         key: deliverableColumnLabel,
         filterLabel: "Delivery Area",

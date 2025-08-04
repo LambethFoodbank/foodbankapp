@@ -48,5 +48,3 @@ grant trigger on table "public"."delivery_areas" to "service_role";
 grant truncate on table "public"."delivery_areas" to "service_role";
 
 grant update on table "public"."delivery_areas" to "service_role";
-
-
