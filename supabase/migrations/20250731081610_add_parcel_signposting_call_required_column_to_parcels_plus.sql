@@ -23,6 +23,7 @@ select
     parcels_events.last_event_data as last_status_event_data,
     parcels_events.last_event_timestamp as last_status_timestamp,
     parcels_events.last_event_workflow_order as last_status_workflow_order,
+    parcels_events.last_event_is_successfully_completed as last_status_is_successfully_completed,
     parcels_events.all_events,
     clients.delivery_instructions as client_delivery_instructions,
     parcels.list_type,
