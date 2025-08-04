@@ -1,10 +1,10 @@
 "use client";
 
+import React from "react";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Tooltip from "@mui/material/Tooltip";
-import React from "react";
 import styled from "styled-components";
+import Tooltip from "@mui/material/Tooltip";
 
 interface Props {
     icon: IconDefinition;

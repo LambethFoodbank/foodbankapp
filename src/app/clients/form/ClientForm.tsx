@@ -81,12 +81,6 @@ export interface ClientFields extends Fields {
     additionalPhoneNumbers: string[] | null;
 }
 
-export interface DeliveryAreaFields extends Fields {
-    postcode: string | null;
-    isDeliverable: boolean;
-    order: number;
-}
-
 export interface ClientErrors extends FormErrors<ClientFields> {
     fullName: Errors;
     phoneNumber: Errors;
