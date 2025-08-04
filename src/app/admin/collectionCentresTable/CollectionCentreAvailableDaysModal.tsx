@@ -13,7 +13,7 @@ import {
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Heading } from "@/app/parcels/ActionBar/ActionModals/GeneralActionModal";
-import { DAYSOFWEEK_ARRAY } from "@/common/databaseDaysOfWeek";
+import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 import CheckboxInput from "@/components/DataInput/CheckboxInput";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
@@ -70,10 +70,7 @@ const formatCollectionCentreAvailableDaysDbData = (
     } else {
         formattedAvailableDays = row.availableDays.map((availableDays) => {
             return {
-                day:
-                    availableDays.day !== null
-                        ? availableDays.day
-                        : DAYSOFWEEK_ARRAY[DAYSOFWEEK_ARRAY.length - 1],
+                day: availableDays.day !== null ? availableDays.day : ("" as DaysOfWeekType),
                 isActive: availableDays.is_active !== null ? availableDays.is_active : false,
             };
         });
@@ -156,7 +153,7 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
             header={
                 <>
                     <Icon icon={faShoePrints} color={theme.primary.largeForeground[2]} />
-                    Edit Collection Available Days
+                    Edit Collection Days
                 </>
             }
             isOpen={props.isOpen}

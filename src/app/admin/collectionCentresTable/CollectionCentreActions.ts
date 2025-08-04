@@ -80,7 +80,7 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
     return { data: formattedData, error: null };
 };
 
-const formatAvailableDaysToDBCollectionCentreTimeSlot = (
+const formatAvailableDaysToDBCollectionCentreAvailableDays = (
     availableDaysData: FormattedAvailableDays[]
 ): DbCollectionCentreAvailableDays => {
     return availableDaysData.map((availableDays) => {
@@ -191,7 +191,7 @@ export const updateDbCollectionCentre = async (
 export const updateDbCollectionCentreAvailableDays = async (
     availableDaysWithPrimaryKey: FormattedAvailableDaysWithPrimaryKey
 ): Promise<UpdateCollectionCentreResult> => {
-    const processedData = formatAvailableDaysToDBCollectionCentreTimeSlot(
+    const processedData = formatAvailableDaysToDBCollectionCentreAvailableDays(
         availableDaysWithPrimaryKey.availableDays
     );
     const { error } = await supabase
