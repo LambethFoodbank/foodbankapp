@@ -15,7 +15,6 @@ export interface ParcelsTableRow {
         isDeliverable: boolean | null;
         clientIsActive: boolean;
     };
-    addressPostcode: Schema["clients"]["address_postcode"];
     phoneNumber: Schema["clients"]["phone_number"];
     deliveryCollection: {
         collectionCentreName: string;

@@ -38,10 +38,10 @@ const SelectedParcelsOverview: React.FC<ShowParcelsProps> = (props) => {
                 {props.parcels.map((parcel) => (
                     <ListItem key={parcel.parcelId}>
                         {getParcelOverviewString(
-                            parcel.addressPostcode,
+                            parcel.addressColumn.addressPostcode,
                             parcel.fullName,
                             parcel.collectionDatetime,
-                            parcel.clientIsActive
+                            parcel.addressColumn.clientIsActive
                         )}
                     </ListItem>
                 ))}

@@ -84,7 +84,6 @@ describe("Parcels Page", () => {
                     clientId: "PRIMARY_KEY2",
                     fullName: "CLIENT_NAME",
                     familyCategory: "Family of 3",
-                    addressPostcode: "SW1A 2AA",
                     phoneNumber: "08642 123",
                     addressColumn: {
                         addressPostcode: "SW1A 2AA",

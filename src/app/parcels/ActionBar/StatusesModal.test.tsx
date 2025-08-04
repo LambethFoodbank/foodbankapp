@@ -11,7 +11,6 @@ import Localization from "@/app/Localization";
 const mockData: ParcelsTableRow[] = [
     {
         clientId: "primaryKey1",
-        addressPostcode: "AB1 2CD",
         phoneNumber: "0987 654321",
         addressColumn: {
             addressPostcode: "AB1 2CD",
@@ -54,7 +53,6 @@ const mockData: ParcelsTableRow[] = [
     },
     {
         clientId: "primaryKey2",
-        addressPostcode: "AB1 aaaa2CD",
         phoneNumber: "+1 234 567",
         addressColumn: {
             addressPostcode: "AB1 aaaa2CD",
