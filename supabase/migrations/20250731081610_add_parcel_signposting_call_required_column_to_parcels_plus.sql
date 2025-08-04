@@ -27,7 +27,6 @@ select
     parcels_events.all_events,
     clients.delivery_instructions as client_delivery_instructions,
     parcels.list_type,
-    parcels.notes as parcel_notes,
     parcels.referral_agency,
     parcels.referrer_name,
     parcels.referrer_email,
