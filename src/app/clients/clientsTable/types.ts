@@ -45,7 +45,6 @@ export interface ClientsTableRow {
         addressPostcode: Schema["clients"]["address_postcode"];
         isDeliverable: boolean | null;
     };
-    addressPostcode: Schema["clients"]["address_postcode"];
     phoneNumber: Schema["clients"]["phone_number"];
     email: string | null;
     isDeliverable: boolean | null;

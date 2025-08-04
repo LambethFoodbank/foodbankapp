@@ -183,7 +183,7 @@ const ClientsPage: React.FC = () => {
     const { role } = useContext(RoleUpdateContext);
 
     const onRowClick = (row: Row<ClientsTableRow>): void => {
-        if (row.data.isDeliverable || (role !== null && role !== "volunteer")) {
+        if (row.data.addressColumn.isDeliverable || (role !== null && role !== "volunteer")) {
             router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
         } else {
             router.push("/clients");

@@ -68,7 +68,6 @@ const getClientsDataAndCount = async (
                 addressPostcode: client.address_postcode,
                 isDeliverable: client.is_deliverable,
             },
-            addressPostcode: client.address_postcode,
             phoneNumber: [client.phone_number, client.additional_phone_numbers_text]
                 .filter((phone) => phone && phone.length > 0)
                 .join(", "),
