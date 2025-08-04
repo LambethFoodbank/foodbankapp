@@ -51,7 +51,6 @@ const convertParcelDbtoParcelRow = async (
                     isDeliverable: parcel.is_deliverable,
                     clientIsActive: parcel.client_is_active ?? false,
                 },
-                addressPostcode: clientActive ? parcel.client_address_postcode : "-",
                 phoneNumber: clientActive
                     ? [parcel.client_phone_number, parcel.client_additional_phone_numbers_text]
                           .filter((phone) => phone && phone.length > 0)
@@ -82,8 +81,6 @@ const convertParcelDbtoParcelRow = async (
                     requiresFollowUpPhoneCall: parcel.signposting_call_required ?? false,
                 },
                 createdAt: parcel.created_at ? new Date(parcel.created_at) : null,
-                clientIsActive: parcel.client_is_active ?? false,
-                isDeliverable: parcel.is_deliverable ?? true,
             };
         }),
         error: null,
