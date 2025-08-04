@@ -15,7 +15,7 @@ import {
 import { StyledIcon, StyledIconButton } from "../Icons/IconButton";
 import { Checkbox, CircularProgress, NoSsr } from "@mui/material";
 import React, { useState } from "react";
-import DataTable, { TableColumn } from "react-data-table-component";
+import DataTable, { TableColumn, TableStyles } from "react-data-table-component";
 import styled, { useTheme } from "styled-components";
 import { Primitive, SortOrder } from "react-data-table-component/dist/DataTable/types";
 import { Centerer } from "../Modal/ModalFormStyles";
@@ -154,6 +154,7 @@ export type BreakPointConfig = {
     breakPoints: number[];
     dividingLineStyle: keyof DividingLineStyleOptions;
 };
+
 interface Props<Data, DbData extends Record<string, unknown>, PaginationType, FilterState> {
     dataPortion: Data[];
     headerKeysAndLabels: TableHeaders<Data>;
@@ -180,8 +181,9 @@ interface Props<Data, DbData extends Record<string, unknown>, PaginationType, Fi
     editableConfig: EditableConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
     pointerOnHover?: boolean;
-    reduceRowHeight?: boolean;
+    customStyles?: TableStyles;
 }
+
 interface CellProps<Data> {
     row: Row<Data>;
     columnDisplayFunctions: ColumnDisplayFunctions<Data>;
@@ -240,7 +242,7 @@ const Table = <
     paginationConfig,
     editableConfig,
     pointerOnHover,
-    reduceRowHeight,
+    customStyles,
 }: Props<Data, DbData, PaginationType, FilterState>): React.ReactElement => {
     const [shownHeaderKeys, setShownHeaderKeys] = useState(
         defaultShownHeaders ?? headerKeysAndLabels.map(([key]) => key)
@@ -433,18 +435,9 @@ const Table = <
 
     const conditionalRowStyles = [
         {
-            when: () => reduceRowHeight === true,
-            style: {
-                // The default DataTable class has a predefined min-height of 48px for the row-element
-                // for this reason, any value < 48px would not decrease the height.
-                height: "48px",
-            },
-        },
-        {
             when: (row: Row<Data>) =>
                 checkboxConfig.displayed && checkboxConfig.isRowChecked(row.data),
             style: {
-                ...(reduceRowHeight === true && { height: "48px" }),
                 backgroundColor: `${theme.primary.background[1]} !important`,
             },
         },
@@ -499,6 +492,7 @@ const Table = <
                 >
                     <NoSsr>
                         <DataTable
+                            customStyles={customStyles}
                             columns={columns}
                             data={rows}
                             keyField="rowId"
