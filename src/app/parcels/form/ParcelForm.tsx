@@ -77,7 +77,7 @@ export interface ParcelFields extends Fields {
     deliveryInstructions: string | null;
     notes: string | null;
     attentionFlag: boolean | null;
-    signpostingCall: boolean;
+    signpostingCall: boolean | null;
     signpostingCallReasons: BooleanGroup | null;
 }
 
@@ -119,7 +119,7 @@ export const initialParcelFields: ParcelFields = {
     deliveryInstructions: null,
     notes: null,
     attentionFlag: null,
-    signpostingCall: false,
+    signpostingCall: null,
     signpostingCallReasons: null,
 };
 
