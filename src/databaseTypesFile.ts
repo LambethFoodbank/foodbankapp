@@ -881,6 +881,63 @@ export type Database = {
         }
         Relationships: []
       }
+      completed_parcels: {
+        Row: {
+          completed_timestamp: string | null
+          family_count: number | null
+          parcel_id: string | null
+          pet_food: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_events_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "public_events_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_events"
+            referencedColumns: ["parcel_id"]
+          },
+          {
+            foreignKeyName: "public_events_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_plus"
+            referencedColumns: ["parcel_id"]
+          },
+        ]
+      }
+      dietary_requirements_plus: {
+        Row: {
+          dairy_free: Database["public"]["Enums"]["item_dietary_status"] | null
+          gluten_free: Database["public"]["Enums"]["item_dietary_status"] | null
+          halal: Database["public"]["Enums"]["item_dietary_status"] | null
+          id: string | null
+          item_name: string | null
+          meat: Database["public"]["Enums"]["item_dietary_status"] | null
+          pescatarian: Database["public"]["Enums"]["item_dietary_status"] | null
+          pet_food: Database["public"]["Enums"]["item_dietary_status"] | null
+          seafood_allergy:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          vegan: Database["public"]["Enums"]["item_dietary_status"] | null
+          vegetarian: Database["public"]["Enums"]["item_dietary_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dietary_requirements_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "lists"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
       family_count: {
         Row: {
           family_count: number | null
