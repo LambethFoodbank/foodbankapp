@@ -424,6 +424,10 @@ const Table = <
                     inputProps={{ "aria-label": `Select row ${row.rowId}` }}
                     checked={checkboxConfig.isRowChecked(row.data)}
                     onChange={() => checkboxConfig.onCheckboxClicked(row.data)}
+                    sx={{
+                        "&.MuiButtonBase-root": { padding: "3px" },
+                        "&.MuiSvgIcon-root": { fontSize: "24px" },
+                    }}
                 />
             ),
             width: "47px",
