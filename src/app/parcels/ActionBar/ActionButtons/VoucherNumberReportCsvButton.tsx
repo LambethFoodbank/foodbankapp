@@ -18,10 +18,10 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<{ data: idAndStatus[], error: FetchReportError | null }> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
+    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
         fromDate,
         toDate
-    )
+    })
         // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
         // eslint-disable-next-line quotes

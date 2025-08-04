@@ -18,10 +18,10 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<{ data: idAndStatus[], error: FetchReportError | null}> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
+    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
         fromDate,
         toDate
-    )
+    })
         // eslint-disable-next-line quotes
         .or('last_status_event_name.eq."Pending More Info"');
 

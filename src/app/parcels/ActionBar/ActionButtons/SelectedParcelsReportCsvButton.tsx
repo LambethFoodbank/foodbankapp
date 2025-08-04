@@ -16,11 +16,9 @@ import ReportCsvButton, {
 const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
 ): Promise<{ data:idAndStatus[], error: FetchReportError | null}> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
-        undefined,
-        undefined,
+    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
         parcelIds
-    ).in("parcel_id", parcelIds);
+    }).in("parcel_id", parcelIds);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
