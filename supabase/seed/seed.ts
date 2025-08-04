@@ -5,7 +5,6 @@ which only gets generated after running npx snaplet generate with local database
 
 import { createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
-import { appendFileSync } from "node:fs";
 import { packingSlots } from "./packingSlotsSeed";
 import {
     booleansWeightedToTrue,
@@ -18,7 +17,6 @@ import {
     possiblePostCodes,
     possiblePets,
     possibleSignpostingCallReasons,
-    possibleDietaryRequirementsStatus,
 } from "./clientsSeed";
 import { genders } from "./families";
 import { collectionCentresWithStringSlots } from "./collectionCentresSeed";

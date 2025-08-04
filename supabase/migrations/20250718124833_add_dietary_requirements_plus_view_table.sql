@@ -11,6 +11,3 @@ create or replace view "public"."dietary_requirements_plus" as  SELECT d.id,
     d.pet_food
    FROM (dietary_requirements d
      JOIN lists l ON ((d.id = l.primary_key)));
-
-
-

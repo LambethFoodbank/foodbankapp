@@ -5,6 +5,3 @@ for all
 to authenticated
 using (true)
 with check (user_is_admin());
-
-
-
