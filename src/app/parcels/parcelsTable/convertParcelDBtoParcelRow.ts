@@ -52,7 +52,6 @@ const convertParcelDbtoParcelRow = async (
                     isDeliverable: parcel.is_deliverable,
                     clientIsActive: parcel.client_is_active ?? false,
                 },
-                addressPostcode: clientActive ? parcel.client_address_postcode : "-",
                 phoneNumber: clientActive ? parcel.client_phone_number ?? "" : "-",
                 deliveryCollection: {
                     collectionCentreName: parcel.collection_centre_name ?? "-",
@@ -77,8 +76,6 @@ const convertParcelDbtoParcelRow = async (
                         : false,
                 },
                 createdAt: parcel.created_at ? new Date(parcel.created_at) : null,
-                clientIsActive: parcel.client_is_active ?? false,
-                isDeliverable: parcel.is_deliverable ?? true,
             };
         }),
         error: null,
