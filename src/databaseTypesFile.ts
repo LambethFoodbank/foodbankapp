@@ -591,10 +591,6 @@ export type Database = {
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
-          referral_agency?: string | null
-          referrer_email?: string | null
-          referrer_name?: string | null
-          referrer_phone?: string | null
           voucher_number?: string | null
         }
         Update: {
