@@ -38,7 +38,11 @@ import {
     eventNamesWithNoData,
     eventNamesWithNumberData,
 } from "./eventsSeed";
-import { getFormattedVoucherNumber, possibleReferralAgency } from "./parcelsSeed";
+import {
+    getFormattedVoucherNumber,
+    possibleReferralAgency,
+    defaultParcelNotes,
+} from "./parcelsSeed";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
@@ -172,6 +176,8 @@ const main = async (): Promise<never> => {
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
                     referrer_email: () => (agency ? copycat.email(ctx.seed) : ""),
                     referrer_phone: () => (agency ? copycat.phoneNumber(ctx.seed) : ""),
+
+                    notes: () => copycat.oneOf(ctx.seed, defaultParcelNotes),
 
                     created_at: parcelCreationDateTime,
                 };

@@ -29,3 +29,5 @@ export const possibleReferralAgency = [
     "Neighborhood Relief Agency",
     "FaithWorks Resource Center",
 ];
+
+export const defaultParcelNotes = ["E.g., Contains frozen items — deliver promptly.", null];
