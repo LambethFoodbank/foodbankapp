@@ -75,17 +75,8 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
 
     const onCancelNotes = async (): Promise<void> => {
         setErrorMessage(null);
-        const { error } = await updateClientNotes(
-            clientId,
-            originalNotes,
-            clientDetails?.lastUpdated
-        );
-        if (error) {
-            setErrorMessage(`Error saving notes, please refresh the page. Log ID: ${error.logId}`);
-            setNotes(originalNotes);
-        } else {
-            loadData();
-        }
+        setNotes(originalNotes);
+        loadData();
     };
 
     const getExpandedClientDetailsForDataViewer = (
