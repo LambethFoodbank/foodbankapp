@@ -55,9 +55,7 @@ const sampleProcessingData: DbParcelRow[] = [
         referrer_name: "John Smith",
         referrer_phone: "0987 654321",
         referral_agency: "Agency 1",
-        parcel_notes: "fragile items",
         client_email: "full.name@example.com",
-
     },
 ];
 
@@ -112,9 +110,7 @@ describe("Parcels Page", () => {
                     },
                     createdAt: new Date("2023-12-31T12:00:00+00:00"),
                     clientIsActive: true,
-                    notes: "fragile items",
                     email: "full.name@example.com",
-
                 },
             ];
             expect(parcelTableRows).toStrictEqual(expected);
