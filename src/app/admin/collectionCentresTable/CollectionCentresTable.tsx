@@ -299,7 +299,7 @@ const CollectionCentresTable: React.FC = () => {
                         disabled={params.row.isNew || params.row.isDelivery}
                         aria-label={`Edit collection available days for ${params.row.name}`}
                     >
-                        Edit Collection Available Days
+                        Edit Collection Days
                     </Button>
                 );
             },

@@ -82,7 +82,7 @@ const formatTimeSlotToDBCollectionCentreTimeSlot = (
     });
 };
 
-const formatAvailableDaysToDBCollectionCentreTimeSlot = (
+const formatAvailableDaysToDBCollectionCentreAvailableDays = (
     availableDaysData: FormattedAvailableDays[]
 ): DbCollectionCentreAvailableDays => {
     return availableDaysData.map((availableDays) => {
@@ -208,7 +208,7 @@ export const updateDbCollectionCentreTimeSlots = async (
 export const updateDbCollectionCentreAvailableDays = async (
     availableDaysWithPrimaryKey: FormattedAvailableDaysWithPrimaryKey
 ): Promise<UpdateCollectionCentreResult> => {
-    const processedData = formatAvailableDaysToDBCollectionCentreTimeSlot(
+    const processedData = formatAvailableDaysToDBCollectionCentreAvailableDays(
         availableDaysWithPrimaryKey.availableDays
     );
     const { error } = await supabase
