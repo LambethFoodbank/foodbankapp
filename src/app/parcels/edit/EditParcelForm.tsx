@@ -48,7 +48,7 @@ const prepareParcelDataForForm = (
         collectionSlot: formatDatetimeAsTime(parcelData.collection_datetime),
         collectionCentre: parcelData.collection_centre?.primary_key ?? null,
         lastUpdated: parcelData.last_updated,
-        deliveryInstructions: parcelData.client?.delivery_instructions,
+        deliveryInstructions: parcelData.client?.delivery_instructions ?? null,
         notes: parcelData.notes,
         referralAgency: parcelData.referral_agency ?? "",
         referrerName: parcelData.referrer_name ?? "",

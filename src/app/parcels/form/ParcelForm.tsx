@@ -72,7 +72,7 @@ export interface ParcelFields extends Fields {
     collectionSlot: string | null;
     collectionCentre: string | null;
     lastUpdated: string | undefined;
-    deliveryInstructions: string | null | undefined;
+    deliveryInstructions: string | null;
     notes: string | null;
 }
 
