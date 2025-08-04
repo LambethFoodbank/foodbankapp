@@ -17,7 +17,7 @@ import ReportCsvButton, {
 const getSignpostingParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
-): Promise<idAndStatus[] | FetchReportError> => {
+): Promise<{ data: idAndStatus[], error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
         fromDate,
         toDate
@@ -30,16 +30,22 @@ const getSignpostingParcelIdsAndStatus = async (
             error: idFetchError,
         });
         return {
-            type: "failedToFetchParcelIds",
-            logId,
+            data: [],
+            error: {
+                type: "failedToFetchParcelIds",
+                logId: logId,
+            },
         };
     }
-    return idAndStatusList;
+    return {
+        data: idAndStatusList,
+        error: null,
+    };
 };
 
 const getSignpostingRawParcelList = async (
     idAndStatusList: idAndStatus[]
-): Promise<rawParcel[] | FetchReportError> => {
+): Promise<{ data: rawParcel[], error: FetchReportError | null }> => {
     const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
         .in(
             "primary_key",
@@ -55,32 +61,38 @@ const getSignpostingRawParcelList = async (
             error: parcelFetchError,
         });
         return {
-            type: "failedToFetchRows",
-            logId,
+            data: [],
+            error: {
+                type: "failedToFetchRows",
+                logId: logId,
+            },
         };
     }
-    return rawParcelList;
+    return {
+        data: rawParcelList,
+        error: null,
+    };
 };
 
 const getSignpostingReportData = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<FetchReportResult> => {
-    const idAndStatusList = await getSignpostingParcelIdsAndStatus(fromDate, toDate);
+    const { data: idAndStatusList, error: idAndStatusError } = await getSignpostingParcelIdsAndStatus(fromDate, toDate);
 
-    if ("type" in idAndStatusList) {
+    if (idAndStatusError) {
         return {
             data: null,
-            error: idAndStatusList,
+            error: idAndStatusError,
         };
     }
 
-    const rawParcelList = await getSignpostingRawParcelList(idAndStatusList);
+    const { data: rawParcelList, error: rawParcelError } = await getSignpostingRawParcelList(idAndStatusList);
 
-    if ("type" in rawParcelList) {
+    if (rawParcelError) {
         return {
             data: null,
-            error: rawParcelList,
+            error: rawParcelError,
         };
     }
 

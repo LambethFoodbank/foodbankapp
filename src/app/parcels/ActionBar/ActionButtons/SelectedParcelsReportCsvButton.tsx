@@ -15,7 +15,7 @@ import ReportCsvButton, {
 
 const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
-): Promise<idAndStatus[] | FetchReportError> => {
+): Promise<{ data:idAndStatus[], error: FetchReportError | null}> => {
     const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery(
         undefined,
         undefined,
@@ -30,15 +30,21 @@ const getSelectedParcelsParcelIdsAndStatus = async (
             }
         );
         return {
-            type: "failedToFetchParcelIds",
-            logId,
+            data: [],
+            error: {
+                type: "failedToFetchParcelIds",
+                logId: logId,
+            },
         };
     }
-    return idAndStatusList;
+    return {
+        data: idAndStatusList,
+        error: null,
+    };
 };
 const getSelectedParcelsRawParcelList = async (
     parcelIds: string[]
-): Promise<rawParcel[] | FetchReportError> => {
+): Promise<{ data: rawParcel[], error: FetchReportError | null }> => {
     const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
         .in("primary_key", parcelIds)
         .order("packing_date")
@@ -49,28 +55,34 @@ const getSelectedParcelsRawParcelList = async (
             error: parcelFetchError,
         });
         return {
-            type: "failedToFetchRows",
-            logId,
+            data: [],
+            error: {
+                type: "failedToFetchRows",
+                logId,
+            },
         };
     }
-    return rawParcelList;
+    return {
+        data: rawParcelList,
+        error: null,
+    };
 };
 const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchReportResult> => {
-    const idAndStatusList = await getSelectedParcelsParcelIdsAndStatus(parcelIds);
+    const {data: idAndStatusList, error: idAndStatusError } = await getSelectedParcelsParcelIdsAndStatus(parcelIds);
 
-    if ("type" in idAndStatusList) {
+    if (idAndStatusError) {
         return {
             data: null,
-            error: idAndStatusList,
+            error: idAndStatusError,
         };
     }
 
-    const rawParcelList = await getSelectedParcelsRawParcelList(parcelIds);
+    const {data: rawParcelList, error: rawParcelError } = await getSelectedParcelsRawParcelList(parcelIds);
 
-    if ("type" in rawParcelList) {
+    if (rawParcelError) {
         return {
             data: null,
-            error: rawParcelList,
+            error: rawParcelError,
         };
     }
 
