@@ -7,6 +7,7 @@ select
     clients.phone_number,
     clients.is_active,
     family_count.family_count,
+    clients.email,
     (delivery_areas.postcode is not null) as is_deliverable
 from
     ((clients

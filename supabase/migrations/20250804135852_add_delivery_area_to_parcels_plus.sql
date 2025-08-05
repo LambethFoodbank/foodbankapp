@@ -31,6 +31,7 @@ select
   parcels.referrer_name,
   parcels.referrer_email,
   parcels.referrer_phone,
+  clients.email as client_email,
   (delivery_areas.postcode is not null) as is_deliverable
 from
    ((((((parcels
