@@ -17,10 +17,10 @@ import { logErrorReturnLogId } from "@/logger/logger";
 const getPendingMoreInfoParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
-): Promise<{ data: idAndStatus[], error: FetchReportError | null}> => {
+): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
         fromDate,
-        toDate
+        toDate,
     })
         // eslint-disable-next-line quotes
         .or('last_status_event_name.eq."Pending More Info"');
@@ -45,7 +45,7 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
 
 const getPendingMoreInfoRawParcelList = async (
     idAndStatusList: idAndStatus[]
-): Promise< { data: rawParcel[], error: FetchReportError | null}> => {
+): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
     const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
         .in(
             "primary_key",
@@ -77,7 +77,8 @@ const getPendingMoreInfoReportData = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<FetchReportResult> => {
-    const { data: idAndStatusList, error: idAndStatusError }= await getPendingMoreInfoParcelIdsAndStatus(fromDate, toDate);
+    const { data: idAndStatusList, error: idAndStatusError } =
+        await getPendingMoreInfoParcelIdsAndStatus(fromDate, toDate);
 
     if (idAndStatusError) {
         return {
@@ -86,7 +87,8 @@ const getPendingMoreInfoReportData = async (
         };
     }
 
-    const {data: rawParcelList, error: rawParcelError} = await getPendingMoreInfoRawParcelList(idAndStatusList);
+    const { data: rawParcelList, error: rawParcelError } =
+        await getPendingMoreInfoRawParcelList(idAndStatusList);
 
     if (rawParcelError) {
         return {

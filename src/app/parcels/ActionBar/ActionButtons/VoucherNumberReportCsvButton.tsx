@@ -17,10 +17,10 @@ import ReportCsvButton, {
 const getMissingVoucherNumberParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
-): Promise<{ data: idAndStatus[], error: FetchReportError | null }> => {
+): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
         fromDate,
-        toDate
+        toDate,
     })
         // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
@@ -48,7 +48,7 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
 
 const getMissingVoucherNumberRawParcelList = async (
     idAndStatusList: idAndStatus[]
-): Promise<{ data: rawParcel[], error: FetchReportError | null }> => {
+): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
     const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
         .in(
             "primary_key",
@@ -79,7 +79,8 @@ const getMissingVoucherNumberReportData = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<FetchReportResult> => {
-    const { data: idAndStatusList, error: idAndStatusError } = await getMissingVoucherNumberParcelIdsAndStatus(fromDate, toDate);
+    const { data: idAndStatusList, error: idAndStatusError } =
+        await getMissingVoucherNumberParcelIdsAndStatus(fromDate, toDate);
 
     if (idAndStatusError) {
         return {
@@ -88,7 +89,8 @@ const getMissingVoucherNumberReportData = async (
         };
     }
 
-    const { data: rawParcelList, error: rawParcelError } = await getMissingVoucherNumberRawParcelList(idAndStatusList);
+    const { data: rawParcelList, error: rawParcelError } =
+        await getMissingVoucherNumberRawParcelList(idAndStatusList);
 
     if (rawParcelError) {
         return {

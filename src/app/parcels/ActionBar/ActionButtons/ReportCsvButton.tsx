@@ -80,17 +80,16 @@ export interface idAndStatus {
 }
 
 type IdAndStatusQueryParams = {
-    fromDate?: Dayjs,
-    toDate?: Dayjs,
-    parcelIds?: string[]
+    fromDate?: Dayjs;
+    toDate?: Dayjs;
+    parcelIds?: string[];
 };
 
 export const getParcelIdsAndStatusQuery = ({
     fromDate,
     toDate,
-    parcelIds
-}: IdAndStatusQueryParams
-): typeof query => {
+    parcelIds,
+}: IdAndStatusQueryParams): typeof query => {
     let query = supabase.from("parcels_plus").select("parcel_id, last_status_event_name");
 
     if (fromDate && toDate) {

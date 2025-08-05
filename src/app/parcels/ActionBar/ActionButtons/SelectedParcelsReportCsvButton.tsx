@@ -15,9 +15,9 @@ import ReportCsvButton, {
 
 const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
-): Promise<{ data:idAndStatus[], error: FetchReportError | null}> => {
+): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
-        parcelIds
+        parcelIds,
     }).in("parcel_id", parcelIds);
 
     if (idFetchError) {
@@ -42,7 +42,7 @@ const getSelectedParcelsParcelIdsAndStatus = async (
 };
 const getSelectedParcelsRawParcelList = async (
     parcelIds: string[]
-): Promise<{ data: rawParcel[], error: FetchReportError | null }> => {
+): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
     const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
         .in("primary_key", parcelIds)
         .order("packing_date")
@@ -66,7 +66,8 @@ const getSelectedParcelsRawParcelList = async (
     };
 };
 const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchReportResult> => {
-    const {data: idAndStatusList, error: idAndStatusError } = await getSelectedParcelsParcelIdsAndStatus(parcelIds);
+    const { data: idAndStatusList, error: idAndStatusError } =
+        await getSelectedParcelsParcelIdsAndStatus(parcelIds);
 
     if (idAndStatusError) {
         return {
@@ -75,7 +76,8 @@ const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchR
         };
     }
 
-    const {data: rawParcelList, error: rawParcelError } = await getSelectedParcelsRawParcelList(parcelIds);
+    const { data: rawParcelList, error: rawParcelError } =
+        await getSelectedParcelsRawParcelList(parcelIds);
 
     if (rawParcelError) {
         return {

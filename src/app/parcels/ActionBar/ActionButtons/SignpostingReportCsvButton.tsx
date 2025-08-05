@@ -17,10 +17,10 @@ import ReportCsvButton, {
 const getSignpostingParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
-): Promise<{ data: idAndStatus[], error: FetchReportError | null }> => {
+): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
         fromDate,
-        toDate
+        toDate,
     })
         // eslint-disable-next-line quotes
         .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
@@ -45,7 +45,7 @@ const getSignpostingParcelIdsAndStatus = async (
 
 const getSignpostingRawParcelList = async (
     idAndStatusList: idAndStatus[]
-): Promise<{ data: rawParcel[], error: FetchReportError | null }> => {
+): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
     const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
         .in(
             "primary_key",
@@ -78,7 +78,8 @@ const getSignpostingReportData = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<FetchReportResult> => {
-    const { data: idAndStatusList, error: idAndStatusError } = await getSignpostingParcelIdsAndStatus(fromDate, toDate);
+    const { data: idAndStatusList, error: idAndStatusError } =
+        await getSignpostingParcelIdsAndStatus(fromDate, toDate);
 
     if (idAndStatusError) {
         return {
@@ -87,7 +88,8 @@ const getSignpostingReportData = async (
         };
     }
 
-    const { data: rawParcelList, error: rawParcelError } = await getSignpostingRawParcelList(idAndStatusList);
+    const { data: rawParcelList, error: rawParcelError } =
+        await getSignpostingRawParcelList(idAndStatusList);
 
     if (rawParcelError) {
         return {
