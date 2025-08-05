@@ -59,7 +59,7 @@ import ListTypeCard from "./formSections/ListTypeCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
-    listType?: ListType;
+    listType: ListType;
     voucherNumber: string | undefined;
     referralAgency: string | undefined;
     referrerName: string | undefined;
@@ -98,7 +98,7 @@ export type CommonCardProps = CardProps<CommonFields, CommonErrors>;
 
 export const initialParcelFields: ParcelFields = {
     clientId: null,
-    listType: undefined,
+    listType: null,
     voucherNumber: "",
     referralAgency: "",
     referrerName: "",

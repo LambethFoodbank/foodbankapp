@@ -66,7 +66,7 @@ export interface ClientFields extends Fields {
     numberOfAdults: number;
     children: Person[];
     numberOfChildren: number;
-    listType?: ListType;
+    listType: ListType;
     cookingFacilities: BooleanGroup | null;
     dietaryRequirements: BooleanGroup | null;
     hygieneProductsTampons: string | null;
@@ -78,7 +78,7 @@ export interface ClientFields extends Fields {
     babyOtherItems: BooleanGroup;
     petFood: BooleanGroup;
     otherItems: BooleanGroup;
-    deliveryInstructions: string | null | undefined;
+    deliveryInstructions: string | null;
     extraInformation: string;
     attentionFlag: boolean;
     signpostingCall: boolean;
