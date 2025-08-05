@@ -2,9 +2,9 @@ import React from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import { getDefaultTextValue, onChangeText } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
+import { ParcelCardProps } from "@/app/parcels/form/ParcelForm";
 
-const ExtraInformationCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter, fields }) => {
+const ExtraInformationCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter, fields }) => {
     return (
         <GenericFormCard
             title="Extra Information"
