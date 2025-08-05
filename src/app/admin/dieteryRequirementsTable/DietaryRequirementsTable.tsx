@@ -108,7 +108,7 @@ const DietaryRequirementsTable: React.FC = () => {
             </Button>
 
             <EditDietaryRequirementsModal
-                open={openEditModal}
+                isOpen={openEditModal}
                 onClose={() => setOpenEditModal(false)}
             />
 

@@ -20,18 +20,18 @@ import { useEffect, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 
 interface Props {
-    open: boolean;
+    isOpen: boolean;
     onClose: () => void;
 }
 
-export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose }) => {
+export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose }) => {
     const [items, setItems] = useState<ListItem[]>([]);
     const [selectedType, setSelectedType] = useState<string>("halal");
     const [included, setIncluded] = useState<Set<string>>(new Set());
     const [excluded, setExcluded] = useState<Set<string>>(new Set());
 
     useEffect(() => {
-        if (!open) {
+        if (!isOpen) {
             return;
         }
 
@@ -39,9 +39,10 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
             const items = await fetchAllItems();
             setItems(items);
 
-            const { data } = await supabase.from("dietary_requirements_plus").select();
+            const { data, error } = await supabase.from("dietary_requirements_plus").select();
 
-            if (!data) {
+            if (error) {
+                console.error("Error fetching dietary requirements data:", error);
                 return;
             }
 
@@ -52,36 +53,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
                 const row = data.find((iterRow) => iterRow.id === item.id);
 
                 if (row) {
-                    let value: string | null = null;
-                    switch (selectedType) {
-                        case "halal":
-                            value = row.halal;
-                            break;
-                        case "vegetarian":
-                            value = row.vegetarian;
-                            break;
-                        case "vegan":
-                            value = row.vegan;
-                            break;
-                        case "meat":
-                            value = row.meat;
-                            break;
-                        case "gluten_free":
-                            value = row.gluten_free;
-                            break;
-                        case "pescatarian":
-                            value = row.pescatarian;
-                            break;
-                        case "dairy_free":
-                            value = row.dairy_free;
-                            break;
-                        case "seafood_allergy":
-                            value = row.seafood_allergy;
-                            break;
-                        case "pet_food":
-                            value = row.pet_food;
-                            break;
-                    }
+                    const value = row[selectedType as keyof typeof row] || null;
 
                     if (value === "included") {
                         includedSet.add(item.id);
@@ -96,7 +68,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
         };
 
         fetchData();
-    }, [open, selectedType]);
+    }, [isOpen, selectedType]);
 
     const handleSubmit = async (): Promise<void> => {
         try {
@@ -156,7 +128,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ open, onClose })
 
     return (
         <Modal
-            isOpen={open}
+            isOpen={isOpen}
             onClose={onClose}
             header="Edit Dietary Requirements"
             headerId="edit-dietary-requirements-modal"
