@@ -53,7 +53,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
             setOriginalNotes(clientDetails?.notes ? clientDetails?.notes : "");
             setIsLoading(false);
         })();
-    }, [clientId, displayClientsParcels]);
+    }, [clientId, displayClientsParcels, clientDetails?.notes]);
 
     useEffect(loadData, [loadData]);
 
@@ -61,7 +61,9 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
         if (isEditting) {
             const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
             if (error) {
-                setErrorMessage(`Error saving notes, please refresh the page. Log ID: ${error.logId}`);
+                setErrorMessage(
+                    `Error saving notes, please refresh the page. Log ID: ${error.logId}`
+                );
                 setNotes(originalNotes);
             } else {
                 setNotes(notes);
