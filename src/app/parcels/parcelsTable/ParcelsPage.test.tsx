@@ -117,9 +117,7 @@ describe("Parcels Page", () => {
                         requiresFollowUpPhoneCall: true,
                     },
                     createdAt: new Date("2023-12-31T12:00:00+00:00"),
-                    clientIsActive: true,
                     email: "full.name@example.com",
-                    isDeliverable: true,
                 },
             ];
             expect(parcelTableRows).toStrictEqual(expected);

@@ -17,11 +17,7 @@ import ExpandedClientDetailsFallback from "@/app/clients/ExpandedClientDetailsFa
 import { CircularProgress } from "@mui/material";
 import { ErrorSecondaryText } from "../../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import {
-    displayPostcodeForHomelessClient,
-    formatDateTime,
-    formatDatetimeAsDate,
-} from "@/common/format";
+import { displayPostcodeForHomelessClient } from "@/common/format";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import DeleteButton from "@/components/Buttons/DeleteButton";
 import deleteClient from "../deleteClient";
