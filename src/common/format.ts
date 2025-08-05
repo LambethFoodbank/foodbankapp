@@ -24,6 +24,9 @@ export const emailRegex = /^\S+@\S+$/;
 
 export const formatPhoneNumber = (value: string): string => {
     const numericInput = value.replace(/(\D)/g, "");
+    if (!numericInput) {
+        return "";
+    }
     return numericInput[0] === "0" ? "+44" + numericInput.slice(1) : "+" + numericInput;
 };
 
