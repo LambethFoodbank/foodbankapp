@@ -1,7 +1,6 @@
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import React from "react";
-import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
 import { DbCollectionCentreType } from "@/common/fetch";
 import { getAvailableDaysIndices } from "@/common/format";
 import { getErrorText, onChangeDate } from "@/components/Form/formFunctions";
