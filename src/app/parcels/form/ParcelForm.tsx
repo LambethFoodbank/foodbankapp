@@ -6,12 +6,12 @@ import { Button, IconButton } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
-    CardProps,
     checkErrorOnSubmit,
     Errors,
     Fields,
     FormErrors,
     createSetter,
+    CardProps,
 } from "@/components/Form/formFunctions";
 import {
     CenterComponent,
@@ -19,10 +19,6 @@ import {
     StyledForm,
     StyledName,
 } from "@/components/Form/formStyling";
-import Icon from "@/components/Icons/Icon";
-import Modal from "@/components/Modal/Modal";
-import { Schema } from "@/databaseUtils";
-
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
@@ -40,7 +36,9 @@ import {
 import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
+    DbCollectionCentreType,
     getActiveTimeSlotsForCollectionCentre,
+    getAvailableDaysForCollectionCentres,
     PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
 import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
@@ -51,6 +49,9 @@ import { useTheme } from "styled-components";
 import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
 import { getDbDate } from "@/common/format";
 import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import Icon from "@/components/Icons/Icon";
+import Modal from "@/components/Modal/Modal";
+import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
