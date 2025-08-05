@@ -37,11 +37,11 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
         ExpandedClientParcelDetails[] | null
     >(null);
 
-    const originalNotes = clientDetails?.notes ?? null;
-
-    const [notes, setNotes] = useState<string | null>(originalNotes);
+    const [originalNotes, setOriginalNotes] = useState<string | null>("");
+    const [notes, setNotes] = useState<string | null>("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isEditting, setIsEditting] = useState<boolean>(false);
 
     const loadData = useCallback(() => {
         (async () => {
@@ -50,6 +50,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
             setClientParcelsDetails(
                 displayClientsParcels ? await getClientParcelsDetails(clientId) : null
             );
+            setOriginalNotes(clientDetails?.notes ? clientDetails?.notes : "");
             setIsLoading(false);
         })();
     }, [clientId, displayClientsParcels]);
@@ -57,26 +58,32 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
     useEffect(loadData, [loadData]);
 
     const onSaveNotes = async (): Promise<void> => {
-        setErrorMessage(null);
-        const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
-        if (error) {
-            setErrorMessage(`Error saving notes, please refresh the page. Log ID: ${error.logId}`);
-            setNotes(originalNotes);
-        } else {
-            setNotes(notes);
-            loadData();
+        if (isEditting) {
+            const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
+            if (error) {
+                setErrorMessage(`Error saving notes, please refresh the page. Log ID: ${error.logId}`);
+                setNotes(originalNotes);
+            } else {
+                setNotes(notes);
+                loadData();
+            }
+            setIsEditting(false);
         }
     };
 
     const onChangeNotes = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
         setErrorMessage(null);
         setNotes(event.target.value);
+        setIsEditting(true);
     };
 
     const onCancelNotes = async (): Promise<void> => {
-        setErrorMessage(null);
-        setNotes(originalNotes);
-        loadData();
+        if (isEditting) {
+            setErrorMessage(null);
+            setNotes(originalNotes);
+            loadData();
+            setIsEditting(false);
+        }
     };
 
     const getExpandedClientDetailsForDataViewer = (
