@@ -165,7 +165,7 @@ export const updateDbCollectionCentre = async (
         return { error: { type: "UpdateCollectionCentreFailed", logId } };
     }
     if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of parcel");
+        const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
         await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
         return { error: { type: "ConcurrentEditCollectionCentre", logId } };
     }
@@ -197,7 +197,7 @@ export const updateDbCollectionCentreTimeSlots = async (
         return { error: { type: "UpdateCollectionCentreFailed", logId } };
     }
     if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of parcel");
+        const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
         await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
         return { error: { type: "ConcurrentEditCollectionCentre", logId } };
     }
