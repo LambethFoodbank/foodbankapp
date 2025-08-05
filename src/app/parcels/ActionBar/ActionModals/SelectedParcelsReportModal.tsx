@@ -1,10 +1,6 @@
 "use client";
 
-<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
-=======
-import React, { useState } from "react";
->>>>>>> 1bbd64a (VFB-410: refactored the code completely)
 import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./GeneralActionModal";
 import { sendAuditLog } from "@/server/auditLog";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
@@ -46,7 +42,6 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-<<<<<<< HEAD
     useEffect(() => {
         const allDeleted = props.selectedParcels.every((parcel) => !parcel.clientIsActive);
         if (allDeleted) {
@@ -55,8 +50,6 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
         }
     }, [props.selectedParcels]);
 
-=======
->>>>>>> 1bbd64a (VFB-410: refactored the code completely)
     const onClose = (): void => {
         props.onClose();
         setErrorMessage(null);
