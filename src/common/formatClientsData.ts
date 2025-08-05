@@ -17,6 +17,10 @@ export interface ClientSummary {
     email: string;
 }
 
+export interface ClientSummaryAndExtraInfo extends ClientSummary {
+    extraInformation: string;
+}
+
 export interface RequirementSummary {
     hygieneProducts: string;
     babyProducts: string;
