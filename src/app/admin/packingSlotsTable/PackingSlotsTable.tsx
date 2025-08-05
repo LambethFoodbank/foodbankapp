@@ -236,6 +236,8 @@ const PackingSlotsTable: React.FC = () => {
             }
 
             return { ...newRow, isNew: false };
+        } catch (error) {
+            throw new Error("Row process failed");
         } finally {
             setIsLoading(false);
         }
