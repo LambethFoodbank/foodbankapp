@@ -125,7 +125,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         }
     }, [areFiltersLoadingForFirstTime, fetchAndDisplayParcelsData]);
 
-    const loadCountAndDataWithTimer = (table_name: string): void => {
+    const loadCountAndDataWithTimer = (table_name?: string): void => {
         if (fetchParcelsTimer.current) {
             clearTimeout(fetchParcelsTimer.current);
             fetchParcelsTimer.current = null;
@@ -142,26 +142,32 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         const subscriptionChannel = supabase
             .channel("parcels-table-changes")
 
-            .on("postgres_changes", { event: "*", schema: "public", table: "parcels" }, () =>
-                loadCountAndDataWithTimer("parcels")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "parcels" },
+                () => loadCountAndDataWithTimer
             )
 
             .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () =>
                 loadCountAndDataWithTimer("events")
             )
 
-            .on("postgres_changes", { event: "*", schema: "public", table: "families" }, () =>
-                loadCountAndDataWithTimer("families")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "families" },
+                () => loadCountAndDataWithTimer
             )
 
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "collection_centres" },
-                () => loadCountAndDataWithTimer("collection_centres")
+                () => loadCountAndDataWithTimer
             )
 
-            .on("postgres_changes", { event: "*", schema: "public", table: "clients" }, () =>
-                loadCountAndDataWithTimer("clients")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "clients" },
+                () => loadCountAndDataWithTimer
             )
             .subscribe((status, err) => {
                 if (subscriptionStatusRequiresErrorMessage(status, err, "parcels and related")) {
