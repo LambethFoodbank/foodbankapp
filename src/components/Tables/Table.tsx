@@ -425,7 +425,7 @@ const Table = <
                     checked={checkboxConfig.isRowChecked(row.data)}
                     onChange={() => checkboxConfig.onCheckboxClicked(row.data)}
                     sx={{
-                        "&.MuiButtonBase-root": { padding: "3px" },
+                        "&.MuiButtonBase-root": { position: "absolute" },
                     }}
                 />
             ),
