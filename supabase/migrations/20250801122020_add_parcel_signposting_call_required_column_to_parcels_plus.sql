@@ -31,6 +31,7 @@ select
     parcels.referrer_name,
     parcels.referrer_email,
     parcels.referrer_phone,
+    clients.email as client_email,
     parcels.flagged_for_attention as parcel_flagged_for_attention,
     parcels.signposting_call_required as parcel_signposting_call_required
 from parcels
