@@ -170,10 +170,6 @@ export const formatAddressFromClientDetails = (
     );
 };
 
-export const formatExtraInformation = (extraInformation: string | null): string => {
-    return extraInformation ? extraInformation.replace(/[\r\n]+/g, "\n") : "";
-};
-
 export const formatHouseholdFromFamilyDetails = (
     family: Pick<
         Schema["families"],
