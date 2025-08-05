@@ -20,7 +20,7 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
 }) => {
     const availableDaysNamesArray = availableDays?.map((availableDaysObject) => {
         if (!availableDaysObject) {
-            return "";
+            return "No days available";
         }
         return availableDaysObject.available_days
             ?.map((days) => (days.day == undefined ? "" : days.day))

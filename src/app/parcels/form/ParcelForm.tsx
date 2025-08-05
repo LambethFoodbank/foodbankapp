@@ -256,12 +256,11 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             const { data, error } = await getAvailableDaysForCollectionCentres(supabase);
 
             if (error) {
-                let errorMessage;
-                switch (error.type) {
-                    case "collectionAvailableDaysFetchFailed":
-                        errorMessage = "Failed to fetch collection available days";
-                        break;
-                }
+                const errorMessages = {
+                    collectionAvailableDaysFetchFailed: "Failed to fetch collection available days",
+                };
+
+                const errorMessage = errorMessages[error.type] || "An unexpected error occurred";
                 setSubmitErrorMessage(`${errorMessage}. Log ID: ${error.logId}`);
                 return;
             }
