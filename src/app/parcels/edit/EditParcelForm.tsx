@@ -62,6 +62,7 @@ const prepareParcelDataForForm = (
             parcelData.signposting_call_reasons !== null
                 ? arrayToBooleanGroup(parcelData.signposting_call_reasons)
                 : null,
+        extraInformation: parcelData.extra_information ?? "",
     };
 };
 

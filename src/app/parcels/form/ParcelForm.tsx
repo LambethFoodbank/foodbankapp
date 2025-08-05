@@ -58,6 +58,7 @@ import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 import AttentionFlagCard from "@/app/parcels/form/formSections/AttentionFlagCard";
 import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import SignpostingCallCard from "@/app/parcels/form/formSections/SignpostingCallCard";
+import ExtraInformationCard from "@/app/parcels/form/formSections/ExtraInformationCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -79,6 +80,7 @@ export interface ParcelFields extends Fields {
     attentionFlag: boolean | null;
     signpostingCall: boolean | null;
     signpostingCallReasons: BooleanGroup | null;
+    extraInformation: string;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -121,6 +123,7 @@ export const initialParcelFields: ParcelFields = {
     attentionFlag: null,
     signpostingCall: null,
     signpostingCallReasons: null,
+    extraInformation: "",
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -162,6 +165,7 @@ const withCollectionFormSections = [
     CollectionSlotCard,
     AttentionFlagCard,
     SignpostingCallCard,
+    ExtraInformationCard,
     ParcelNotesCard,
 ];
 
@@ -173,6 +177,7 @@ const noCollectionFormSections = [
     ShippingMethodCard,
     AttentionFlagCard,
     SignpostingCallCard,
+    ExtraInformationCard,
     DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
@@ -355,6 +360,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 fields.signpostingCall && fields.signpostingCallReasons !== null
                     ? checkboxGroupToArray(fields.signpostingCallReasons)
                     : [],
+            extra_information: fields.extraInformation,
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(
