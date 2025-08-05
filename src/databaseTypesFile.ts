@@ -981,6 +981,7 @@ export type Database = {
           collection_datetime: string | null
           created_at: string | null
           family_count: number | null
+          flagged_for_attention: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
@@ -991,7 +992,6 @@ export type Database = {
           packing_date: string | null
           packing_slot_name: string | null
           packing_slot_order: number | null
-          parcel_flagged_for_attention: boolean | null
           parcel_id: string | null
           referral_agency: string | null
           referrer_email: string | null
