@@ -190,6 +190,7 @@ export type Database = {
           default_list: Database["public"]["Enums"]["list_type"]
           delivery_instructions: string | null
           dietary_requirements: string[] | null
+          email: string | null
           extra_information: string | null
           family_id: string
           flagged_for_attention: boolean | null
@@ -221,6 +222,7 @@ export type Database = {
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
+          email?: string | null
           extra_information?: string | null
           family_id?: string
           flagged_for_attention?: boolean | null
@@ -252,6 +254,7 @@ export type Database = {
           default_list?: Database["public"]["Enums"]["list_type"]
           delivery_instructions?: string | null
           dietary_requirements?: string[] | null
+          email?: string | null
           extra_information?: string | null
           family_id?: string
           flagged_for_attention?: boolean | null
@@ -512,9 +515,14 @@ export type Database = {
           created_at: string
           last_updated: string
           list_type: Database["public"]["Enums"]["list_type"]
+          notes: string | null
           packing_date: string | null
           packing_slot: string | null
           primary_key: string
+          referral_agency: string | null
+          referrer_email: string | null
+          referrer_name: string | null
+          referrer_phone: string | null
           voucher_number: string | null
         }
         Insert: {
@@ -524,9 +532,14 @@ export type Database = {
           created_at?: string
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
+          notes?: string | null
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
+          referral_agency?: string | null
+          referrer_email?: string | null
+          referrer_name?: string | null
+          referrer_phone?: string | null
           voucher_number?: string | null
         }
         Update: {
@@ -536,9 +549,14 @@ export type Database = {
           created_at?: string
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
+          notes?: string | null
           packing_date?: string | null
           packing_slot?: string | null
           primary_key?: string
+          referral_agency?: string | null
+          referrer_email?: string | null
+          referrer_name?: string | null
+          referrer_phone?: string | null
           voucher_number?: string | null
         }
         Relationships: [
@@ -801,43 +819,13 @@ export type Database = {
         Row: {
           address_postcode: string | null
           client_id: string | null
+          email: string | null
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
           phone_number: string | null
         }
         Relationships: []
-      }
-      completed_parcels: {
-        Row: {
-          completed_timestamp: string | null
-          family_count: number | null
-          parcel_id: string | null
-          pet_food: string[] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels"
-            referencedColumns: ["primary_key"]
-          },
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels_events"
-            referencedColumns: ["parcel_id"]
-          },
-          {
-            foreignKeyName: "public_events_parcel_id_fkey"
-            columns: ["parcel_id"]
-            isOneToOne: false
-            referencedRelation: "parcels_plus"
-            referencedColumns: ["parcel_id"]
-          },
-        ]
       }
       family_count: {
         Row: {
@@ -850,6 +838,7 @@ export type Database = {
         Row: {
           all_events: string[] | null
           last_event_data: string | null
+          last_event_is_successfully_completed: boolean | null
           last_event_name: string | null
           last_event_timestamp: string | null
           last_event_workflow_order: number | null
@@ -870,6 +859,7 @@ export type Database = {
           all_events: string[] | null
           client_address_postcode: string | null
           client_delivery_instructions: string | null
+          client_email: string | null
           client_flagged_for_attention: boolean | null
           client_full_name: string | null
           client_id: string | null
@@ -884,6 +874,7 @@ export type Database = {
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
+          last_status_is_successfully_completed: boolean | null
           last_status_timestamp: string | null
           last_status_workflow_order: number | null
           list_type: Database["public"]["Enums"]["list_type"] | null
@@ -891,6 +882,10 @@ export type Database = {
           packing_slot_name: string | null
           packing_slot_order: number | null
           parcel_id: string | null
+          referral_agency: string | null
+          referrer_email: string | null
+          referrer_name: string | null
+          referrer_phone: string | null
           voucher_number: string | null
         }
         Relationships: [
