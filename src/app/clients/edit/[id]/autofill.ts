@@ -52,7 +52,6 @@ const autofill = (
         petFood: arrayToBooleanGroup(clientData.pet_food ?? []),
         otherItems: arrayToBooleanGroup(clientData.other_items ?? []),
         deliveryInstructions: clientData.delivery_instructions ?? "",
-        extraInformation: clientData.extra_information ?? "",
         lastUpdated: clientData.last_updated,
         notes: clientData.notes,
     };
