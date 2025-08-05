@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import styled, { useTheme } from "styled-components";
-import { ErrorTextModalFooter } from "@/app/errorStylingandMessages";
+import { ErrorSecondaryText, ErrorTextModalFooter } from "@/app/errorStylingandMessages";
 import { FormGroup } from "@mui/material";
 import Icon from "@/components/Icons/Icon";
 import { faShoePrints, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
