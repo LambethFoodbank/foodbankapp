@@ -4,7 +4,7 @@ import { faShoePrints } from "@fortawesome/free-solid-svg-icons";
 import { FormGroup } from "@mui/material";
 import Button from "@mui/material/Button";
 import React, { useEffect, useState } from "react";
-import styled, { useTheme } from "styled-components";
+import { useTheme } from "styled-components";
 import {
     CollectionCentresTableRow,
     FormattedAvailableDays,
@@ -25,21 +25,13 @@ import {
     SpaceBetween,
 } from "@/components/Modal/ModalFormStyles";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import { ModalAvailableDaysContainer, ModalAvailableDaysRow } from "@/app/admin/common/modalStyles";
 
 interface Props {
     selectedCollectionCentreInfo: CollectionCentresTableRow | null;
     isOpen: boolean;
     onClose: () => void;
 }
-
-const ModalAvailableDaysContainer = styled.div`
-    max-height: 40vh;
-    overflow-y: auto;
-`;
-
-const ModalAvailableDaysRow = styled.div`
-    width: 20rem;
-`;
 
 function getBaseAuditLogForCollectionCentreAvailableDays(
     action: string,
