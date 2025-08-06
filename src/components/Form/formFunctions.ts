@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs";
-import { phoneNumberFormatSymbolsRegex } from "@/common/format";
+import { phoneNumberFormatSymbolsRegex, formatPhoneNumber } from "@/common/format";
 import {
     BooleanGroup,
     ChangeEventHandler,
@@ -26,6 +26,7 @@ export enum Errors {
     invalidCollectionDate = "The previous collection date is no longer available, please select a new collection date.",
     invalidCollectionSlot = "The previous timeslot is no longer available, please select a new timeslot.",
     noCollectionSlotsSet = "There are no collection slots set for this collection centre, please select a different collection centre or contact admin.",
+    alreadyExists = "This phone number already exists, please add a different phone number.",
 }
 
 export const numberRegex = /^\d+$/;
@@ -68,7 +69,9 @@ const getErrorType = (
     required?: boolean,
     regex?: RegExp,
     additionalCondition?: (value: string) => boolean,
-    maxCharacters?: number
+    maxCharacters?: number,
+    currentAdditionalPhoneNumbers?: string[] | null,
+    primaryPhoneNumber?: string | null
 ): Errors => {
     if (input == "") {
         return required ? Errors.required : Errors.none;
@@ -82,6 +85,13 @@ const getErrorType = (
 
     if (maxCharacters !== undefined && input.length > maxCharacters) {
         return Errors.tooLong;
+    }
+
+    if (currentAdditionalPhoneNumbers) {
+        return currentAdditionalPhoneNumbers.includes(formatPhoneNumber(input)) ||
+            primaryPhoneNumber === formatPhoneNumber(input)
+            ? Errors.alreadyExists
+            : Errors.none;
     }
 
     return Errors.none;
@@ -98,6 +108,7 @@ interface OnChangeTextOptions<SpecificFields> {
 export const onChangeAdditionalFields = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     currentAdditionalPhoneNumbers: string[] | null,
+    primaryPhoneNumber: string | null,
     errorSetter: Setter<FormErrors<SpecificFields>> | Setter<Required<FormErrors<SpecificFields>>>,
     key: keyof SpecificFields,
     index: number,
@@ -112,10 +123,11 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
             options?.required,
             options?.regex,
             options?.additionalCondition,
-            options?.maxCharacters
+            options?.maxCharacters,
+            currentAdditionalPhoneNumbers,
+            primaryPhoneNumber
         );
 
-        console.log(errorType);
         errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });
 
         if (errorType === Errors.none) {
@@ -150,6 +162,7 @@ export const onChangeText = <SpecificFields extends Fields>(
             options?.additionalCondition,
             options?.maxCharacters
         );
+
         errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });
         if (errorType === Errors.none) {
             const newValue = options?.formattingFunction

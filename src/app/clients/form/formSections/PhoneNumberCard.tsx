@@ -16,6 +16,7 @@ import Divider from "@mui/material/Divider";
 
 import { FormText, GappedDiv, GappedRowDiv } from "@/components/Form/formStyling";
 import DeleteIcon from "@mui/icons-material/Delete";
+import FloatingToast from "@/components/FloatingToast";
 
 const phoneNumberIsRequired = false;
 
@@ -29,6 +30,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         const additionalCount = fields.additionalPhoneNumbers?.length || 0;
         return Array.from({ length: additionalCount + 1 }, (_, index) => ({ id: index }));
     });
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const additionalCount = fields.additionalPhoneNumbers?.length || 0;
@@ -39,9 +41,38 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         }
     }, [fields.additionalPhoneNumbers?.length]);
 
+    useEffect(() => {
+        if (errorMessage) {
+            const timer = setTimeout(() => {
+                setErrorMessage(null);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [errorMessage]);
+
     const handleAddPhoneNumber = () => {
         const newId = phoneNumbers.length - 1;
-        setPhoneNumbers([...phoneNumbers, { id: newId }]);
+        if (newId > 0) {
+            if (
+                fields?.additionalPhoneNumbers[newId - 1] !== undefined &&
+                fields.additionalPhoneNumbers[newId - 1].length > 0
+            ) {
+                setPhoneNumbers([...phoneNumbers, { id: newId }]);
+            } else {
+                setErrorMessage(
+                    "The previous phone number should be filled before adding another phone number."
+                );
+            }
+        } else {
+            if (fields.phoneNumber?.length > 0) {
+                setPhoneNumbers([...phoneNumbers, { id: newId }]);
+            } else {
+                setErrorMessage(
+                    "The primary phone number should be filled before adding another phone number."
+                );
+            }
+        }
     };
 
     const handleRemovePhoneNumber = (indexToRemove: number) => {
@@ -49,15 +80,11 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
             prevPhoneNumbers.filter((_, index) => index !== indexToRemove)
         );
 
-        console.log(indexToRemove);
-
         const updatedAdditionalPhones = [...(fields.additionalPhoneNumbers || [])];
         updatedAdditionalPhones.splice(indexToRemove - 1, 1);
-        console.log(updatedAdditionalPhones);
 
         fieldSetter({ additionalPhoneNumbers: updatedAdditionalPhones });
     };
-
     return (
         <GenericFormCard
             title="Phone Number"
@@ -87,6 +114,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                         {index >= 1 && (
                             <GappedRowDiv>
                                 <FreeFormTextInput
+                                    disabled={errorExists(formErrors.phoneNumber)}
                                     key={phone.id}
                                     id={`client-phone-number-${phone.id}`}
                                     label={`Phone Number ${index > 0 ? index + 1 : ""}`}
@@ -96,6 +124,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                     onChange={onChangeAdditionalFields(
                                         fieldSetter,
                                         fields.additionalPhoneNumbers,
+                                        fields.phoneNumber,
                                         errorSetter,
                                         "additionalPhoneNumbers",
                                         index - 1,
@@ -115,9 +144,23 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                         )}
                     </GappedDiv>
                 ))}
-                <Button color="primary" startIcon={<AddIcon />} onClick={handleAddPhoneNumber}>
-                    Add another phone number
-                </Button>
+                {!errorExists(formErrors.phoneNumber) &&
+                    !errorExists(formErrors.additionalPhoneNumbers) && (
+                        <Button
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            onClick={handleAddPhoneNumber}
+                        >
+                            Add another phone number
+                        </Button>
+                    )}
+                {errorMessage && (
+                    <FloatingToast
+                        message={errorMessage}
+                        severity="warning"
+                        variant="filled"
+                    ></FloatingToast>
+                )}
             </GappedDiv>
         </GenericFormCard>
     );
