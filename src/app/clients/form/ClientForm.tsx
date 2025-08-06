@@ -58,7 +58,7 @@ export interface ClientFields extends Fields {
     addressLine2: string;
     addressTown: string;
     addressCounty: string;
-    addressPostcode: string;
+    addressPostcode: string | null;
     adults: Person[];
     numberOfAdults: number;
     children: Person[];

@@ -88,7 +88,6 @@ describe("Parcels Page", () => {
                     addressColumn: {
                         addressPostcode: "SW1A 2AA",
                         isDeliverable: true,
-                        clientIsActive: true,
                     },
                     collectionDatetime: new Date("2023-08-04T13:30:00+00:00"),
                     deliveryCollection: {
@@ -117,6 +116,7 @@ describe("Parcels Page", () => {
                         requiresFollowUpPhoneCall: true,
                     },
                     createdAt: new Date("2023-12-31T12:00:00+00:00"),
+                    clientIsActive: true,
                     email: "full.name@example.com",
                 },
             ];

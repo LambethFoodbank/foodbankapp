@@ -45,7 +45,6 @@ export const mockData: ParcelsTableRow[] = [
         addressColumn: {
             addressPostcode: "AB1 2CD",
             isDeliverable: false,
-            clientIsActive: true,
         },
         deliveryCollection: {
             collectionCentreName: "Centre 1",
@@ -77,6 +76,7 @@ export const mockData: ParcelsTableRow[] = [
         referrerName: "Ana Doe",
         referrerPhone: "0987 654000",
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
+        clientIsActive: true,
         email: "john.smith@example.com",
     },
     {
@@ -85,7 +85,6 @@ export const mockData: ParcelsTableRow[] = [
         addressColumn: {
             addressPostcode: "AB1 aaaa2CD",
             isDeliverable: false,
-            clientIsActive: true,
         },
         deliveryCollection: {
             collectionCentreName: "Centraaaae 1",
@@ -117,6 +116,7 @@ export const mockData: ParcelsTableRow[] = [
         referrerName: "John Doe",
         referrerPhone: "0987 654000",
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
+        clientIsActive: true,
         email: "john.doe@example.com",
     },
 ];

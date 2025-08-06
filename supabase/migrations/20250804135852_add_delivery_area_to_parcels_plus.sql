@@ -32,7 +32,7 @@ select
   parcels.referrer_email,
   parcels.referrer_phone,
   clients.email as client_email,
-  (delivery_areas.postcode is not null) as is_deliverable
+  ((delivery_areas.postcode is not null and clients.is_active) is true or clients.address_postcode is null) as is_deliverable
 from
    ((((((parcels
   left join collection_centres on ((parcels.collection_centre = collection_centres.primary_key)))

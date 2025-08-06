@@ -70,9 +70,15 @@ export const formatClientRecord = (
 export const formatDeliveryAreaRecord = (
     fields: ClientFields
 ): DeliveryAreaDatabaseInsertRecord => {
-    return {
-        postcode: fields.addressPostcode.split(/\s+/)[0],
-    };
+    if (fields.addressPostcode !== null) {
+        return {
+            postcode: fields.addressPostcode.split(/\s+/)[0],
+        };
+    } else {
+        return {
+            postcode: "",
+        };
+    }
 };
 
 type addClientErrors = "failedToInsertClientAndFamily";

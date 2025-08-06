@@ -37,7 +37,7 @@ const AddressCard: React.FC<ClientCardProps> = ({
         if (event.target.checked) {
             errorSetter({ addressPostcode: Errors.none, addressLine1: Errors.none });
             fieldSetter({
-                addressPostcode: "",
+                addressPostcode: null,
                 addressLine1: "",
                 addressLine2: "",
                 addressTown: "",

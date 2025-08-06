@@ -13,7 +13,6 @@ export interface ParcelsTableRow {
     addressColumn: {
         addressPostcode: Schema["clients"]["address_postcode"];
         isDeliverable: boolean | null;
-        clientIsActive: boolean;
     };
     phoneNumber: Schema["clients"]["phone_number"];
     deliveryCollection: {
@@ -43,6 +42,7 @@ export interface ParcelsTableRow {
     };
     packingDate: Date | null;
     createdAt: Date | null;
+    clientIsActive: boolean;
     email: string | null;
 }
 
