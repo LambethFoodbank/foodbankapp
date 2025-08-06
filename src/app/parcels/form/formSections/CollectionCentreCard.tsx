@@ -31,7 +31,10 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
         useMemo(() => {
             return collectionCentresLabelsAndValues.map((centre, index) => {
                 const [label, value] = centre;
-                const daysString = availableDaysNamesArray?.[index];
+                const daysString =
+                    availableDaysNamesArray?.[index] == ""
+                        ? "No days available"
+                        : availableDaysNamesArray[index];
 
                 return [label + " - " + daysString, value];
             });
