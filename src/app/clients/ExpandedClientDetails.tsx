@@ -41,7 +41,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
     const [notes, setNotes] = useState<string | null>("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [isEditting, setIsEditting] = useState<boolean>(false);
+    const [isEditing, setisEditing] = useState<boolean>(false);
 
     const loadData = useCallback(() => {
         (async () => {
@@ -58,7 +58,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
     useEffect(loadData, [loadData]);
 
     const onSaveNotes = async (): Promise<void> => {
-        if (isEditting) {
+        if (isEditing) {
             const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
             if (error) {
                 setErrorMessage(
@@ -69,22 +69,22 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
                 setNotes(notes);
                 loadData();
             }
-            setIsEditting(false);
+            setisEditing(false);
         }
     };
 
     const onChangeNotes = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
         setErrorMessage(null);
         setNotes(event.target.value);
-        setIsEditting(true);
+        setisEditing(true);
     };
 
     const onCancelNotes = async (): Promise<void> => {
-        if (isEditting) {
+        if (isEditing) {
             setErrorMessage(null);
             setNotes(originalNotes);
             loadData();
-            setIsEditting(false);
+            setisEditing(false);
         }
     };
 
