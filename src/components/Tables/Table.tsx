@@ -176,6 +176,7 @@ interface Props<Data, DbData extends Record<string, unknown>, PaginationType, Fi
     rowBreakPointConfigs?: BreakPointConfig[];
     defaultShownHeaders?: readonly (keyof Data)[];
     toggleableHeaders?: readonly (keyof Data | string)[];
+    showToggleableHeadersInTableContainer?: boolean;
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>;
     columnStyleOptions?: ColumnStyles<Data>;
     editableConfig: EditableConfig<Data>;
@@ -231,6 +232,7 @@ const Table = <
     isLoading = false,
     defaultShownHeaders,
     toggleableHeaders = [],
+    showToggleableHeadersInTableContainer = true,
     onRowClick,
     columnDisplayFunctions = {},
     columnStyleOptions = {},
@@ -488,6 +490,16 @@ const Table = <
             )}
 
             <RelativeContainerForTable>
+                {showToggleableHeadersInTableContainer && (
+                    <ColumnSelectorContainer>
+                        <ColumnTogglePopup
+                            toggleableHeaders={toggleableHeaders}
+                            shownHeaderKeys={shownHeaderKeys}
+                            setShownHeaderKeys={setShownHeaderKeys}
+                            headers={headerKeysAndLabels}
+                        />
+                    </ColumnSelectorContainer>
+                )}
                 <TableStyling
                     $rowBreakPointConfigs={rowBreakPointConfigs ?? []}
                     $dividingLineStyleOptions={getDividingLineStyleOptions(theme)}
@@ -564,6 +576,13 @@ const EditAndReorderArrowDiv = styled.div`
 
 const RelativeContainerForTable = styled.div`
     position: relative;
+`;
+
+const ColumnSelectorContainer = styled.div`
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 900;
 `;
 
 const TableStyling = styled.div<{
@@ -644,12 +663,11 @@ const TableStyling = styled.div<{
     & .rdt_TableHeadRow,
     & .rdt_TableCol,
     & .rdt_Table {
-        //text-align: start;
+        text-align: start;
         font-size: 1rem;
         background-color: transparent;
         color: ${(props) => props.theme.main.foreground[2]};
-        text-align: center;
-        justify-content: center;
+        justify-content: start;
     }
 
     & .rdt_Table {
@@ -687,7 +705,7 @@ const TableStyling = styled.div<{
     }
 
     & .rdt_TableRow {
-        text-align: center;
+        text-align: start;
         font-size: 1rem;
         background-color: ${(props) => props.theme.main.background[1]};
     }

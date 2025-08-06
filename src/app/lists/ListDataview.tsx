@@ -326,6 +326,7 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
                 <ClientPaginatedTable<ListRow, string>
                     headerKeysAndLabels={listsHeaderKeysAndLabels}
                     toggleableHeaders={toggleableHeaders}
+                    showToggleableHeadersInTableContainer={false}
                     dataPortion={listData}
                     columnDisplayFunctions={listDataViewColumnDisplayFunctions}
                     columnStyleOptions={listsColumnStyleOptions}

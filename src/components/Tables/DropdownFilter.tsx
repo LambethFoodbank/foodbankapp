@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { ClientSideFilter, ClientSideFilterMethod } from "./Filters";
 import FormControl from "@mui/material/FormControl";
@@ -59,7 +57,7 @@ export const clientSideDropdownFilter = <Data,>({
                         labelId={`${key}-label`}
                         value={state}
                         label={label}
-                        onChange={(e) => setState(e.target.value as string)}
+                        onChange={(event) => setState(event.target.value as string)}
                     >
                         {itemLabelsAndKeys.map(([itemLabel, itemKey]) => (
                             <MenuItem key={itemKey} value={itemKey}>

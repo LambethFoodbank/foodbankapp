@@ -83,7 +83,7 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
                             },
                         ])
                 ),
-            }) as ListRow
+            }) as ListRow // this cast is needed here as the type system can't infer what Object.fromEntries will return
     );
 };
 
