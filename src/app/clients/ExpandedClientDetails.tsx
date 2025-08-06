@@ -62,7 +62,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
             const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
             if (error) {
                 setErrorMessage(
-                    `Error saving notes, please refresh the page. Log ID: ${error.logId}`
+                    `Record has been edited recently - please refresh the page. Log ID: ${error.logId}`
                 );
                 setNotes(originalNotes);
             } else {
