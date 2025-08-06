@@ -48,6 +48,7 @@ const GenericSelect = <ValueType,>(props: GenericProps<ValueType>): React.ReactE
                 value={props.value ?? undefined}
                 onChange={props.onChange}
                 labelId={props.selectLabelId}
+                label={props.listTitle}
                 inputRef={dropdownInputFocusRef}
                 error={props.error}
             >
