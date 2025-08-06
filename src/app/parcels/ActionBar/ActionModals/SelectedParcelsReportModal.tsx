@@ -57,10 +57,10 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
         });
         props.postSuccessCallback();
 
-        // Delay closing the modal to allow user to handle file explorer dialog
+        // Auto-close the modal after 3 seconds
         setTimeout(() => {
             props.onClose();
-        }, 3000); // 3-second delay
+        }, 3000);
     };
 
     const onFileCreationFailed = (csvError: FetchSelectedParcelsReportError): void => {

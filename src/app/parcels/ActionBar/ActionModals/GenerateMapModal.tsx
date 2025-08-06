@@ -81,7 +81,7 @@ const GenerateMapModal: React.FC<ActionModalProps> = (props) => {
         // Auto-close the modal after 3 seconds
         setTimeout(() => {
             props.onClose();
-        }, 3000); // 3-second delay
+        }, 3000);
     };
 
     return (
