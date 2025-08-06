@@ -20,6 +20,7 @@ import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionSta
 import { clientSideButtonGroupFilter, filterRowbyButton } from "@/components/Tables/ButtonFilter";
 import { buildClientSideTextFilter, filterRowByText } from "@/components/Tables/TextFilter";
 import { clientSideDropdownFilter } from "@/components/Tables/DropdownFilter";
+import { itemTypeLabels } from "@/common/databaseItemTypes";
 
 interface FetchedListsData {
     listsData: Schema["lists"][];
@@ -90,8 +91,15 @@ const filterRowByAvailability = <Data,>(row: Data, state: string, rowKey?: keyof
     if (state === "all" || !rowKey) {
         return true;
     }
-    const desired = state === "true"; // "true" for Available, "false" for Not available
+    const desired = state === "true";
     return (row as never)[rowKey] === desired;
+};
+
+const filterRowByItemType = <Data,>(row: Data, state: string, rowKey?: keyof Data): boolean => {
+    if (state === "all" || !rowKey) {
+        return true;
+    }
+    return (row as never)[rowKey] === state;
 };
 
 const filters: ListFilter[] = [
@@ -121,7 +129,19 @@ const filters: ListFilter[] = [
         ],
         initialSelected: "all",
         method: filterRowByAvailability,
-        shouldPersistOnClear: true,
+    }),
+    clientSideDropdownFilter({
+        key: "itemType",
+        rowKey: "item_type",
+        label: "Item Type",
+        itemLabelsAndKeys: [
+            ["All", "all"],
+            ...Object.entries(itemTypeLabels).map(
+                ([key, label]) => [label, key] as [string, string]
+            ),
+        ],
+        initialSelected: "all",
+        method: filterRowByItemType,
     }),
 ];
 
