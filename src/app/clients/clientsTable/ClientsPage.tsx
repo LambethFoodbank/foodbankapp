@@ -192,7 +192,7 @@ const ClientsPage: React.FC = () => {
     }: ClientsTableRow["addressColumn"]): React.ReactElement => {
         const postcodeRow: React.ReactNode[] = [];
         postcodeRow.push(formatNullPostcode(addressPostcode));
-        if (!isDeliverable) {
+        if (!isDeliverable && !addressPostcode?.includes("-")) {
             postcodeRow.push(
                 <span style={{ paddingLeft: "0.3rem" }}>
                     <>
