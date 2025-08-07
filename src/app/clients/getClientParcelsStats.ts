@@ -12,7 +12,7 @@ export interface ExpandedClientParcelStats extends Data {
 
 interface ParcelStatsInfo extends Data {
     last_event_timestamp: string | null;
-    all_events: string[] | null;
+    last_event_is_successfully_completed: boolean | null;
 }
 
 interface ClientParcelStatsError {
@@ -33,7 +33,7 @@ const getAllClientParcelsStats = async (
         .select(
             `
             last_event_timestamp,
-            all_events
+            last_event_is_successfully_completed
         `
         )
         .in("parcel_id", parcelIdList);
@@ -70,10 +70,7 @@ export const getClientParcelsStats = async (
     }
 
     const deliveredParcels = parcelData.filter(
-        (parcel) =>
-            parcel.all_events?.includes("Delivered") ||
-            parcel.all_events?.includes("Parcel Collected") ||
-            parcel.all_events?.includes("Fulfilled with Trussell")
+        (parcel) => parcel.last_event_is_successfully_completed
     );
 
     const todayTime = new Date();
