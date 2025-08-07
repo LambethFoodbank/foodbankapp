@@ -41,8 +41,8 @@ export interface ClientsTableRow {
     clientId: Schema["clients"]["primary_key"];
     fullName: Schema["clients"]["full_name"];
     familyCategory: string;
-    addressColumn: {
-        addressPostcode: Schema["clients"]["address_postcode"];
+    addressPostcode: {
+        postcode: Schema["clients"]["address_postcode"];
         isDeliverable: boolean | null;
     };
     phoneNumber: Schema["clients"]["phone_number"];

@@ -4,7 +4,7 @@ import { ClientsTableRow } from "./types";
 const clientsHeaders: TableHeaders<ClientsTableRow> = [
     ["fullName", "Name"],
     ["familyCategory", "Family Size"],
-    ["addressColumn", "Postcode"],
+    ["addressPostcode", "Postcode"],
     ["phoneNumber", "Phone"],
     ["email", "Email"],
 ];

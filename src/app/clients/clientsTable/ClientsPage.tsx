@@ -179,7 +179,7 @@ const ClientsPage: React.FC = () => {
     const { role } = useContext(RoleUpdateContext);
 
     const onRowClick = (row: Row<ClientsTableRow>): void => {
-        if (row.data.addressColumn.isDeliverable || (role !== null && role !== "volunteer")) {
+        if (row.data.addressPostcode.isDeliverable || (role !== null && role !== "volunteer")) {
             router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
         } else {
             router.push("/clients");
@@ -187,12 +187,12 @@ const ClientsPage: React.FC = () => {
     };
 
     const RowToIconsColumn = ({
-        addressPostcode,
+        postcode,
         isDeliverable,
-    }: ClientsTableRow["addressColumn"]): React.ReactElement => {
+    }: ClientsTableRow["addressPostcode"]): React.ReactElement => {
         const postcodeRow: React.ReactNode[] = [];
-        postcodeRow.push(formatNullPostcode(addressPostcode));
-        if (!isDeliverable && !addressPostcode?.includes("-")) {
+        postcodeRow.push(formatNullPostcode(postcode));
+        if (!isDeliverable && postcode !== "-") {
             postcodeRow.push(
                 <span style={{ paddingLeft: "0.3rem" }}>
                     <>
@@ -205,7 +205,7 @@ const ClientsPage: React.FC = () => {
     };
 
     const clientTableColumnDisplayFunctions = {
-        addressColumn: RowToIconsColumn,
+        addressPostcode: RowToIconsColumn,
     };
 
     return (

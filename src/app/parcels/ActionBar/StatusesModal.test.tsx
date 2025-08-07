@@ -12,8 +12,8 @@ const mockData: ParcelsTableRow[] = [
     {
         clientId: "primaryKey1",
         phoneNumber: "0987 654321",
-        addressColumn: {
-            addressPostcode: "AB1 2CD",
+        addressPostcode: {
+            postcode: "AB1 2CD",
             isDeliverable: false,
         },
         deliveryCollection: {
@@ -52,8 +52,8 @@ const mockData: ParcelsTableRow[] = [
     {
         clientId: "primaryKey2",
         phoneNumber: "+1 234 567",
-        addressColumn: {
-            addressPostcode: "AB1 aaaa2CD",
+        addressPostcode: {
+            postcode: "AB1 aaaa2CD",
             isDeliverable: false,
         },
         deliveryCollection: {

@@ -78,17 +78,14 @@ function EditToolbar(props: EditToolbarProps): React.JSX.Element {
 
 function getBaseAuditLogForDeliveryAreasAction(
     action: string,
-    deliveryAreasRow: DeliveryAreasRow,
-    options?: {
-        excludeDeliveryAreasId?: boolean;
-    }
+    deliveryAreasRow: DeliveryAreasRow
 ): Pick<AuditLog, "action" | "content" | "deliveryAreasId"> {
     return {
         action,
         content: {
             deliveryAreasPostcode: deliveryAreasRow.postcode,
         },
-        deliveryAreasId: options?.excludeDeliveryAreasId ? undefined : deliveryAreasRow.id,
+        deliveryAreasId: deliveryAreasRow.id,
     };
 }
 
@@ -163,8 +160,7 @@ const DeliveryAreasTable: React.FC = () => {
                 await insertNewDeliveryAreas(newRow);
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
                 "add a new delivery area",
-                newRow,
-                { excludeDeliveryAreasId: true }
+                newRow
             );
 
             if (insertDeliveryAreasError) {

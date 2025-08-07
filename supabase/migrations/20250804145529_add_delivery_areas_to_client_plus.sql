@@ -10,8 +10,8 @@ select
     clients.email,
     ((delivery_areas.postcode is not null and clients.is_active is true) or clients.address_postcode is null) as is_deliverable
 from
-    ((clients
-    left join family_count on ((clients.family_id = family_count.family_id)))
-    left join delivery_areas on ((split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode)))
+    clients
+    left join family_count on clients.family_id = family_count.family_id
+    left join delivery_areas on split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode
 order by
     clients.full_name;

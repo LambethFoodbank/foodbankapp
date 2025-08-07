@@ -12,7 +12,7 @@ const clientsSortableColumns: SortOptions<ClientsTableRow, ClientsSortMethod>[] 
             query.order("family_count", { ascending: sortDirection === "asc" }),
     },
     {
-        key: "addressColumn",
+        key: "addressPostcode",
         sortMethod: (sortDirection, query) =>
             query.order("address_postcode", { ascending: sortDirection === "asc" }),
     },

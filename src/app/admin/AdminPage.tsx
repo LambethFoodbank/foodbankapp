@@ -66,6 +66,11 @@ const AdminPage: React.FC = () => {
             panelContent: <DietaryRequirementsTable />,
         },
         {
+            panelTitle: "Edit Delivery Areas",
+            panelIcon: faTruck,
+            panelContent: <DeliveryAreasTable />,
+        },
+        {
             panelTitle: "Edit Website Data",
             panelIcon: faServer,
             panelContent: <WebsiteDataTable />,
@@ -74,11 +79,6 @@ const AdminPage: React.FC = () => {
             panelTitle: "View Audit Logs",
             panelIcon: auditLogIcon,
             panelContent: <AuditLogTable />,
-        },
-        {
-            panelTitle: "Edit Delivery Areas",
-            panelIcon: faTruck,
-            panelContent: <DeliveryAreasTable />,
         },
     ];
 

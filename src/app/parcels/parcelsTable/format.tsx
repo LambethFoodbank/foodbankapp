@@ -85,13 +85,13 @@ const formatNullPostcode = (postcodeData: string | null): string => {
 };
 
 const rowToAddressColumn = ({
-    addressPostcode,
+    postcode,
     isDeliverable,
-}: ParcelsTableRow["addressColumn"]): React.ReactElement => {
+}: ParcelsTableRow["addressPostcode"]): React.ReactElement => {
     const postcodeRow: React.ReactNode[] = [];
-    postcodeRow.push(formatNullPostcode(addressPostcode));
+    postcodeRow.push(formatNullPostcode(postcode));
 
-    if (!isDeliverable && !addressPostcode?.includes("-")) {
+    if (!isDeliverable && postcode !== "-") {
         postcodeRow.push(
             <span style={{ paddingLeft: "0.3rem" }}>
                 <>
@@ -109,7 +109,7 @@ export const parcelTableColumnDisplayFunctions = {
     deliveryCollection: RowToDeliveryCollectionColumn,
     packingDate: formatDatetimeAsDate,
     lastStatus: rowToLastStatusColumn,
-    addressColumn: rowToAddressColumn,
+    addressPostcode: rowToAddressColumn,
     createdAt: formatDateTime,
 };
 

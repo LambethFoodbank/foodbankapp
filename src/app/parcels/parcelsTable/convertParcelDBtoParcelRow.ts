@@ -46,8 +46,8 @@ const convertParcelDbtoParcelRow = async (
                 familyCategory: clientActive
                     ? familyCountToFamilyCategory(parcel.family_count ?? 0)
                     : "-",
-                addressColumn: {
-                    addressPostcode: clientActive ? parcel.client_address_postcode : "-",
+                addressPostcode: {
+                    postcode: clientActive ? parcel.client_address_postcode : "-",
                     isDeliverable: parcel.is_deliverable,
                 },
                 phoneNumber: clientActive
