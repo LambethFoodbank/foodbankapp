@@ -25,7 +25,6 @@ export const updateClientDeliveryInstructions = async (
         const logId = await logErrorReturnLogId("update client delivery instructions failed", {
             error,
         });
-        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
         return { error: { type: "updateDeliveryInstructionsFailed", logId } };
     }
 

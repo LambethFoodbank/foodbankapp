@@ -111,7 +111,7 @@ export const initialParcelFields: ParcelFields = {
     collectionSlot: null,
     collectionCentre: null,
     lastUpdated: undefined,
-    deliveryInstructions: null, // this should be the client's field
+    deliveryInstructions: null,
     notes: null,
 };
 
@@ -193,7 +193,7 @@ const databaseErrorMessageFromErrorType = (
 const ParcelForm: React.FC<ParcelFormProps> = ({
     initialFields,
     initialFormErrors,
-    clientId,
+    clientId = null,
     writeParcelInfoToDatabase,
     deliveryPrimaryKey,
     collectionCentresLabelsAndValues,
