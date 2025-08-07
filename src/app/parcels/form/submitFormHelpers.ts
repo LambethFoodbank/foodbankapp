@@ -10,15 +10,18 @@ export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelEr
 export type ParcelDatabaseInsertRecord = InsertSchema["parcels"];
 type ParcelDatabaseUpdateRecord = UpdateSchema["parcels"];
 
-type InsertParcelErrorType = "failedToInsertParcel";
+type InsertParcelErrorType = "failedToInsertParcel" | "failedToUpdateDeliveryInstructions";
 export type InsertParcelReturnType = {
     error: { type: InsertParcelErrorType; logId: string } | null;
     parcelId: string | null;
 };
 
-type InsertParcel = (parcelRecord: ParcelDatabaseInsertRecord) => Promise<InsertParcelReturnType>;
+type InsertParcel = (
+    parcelRecord: ParcelDatabaseInsertRecord,
+    deliveryInstructions: string | undefined
+) => Promise<InsertParcelReturnType>;
 
-export const insertParcel: InsertParcel = async (parcelRecord) => {
+export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructions) => {
     const { data, error } = await supabase
         .from("parcels")
         .insert(parcelRecord)
@@ -39,6 +42,20 @@ export const insertParcel: InsertParcel = async (parcelRecord) => {
         const logId = await logErrorReturnLogId("Error with insert: parcel data", error);
         await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
         return { parcelId: null, error: { type: "failedToInsertParcel", logId } };
+    }
+
+    const { error: updateDeliveryInstructionsError } = await updateClientDeliveryInstructions(
+        parcelRecord.client_id == undefined ? "" : parcelRecord.client_id,
+        deliveryInstructions
+    );
+
+    if (updateDeliveryInstructionsError) {
+        const logId = await logErrorReturnLogId(
+            "Error with update: parcel data",
+            updateDeliveryInstructionsError
+        );
+        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+        return { parcelId: null, error: { type: "failedToUpdateDeliveryInstructions", logId } };
     }
 
     await sendAuditLog({ ...auditLog, wasSuccess: true, parcelId: data.primary_key });
