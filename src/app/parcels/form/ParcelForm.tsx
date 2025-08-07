@@ -59,7 +59,7 @@ import ListTypeCard from "./formSections/ListTypeCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
-    listType: ListType;
+    listType: ListType | null;
     voucherNumber: string | undefined;
     referralAgency: string | undefined;
     referrerName: string | undefined;
@@ -98,7 +98,7 @@ export type CommonCardProps = CardProps<CommonFields, CommonErrors>;
 
 export const initialParcelFields: ParcelFields = {
     clientId: null,
-    listType: null,
+    listType: "regular",
     voucherNumber: "",
     referralAgency: "",
     referrerName: "",
@@ -324,7 +324,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
 
         const parcelRecord = {
             client_id: clientId || fields.clientId || "",
-            list_type: fields.listType,
+            list_type: fields.listType ?? undefined,
             packing_date: packingDate,
             packing_slot: fields.packingSlot,
             voucher_number: fields.voucherNumber,
