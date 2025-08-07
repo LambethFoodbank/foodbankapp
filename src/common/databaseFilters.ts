@@ -4,13 +4,14 @@ import { DbClientRow, DbParcelRow } from "@/databaseUtils";
 import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/format";
 
 const textFilterDelimiter = ",";
+const defaultQueryFilterRegex = /[^a-zA-Z0-9 '\-+?]/g;
+const emailQueryFilterRegex = /[^a-zA-Z0-9 '\-@.+?]/g;
 
 export const dbFilterWithSubstringQueries = <DbData extends DbClientRow | DbParcelRow>(
     substringToSubqueryMap: (value: string) => string,
-    customRegex?: RegExp
+    regex: RegExp = defaultQueryFilterRegex
 ): ServerSideFilterMethod<DbData, string> => {
     return (query, state) => {
-        const regex = customRegex ? customRegex : /[^a-zA-Z0-9 '\-+?]/g;
         const substrings = state
             .split(textFilterDelimiter)
             .map((substring) => substring.trim().replace(regex, ""))
@@ -72,7 +73,7 @@ export const emailSearch = <DbData extends DbClientRow | DbParcelRow>(
             return `${clientIsActiveColumnLabel}.is.false`;
         }
         return `and(${clientIsActiveColumnLabel}.is.true, ${emailColumnLabel}.ilike.%${substring.toLowerCase()}%)`;
-    }, /[^a-zA-Z0-9 '\-@.+?]/g);
+    }, emailQueryFilterRegex);
 };
 
 export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
