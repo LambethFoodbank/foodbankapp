@@ -3,7 +3,7 @@ import { DatabaseError } from "@/app/errorClasses";
 import { Data } from "@/components/DataViewer/DataViewer";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { ExpandedClientParcelDetails, getClientParcelsDetails } from "./getClientParcelsData";
-import { isAfter, isBefore} from "date-fns";
+import { isAfter, isBefore, sub } from "date-fns";
 
 export interface ExpandedClientParcelStats extends Data {
     totalParcels: number;
@@ -74,9 +74,8 @@ export const getClientParcelsStats = async (
             parcel.all_events?.includes("Fulfilled with Trussell")
     );
 
-    const todayTime = new Date().getTime();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(new Date().getMonth() - 6);
+    const todayTime = new Date();
+    const sixMonthsAgo = sub(todayTime, {months: 6});
 
     const deliveredLastSixMonths = deliveredParcels.filter((parcel) => {
         if (!parcel.last_event_timestamp) {
