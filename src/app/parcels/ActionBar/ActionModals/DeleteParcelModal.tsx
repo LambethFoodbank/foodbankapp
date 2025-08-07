@@ -87,6 +87,11 @@ const DeleteParcelModal: React.FC<ActionModalProps> = (props) => {
         } else {
             setSuccessMessage(`${numberOfParcelsToDelete > 1 ? "Parcels" : "Parcel"} Deleted`);
             props.postSuccessCallback();
+
+            // Auto-close the modal after 3 seconds
+            setTimeout(() => {
+                onClose();
+            }, 3000);
         }
         setActionCompleted(true);
     };

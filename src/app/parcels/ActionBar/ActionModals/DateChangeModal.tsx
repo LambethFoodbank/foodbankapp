@@ -105,6 +105,11 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
         } else {
             setSuccessMessage(`Packing Date Changed to ${newPackingDate}`);
             props.postSuccessCallback();
+
+            // Auto-close the modal after 3 seconds
+            setTimeout(() => {
+                props.onClose();
+            }, 3000);
         }
         setActionCompleted(true);
     };

@@ -109,6 +109,11 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
             content: { parcelIds: parcelIds },
         });
         props.postSuccessCallback();
+
+        // Auto-close the modal after 3 seconds
+        setTimeout(() => {
+            props.onClose();
+        }, 3000);
     };
 
     const onPdfCreationFailed = (pdfError: ShoppingListPdfError): void => {

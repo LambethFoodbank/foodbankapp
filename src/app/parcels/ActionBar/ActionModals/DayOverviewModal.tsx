@@ -69,6 +69,11 @@ const DayOverviewModal: React.FC<ActionModalProps> = (props) => {
             content: { parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId) },
         });
         props.postSuccessCallback();
+
+        // Auto-close the modal after 3 seconds
+        setTimeout(() => {
+            props.onClose();
+        }, 3000);
     };
 
     const onPdfCreationFailed = (pdfError: DayOverviewPdfError): void => {
