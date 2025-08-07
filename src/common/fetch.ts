@@ -12,7 +12,7 @@ type CollectionCentre = Pick<
 
 type PackingSlot = Pick<Schema["packing_slots"], "primary_key" | "is_shown" | "name">;
 
-type Client = Pick<Schema["clients"], "primary_key" | "delivery_instructions">;
+type Client = Pick<Schema["clients"], "delivery_instructions">;
 
 type DatabaseProfile = Pick<
     Schema["profiles"],
@@ -77,7 +77,6 @@ export const fetchParcel = async (
                 is_shown
             ),
             client: clients(
-                primary_key,
                 delivery_instructions
             )`
         )
