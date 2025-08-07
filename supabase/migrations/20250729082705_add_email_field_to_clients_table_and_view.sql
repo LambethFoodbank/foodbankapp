@@ -1,5 +1,6 @@
 alter table "public"."clients" add column "email" text;
-create or replace view public.clients_plus as
+create or replace view
+  public.clients_plus as
 select
   clients.primary_key as client_id,
   clients.full_name,
