@@ -10,12 +10,6 @@ export const updateClientDeliveryInstructions = async (
     clientId: string,
     delivery_instructions: string | undefined
 ): Promise<UpdateClientDeliveryInstructionsResponse> => {
-    const baseAuditLogProps = {
-        action: "update client delivery instructions",
-        clientId,
-        content: { delivery_instructions: delivery_instructions, clientId },
-    };
-
     const { error } = await supabase
         .from("clients")
         .update({ delivery_instructions: delivery_instructions })
@@ -28,6 +22,5 @@ export const updateClientDeliveryInstructions = async (
         return { error: { type: "updateDeliveryInstructionsFailed", logId } };
     }
 
-    await sendAuditLog({ ...baseAuditLogProps, wasSuccess: true });
     return { error: null };
 };
