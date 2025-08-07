@@ -52,7 +52,7 @@ export interface Person {
 export type Fields = Record<string, unknown>;
 
 export type FormErrors<SpecificFields extends Fields> = {
-    [errorKey in keyof SpecificFields]?: Errors;
+    [errorKey in keyof SpecificFields]?: Errors | Errors[];
 };
 
 export const createSetter = <SpecificFields extends Fields>(
