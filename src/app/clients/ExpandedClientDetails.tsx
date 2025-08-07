@@ -52,16 +52,20 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
         (async () => {
             setIsLoading(true);
             setClientDetails(await getExpandedClientDetails(clientId));
-            
+
             setClientParcelsDetails(
                 displayClientsParcels ? await getClientParcelsDetails(clientId) : null
             );
             setOriginalNotes(clientDetails?.notes ? clientDetails?.notes : "");
             if (displayClientsParcels) {
-                const { data: clientParcelStats, error: clientParcelStatsError } = await getClientParcelsStats(clientId);
+                const { data: clientParcelStats, error: clientParcelStatsError } =
+                    await getClientParcelsStats(clientId);
+
                 if (clientParcelStatsError) {
-                    setErrorMessage(`${clientParcelStatsError.errorMessage} Log ID: ${clientParcelStatsError.logId}`);
-                } 
+                    setErrorMessage(
+                        `${clientParcelStatsError.errorMessage} Log ID: ${clientParcelStatsError.logId}`
+                    );
+                }
                 setClientParcelsStats(clientParcelStats);
             } else {
                 setClientParcelsStats(null);

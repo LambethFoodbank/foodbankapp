@@ -1,5 +1,4 @@
 import supabase from "@/supabaseClient";
-import { DatabaseError } from "@/app/errorClasses";
 import { Data } from "@/components/DataViewer/DataViewer";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { ExpandedClientParcelDetails, getClientParcelsDetails } from "./getClientParcelsData";
@@ -19,14 +18,16 @@ interface ParcelStatsInfo extends Data {
 interface ClientParcelStatsError {
     errorMessage: string;
     logId: string;
-};
+}
 
 const getParcelIdList = async (clientId: string): Promise<string[]> => {
     const parcelsData: ExpandedClientParcelDetails[] = await getClientParcelsDetails(clientId);
     return parcelsData.map((clientDetails) => clientDetails.parcelId);
 };
 
-const getAllClientParcelsStats = async (parcelIdList: string[]): Promise<{ data: ParcelStatsInfo[], error: ClientParcelStatsError | null }> => {
+const getAllClientParcelsStats = async (
+    parcelIdList: string[]
+): Promise<{ data: ParcelStatsInfo[]; error: ClientParcelStatsError | null }> => {
     const { data, error } = await supabase
         .from("parcels_events")
         .select(
@@ -43,22 +44,23 @@ const getAllClientParcelsStats = async (parcelIdList: string[]): Promise<{ data:
             data: [],
             error: {
                 errorMessage: "Error with fetch: Client parcels details.",
-                logId: logId
-            }
+                logId: logId,
+            },
         };
     }
     return {
         data: data,
         error: null,
-    }
+    };
 };
 
 export const getClientParcelsStats = async (
     clientId: string
-): Promise<{ data: ExpandedClientParcelStats[], error: ClientParcelStatsError | null} > => {
+): Promise<{ data: ExpandedClientParcelStats[]; error: ClientParcelStatsError | null }> => {
     const idList = await getParcelIdList(clientId);
 
-    const { data: parcelData, error: clientParcelStatsError } = await getAllClientParcelsStats(idList);
+    const { data: parcelData, error: clientParcelStatsError } =
+        await getAllClientParcelsStats(idList);
 
     if (clientParcelStatsError) {
         return {
@@ -75,7 +77,7 @@ export const getClientParcelsStats = async (
     );
 
     const todayTime = new Date();
-    const sixMonthsAgo = sub(todayTime, {months: 6});
+    const sixMonthsAgo = sub(todayTime, { months: 6 });
 
     const deliveredLastSixMonths = deliveredParcels.filter((parcel) => {
         if (!parcel.last_event_timestamp) {
@@ -85,11 +87,13 @@ export const getClientParcelsStats = async (
         return isAfter(time, sixMonthsAgo) && isBefore(time, todayTime);
     });
     return {
-        data: [{
+        data: [
+            {
                 totalParcels: parcelData.length,
                 totalSuccessful: deliveredParcels.length,
                 lastSixMonthsSuccessful: deliveredLastSixMonths.length,
-            },],
-            error: null,
-        };
+            },
+        ],
+        error: null,
+    };
 };
