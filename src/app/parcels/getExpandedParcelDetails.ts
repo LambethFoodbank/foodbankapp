@@ -175,8 +175,8 @@ const getExpandedParcelDetails = async (
                     ),
                     deliveryInstructions: client.delivery_instructions ?? "",
                     parcelNotes: rawParcelDetails.notes ?? "",
-                    phoneNumber: client.phone_number ?? "",
-                    additionalPhoneNumbers: formatAdditionalPhoneNumbers(
+                    phoneNumber: formatAdditionalPhoneNumbers(
+                        client.phone_number,
                         client.additional_phone_numbers
                     ),
                     email: client.email ?? "",

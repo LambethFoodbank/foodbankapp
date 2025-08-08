@@ -95,7 +95,6 @@ export interface ExpandedClientData {
     address: string;
     deliveryInstructions: string;
     phoneNumber: string;
-    additionalPhoneNumbers: string;
     email: string;
     household: string;
     adults: string;
@@ -117,8 +116,10 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         fullName: client.full_name ?? "",
         address: formatAddressFromClientDetails(client),
         deliveryInstructions: client.delivery_instructions ?? "",
-        phoneNumber: client.phone_number ?? "",
-        additionalPhoneNumbers: formatAdditionalPhoneNumbers(client.additional_phone_numbers),
+        phoneNumber: formatAdditionalPhoneNumbers(
+            client.phone_number,
+            client.additional_phone_numbers
+        ),
         email: client.email ?? "",
         defaultList: client.default_list,
         household: formatHouseholdFromFamilyDetails(client.family),
@@ -170,13 +171,20 @@ export const formatAddressFromClientDetails = (
     );
 };
 
-export const formatAdditionalPhoneNumbers = (phoneNumbers: string[] | null): string => {
-    if (phoneNumbers === null || phoneNumbers.length === 0) {
+export const formatAdditionalPhoneNumbers = (
+    primaryPhoneNumber: string | null,
+    additionalPhoneNumbers: string[] | null
+): string => {
+    if (primaryPhoneNumber === null || primaryPhoneNumber.length === 0) {
         return "None";
     }
-    return phoneNumbers.sort().join(", ");
+    if (additionalPhoneNumbers) {
+        const allPhoneNumbers: string[] = [primaryPhoneNumber, ...additionalPhoneNumbers];
+        return allPhoneNumbers.join(", ");
+    } else {
+        return primaryPhoneNumber;
+    }
 };
-
 export const formatHouseholdFromFamilyDetails = (
     family: Pick<
         Schema["families"],
