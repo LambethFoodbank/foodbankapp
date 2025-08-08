@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { CollectionCentresLabelsAndValues, DbCollectionCentreType } from "@/common/fetch";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
