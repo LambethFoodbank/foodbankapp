@@ -22,7 +22,7 @@ const getSelectedParcelsParcelIdsAndStatus = async (
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
-            "Failed to fetch signposting parcel IDs and statuses",
+            "Failed to fetch signposting parcel IDs and statuses for Selected Parcels Report ",
             {
                 error: idFetchError,
             }
@@ -49,7 +49,7 @@ const getSelectedParcelsRawParcelList = async (
         .order("primary_key");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch parcel data", {
+        const logId = await logErrorReturnLogId("Failed to fetch Selected Parcels Report Parcel data", {
             error: parcelFetchError,
         });
         return {

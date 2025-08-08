@@ -26,7 +26,7 @@ const getSignpostingParcelIdsAndStatus = async (
         .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
 
     if (idFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch parcel IDs and statuses", {
+        const logId = await logErrorReturnLogId("Failed to fetch parcel IDs and statuses for Signposting Report", {
             error: idFetchError,
         });
         return {
@@ -57,7 +57,7 @@ const getSignpostingRawParcelList = async (
         .order("client_id");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch parcel data", {
+        const logId = await logErrorReturnLogId("Failed to fetch Signposting Report parcel data", {
             error: parcelFetchError,
         });
         return {
