@@ -51,7 +51,7 @@ export type ReportRow = {
     signpostingCallRequired: boolean;
     flaggedForAttention: boolean;
     phoneNumber: string;
-    // email: string; // this is for after VFB-395 is merged
+    email: string;
     signpostingCallReasons: string;
     address: string;
     parcelStatus: string;
@@ -119,6 +119,7 @@ export interface rawParcel {
         signposting_call_required: boolean | null;
         flagged_for_attention: boolean | null;
         phone_number: string | null;
+        email: string | null;
         signposting_call_reasons: string[] | null;
         delivery_instructions: string | null;
         extra_information: string | null;
@@ -170,6 +171,7 @@ export const getRawParcelListQuery = (): typeof query => {
                 signposting_call_required,
                 flagged_for_attention,
                 phone_number,
+                email,
                 signposting_call_reasons,
                 delivery_instructions,
                 extra_information,
@@ -223,9 +225,7 @@ export const convertRawParcelListToReportResult = (
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
-                    /*
-                    email: rawParcel.client.email ?? "" // not sure if this would need to use a formatStringAsEmailForCsv; this should be decommented after VFB-395 is merged
-                    */
+                    email: rawParcel.client?.email ?? "",
                     signpostingCallReasons: formatRequirementsByCanonicalOrder(
                         rawParcel.client?.signposting_call_reasons ?? null,
                         signpostingCallOptions
@@ -297,7 +297,7 @@ export interface ButtonProps {
     disabled?: boolean;
     getReportDataByDate?: (fromDate: Dayjs, toDate: Dayjs) => Promise<FetchReportResult>;
     getReportDataByList?: (parcels: string[]) => Promise<FetchReportResult>;
-    fileName: string;
+    fileName?: string;
 }
 
 const ReportCsvButton = ({
@@ -309,12 +309,12 @@ const ReportCsvButton = ({
     disabled,
     getReportDataByDate,
     getReportDataByList,
-    fileName,
+    fileName = "Report.csv",
 }: ButtonProps): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<ReportRow[], FetchReportErrorType>
     > => {
-        if (fromDate && toDate && getReportDataByDate) {
+        if (fromDate && toDate && getReportDataByDate && !parcels) {
             const { data: requiredData, error } = await getReportDataByDate(fromDate, toDate);
             if (error) {
                 return { data: null, error };
@@ -323,12 +323,13 @@ const ReportCsvButton = ({
                 data: { fileData: requiredData, fileName: fileName },
                 error: null,
             };
-        } else if (parcels && getReportDataByList) {
+        } else if (parcels && parcels.length > 0 && getReportDataByList) {
             const parcelIds = parcels.map((parcel) => {
                 return parcel.parcelId;
             });
             const { data: requiredData, error } = await getReportDataByList(parcelIds);
             if (error) {
+                console.log(error);
                 return { data: null, error };
             }
             return {
