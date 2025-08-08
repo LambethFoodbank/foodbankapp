@@ -44,14 +44,28 @@ export interface DeliveryAreasRow {
     isNew: boolean;
 }
 
+const removeCurrentCharacter = (value: string): string => {
+    return value.slice(0, value.length - 1);
+};
+
 const formatPostcode = (value: string): string => {
     value = value.toUpperCase().slice(0, 4);
+    const currentChar = value.charAt(value.length - 1);
+    const previousChar = value.charAt(value.length - 2);
+
     if (!value.charAt(0).match(/[A-Z]/)) {
         value = value.slice(0, 0);
     }
-    if (!value.charAt(value.length - 1).match(/[A-Z0-9]/)) {
-        value = value.slice(0, value.length - 1);
+    if (previousChar.match(/[0-9]/) && currentChar.match(/[A-Z]/)) {
+        value = removeCurrentCharacter(value);
     }
+    if (!currentChar.match(/[A-Z0-9]/)) {
+        value = removeCurrentCharacter(value);
+    }
+    if (value.length === 3 && !currentChar.match(/[0-9]/)) {
+        value = removeCurrentCharacter(value);
+    }
+
     return value;
 };
 
@@ -63,7 +77,7 @@ function EditToolbar(props: EditToolbarProps): React.JSX.Element {
         setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
         setRowModesModel((oldModel) => ({
             ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "postcode" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: "postcode", editable: true },
         }));
     };
 
@@ -239,7 +253,7 @@ const DeliveryAreasTable: React.FC = () => {
         }
     };
 
-    const deliveryAreassColumns: GridColDef[] = [
+    const deliveryAreasColumns: GridColDef[] = [
         {
             field: "postcode",
             headerName: "Postcode",
@@ -317,8 +331,11 @@ const DeliveryAreasTable: React.FC = () => {
                         },
                     }}
                     sortingOrder={["asc", "desc"]}
-                    columns={deliveryAreassColumns}
+                    columns={deliveryAreasColumns}
                     editMode="row"
+                    isCellEditable={(params) =>
+                        rowModesModel[params.id]?.mode === GridRowModes.Edit
+                    }
                     rowModesModel={rowModesModel}
                     onRowModesModelChange={setRowModesModel}
                     onRowEditStop={handleRowEditStop}

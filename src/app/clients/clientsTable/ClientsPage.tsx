@@ -186,7 +186,7 @@ const ClientsPage: React.FC = () => {
         }
     };
 
-    const RowToIconsColumn = ({
+    const rowToAddressColumn = ({
         postcode,
         isDeliverable,
     }: ClientsTableRow["addressPostcode"]): React.ReactElement => {
@@ -205,7 +205,7 @@ const ClientsPage: React.FC = () => {
     };
 
     const clientTableColumnDisplayFunctions = {
-        addressPostcode: RowToIconsColumn,
+        addressPostcode: rowToAddressColumn,
     };
 
     return (
