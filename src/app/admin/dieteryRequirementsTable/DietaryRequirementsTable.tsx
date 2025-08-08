@@ -65,18 +65,29 @@ const DietaryRequirementsTable: React.FC = () => {
             headerName: "Dietary Requirement",
             flex: 1,
             width: 200,
+            filterable: false,
+            disableColumnMenu: true,
             renderHeader: (params) => <Header {...params} />,
         },
         {
             field: "included",
             headerName: "Included",
             flex: 1,
+            sortable: false,
+            disableColumnMenu: true,
+            renderCell: (params) => (
+                <div style={{ whiteSpace: "pre-line" }}>
+                    {Array.isArray(params.value) ? params.value.join(", ") : ""}
+                </div>
+            ),
             renderHeader: (params) => <Header {...params} />,
         },
         {
             field: "excluded",
             headerName: "Excluded",
             flex: 1,
+            sortable: false,
+            disableColumnMenu: true,
             renderCell: (params) => (
                 <div style={{ whiteSpace: "pre-line" }}>
                     {Array.isArray(params.value) ? params.value.join(", ") : ""}
