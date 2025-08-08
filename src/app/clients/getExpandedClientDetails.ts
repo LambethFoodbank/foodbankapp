@@ -64,6 +64,7 @@ const getRawClientDetails = async (clientId: string) => {
             other_items,
             extra_information,
             signposting_call_required,
+            last_updated,
             signposting_call_reasons,
             notes,
             is_active,
@@ -109,6 +110,7 @@ export interface ExpandedClientData {
     otherRequirements: string;
     extraInformation: string;
     signpostingCallRequired: boolean;
+    lastUpdated: string;
     signpostingCallReasons: string;
     notes: string | null;
     isActive: boolean;
@@ -152,6 +154,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         ),
         extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,
+        lastUpdated: client.last_updated,
         signpostingCallReasons:
             client.signposting_call_required === true
                 ? formatRequirementsByCanonicalOrder(

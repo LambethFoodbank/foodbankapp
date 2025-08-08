@@ -1,22 +1,22 @@
+import { CircularProgress } from "@mui/material";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-import DataViewer, {
-    DataForDataViewer,
-    convertDataToDataForDataViewer,
-} from "@/components/DataViewer/DataViewer";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
+import styled from "styled-components";
 import ClientParcelsTable from "@/app/clients/ClientParcelsTable";
 import {
     ExpandedClientParcelDetails,
     getClientParcelsDetails,
 } from "@/app/clients/getClientParcelsData";
-import styled from "styled-components";
-import { ErrorSecondaryText } from "../errorStylingandMessages";
-import { CircularProgress } from "@mui/material";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
+import { capitaliseWords } from "@/common/format";
+import DataViewer, {
+    convertDataToDataForDataViewer,
+    DataForDataViewer,
+} from "@/components/DataViewer/DataViewer";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { updateClientNotes } from "./updateClientNotes";
-import { capitaliseWords } from "@/common/format";
+import { ErrorSecondaryText } from "../errorStylingandMessages";
 
 interface Props {
     clientId: string;
@@ -37,11 +37,11 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
         ExpandedClientParcelDetails[] | null
     >(null);
 
-    const originalNotes = clientDetails?.notes ?? null;
-
-    const [notes, setNotes] = useState<string | null>(originalNotes);
+    const [originalNotes, setOriginalNotes] = useState<string | null>("");
+    const [notes, setNotes] = useState<string | null>("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isEditing, setisEditing] = useState<boolean>(false);
 
     const loadData = useCallback(() => {
         (async () => {
@@ -50,31 +50,42 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
             setClientParcelsDetails(
                 displayClientsParcels ? await getClientParcelsDetails(clientId) : null
             );
+            setOriginalNotes(clientDetails?.notes ? clientDetails?.notes : "");
             setIsLoading(false);
         })();
-    }, [clientId, displayClientsParcels]);
+    }, [clientId, displayClientsParcels, clientDetails?.notes]);
 
     useEffect(loadData, [loadData]);
 
     const onSaveNotes = async (): Promise<void> => {
-        setErrorMessage(null);
-        const { error } = await updateClientNotes(clientId, notes);
-        if (error) {
-            setErrorMessage(`Error saving notes. Log ID: ${error.logId}`);
-            setNotes(originalNotes);
+        if (isEditing) {
+            const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
+            if (error) {
+                setErrorMessage(
+                    `Record has been edited recently - please refresh the page. Log ID: ${error.logId}`
+                );
+                setNotes(originalNotes);
+            } else {
+                setNotes(notes);
+                loadData();
+            }
+            setisEditing(false);
         }
-        loadData();
     };
 
     const onChangeNotes = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
         setErrorMessage(null);
         setNotes(event.target.value);
+        setisEditing(true);
     };
 
     const onCancelNotes = async (): Promise<void> => {
-        setErrorMessage(null);
-        setNotes(originalNotes);
-        loadData();
+        if (isEditing) {
+            setErrorMessage(null);
+            setNotes(originalNotes);
+            loadData();
+            setisEditing(false);
+        }
     };
 
     const getExpandedClientDetailsForDataViewer = (
