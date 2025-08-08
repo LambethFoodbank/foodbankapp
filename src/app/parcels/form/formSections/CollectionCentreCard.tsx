@@ -10,6 +10,7 @@ interface CollectionCentreCardProps extends ParcelCardProps {
     collectionCentresLabelsAndValues: CollectionCentresLabelsAndValues;
     availableDays: DbCollectionCentreType[];
 }
+
 const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     fieldSetter,
     errorSetter,
@@ -20,7 +21,7 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
 }) => {
     const availableDaysNamesArray = availableDays?.map((availableDaysObject) => {
         if (!availableDaysObject) {
-            return "No days available";
+            return "This centre is closed all week";
         }
         return availableDaysObject.available_days
             ?.map((days) => (days.day == undefined ? "" : days.day))
@@ -28,17 +29,15 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     });
 
     const collectionCentresLabelsAndValuesWithDays: CollectionCentresLabelsAndValues =
-        useMemo(() => {
-            return collectionCentresLabelsAndValues.map((centre, index) => {
-                const [label, value] = centre;
-                const daysString =
-                    availableDaysNamesArray?.[index] == ""
-                        ? "No days available"
-                        : availableDaysNamesArray[index];
+        collectionCentresLabelsAndValues.map((centre, index) => {
+            const [label, value] = centre;
+            const daysString =
+                availableDaysNamesArray?.[index] == ""
+                    ? "This centre is closed all week"
+                    : availableDaysNamesArray[index];
 
-                return [label + " - " + daysString, value];
-            });
-        }, [collectionCentresLabelsAndValues, availableDaysNamesArray]);
+            return [label + " - " + daysString, value];
+        });
 
     return (
         <GenericFormCard
