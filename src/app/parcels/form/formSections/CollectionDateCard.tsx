@@ -27,7 +27,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
             ? []
             : getAvailableDaysIndices(daysForSelectedCentre?.available_days);
 
-    const isUnavailable = (availableDay: Dayjs): boolean => {
+    const isCentreClosedOnDay = (availableDay: Dayjs): boolean => {
         return !availableDaysIndices?.includes(dayjs(availableDay).day()) as boolean;
     };
 
@@ -44,7 +44,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
                     }}
                     label="Date"
                     value={fields.collectionDate ? dayjs(fields.collectionDate) : null}
-                    shouldDisableDate={isUnavailable}
+                    shouldDisableDate={isCentreClosedOnDay}
                 />
                 <ErrorText>{getErrorText(formErrors.collectionDate)}</ErrorText>
             </>

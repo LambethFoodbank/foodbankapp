@@ -257,7 +257,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
 
             if (error) {
                 const errorMessages = {
-                    collectionAvailableDaysFetchFailed: "Failed to fetch collection available days",
+                    collectionAvailableDaysFetchFailed:
+                        "Failed to fetch collection centre available days",
                 };
 
                 const errorMessage = errorMessages[error.type] || "An unexpected error occurred";

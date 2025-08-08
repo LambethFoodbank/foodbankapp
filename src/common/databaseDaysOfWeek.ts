@@ -12,5 +12,3 @@ export const DAYSOFWEEK_ARRAY: DaysOfWeekType[] = [
     "Saturday",
     "",
 ] as const;
-
-export type DaysOfWeekLabelsAndValues = [string, string, string, string, string, string, string][];

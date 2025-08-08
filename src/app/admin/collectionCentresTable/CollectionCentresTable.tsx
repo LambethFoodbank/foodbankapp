@@ -353,7 +353,7 @@ const CollectionCentresTable: React.FC = () => {
                         size="small"
                         onClick={handleEditCollectionCentreAvailableDays}
                         disabled={params.row.isNew || params.row.isDelivery}
-                        aria-label={`Edit collection available days for ${params.row.name}`}
+                        aria-label={`Edit available collection days for ${params.row.name}`}
                     >
                         Edit Collection Days
                     </Button>
