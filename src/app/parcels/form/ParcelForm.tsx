@@ -427,6 +427,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                             errorSetter={errorSetter}
                             fieldSetter={fieldSetter}
                             fields={fields}
+                            deliveryPrimaryKey={deliveryPrimaryKey}
                             collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                             packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                             collectionTimeSlotsLabelsAndValues={collectionSlotsLabelsAndValues}
