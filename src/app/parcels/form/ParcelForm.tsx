@@ -53,6 +53,7 @@ import {
 import { getDbDate } from "@/common/format";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
+import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -149,6 +150,7 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
+    ParcelNotesCard,
 ];
 
 const noCollectionFormSections = [
@@ -158,6 +160,7 @@ const noCollectionFormSections = [
     PackingSlotsCard,
     ShippingMethodCard,
     DeliveryInstructionsCard,
+    ParcelNotesCard,
 ];
 
 export const mergeDateAndTime = (date: string, time: string): Dayjs => {
