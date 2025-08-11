@@ -7,7 +7,11 @@ import ReportModal from "./ReportModal";
 
 const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
     return (
-        <ReportModal actionModalProps={{ ...props }} csvButton={SelectedParcelsReportCsvButton} reportName="Selected Parcels Report"/>
+        <ReportModal
+            actionModalProps={{ ...props }}
+            csvButton={SelectedParcelsReportCsvButton}
+            reportName="Selected Parcels Report"
+        />
     );
 };
 
