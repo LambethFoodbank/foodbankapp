@@ -199,7 +199,7 @@ const CollectionCentresTable: React.FC = () => {
 
                     if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {
                         message =
-                            "Record has been edited recently - please refresh the page.\n" +
+                            "Record has been edited recently - please refresh the page." +
                             `Log ID: ${updateCollectionCentreError.logId}`;
                     }
                     setErrorMessage(message);
