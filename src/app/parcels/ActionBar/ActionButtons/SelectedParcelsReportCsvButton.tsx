@@ -43,7 +43,7 @@ const getSelectedParcelsParcelIdsAndStatus = async (
 const getSelectedParcelsRawParcelList = async (
     parcelIds: string[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
+    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
         .in("primary_key", parcelIds)
         .order("packing_date")
         .order("primary_key");
@@ -59,6 +59,18 @@ const getSelectedParcelsRawParcelList = async (
             data: [],
             error: {
                 type: "failedToFetchRows",
+                logId,
+            },
+        };
+    }
+    if (!rawParcelList || rawParcelList.length === 0) {
+        const logId = await logErrorReturnLogId(
+            "No parcels with specified status to create Selected Parcels report"
+        );
+        return {
+            data: [],
+            error: {
+                type: "noRowsForInterval",
                 logId,
             },
         };

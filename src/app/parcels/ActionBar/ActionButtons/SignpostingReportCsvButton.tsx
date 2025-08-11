@@ -49,7 +49,7 @@ const getSignpostingParcelIdsAndStatus = async (
 const getSignpostingRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
+    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -68,6 +68,18 @@ const getSignpostingRawParcelList = async (
             error: {
                 type: "failedToFetchRows",
                 logId: logId,
+            },
+        };
+    }
+    if (!rawParcelList || rawParcelList.length === 0) {
+        const logId = await logErrorReturnLogId(
+            "No parcels with specified status to create Signposting report"
+        );
+        return {
+            data: [],
+            error: {
+                type: "noRowsForInterval",
+                logId,
             },
         };
     }

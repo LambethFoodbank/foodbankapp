@@ -1,9 +1,8 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./GeneralActionModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import dayjs from "dayjs";
+import "dayjs/plugin/isSameOrBefore";
 import DateRangeInputs, { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { sendAuditLog } from "@/server/auditLog";
 import styled from "styled-components";
@@ -65,8 +64,8 @@ export const ReportModalContent: React.FC<ContentProps> = ({
                         {csvButton({
                             fromDate: dateRange.from,
                             toDate: dateRange.to,
-                            onFileCreationCompleted: onFileCreationCompleted,
-                            onFileCreationFailed: onFileCreationFailed,
+                            onFileCreationCompleted,
+                            onFileCreationFailed,
                             disabled: !isInputValid,
                         })}
                     </Centerer>
@@ -80,8 +79,8 @@ export const ReportModalContent: React.FC<ContentProps> = ({
                     />
                     {csvButton({
                         parcels: selectedParcels,
-                        onFileCreationCompleted: onFileCreationCompleted,
-                        onFileCreationFailed: onFileCreationFailed,
+                        onFileCreationCompleted,
+                        onFileCreationFailed,
                     })}
                 </>
             )}
@@ -90,7 +89,7 @@ export const ReportModalContent: React.FC<ContentProps> = ({
 };
 
 const ReportModal: React.FC<ReportModalProps> = (props) => {
-    const [actionCompleted, setActionCompleted] = useState(true);
+    const [actionCompleted, setActionCompleted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [dateRange, setDateRange] = useState<DateRangeState>({ from: dayjs(), to: dayjs() });
@@ -98,7 +97,9 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
     const isInputValid =
         props.actionModalProps.selectedParcels.length > 0
             ? undefined
-            : dateRange.from <= dateRange.to;
+            : dateRange.from.isSameOrBefore(dateRange.to);
+    // this is used for the reports that use a time interval to determine what information to be put in the report
+    // and is unused for the reports that use a list of parcels as the information for the report
 
     useEffect(() => {
         if (props.actionModalProps.selectedParcels.length > 0) {
@@ -107,7 +108,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
             );
             if (allDeleted) {
                 setErrorMessage("All selected parcels belong to deleted clients.");
-                setActionCompleted(false);
+                setActionCompleted(true);
             }
         }
     }, [props.actionModalProps.selectedParcels]);
@@ -120,19 +121,19 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
 
     const onFileCreationCompleted = async (): Promise<void> => {
         setSuccessMessage(`${props.reportName} Created`);
-        setActionCompleted(false);
-        let content = {};
+        setActionCompleted(true);
+        let content;
         if (
             props.actionModalProps.selectedParcels &&
             props.actionModalProps.selectedParcels.length > 0
         ) {
             content = {
-                fromDate: dateRange.from.toString(),
-                toDate: dateRange.to.toString(),
+                parcelIds: props.actionModalProps.selectedParcels.map((parcel) => parcel.parcelId),
             };
         } else {
             content = {
-                parcelIds: props.actionModalProps.selectedParcels.map((parcel) => parcel.parcelId),
+                fromDate: dateRange.from.toString(),
+                toDate: dateRange.to.toString(),
             };
         }
         void sendAuditLog({
@@ -141,6 +142,10 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
             content: content,
         });
         props.actionModalProps.postSuccessCallback();
+
+        setTimeout(() => {
+            props.actionModalProps.onClose();
+        }, 3000);
     };
 
     const onFileCreationFailed = (csvError: FetchReportError): void => {
@@ -149,7 +154,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
         } else {
             setErrorMessage(`Failed to fetch ${props.reportName} data`);
         }
-        setActionCompleted(false);
+        setActionCompleted(true);
         void sendAuditLog({
             action: `generate ${props.reportName.toLowerCase}`,
             wasSuccess: false,
@@ -168,7 +173,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
             errorMessage={errorMessage}
             successMessage={successMessage}
         >
-            {actionCompleted && (
+            {!actionCompleted && (
                 <ReportModalContent
                     dateRange={dateRange}
                     setRange={setDateRange}

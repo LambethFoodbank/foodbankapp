@@ -94,7 +94,13 @@ export const getParcelIdsAndStatusQuery = ({
     toDate,
     parcelIds,
 }: IdAndStatusQueryParams): typeof query => {
-    let query = supabase.from("parcels_plus").select("parcel_id, last_status_event_name");
+    // Find IDs of non-deleted parcels in the period. This is done before the complex query because
+    // joining clients and families to the view does not behave as expected.
+    let query = supabase
+        .from("parcels_plus")
+        .select("parcel_id, last_status_event_name")
+        // eslint-disable-next-line quotes
+        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
 
     if (fromDate && toDate) {
         query = query
@@ -157,66 +163,62 @@ export interface rawParcel {
     } | null;
 }
 
-export const getRawParcelListQuery = (): typeof query => {
-    const query = supabase
-        .from("parcels")
-        .select(
-            `
-            primary_key,
-            voucher_number,
-            packing_date,
-            created_at,
-            collection_datetime,
-            referral_agency,
-            referrer_email,
-            referrer_name,
-            referrer_phone,
-            collection_centre:collection_centres(
-                name,
-                is_shown
-            ),
-            list_type,
-            client:clients(
-                full_name,
-                is_active,
-                signposting_call_required,
-                flagged_for_attention,
-                phone_number,
-                email,
-                signposting_call_reasons,
-                delivery_instructions,
-                extra_information,
-                notes,
-                address_1,
-                address_2,
-                address_town,
-                address_county,
-                address_postcode,
-                cooking_facilities,
-                dietary_requirements,
-                hygiene_tampons,
-                hygiene_pads,
-                hygiene_other_items,
-                baby_food,
-                baby_formula,
-                baby_nappies,
-                baby_other_items,
-                pet_food,
-                other_items,
+export const getRawParcelListQuery = supabase
+    .from("parcels")
+    .select(
+        `
+        primary_key,
+        voucher_number,
+        packing_date,
+        created_at,
+        collection_datetime,
+        referral_agency,
+        referrer_email,
+        referrer_name,
+        referrer_phone,
+        collection_centre:collection_centres(
+            name,
+            is_shown
+        ),
+        list_type,
+        client:clients(
+            full_name,
+            is_active,
+            signposting_call_required,
+            flagged_for_attention,
+            phone_number,
+            email,
+            signposting_call_reasons,
+            delivery_instructions,
+            extra_information,
+            notes,
+            address_1,
+            address_2,
+            address_town,
+            address_county,
+            address_postcode,
+            cooking_facilities,
+            dietary_requirements,
+            hygiene_tampons,
+            hygiene_pads,
+            hygiene_other_items,
+            baby_food,
+            baby_formula,
+            baby_nappies,
+            baby_other_items,
+            pet_food,
+            other_items,
 
-                family:families(
-                    birth_year,
-                    birth_month,
-                    gender,
-                    recorded_as_child
-                )
+            family:families(
+                birth_year,
+                birth_month,
+                gender,
+                recorded_as_child
             )
-            `
         )
-        .limit(1, { foreignTable: "clients" });
-
-    return query;
-};
+        `
+    )
+    .limit(1, { foreignTable: "clients" });
 
 export const convertRawParcelListToReportResult = (
     rawParcelList: rawParcel[],
@@ -344,7 +346,6 @@ const ReportCsvButton = ({
             });
             const { data: requiredData, error } = await getReportDataByList(parcelIds);
             if (error) {
-                console.log(error);
                 return { data: null, error };
             }
             return {

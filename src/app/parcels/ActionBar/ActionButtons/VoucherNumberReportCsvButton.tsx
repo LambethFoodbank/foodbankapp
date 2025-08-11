@@ -23,7 +23,7 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
         toDate,
     })
         // eslint-disable-next-line quotes
-        .or('voucher_number.not.ilike.E%, voucher_number.eq."", voucher_number.is.null')
+        .or('voucher_number.not.ilike.E%, voucher_number.ilike."", voucher_number.is.null')
         // eslint-disable-next-line quotes
         .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
         .eq("client_is_active", true);
@@ -52,7 +52,7 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
 const getMissingVoucherNumberRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
+    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -75,6 +75,20 @@ const getMissingVoucherNumberRawParcelList = async (
             },
         };
     }
+
+    if (!rawParcelList || rawParcelList.length === 0) {
+        const logId = await logErrorReturnLogId(
+            "No parcels with specified status to create Missing Voucher Number report"
+        );
+        return {
+            data: [],
+            error: {
+                type: "noRowsForInterval",
+                logId,
+            },
+        };
+    }
+
     return {
         data: rawParcelList,
         error: null,

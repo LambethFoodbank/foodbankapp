@@ -49,7 +49,7 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
 const getPendingMoreInfoRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery()
+    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
