@@ -51,9 +51,6 @@ import {
     PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
 import { getDbDate } from "@/common/format";
-import Icon from "@/components/Icons/Icon";
-import Modal from "@/components/Modal/Modal";
-import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 
@@ -152,7 +149,6 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
-    ParcelNotesCard,
 ];
 
 const noCollectionFormSections = [
@@ -162,7 +158,6 @@ const noCollectionFormSections = [
     PackingSlotsCard,
     ShippingMethodCard,
     DeliveryInstructionsCard,
-    ParcelNotesCard,
 ];
 
 export const mergeDateAndTime = (date: string, time: string): Dayjs => {
