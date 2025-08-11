@@ -36,6 +36,7 @@ import {
 import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
+    DbCollectionCentreAvailableDaysType,
     DbCollectionCentreType,
     getActiveTimeSlotsForCollectionCentre,
     getAvailableDaysForCollectionCentres,
@@ -210,6 +211,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
     const [collectionAvailableDays, setAvailableDays] = useState<DbCollectionCentreType[]>([]);
+    const [availableDaysForCentre, setAvailableDaysForCentre] =
+        useState<DbCollectionCentreAvailableDaysType>(null);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 
@@ -252,6 +255,22 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     }, [fields.collectionCentre, initialFormErrors]);
 
     useEffect(() => {
+        const getAvailableDaysForCentre = async (
+            collectionCentre: string | null
+        ): Promise<void> => {
+            if (fields.collectionCentre) {
+                const availableDays = collectionAvailableDays.find(
+                    (centre) => centre?.primary_key == collectionCentre
+                )?.available_days;
+
+                setAvailableDaysForCentre(availableDays ? availableDays : null);
+            }
+        };
+
+        void getAvailableDaysForCentre(fields.collectionCentre);
+    }, [collectionAvailableDays, fields.collectionCentre]);
+
+    useEffect(() => {
         const getAvailableDays = async (): Promise<void> => {
             const { data, error } = await getAvailableDaysForCollectionCentres(supabase);
 
@@ -270,7 +289,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         };
 
         void getAvailableDays();
-    }, [fields.collectionCentre, initialFormErrors]);
+    }, []);
 
     useEffect(() => {
         // If the Shipping Method changes, errors for collection date and slot should be reset
@@ -411,7 +430,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                             collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                             packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                             collectionTimeSlotsLabelsAndValues={collectionSlotsLabelsAndValues}
-                            availableDays={collectionAvailableDays}
+                            collectionAvailableDays={collectionAvailableDays}
+                            availableDaysForSelectedCentre={availableDaysForCentre}
                             listTypeLabelsAndValues={listTypeLabelsAndValues}
                         />
                     );
