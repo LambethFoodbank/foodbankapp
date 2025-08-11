@@ -214,7 +214,7 @@ const PackingSlotsTable: React.FC = () => {
 
                     if (updatePackingSlotError.type === "ConcurrentEditPackingSlots") {
                         message =
-                            "Record has been edited recently - please refresh the page.\n" +
+                            "Record has been edited recently - please refresh the page." +
                             `Log ID: ${updatePackingSlotError.logId}`;
                     }
 
