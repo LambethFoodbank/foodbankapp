@@ -258,9 +258,7 @@ export const getAvailableDaysForCollectionCentres = async (
         if (availableDaysObject.available_days == null) {
             return null;
         }
-        availableDaysObject.available_days = availableDaysObject.available_days?.filter(
-            (availableDays) => availableDays.is_active
-        );
+
         return availableDaysObject;
     });
 
