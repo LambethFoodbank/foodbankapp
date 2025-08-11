@@ -33,7 +33,7 @@ const getAllClientParcelsStats = async (
             `
             last_event_timestamp,
             last_event_is_successfully_completed
-        `
+            `
         )
         .in("parcel_id", parcelIdList);
 
