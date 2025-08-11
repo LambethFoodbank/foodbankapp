@@ -35,15 +35,15 @@ type DietaryRequirementsPlusTableRow = {
 
 type DietaryRequirementsTableRow = {
     id: string;
-    halal?: DatabaseEnums["item_dietary_status"] | null;
-    vegetarian?: DatabaseEnums["item_dietary_status"] | null;
-    vegan?: DatabaseEnums["item_dietary_status"] | null;
-    meat?: DatabaseEnums["item_dietary_status"] | null;
-    gluten_free?: DatabaseEnums["item_dietary_status"] | null;
-    pescatarian?: DatabaseEnums["item_dietary_status"] | null;
-    dairy_free?: DatabaseEnums["item_dietary_status"] | null;
-    seafood_allergy?: DatabaseEnums["item_dietary_status"] | null;
-    pet_food?: DatabaseEnums["item_dietary_status"] | null;
+    halal: DatabaseEnums["item_dietary_status"] | null;
+    vegetarian: DatabaseEnums["item_dietary_status"] | null;
+    vegan: DatabaseEnums["item_dietary_status"] | null;
+    meat: DatabaseEnums["item_dietary_status"] | null;
+    gluten_free: DatabaseEnums["item_dietary_status"] | null;
+    pescatarian: DatabaseEnums["item_dietary_status"] | null;
+    dairy_free: DatabaseEnums["item_dietary_status"] | null;
+    seafood_allergy: DatabaseEnums["item_dietary_status"] | null;
+    pet_food: DatabaseEnums["item_dietary_status"] | null;
 };
 
 export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose }) => {
@@ -60,7 +60,10 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         }
 
         const fetchData = async (): Promise<void> => {
-            const { data, error } = await supabase.from("dietary_requirements_plus").select();
+            const { data, error } = await supabase
+                .from("dietary_requirements_plus")
+                .select()
+                .order("item_name");
 
             if (error) {
                 console.error("Error fetching dietary requirements data:", error);
@@ -69,18 +72,17 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
             setItems(data);
 
-            const included: (string | null)[] = [];
-            const excluded: (string | null)[] = [];
+            const included: (string | null)[] = [
+                ...data
+                    .filter((row) => row[selectedType as keyof typeof row] === "included")
+                    .map((row) => row.id),
+            ];
 
-            data.forEach((row) => {
-                const value = row[selectedType as keyof typeof row] || null;
-
-                if (value === "included") {
-                    included.push(row.id);
-                } else if (value === "excluded") {
-                    excluded.push(row.id);
-                }
-            });
+            const excluded: (string | null)[] = [
+                ...data
+                    .filter((row) => row[selectedType as keyof typeof row] === "excluded")
+                    .map((row) => row.id),
+            ];
 
             setInitialIncluded(included);
             setInitialExcluded(excluded);
@@ -89,7 +91,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             setNewExcluded(excluded);
         };
 
-        fetchData();
+        void fetchData();
     }, [isOpen, selectedType]);
 
     const handleSubmit = async (): Promise<void> => {
