@@ -26,9 +26,12 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
         .or('last_status_event_name.eq."Pending More Info"');
 
     if (idFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch parcel IDs and statuses for Pending More Info Report", {
-            error: idFetchError,
-        });
+        const logId = await logErrorReturnLogId(
+            "Failed to fetch parcel IDs and statuses for Pending More Info Report",
+            {
+                error: idFetchError,
+            }
+        );
         return {
             data: [],
             error: {
@@ -56,9 +59,12 @@ const getPendingMoreInfoRawParcelList = async (
         .order("client_id");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch Pending More Info Report Parcel data", {
-            error: parcelFetchError,
-        });
+        const logId = await logErrorReturnLogId(
+            "Failed to fetch Pending More Info Report Parcel data",
+            {
+                error: parcelFetchError,
+            }
+        );
         return {
             data: [],
             error: {

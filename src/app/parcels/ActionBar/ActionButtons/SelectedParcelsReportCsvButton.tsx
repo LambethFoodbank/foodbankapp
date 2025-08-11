@@ -49,9 +49,12 @@ const getSelectedParcelsRawParcelList = async (
         .order("primary_key");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch Selected Parcels Report Parcel data", {
-            error: parcelFetchError,
-        });
+        const logId = await logErrorReturnLogId(
+            "Failed to fetch Selected Parcels Report Parcel data",
+            {
+                error: parcelFetchError,
+            }
+        );
         return {
             data: [],
             error: {

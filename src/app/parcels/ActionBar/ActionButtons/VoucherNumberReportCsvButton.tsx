@@ -29,9 +29,12 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
         .eq("client_is_active", true);
 
     if (idFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch parcel IDs and statuses for Missing Voucher Number Report", {
-            error: idFetchError,
-        });
+        const logId = await logErrorReturnLogId(
+            "Failed to fetch parcel IDs and statuses for Missing Voucher Number Report",
+            {
+                error: idFetchError,
+            }
+        );
         return {
             data: [],
             error: {
@@ -58,9 +61,12 @@ const getMissingVoucherNumberRawParcelList = async (
         .order("client_id");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch Missing Voucher Number Report parcel data", {
-            error: parcelFetchError,
-        });
+        const logId = await logErrorReturnLogId(
+            "Failed to fetch Missing Voucher Number Report parcel data",
+            {
+                error: parcelFetchError,
+            }
+        );
         return {
             data: [],
             error: {
