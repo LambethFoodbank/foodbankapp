@@ -73,6 +73,20 @@ const getPendingMoreInfoRawParcelList = async (
             },
         };
     }
+
+    if (!rawParcelList || rawParcelList.length === 0) {
+        const logId = await logErrorReturnLogId(
+            "No parcels with specified status to create Pending More Info report"
+        );
+        return {
+            data: [],
+            error: {
+                type: "noRowsForInterval",
+                logId,
+            },
+        };
+    }
+
     return {
         data: rawParcelList,
         error: null,

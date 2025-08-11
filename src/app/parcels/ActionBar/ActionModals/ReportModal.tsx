@@ -144,7 +144,11 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
     };
 
     const onFileCreationFailed = (csvError: FetchReportError): void => {
-        setErrorMessage(`Failed to fetch ${props.reportName} data`);
+        if (csvError.type === "noRowsForInterval") {
+            setErrorMessage(`No parcels with specified status to create ${props.reportName}.`);
+        } else {
+            setErrorMessage(`Failed to fetch ${props.reportName} data`);
+        }
         setActionCompleted(false);
         void sendAuditLog({
             action: `generate ${props.reportName.toLowerCase}`,
