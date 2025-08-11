@@ -23,7 +23,9 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
             return true;
         }
 
-        return !availableDaysForSelectedCentre[dayjs(day).day()].is_active as boolean;
+        const dayIndex = day.day() != 0 ? day.day() - 1 : 6;
+
+        return !availableDaysForSelectedCentre[dayIndex].is_active;
     };
 
     return (

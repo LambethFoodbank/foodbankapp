@@ -24,7 +24,8 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
             return "This centre is closed all week";
         }
         return availableDaysObject.available_days
-            ?.map((days) => (days.day == undefined ? "" : days.day))
+            ?.filter((collectionDay) => collectionDay.is_active)
+            ?.map((collectionDay) => (collectionDay.day == undefined ? "" : collectionDay.day))
             .join(", ");
     });
 

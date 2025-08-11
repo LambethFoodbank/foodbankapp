@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "styled-components";
 import {
     CollectionCentresTableRow,
-    FormattedAvailableDays,
+    FormattedAvailableDayType,
     FormattedAvailableDaysWithPrimaryKey,
     updateDbCollectionCentreAvailableDays,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
@@ -55,7 +55,7 @@ function getBaseAuditLogForCollectionCentreAvailableDays(
 const formatCollectionCentreAvailableDaysDbData = (
     row: CollectionCentresTableRow
 ): FormattedAvailableDaysWithPrimaryKey => {
-    let formattedAvailableDays: FormattedAvailableDays[];
+    let formattedAvailableDays: FormattedAvailableDayType[];
 
     if (row.availableDays === null || row.availableDays === undefined) {
         formattedAvailableDays = [];
