@@ -45,7 +45,7 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
     }
 
     const { error: updateDeliveryInstructionsError } = await updateClientDeliveryInstructions(
-        parcelRecord.client_id == undefined ? "" : parcelRecord.client_id,
+        parcelRecord.client_id,
         deliveryInstructions
     );
 
@@ -109,8 +109,16 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
             return { parcelId: null, error: { type: "concurrentUpdateConflict", logId } };
         }
 
+        if (parcelRecord.client_id == undefined || parcelRecord.client_id == "") {
+            const logId = await logErrorReturnLogId(
+                "could not update parcel delivery instructions because of undefined client_id"
+            );
+            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+            return { parcelId: null, error: { type: "failedToUpdateDeliveryInstructions", logId } };
+        }
+
         const { error: updateDeliveryInstructionsError } = await updateClientDeliveryInstructions(
-            parcelRecord.client_id == undefined ? "" : parcelRecord.client_id,
+            parcelRecord.client_id,
             deliveryInstructions
         );
 
