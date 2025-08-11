@@ -1,10 +1,5 @@
-"use client";
-
-import {
-    fetchAllItems,
-    dietaryRequirementTypes,
-    ListItem,
-} from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsActions";
+import { dietaryRequirementTypes } from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsActions";
+import { DatabaseEnums } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import {
     Box,
@@ -24,11 +19,40 @@ interface Props {
     onClose: () => void;
 }
 
+type DietaryRequirementsPlusTableRow = {
+    id: string | null;
+    item_name: string | null;
+    halal: DatabaseEnums["item_dietary_status"] | null;
+    vegetarian: DatabaseEnums["item_dietary_status"] | null;
+    vegan: DatabaseEnums["item_dietary_status"] | null;
+    meat: DatabaseEnums["item_dietary_status"] | null;
+    gluten_free: DatabaseEnums["item_dietary_status"] | null;
+    pescatarian: DatabaseEnums["item_dietary_status"] | null;
+    dairy_free: DatabaseEnums["item_dietary_status"] | null;
+    seafood_allergy: DatabaseEnums["item_dietary_status"] | null;
+    pet_food: DatabaseEnums["item_dietary_status"] | null;
+};
+
+type DietaryRequirementsTableRow = {
+    id: string;
+    halal?: DatabaseEnums["item_dietary_status"] | null;
+    vegetarian?: DatabaseEnums["item_dietary_status"] | null;
+    vegan?: DatabaseEnums["item_dietary_status"] | null;
+    meat?: DatabaseEnums["item_dietary_status"] | null;
+    gluten_free?: DatabaseEnums["item_dietary_status"] | null;
+    pescatarian?: DatabaseEnums["item_dietary_status"] | null;
+    dairy_free?: DatabaseEnums["item_dietary_status"] | null;
+    seafood_allergy?: DatabaseEnums["item_dietary_status"] | null;
+    pet_food?: DatabaseEnums["item_dietary_status"] | null;
+};
+
 export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose }) => {
-    const [items, setItems] = useState<ListItem[]>([]);
+    const [items, setItems] = useState<DietaryRequirementsPlusTableRow[]>([]);
     const [selectedType, setSelectedType] = useState<string>("halal");
-    const [included, setIncluded] = useState<Set<string>>(new Set());
-    const [excluded, setExcluded] = useState<Set<string>>(new Set());
+    const [initialIncluded, setInitialIncluded] = useState<(string | null)[]>([]);
+    const [initialExcluded, setInitialExcluded] = useState<(string | null)[]>([]);
+    const [newIncluded, setNewIncluded] = useState<(string | null)[]>([]);
+    const [newExcluded, setNewExcluded] = useState<(string | null)[]>([]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -36,9 +60,6 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         }
 
         const fetchData = async (): Promise<void> => {
-            const items = await fetchAllItems();
-            setItems(items);
-
             const { data, error } = await supabase.from("dietary_requirements_plus").select();
 
             if (error) {
@@ -46,83 +67,92 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                 return;
             }
 
-            const includedSet = new Set<string>();
-            const excludedSet = new Set<string>();
+            setItems(data);
 
-            items.forEach((item) => {
-                const row = data.find((iterRow) => iterRow.id === item.id);
+            const included: (string | null)[] = [];
+            const excluded: (string | null)[] = [];
 
-                if (row) {
-                    const value = row[selectedType as keyof typeof row] || null;
+            data.forEach((row) => {
+                const value = row[selectedType as keyof typeof row] || null;
 
-                    if (value === "included") {
-                        includedSet.add(item.id);
-                    } else if (value === "excluded") {
-                        excludedSet.add(item.id);
-                    }
+                if (value === "included") {
+                    included.push(row.id);
+                } else if (value === "excluded") {
+                    excluded.push(row.id);
                 }
             });
 
-            setIncluded(includedSet);
-            setExcluded(excludedSet);
+            setInitialIncluded(included);
+            setInitialExcluded(excluded);
+
+            setNewIncluded(included);
+            setNewExcluded(excluded);
         };
 
         fetchData();
     }, [isOpen, selectedType]);
 
     const handleSubmit = async (): Promise<void> => {
-        try {
-            const allUpdates = items.map((item) => ({
-                id: item.id,
-                [selectedType]: "not_specified",
-            }));
-
-            included.forEach((id) => {
-                const item = allUpdates.find((iterItem) => iterItem.id === id);
-                if (item) {
-                    item[selectedType] = "included";
-                }
-            });
-
-            excluded.forEach((id) => {
-                const item = allUpdates.find((iterItem) => iterItem.id === id);
-                if (item) {
-                    item[selectedType] = "excluded";
-                }
-            });
-
-            const { error } = await supabase
-                .from("dietary_requirements")
-                .upsert(allUpdates, { onConflict: "id" });
-
-            if (error) {
-                throw error;
+        const changedItems = items.filter((item) => {
+            if (!item.id) {
+                return false;
             }
 
+            const wasIncluded = initialIncluded.includes(item.id);
+            const wasExcluded = initialExcluded.includes(item.id);
+            const isNowIncluded = newIncluded.includes(item.id);
+            const isNowExcluded = newExcluded.includes(item.id);
+
+            return wasIncluded !== isNowIncluded || wasExcluded !== isNowExcluded;
+        });
+
+        if (changedItems.length === 0) {
             onClose();
-        } catch (errorMessage) {
-            alert("Error saving data.");
+            return;
+        }
+
+        // Only include changed fields in the update
+        const updates: DietaryRequirementsTableRow[] = changedItems.map((item) => {
+            const newStatus = newIncluded.includes(item.id)
+                ? "included"
+                : newExcluded.includes(item.id)
+                  ? "excluded"
+                  : "not_specified";
+
+            return {
+                id: item.id,
+                [selectedType]: newStatus as DatabaseEnums["item_dietary_status"],
+            } as DietaryRequirementsTableRow;
+        });
+
+        const { error } = await supabase
+            .from("dietary_requirements")
+            .upsert(updates, { onConflict: "id" });
+
+        if (error) {
+            console.error("Error updating dietary requirements:", error);
+        } else {
+            onClose();
         }
     };
 
-    const handleToggle = (id: string, type: "included" | "excluded"): void => {
-        const toggleSet = type === "included" ? included : excluded;
-        const oppositeSet = type === "included" ? excluded : included;
+    const handleToggle = (id: string | null, type: "included" | "excluded"): void => {
+        let toggleList = type === "included" ? newIncluded : newExcluded;
+        let oppositeList = type === "included" ? newExcluded : newIncluded;
 
-        const newSet = new Set(toggleSet);
-        if (newSet.has(id)) {
-            newSet.delete(id);
+        if (toggleList.includes(id)) {
+            toggleList = toggleList.filter((item) => item !== id);
         } else {
-            newSet.add(id);
-            oppositeSet.delete(id); // can't be both
+            toggleList = [...toggleList, id];
+            oppositeList = oppositeList.filter((item) => item !== id);
         }
 
         if (type === "included") {
-            setIncluded(newSet);
-            setExcluded(new Set(oppositeSet));
+            setNewIncluded(toggleList);
+            setNewExcluded(oppositeList);
         } else {
-            setExcluded(newSet);
-            setIncluded(new Set(oppositeSet));
+            setNewExcluded(toggleList);
+            setNewIncluded(oppositeList);
         }
     };
 
@@ -153,8 +183,8 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                     value={selectedType}
                     onChange={(event) => {
                         setSelectedType(event.target.value);
-                        setIncluded(new Set());
-                        setExcluded(new Set());
+                        // setIncluded(new Set());
+                        // setExcluded(new Set());
                     }}
                 >
                     {dietaryRequirementTypes.map((dietary) => (
@@ -175,11 +205,11 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={included.has(item.id)}
+                                        checked={newIncluded.includes(item.id)}
                                         onChange={() => handleToggle(item.id, "included")}
                                     />
                                 }
-                                label={item.name}
+                                label={item.item_name || "Unnamed Item"}
                             />
                         </Grid>
                     ))}
@@ -196,11 +226,11 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={excluded.has(item.id)}
+                                        checked={newExcluded.includes(item.id)}
                                         onChange={() => handleToggle(item.id, "excluded")}
                                     />
                                 }
-                                label={item.name}
+                                label={item.item_name || "Unnamed Item"}
                             />
                         </Grid>
                     ))}
