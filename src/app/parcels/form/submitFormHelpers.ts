@@ -44,6 +44,17 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
         return { parcelId: null, error: { type: "failedToInsertParcel", logId } };
     }
 
+    if (parcelRecord.client_id == "") {
+        const logId = await logErrorReturnLogId(
+            "could not update parcel delivery instructions because of undefined client_id"
+        );
+        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+        return {
+            parcelId: parcelRecord.primary_key ? parcelRecord.primary_key : null,
+            error: { type: "failedToUpdateDeliveryInstructions", logId },
+        };
+    }
+
     const { error: updateDeliveryInstructionsError } = await updateClientDeliveryInstructions(
         parcelRecord.client_id,
         deliveryInstructions
@@ -114,7 +125,10 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
                 "could not update parcel delivery instructions because of undefined client_id"
             );
             await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-            return { parcelId: null, error: { type: "failedToUpdateDeliveryInstructions", logId } };
+            return {
+                parcelId: primaryKey,
+                error: { type: "failedToUpdateDeliveryInstructions", logId },
+            };
         }
 
         const { error: updateDeliveryInstructionsError } = await updateClientDeliveryInstructions(
@@ -128,7 +142,10 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
                 updateDeliveryInstructionsError
             );
             await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-            return { parcelId: null, error: { type: "failedToUpdateDeliveryInstructions", logId } };
+            return {
+                parcelId: primaryKey,
+                error: { type: "failedToUpdateDeliveryInstructions", logId },
+            };
         }
 
         await sendAuditLog({ ...auditLog, wasSuccess: true });
