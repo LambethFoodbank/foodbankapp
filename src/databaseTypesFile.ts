@@ -924,6 +924,8 @@ export type Database = {
       }
       clients_plus: {
         Row: {
+          additional_phone_numbers: string[] | null
+          additional_phone_numbers_text: string | null
           address_postcode: string | null
           client_id: string | null
           email: string | null
@@ -983,6 +985,7 @@ export type Database = {
         Row: {
           all_events: string[] | null
           client_additional_phone_numbers: string[] | null
+          client_additional_phone_numbers_text: string | null
           client_address_postcode: string | null
           client_delivery_instructions: string | null
           client_email: string | null

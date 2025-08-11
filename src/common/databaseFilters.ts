@@ -59,18 +59,18 @@ export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
     phoneColumnLabel: Extract<keyof DbData, "phone_number" | "client_phone_number">,
     additionalPhoneColumnLabel: Extract<
         keyof DbData,
-        "additional_phone_numbers" | "client_additional_phone_numbers"
+        "additional_phone_numbers_text" | "client_additional_phone_numbers_text"
     >,
     clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
-        if ("-".includes(substring.toLowerCase())) {
+        if (substring === "-") {
             const phoneColumnQueryInactiveClient = `or(${clientIsActiveColumnLabel}.is.false, ${phoneColumnLabel}.ilike.%${substring}%)`;
-            const additionalPhoneColumnQueryInactiveClient = `or(${clientIsActiveColumnLabel}.is.false, ${additionalPhoneColumnLabel}.cs.{${substring}})`;
+            const additionalPhoneColumnQueryInactiveClient = `or(${clientIsActiveColumnLabel}.is.false, ${additionalPhoneColumnLabel}.ilike.%${substring}%)`;
             return `or(${phoneColumnQueryInactiveClient}, ${additionalPhoneColumnQueryInactiveClient})`;
         }
         const phoneColumnQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
-        const additionalPhoneQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${additionalPhoneColumnLabel}.cs.{${substring}})`;
+        const additionalPhoneQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${additionalPhoneColumnLabel}.ilike.%${substring}%)`;
         return `or(${phoneColumnQueryActiveClient}, ${additionalPhoneQueryActiveClient})`;
     });
 };

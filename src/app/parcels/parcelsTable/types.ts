@@ -12,7 +12,7 @@ export interface ParcelsTableRow {
     familyCategory: string;
     addressPostcode: Schema["clients"]["address_postcode"];
     phoneNumber: Schema["clients"]["phone_number"];
-    additionalPhoneNumber: string | null;
+    additionalPhoneNumbers: string | string[] | null;
     deliveryCollection: {
         collectionCentreName: string;
         collectionCentreAcronym: string;

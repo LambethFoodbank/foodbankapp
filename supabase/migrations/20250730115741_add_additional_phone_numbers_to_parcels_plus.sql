@@ -31,7 +31,8 @@ select
     parcels.referrer_name,
     parcels.referrer_email,
     parcels.referrer_phone,
-    clients.additional_phone_numbers as client_additional_phone_numbers
+    clients.additional_phone_numbers as client_additional_phone_numbers,
+    array_to_string(clients.additional_phone_numbers, ' ') as client_additional_phone_numbers_text
 from parcels
          left join collection_centres on parcels.collection_centre = collection_centres.primary_key
          left join clients on parcels.client_id = clients.primary_key
