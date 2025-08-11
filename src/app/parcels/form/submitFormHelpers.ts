@@ -30,7 +30,7 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
 
     const auditLog = {
         action: "add a parcel",
-        content: { parcelDetails: parcelRecord },
+        content: { parcelDetails: { ...parcelRecord, deliveryInstructions } },
         clientId: parcelRecord.client_id,
         collectionCentreId: parcelRecord.collection_centre
             ? parcelRecord.collection_centre
@@ -88,7 +88,7 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
 
         const auditLog = {
             action: "edit a parcel",
-            content: { parcelDetails: parcelRecord, count: count },
+            content: { parcelDetails: { ...parcelRecord, deliveryInstructions }, count: count },
             clientId: parcelRecord.client_id,
             collectionCentreId: parcelRecord.collection_centre
                 ? parcelRecord.collection_centre
