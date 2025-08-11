@@ -201,7 +201,6 @@ const CollectionCentresTable: React.FC = () => {
                             `Log ID: ${updateCollectionCentreError.logId}`;
                     }
                     setErrorMessage(message);
-                    throw new Error("Update failed");
                 }
             }
             return newRow;
