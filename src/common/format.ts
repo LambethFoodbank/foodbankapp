@@ -1,8 +1,6 @@
 import { Json } from "@/databaseTypesFile";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { DAYSOFWEEK_ARRAY } from "@/common/databaseDaysOfWeek";
-import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
 
 const localeCode = "en-GB";
 
