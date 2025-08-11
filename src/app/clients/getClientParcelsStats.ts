@@ -2,7 +2,7 @@ import supabase from "@/supabaseClient";
 import { Data } from "@/components/DataViewer/DataViewer";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { ExpandedClientParcelDetails, getClientParcelsDetails } from "./getClientParcelsData";
-
+import dayjs from "dayjs";
 export interface ExpandedClientParcelStats extends Data {
     totalParcels: number;
     totalSuccessful: number;
@@ -72,17 +72,15 @@ export const getClientParcelsStats = async (
         (parcel) => parcel.last_event_is_successfully_completed
     );
 
-    const todayTime = new Date().getTime();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(new Date().getMonth() - 6);
-    const sixMonthsAgoTime = sixMonthsAgo.getTime();
+    const todayTime = dayjs();
+    const sixMonthsAgo = todayTime.subtract(6, "months");
 
     const deliveredLastSixMonths = deliveredParcels.filter((parcel) => {
         if (!parcel.last_event_timestamp) {
             return false;
         }
-        const time = Date.parse(parcel.last_event_timestamp);
-        return time >= sixMonthsAgoTime && time <= todayTime;
+        const time = dayjs(parcel.last_event_timestamp);
+        return time.isAfter(sixMonthsAgo) && time.isBefore(todayTime);
     });
     return {
         data: [
