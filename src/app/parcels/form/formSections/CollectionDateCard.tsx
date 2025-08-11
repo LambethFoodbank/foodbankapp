@@ -1,15 +1,14 @@
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import React from "react";
-import { DbCollectionCentreType } from "@/common/fetch";
-import { getAvailableDaysIndices } from "@/common/format";
 import { getErrorText, onChangeDate } from "@/components/Form/formFunctions";
 import { ErrorText } from "@/components/Form/formStyling";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ParcelCardProps } from "../ParcelForm";
+import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
 
 interface DateCardProps extends ParcelCardProps {
-    availableDays: DbCollectionCentreType[];
+    availableDaysForSelectedCentre: DbCollectionCentreAvailableDaysType;
 }
 
 const CollectionDateCard: React.FC<DateCardProps> = ({
@@ -17,18 +16,14 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
     errorSetter,
     formErrors,
     fields,
-    availableDays,
+    availableDaysForSelectedCentre,
 }) => {
-    const daysForSelectedCentre = availableDays.find(
-        (availableDaysObject) => availableDaysObject?.primary_key === fields.collectionCentre
-    );
-    const availableDaysIndices =
-        daysForSelectedCentre?.available_days === undefined
-            ? []
-            : getAvailableDaysIndices(daysForSelectedCentre?.available_days);
+    const isCentreClosedOnDay = (day: Dayjs): boolean => {
+        if (!availableDaysForSelectedCentre) {
+            return true;
+        }
 
-    const isCentreClosedOnDay = (availableDay: Dayjs): boolean => {
-        return !availableDaysIndices?.includes(dayjs(availableDay).day()) as boolean;
+        return !availableDaysForSelectedCentre[dayjs(day).day()].is_active as boolean;
     };
 
     return (
@@ -45,6 +40,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
                     label="Date"
                     value={fields.collectionDate ? dayjs(fields.collectionDate) : null}
                     shouldDisableDate={isCentreClosedOnDay}
+                    disabled={!fields.collectionCentre}
                 />
                 <ErrorText>{getErrorText(formErrors.collectionDate)}</ErrorText>
             </>
