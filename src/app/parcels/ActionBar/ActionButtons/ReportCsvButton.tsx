@@ -59,7 +59,8 @@ export type ReportRow = {
     deliveryCollectionDate: string;
     deliveryInstructions: string;
     extraInformation: string;
-    notes: string;
+    parcelNotes: string;
+    clientNotes: string;
     cookingFacilities: string;
     dietaryRequirements: string;
     hygieneProducts: string;
@@ -118,6 +119,7 @@ export interface rawParcel {
     packing_date: string | null;
     created_at: string;
     collection_datetime: string | null;
+    notes: string | null;
     referral_agency: string | null;
     referrer_email: string | null;
     referrer_name: string | null;
@@ -172,6 +174,7 @@ export const getRawParcelListQuery = supabase
         packing_date,
         created_at,
         collection_datetime,
+        notes,
         referral_agency,
         referrer_email,
         referrer_name,
@@ -256,7 +259,8 @@ export const convertRawParcelListToReportResult = (
                     deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
                     deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
                     extraInformation: rawParcel.client?.extra_information ?? "",
-                    notes: rawParcel.client?.notes ?? "",
+                    parcelNotes: rawParcel?.notes ?? "",
+                    clientNotes: rawParcel.client?.notes ?? "",
                     cookingFacilities: formatRequirementsByCanonicalOrder(
                         rawParcel.client?.cooking_facilities ?? null,
                         cookingFacilitiesOptions

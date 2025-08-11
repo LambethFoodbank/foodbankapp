@@ -24,8 +24,6 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
     })
         // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.ilike."", voucher_number.is.null')
-        // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null')
         .eq("client_is_active", true);
 
     if (idFetchError) {
