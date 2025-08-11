@@ -2,158 +2,54 @@
 
 import { Dayjs } from "dayjs";
 import React from "react";
-import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
-import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
-import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
-import {
-    formatAddressFromClientDetails,
-    formatBabyProducts,
-    formatBreakdownOfAdultsFromFamilyDetails,
-    formatBreakdownOfChildrenFromFamilyDetails,
-    formatHouseholdFromFamilyDetails,
-    formatHygieneProducts,
-    formatRequirementsByCanonicalOrder,
-} from "@/app/clients/getExpandedClientDetails";
-import { formatDatetimeAsDate, getDbDate } from "@/common/format";
-import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
-import CsvButton, {
-    formatNumberAsStringForCsv,
-} from "@/components/FileGenerationButtons/CsvButton";
+import ReportCsvButton, {
+    ButtonProps,
+    convertRawParcelListToReportResult,
+    FetchReportError,
+    FetchReportResult,
+    getParcelIdsAndStatusQuery,
+    getRawParcelListQuery,
+    idAndStatus,
+    rawParcel,
+} from "./ReportCsvButton";
 import { logErrorReturnLogId } from "@/logger/logger";
-import supabase from "@/supabaseClient";
 
-type FetchPendingMoreInfoReportResult =
-    | {
-          data: PendingMoreInfoReportRow[];
-          error: null;
-      }
-    | {
-          data: null;
-          error: FetchPendingMoreInfoReportError;
-      };
-
-export interface FetchPendingMoreInfoReportError {
-    type: FetchPendingMoreInfoReportErrorType;
-    logId: string;
-}
-
-type FetchPendingMoreInfoReportErrorType =
-    | "failedToFetchPendingMoreInfoRows"
-    | "noPendingMoreInfoRowsForInterval"
-    | "failedToFetchPendingMoreInfoParcelIds";
-
-type PendingMoreInfoReportRow = {
-    voucherNumber: string;
-    packingDate: string;
-    fullName: string;
-    signpostingCallRequired: boolean;
-    flaggedForAttention: boolean;
-    phoneNumber: string;
-    signpostingCallReasons: string;
-    address: string;
-    parcelStatus: string;
-    deliveryOrCollection: string;
-    deliveryCollectionDate: string;
-    deliveryInstructions: string;
-    extraInformation: string;
-    notes: string;
-    cookingFacilities: string;
-    dietaryRequirements: string;
-    hygieneProducts: string;
-    babyProducts: string;
-    petFood: string;
-    otherItems: string;
-    household: string;
-    adults: string;
-    children: string;
-    parcelListType: string;
-    clientIsActive: boolean;
-    recordCreatedOn: string;
-};
-
-const getPendingMoreInfoReportData = async (
+const getPendingMoreInfoParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
-): Promise<FetchPendingMoreInfoReportResult> => {
-    // Find IDs of parcels with the 'Pending More Info' status.
-    const { data: idAndStatusList, error: idFetchError } = await supabase
-        .from("parcels_plus")
-        .select("parcel_id, last_status_event_name")
-        .gte("packing_date", getDbDate(fromDate))
-        .lte("packing_date", getDbDate(toDate))
+): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
+    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
+        fromDate,
+        toDate,
+    })
         // eslint-disable-next-line quotes
         .or('last_status_event_name.eq."Pending More Info"');
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
-            "Failed to fetch PendingMoreInfo parcel IDs and statuses",
+            "Failed to fetch parcel IDs and statuses for Pending More Info Report",
             {
                 error: idFetchError,
             }
         );
         return {
-            data: null,
+            data: [],
             error: {
-                type: "failedToFetchPendingMoreInfoParcelIds",
-                logId,
+                type: "failedToFetchParcelIds",
+                logId: logId,
             },
         };
     }
+    return {
+        data: idAndStatusList,
+        error: null,
+    };
+};
 
-    const { data: rawParcelList, error: parcelFetchError } = await supabase
-        .from("parcels")
-        .select(
-            `
-            primary_key,
-            voucher_number,
-            packing_date,
-            created_at,
-            collection_datetime,
-            collection_centre:collection_centres(
-                name,
-                is_shown
-            ),
-            list_type,
-
-            client:clients(
-                full_name,
-                is_active,
-                signposting_call_required,
-                flagged_for_attention,
-                phone_number,
-                signposting_call_reasons,
-                delivery_instructions,
-                extra_information,
-                notes,
-                address_1,
-                address_2,
-                address_town,
-                address_county,
-                address_postcode,
-                cooking_facilities,
-                dietary_requirements,
-                hygiene_tampons,
-                hygiene_pads,
-                hygiene_other_items,
-                baby_food,
-                baby_formula,
-                baby_nappies,
-                baby_other_items,
-                pet_food,
-                other_items,
-
-                family:families(
-                    birth_year,
-                    birth_month,
-                    gender,
-                    recorded_as_child
-                )
-            )
-            `
-        )
-        .limit(1, { foreignTable: "clients" })
+const getPendingMoreInfoRawParcelList = async (
+    idAndStatusList: idAndStatus[]
+): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
+    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -163,14 +59,17 @@ const getPendingMoreInfoReportData = async (
         .order("client_id");
 
     if (parcelFetchError) {
-        const logId = await logErrorReturnLogId("Failed to fetch PendingMoreInfo rows", {
-            error: parcelFetchError,
-        });
+        const logId = await logErrorReturnLogId(
+            "Failed to fetch Pending More Info Report Parcel data",
+            {
+                error: parcelFetchError,
+            }
+        );
         return {
-            data: null,
+            data: [],
             error: {
-                type: "failedToFetchPendingMoreInfoRows",
-                logId,
+                type: "failedToFetchRows",
+                logId: logId,
             },
         };
     }
@@ -180,97 +79,46 @@ const getPendingMoreInfoReportData = async (
             "No parcels with specified status to create Pending More Info report"
         );
         return {
-            data: null,
+            data: [],
             error: {
-                type: "noPendingMoreInfoRowsForInterval",
+                type: "noRowsForInterval",
                 logId,
             },
         };
     }
 
     return {
+        data: rawParcelList,
         error: null,
-        data: rawParcelList
-            .filter((rawParcel) => !!rawParcel.client)
-            .map((rawParcel): PendingMoreInfoReportRow => {
-                return {
-                    voucherNumber: rawParcel.voucher_number ?? "",
-                    packingDate: formatDatetimeAsDate(rawParcel.packing_date),
-                    fullName: rawParcel.client?.full_name ?? "(error)",
-                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
-                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
-                    phoneNumber: rawParcel.client
-                        ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
-                        : "",
-                    signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? null,
-                        signpostingCallOptions
-                    ),
-                    address: rawParcel.client
-                        ? formatAddressFromClientDetails(rawParcel.client)
-                        : "",
-                    parcelStatus:
-                        idAndStatusList.find(
-                            (idAndStatus) => idAndStatus.parcel_id === rawParcel.primary_key
-                        )?.last_status_event_name ?? "(none)",
-                    deliveryOrCollection: rawParcel.collection_centre?.is_shown
-                        ? rawParcel.collection_centre?.name
-                        : `${rawParcel.collection_centre?.name} (inactive)`,
-                    deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
-                    deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
-                    extraInformation: rawParcel.client?.extra_information ?? "",
-                    notes: rawParcel.client?.notes ?? "",
-                    cookingFacilities: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.cooking_facilities ?? null,
-                        cookingFacilitiesOptions
-                    ),
-                    dietaryRequirements: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.dietary_requirements ?? null,
-                        dietaryRequirementOptions
-                    ),
-                    hygieneProducts: formatHygieneProducts(
-                        rawParcel.client?.hygiene_tampons ?? null,
-                        rawParcel.client?.hygiene_pads ?? null,
-                        rawParcel.client?.hygiene_other_items ?? []
-                    ),
-                    babyProducts: formatBabyProducts(
-                        rawParcel.client?.baby_food ?? null,
-                        rawParcel.client?.baby_formula ?? null,
-                        rawParcel.client?.baby_nappies ?? null,
-                        rawParcel.client?.baby_other_items ?? []
-                    ),
-                    petFood: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.pet_food ?? null,
-                        petFoodOptions
-                    ),
-                    otherItems: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.other_items ?? null,
-                        otherRequirementOptions
-                    ),
-                    household: rawParcel.client
-                        ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    adults: rawParcel.client
-                        ? formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    children: rawParcel.client
-                        ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    parcelListType: rawParcel.list_type,
-                    clientIsActive: rawParcel.client?.is_active ?? false,
-                    recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
-                };
-            }),
     };
 };
 
-interface ButtonProps {
-    fromDate: Dayjs;
-    toDate: Dayjs;
-    onFileCreationCompleted: () => void;
-    onFileCreationFailed: (error: FetchPendingMoreInfoReportError) => void;
-    disabled: boolean;
-}
+const getPendingMoreInfoReportData = async (
+    fromDate: Dayjs,
+    toDate: Dayjs
+): Promise<FetchReportResult> => {
+    const { data: idAndStatusList, error: idAndStatusError } =
+        await getPendingMoreInfoParcelIdsAndStatus(fromDate, toDate);
+
+    if (idAndStatusError) {
+        return {
+            data: null,
+            error: idAndStatusError,
+        };
+    }
+
+    const { data: rawParcelList, error: rawParcelError } =
+        await getPendingMoreInfoRawParcelList(idAndStatusList);
+
+    if (rawParcelError) {
+        return {
+            data: null,
+            error: rawParcelError,
+        };
+    }
+
+    return convertRawParcelListToReportResult(rawParcelList, idAndStatusList);
+};
 
 const PendingMoreInfoReportCsvButton = ({
     fromDate,
@@ -279,32 +127,16 @@ const PendingMoreInfoReportCsvButton = ({
     onFileCreationFailed,
     disabled,
 }: ButtonProps): React.ReactElement => {
-    const fetchDataAndFileName = async (): Promise<
-        FileGenerationDataFetchResponse<
-            PendingMoreInfoReportRow[],
-            FetchPendingMoreInfoReportErrorType
-        >
-    > => {
-        const { data: requiredData, error } = await getPendingMoreInfoReportData(fromDate, toDate);
-        if (error) {
-            return { data: null, error };
-        }
-        return {
-            data: { fileData: requiredData, fileName: "PendingMoreInfoReport.csv" },
-            error: null,
-        };
+    const props: ButtonProps = {
+        fromDate: fromDate,
+        toDate: toDate,
+        onFileCreationCompleted: onFileCreationCompleted,
+        onFileCreationFailed: onFileCreationFailed,
+        disabled: disabled,
+        getReportDataByDate: getPendingMoreInfoReportData,
+        fileName: "PendingMoreInfoReport.csv",
     };
-
-    return (
-        <CsvButton
-            fetchDataAndFileName={fetchDataAndFileName}
-            csvConfig={{ useKeysAsHeaders: true, quoteStrings: true }}
-            onFileCreationCompleted={onFileCreationCompleted}
-            onFileCreationFailed={onFileCreationFailed}
-            disabled={disabled}
-            formSubmitButton={true}
-        />
-    );
+    return ReportCsvButton(props);
 };
 
 export default PendingMoreInfoReportCsvButton;
