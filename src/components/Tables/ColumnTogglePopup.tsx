@@ -6,12 +6,10 @@ import CheckboxGroupPopup from "../DataInput/CheckboxGroupPopup";
 import { ViewColumnOutlined } from "@mui/icons-material";
 import styled from "styled-components";
 
-type ToggleableKey = "Referral Details" | "referralAgency" | "referrerName" | "referrerEmail" | "referrerPhone";
-
 interface ColumnTogglePopupProps<Data> {
-    toggleableHeaders?: readonly (keyof Data)[];
+    toggleableHeaders?: readonly (keyof Data | string)[];
     shownHeaderKeys: readonly (keyof Data)[];
-    setShownHeaderKeys: (headers: (keyof Data | string)[]) => void;
+    setShownHeaderKeys: (headers: (keyof Data)[]) => void;
     headers: TableHeaders<Data>;
 }
 
@@ -36,14 +34,17 @@ const ColumnTogglePopup = <Data,>({
     ] as const;
 
     const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const checkboxKey = event.target.name as keyof Data;
+        const checkboxKey = event.target.name;
         const isReferralDetails = checkboxKey === "Referral Details";
-        const keysToUpdate = isReferralDetails ? referralDetails : [checkboxKey];
+        const keysToUpdate = isReferralDetails
+            ? (referralDetails as unknown as (keyof Data)[])
+            : [checkboxKey as keyof Data];
 
         const newKeys = event.target.checked
             ? Array.from(new Set([...shownHeaderKeys, ...keysToUpdate]))
-            : shownHeaderKeys.filter((key) => !keysToUpdate.includes(key));
-        setShownHeaderKeys(newKeys);
+            : shownHeaderKeys.filter((key) => !keysToUpdate.includes(key as keyof Data));
+
+        setShownHeaderKeys(newKeys as (keyof Data)[]);
     };
 
     return (
@@ -52,7 +53,7 @@ const ColumnTogglePopup = <Data,>({
                 labelsAndKeys={(toggleableHeaders ?? []).map((key) => {
                     const headerLabel =
                         headers.find(([headerKey]) => headerKey === key)?.[1] ?? key.toString();
-                    return [headerLabel, key as string];
+                    return [headerLabel, key.toString()];
                 })}
                 checkedKeys={shownHeaderKeys.map((key) => key as string)}
                 onChange={onChangeCheckbox}

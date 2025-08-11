@@ -31,7 +31,7 @@ export const parcelTableDefaultShownHeaders: (keyof ParcelsTableRow)[] = [
     "lastStatus",
 ];
 
-export const parcelTableToggleableHeaders: (keyof ParcelsTableRow | any)[] = [
+export const parcelTableToggleableHeaders: (keyof ParcelsTableRow | "Referral Details")[] = [
     "fullName",
     "familyCategory",
     "addressPostcode",
