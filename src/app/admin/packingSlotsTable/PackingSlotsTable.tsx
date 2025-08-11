@@ -212,9 +212,9 @@ const PackingSlotsTable: React.FC = () => {
                 if (updatePackingSlotError) {
                     let message = `Failed to update the packing slot. Log ID: ${updatePackingSlotError.logId}`;
 
-                    if (updatePackingSlotError.type === "ConcurrentEdit") {
+                    if (updatePackingSlotError.type === "ConcurrentEditPackingSlots") {
                         message =
-                            "This packing slot was modified by someone else.\n" +
+                            "Record has been edited recently - please refresh the page.\n" +
                             `Log ID: ${updatePackingSlotError.logId}`;
                     }
 
@@ -226,7 +226,7 @@ const PackingSlotsTable: React.FC = () => {
                         logId: updatePackingSlotError.logId,
                     });
 
-                    throw new Error("Update failed");
+                    throw new Error(message);
                 } else {
                     void sendAuditLog({
                         ...baseAuditLog,
@@ -236,8 +236,6 @@ const PackingSlotsTable: React.FC = () => {
             }
 
             return { ...newRow, isNew: false };
-        } catch (error) {
-            throw new Error("Row process failed");
         } finally {
             setIsLoading(false);
         }
@@ -473,7 +471,7 @@ const PackingSlotsTable: React.FC = () => {
                     editMode="row"
                     rowModesModel={rowModesModel}
                     onProcessRowUpdateError={(error) => {
-                        console.error("Error while updating row:", error);
+                        setErrorMessage(error.message);
                     }}
                     onRowModesModelChange={(newModel) => {
                         setRowModesModel(newModel);

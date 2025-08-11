@@ -3,7 +3,6 @@ import { PackingSlotRow } from "@/app/admin/packingSlotsTable/PackingSlotsTable"
 import { DatabaseError } from "@/app/errorClasses";
 import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
-import { sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 
 type DbPackingSlot = Tables<"packing_slots">;
@@ -84,7 +83,7 @@ export const insertNewPackingSlot = async (
 
 type UpdatePackingSlotResult = {
     error: {
-        type: "UpdatePackingSlotsFailed" | "ConcurrentEdit";
+        type: "UpdatePackingSlotsFailed" | "ConcurrentEditPackingSlots";
         logId: string;
     } | null;
 };
@@ -93,10 +92,6 @@ export const updateDbPackingSlot = async (
     row: PackingSlotRow
 ): Promise<UpdatePackingSlotResult> => {
     const processedData = formatExistingRowToDBPackingSlot(row);
-    const baseAuditLogProps = {
-        action: "update packing slots information",
-        content: { data: processedData },
-    };
     const lastUpdated = row.originalLastUpdated;
 
     const { error, count } = await supabase
@@ -113,17 +108,17 @@ export const updateDbPackingSlot = async (
         .eq("last_updated", lastUpdated)
         .select();
 
-    if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of packing slots");
-        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
-        return { error: { type: "ConcurrentEdit", logId } };
-    } else if (error) {
+    if (error) {
         const logId = await logErrorReturnLogId("Failed to update packing slot", {
             error,
             newPackingSlotData: processedData,
         });
 
         return { error: { type: "UpdatePackingSlotsFailed", logId } };
+    }
+    if (count === 0) {
+        const logId = await logWarningReturnLogId("Concurrent editing of packing slots");
+        return { error: { type: "ConcurrentEditPackingSlots", logId } };
     }
 
     return { error: null };
