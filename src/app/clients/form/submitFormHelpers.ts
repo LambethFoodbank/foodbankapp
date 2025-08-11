@@ -93,11 +93,11 @@ type InsertDeliveryAreaErrorType = "failedToInsertDeliveryArea";
 export type InsertDeliveryAreaReturnType = {
     error: { type: InsertDeliveryAreaErrorType; logId: string } | null;
 };
-type InsertDeliveryArea = (
+type InsertDeliveryAreaType = (
     deliveryAreaRecord: DeliveryAreaDatabaseInsertRecord
 ) => Promise<InsertDeliveryAreaReturnType>;
 
-export const insertDeliveryArea: InsertDeliveryArea = async (deliveryAreaRecord) => {
+export const insertDeliveryArea: InsertDeliveryAreaType = async (deliveryAreaRecord) => {
     const { error } = await supabase.from("delivery_areas").insert(deliveryAreaRecord).single();
 
     const auditLog = {

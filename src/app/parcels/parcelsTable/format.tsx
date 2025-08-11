@@ -1,12 +1,6 @@
 import React from "react";
 import { useTheme } from "styled-components";
-import {
-    displayNameForDeletedClient,
-    displayPostcodeForHomelessClient,
-    formatDateTime,
-    formatDatetimeAsDate,
-} from "@/common/format";
-import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
+import { displayNameForDeletedClient, formatDateTime, formatDatetimeAsDate } from "@/common/format";
 import CollectionIcon from "@/components/Icons/CollectionIcon";
 import CongestionChargeAppliesIcon from "@/components/Icons/CongestionChargeAppliesIcon";
 import DeliveryIcon from "@/components/Icons/DeliveryIcon";
@@ -18,6 +12,7 @@ import {
     GetParcelDataAndCountErrorType,
     ParcelsTableRow,
 } from "./types";
+import { rowToAddressColumn } from "@/common/tableRows";
 
 const RowToIconsColumn = ({
     flaggedForAttention,
@@ -78,30 +73,6 @@ const rowToLastStatusColumn = (data: ParcelsTableRow["lastStatus"] | null): stri
     return (
         `${name}` + (eventData ? ` (${eventData})` : "") + ` @ ${formatDatetimeAsDate(timestamp)}`
     );
-};
-
-const formatNullPostcode = (postcodeData: string | null): string => {
-    return postcodeData ?? displayPostcodeForHomelessClient;
-};
-
-const rowToAddressColumn = ({
-    postcode,
-    isDeliverable,
-}: ParcelsTableRow["addressPostcode"]): React.ReactElement => {
-    const postcodeRow: React.ReactNode[] = [];
-    postcodeRow.push(formatNullPostcode(postcode));
-
-    if (!isDeliverable && postcode !== "-") {
-        postcodeRow.push(
-            <span style={{ paddingLeft: "0.3rem" }}>
-                <>
-                    <ClientOutsideDeliveryAreaIcon />
-                </>
-            </span>
-        );
-    }
-
-    return <>{postcodeRow}</>;
 };
 
 export const parcelTableColumnDisplayFunctions = {

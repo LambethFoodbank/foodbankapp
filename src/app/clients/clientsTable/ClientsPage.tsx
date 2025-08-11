@@ -17,7 +17,6 @@ import ExpandedClientDetailsFallback from "@/app/clients/ExpandedClientDetailsFa
 import { CircularProgress } from "@mui/material";
 import { ErrorSecondaryText } from "../../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { displayPostcodeForHomelessClient } from "@/common/format";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import DeleteButton from "@/components/Buttons/DeleteButton";
 import deleteClient from "../deleteClient";
@@ -34,7 +33,7 @@ import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
 import { RoleUpdateContext } from "@/app/roles";
-import ClientOutsideDeliveryAreaIcon from "@/components/Icons/ClientsOutsideDeliveryAreaIcon";
+import { rowToAddressColumn } from "@/common/tableRows";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -150,10 +149,6 @@ const ClientsPage: React.FC = () => {
         })();
     }, [clientId]);
 
-    const formatNullPostcode = (postcodeData: string | null): string => {
-        return postcodeData ?? displayPostcodeForHomelessClient;
-    };
-
     const onDeleteClient = async (): Promise<void> => {
         if (clientId) {
             const deletedClientsParcels = await getClientParcelsDetails(clientId);
@@ -184,24 +179,6 @@ const ClientsPage: React.FC = () => {
         } else {
             router.push("/clients");
         }
-    };
-
-    const rowToAddressColumn = ({
-        postcode,
-        isDeliverable,
-    }: ClientsTableRow["addressPostcode"]): React.ReactElement => {
-        const postcodeRow: React.ReactNode[] = [];
-        postcodeRow.push(formatNullPostcode(postcode));
-        if (!isDeliverable && postcode !== "-") {
-            postcodeRow.push(
-                <span style={{ paddingLeft: "0.3rem" }}>
-                    <>
-                        <ClientOutsideDeliveryAreaIcon />
-                    </>
-                </span>
-            );
-        }
-        return <>{postcodeRow}</>;
     };
 
     const clientTableColumnDisplayFunctions = {

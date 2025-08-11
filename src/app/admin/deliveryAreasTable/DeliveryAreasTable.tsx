@@ -134,13 +134,13 @@ const DeliveryAreasTable: React.FC = () => {
                         setRows(deliveryAreas);
                     } catch (error) {
                         setRows([]);
-                        setErrorMessage("Error fetching data, please reload");
                         if (error instanceof Error) {
                             void logErrorReturnLogId(
                                 "Error with fetch: Delivery areas subscription",
                                 {},
                                 error
                             );
+                            setErrorMessage("Error fetching data, please reload");
                         }
                     }
                 }
@@ -165,16 +165,16 @@ const DeliveryAreasTable: React.FC = () => {
         }));
     };
 
-    const processRowUpdate = async (newRow: DeliveryAreasRow): Promise<DeliveryAreasRow> => {
+    const processRowUpdate = async (row: DeliveryAreasRow): Promise<DeliveryAreasRow> => {
         setErrorMessage(null);
         setIsLoading(true);
 
-        if (newRow.isNew) {
+        if (row.isNew) {
             const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
-                await insertNewDeliveryAreas(newRow);
+                await insertNewDeliveryAreas(row);
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
                 "add a new delivery area",
-                newRow
+                row
             );
 
             if (insertDeliveryAreasError) {
@@ -195,10 +195,10 @@ const DeliveryAreasTable: React.FC = () => {
                 });
             }
         } else {
-            const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(newRow);
+            const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(row);
             const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
                 "update a delivery area",
-                newRow
+                row
             );
 
             if (updateDeliveryAreasError) {
@@ -217,7 +217,7 @@ const DeliveryAreasTable: React.FC = () => {
 
         setIsLoading(false);
 
-        return newRow;
+        return row;
     };
 
     const handleRowEditStop: GridEventListener<"rowEditStop"> = (params, event) => {

@@ -6,7 +6,6 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
 
 type DbDeliveryAreas = Tables<"delivery_areas">;
-type NewDbDeliveryAreas = Omit<DbDeliveryAreas, "id">;
 
 export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
     const { data, error } = await supabase.from("delivery_areas").select();
@@ -32,10 +31,6 @@ const formatExistingRowToDbDeliveryAreas = (row: DeliveryAreasRow): DbDeliveryAr
     };
 };
 
-const formatNewRowToDbDeliveryAreas = (newRow: DeliveryAreasRow): NewDbDeliveryAreas => {
-    return { postcode: newRow.postcode };
-};
-
 type InsertDeliveryAreasResult =
     | {
           data: { deliveryAreasId: string };
@@ -52,7 +47,7 @@ type InsertDeliveryAreasResult =
 export const insertNewDeliveryAreas = async (
     newRow: DeliveryAreasRow
 ): Promise<InsertDeliveryAreasResult> => {
-    const data = formatNewRowToDbDeliveryAreas(newRow);
+    const data = { postcode: newRow.postcode };
     const { data: deliveryAreas, error } = await supabase
         .from("delivery_areas")
         .insert(data)
@@ -108,7 +103,7 @@ export const deleteDbDeliveryAreas = async (
         .eq("postcode", processedData.postcode);
 
     if (error) {
-        const logId = await logErrorReturnLogId("Failed to update delivery area", {
+        const logId = await logErrorReturnLogId("Failed to delete delivery area", {
             error,
             newDeliveryAreasData: processedData,
         });

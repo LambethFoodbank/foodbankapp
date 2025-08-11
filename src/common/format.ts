@@ -50,6 +50,10 @@ export const displayList = (data: string[]): string => {
     return data.length === 0 ? "None" : data.join(", ");
 };
 
+export const formatNullPostcode = (postcodeData: string | null): string => {
+    return postcodeData ?? displayPostcodeForHomelessClient;
+};
+
 export const formatAddress = (
     addressLine1: string | null,
     addressLine2: string | null,
