@@ -72,6 +72,10 @@ export type ReportRow = {
     parcelListType: string;
     clientIsActive: boolean;
     recordCreatedOn: string;
+    referralAgency: string | null;
+    referrerEmail: string | null;
+    referrerName: string | null;
+    referrerPhone: string | null;
 };
 
 export interface idAndStatus {
@@ -108,6 +112,10 @@ export interface rawParcel {
     packing_date: string | null;
     created_at: string;
     collection_datetime: string | null;
+    referral_agency: string | null;
+    referrer_email: string | null;
+    referrer_name: string | null;
+    referrer_phone: string | null;
     collection_centre: {
         name: string;
         is_shown: boolean;
@@ -159,12 +167,15 @@ export const getRawParcelListQuery = (): typeof query => {
             packing_date,
             created_at,
             collection_datetime,
+            referral_agency,
+            referrer_email,
+            referrer_name,
+            referrer_phone,
             collection_centre:collection_centres(
                 name,
                 is_shown
             ),
             list_type,
-
             client:clients(
                 full_name,
                 is_active,
@@ -283,6 +294,10 @@ export const convertRawParcelListToReportResult = (
                     parcelListType: rawParcel.list_type,
                     clientIsActive: rawParcel.client?.is_active ?? false,
                     recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
+                    referralAgency: rawParcel?.referral_agency ?? "",
+                    referrerName: rawParcel?.referrer_name ?? "",
+                    referrerPhone: rawParcel?.referrer_phone ?? "",
+                    referrerEmail: rawParcel?.referrer_email ?? "",
                 };
             }),
     };
