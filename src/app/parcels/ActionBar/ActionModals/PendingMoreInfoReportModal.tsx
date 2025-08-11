@@ -7,7 +7,7 @@ import ReportModal from "./ReportModal";
 
 const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
     return (
-        <ReportModal actionModalProps={{ ...props }} csvButton={PendingMoreInfoReportCsvButton} />
+        <ReportModal actionModalProps={{ ...props }} csvButton={PendingMoreInfoReportCsvButton} reportName="Pending More Info Report"/>
     );
 };
 

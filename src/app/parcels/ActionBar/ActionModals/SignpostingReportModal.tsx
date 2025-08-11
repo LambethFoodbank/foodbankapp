@@ -6,7 +6,7 @@ import ReportModal from "./ReportModal";
 import SignpostingReportCsvButton from "../ActionButtons/SignpostingReportCsvButton";
 
 const SignPostingReportModal: React.FC<ActionModalProps> = (props) => {
-    return <ReportModal actionModalProps={{ ...props }} csvButton={SignpostingReportCsvButton} />;
+    return <ReportModal actionModalProps={{ ...props }} csvButton={SignpostingReportCsvButton} reportName="Signposting Report"/>;
 };
 
 export default SignPostingReportModal;

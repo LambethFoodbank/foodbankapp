@@ -19,6 +19,7 @@ interface ReportInputProps {
 interface ReportModalProps {
     actionModalProps: ActionModalProps;
     csvButton: (props: ButtonProps) => React.ReactElement;
+    reportName: string;
 }
 interface ContentProps {
     onFileCreationCompleted: () => void;
@@ -118,7 +119,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
     };
 
     const onFileCreationCompleted = async (): Promise<void> => {
-        setSuccessMessage("Report Created");
+        setSuccessMessage(`${props.reportName} Created`);
         setActionCompleted(false);
         let content = {};
         if (
@@ -135,7 +136,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
             };
         }
         void sendAuditLog({
-            action: "generate report",
+            action: `generate ${props.reportName.toLowerCase}`,
             wasSuccess: true,
             content: content,
         });
@@ -143,10 +144,10 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
     };
 
     const onFileCreationFailed = (csvError: FetchReportError): void => {
-        setErrorMessage("Failed to fetch report data");
+        setErrorMessage(`Failed to fetch ${props.reportName} data`);
         setActionCompleted(false);
         void sendAuditLog({
-            action: "generate report",
+            action: `generate ${props.reportName.toLowerCase}`,
             wasSuccess: false,
             content: {
                 fromDate: dateRange.from.toString(),

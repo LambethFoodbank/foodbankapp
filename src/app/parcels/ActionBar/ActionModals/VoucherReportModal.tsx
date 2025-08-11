@@ -10,6 +10,7 @@ const MissingVoucherNumberReportModal: React.FC<ActionModalProps> = (props) => {
         <ReportModal
             actionModalProps={{ ...props }}
             csvButton={MissingVoucherNumberReportCsvButton}
+            reportName="Missing Voucher Number Report"
         />
     );
 };
