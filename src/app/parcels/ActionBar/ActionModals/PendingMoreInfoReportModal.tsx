@@ -96,7 +96,11 @@ const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
     };
 
     const onFileCreationFailed = (csvError: FetchPendingMoreInfoReportError): void => {
-        setErrorMessage("Failed to fetch pendingMoreInfo report data");
+        if (csvError.type == "noPendingMoreInfoRowsForInterval") {
+            setErrorMessage("No parcels with specified status to create Pending More Info report");
+        } else {
+            setErrorMessage("Failed to fetch pendingMoreInfo report data");
+        }
         setActionCompleted(true);
         void sendAuditLog({
             action: "generate pendingMoreInfo report",
