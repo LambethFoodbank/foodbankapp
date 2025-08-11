@@ -27,7 +27,7 @@ export interface FormattedTimeSlot {
     isActive: boolean;
 }
 
-export interface FormattedAvailableDays {
+export interface FormattedAvailableDayType {
     day: DaysOfWeekType;
     isActive: boolean;
 }
@@ -40,7 +40,7 @@ export interface FormattedTimeSlotsWithPrimaryKey {
 
 export interface FormattedAvailableDaysWithPrimaryKey {
     primaryKey: Schema["collection_centres"]["primary_key"];
-    availableDays: FormattedAvailableDays[];
+    availableDays: FormattedAvailableDayType[];
 }
 
 type DbCollectionCentre = Omit<Tables<"collection_centres">, "last_updated">;
@@ -55,6 +55,37 @@ type FetchCollectionCentresResult =
           data: null;
           error: { type: "failedToFetchCollectionCentres"; logId: string };
       };
+
+export const initialCollectionAvailableDays: FormattedAvailableDayType[] = [
+    {
+        day: "Monday",
+        isActive: false,
+    },
+    {
+        day: "Tuesday",
+        isActive: false,
+    },
+    {
+        day: "Wednesday",
+        isActive: false,
+    },
+    {
+        day: "Thursday",
+        isActive: false,
+    },
+    {
+        day: "Friday",
+        isActive: false,
+    },
+    {
+        day: "Saturday",
+        isActive: false,
+    },
+    {
+        day: "Sunday",
+        isActive: false,
+    },
+];
 
 export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionCentresResult> => {
     const { data, error } = await supabase.from("collection_centres").select().order("name");
@@ -81,7 +112,7 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
 };
 
 const formatAvailableDaysToDBCollectionCentreAvailableDays = (
-    availableDaysData: FormattedAvailableDays[]
+    availableDaysData: FormattedAvailableDayType[]
 ): DbCollectionCentreAvailableDays => {
     return availableDaysData.map((availableDays) => {
         return {
@@ -114,7 +145,12 @@ const formatNewRowToDBCollectionCentre = (
         is_shown: newRow.isShown,
         is_delivery: newRow.isDelivery,
         time_slots: newRow.timeSlots,
-        available_days: newRow.availableDays,
+        available_days: initialCollectionAvailableDays.map((collectionAvailableDay) => {
+            return {
+                day: collectionAvailableDay.day == "" ? null : collectionAvailableDay.day,
+                is_active: collectionAvailableDay.isActive,
+            };
+        }),
     };
 };
 
