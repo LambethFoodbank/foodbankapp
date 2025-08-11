@@ -7,6 +7,12 @@ describe("Edit a collection centre on admins page", () => {
     });
 
     it("Adds a collection centre and hides it successfully", () => {
+        cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
+            "getCollectionCentresRequest"
+        );
+        cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
+            "patchCollectionCentreRequest"
+        );
         toggleCollectionCentreSection();
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .find(".MuiDataGrid-row", { timeout: 5000 })
@@ -26,6 +32,8 @@ describe("Edit a collection centre on admins page", () => {
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
             .should("exist");
+
+        cy.wait("@getCollectionCentresRequest");
 
         startEditingCollectionCentreRow(newCollectionCentreName);
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
@@ -50,7 +58,15 @@ describe("Edit a collection centre on admins page", () => {
     });
 
     it("Adds a collection centre and edits collection slots successfully", () => {
+        cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
+            "getCollectionCentresRequest"
+        );
+        cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
+            "patchCollectionCentreRequest"
+        );
+
         toggleCollectionCentreSection();
+
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .find(".MuiDataGrid-row", { timeout: 5000 })
             .should("be.visible");
@@ -69,6 +85,8 @@ describe("Edit a collection centre on admins page", () => {
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
             .should("exist");
+
+        cy.wait("@getCollectionCentresRequest");
 
         // Open modal
         clickEditSlotsButtonForCentre(newCollectionCentreName);

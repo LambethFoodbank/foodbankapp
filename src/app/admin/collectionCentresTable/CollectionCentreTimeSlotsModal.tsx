@@ -62,10 +62,12 @@ function getBaseAuditLogForCollectionCentreTimeSlots(
     const timeSlots = Object.fromEntries(
         timeSlotsWithPrimaryKey.timeSlots.map((timeSlot) => [timeSlot.time, timeSlot.isActive])
     );
+    const lastUpdated = timeSlotsWithPrimaryKey.lastUpdated;
     return {
         action,
         content: {
             timeSlots,
+            lastUpdated,
         },
         collectionCentreId: timeSlotsWithPrimaryKey.primaryKey,
     };
@@ -92,6 +94,7 @@ const formatCollectionCentreTimeSlotDbData = (
     return {
         primaryKey: row.id,
         timeSlots: formattedTimeSlots,
+        lastUpdated: row.lastUpdated,
     };
 };
 
@@ -130,11 +133,19 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
             setTimeSlotModalErrorMessage(
                 `Failed to update the collection centre time slots. Log ID: ${updateTimeSlotError.logId}`
             );
+            let message = `Failed to update the collection centre time slots. Log ID: ${updateTimeSlotError.logId}`;
+            if ((updateTimeSlotError as any).type === "ConcurrentEditCollectionCentre") {
+                message =
+                    "Record has been edited recently - please refresh the page." +
+                    `Log ID: ${updateTimeSlotError.logId}`;
+            }
+            setTimeSlotModalErrorMessage(message);
             await sendAuditLog({
                 ...baseAuditLog,
                 wasSuccess: false,
                 logId: updateTimeSlotError.logId,
             });
+            return;
         }
 
         await sendAuditLog({ ...baseAuditLog, wasSuccess: true });

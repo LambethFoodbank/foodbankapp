@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { logErrorReturnLogId } from "@/logger/logger";
-import supabase from "@/supabaseClient";
-import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
+import CancelIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import { LinearProgress } from "@mui/material";
+import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
     GridColDef,
@@ -13,13 +14,7 @@ import {
     GridRowModes,
     GridRowModesModel,
 } from "@mui/x-data-grid";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import Header from "@/app/admin/websiteDataTable/Header";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
-import { LinearProgress } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     CollectionCentresTableRow,
     fetchCollectionCentresForTable,
@@ -29,8 +24,13 @@ import {
     updateDbCollectionCentre,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 import { EditToolbar } from "@/app/admin/collectionCentresTable/CollectionCentresTableToolbar";
-import Button from "@mui/material/Button";
+import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
+import Header from "@/app/admin/websiteDataTable/Header";
+import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
+import { logErrorReturnLogId } from "@/logger/logger";
+import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import supabase from "@/supabaseClient";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
 
 function getBaseAuditLogForCollectionCentreAction(
@@ -46,6 +46,7 @@ function getBaseAuditLogForCollectionCentreAction(
             collectionCentreName: collectionCentreRow.name,
             collectionCentreAcronym: collectionCentreRow.acronym,
             collectionCentreIsShown: collectionCentreRow.isShown,
+            collectionCentreLastUpdated: collectionCentreRow.lastUpdated,
         },
         collectionCentreId: options?.excludeCollectionCentreId ? undefined : collectionCentreRow.id,
     };
@@ -56,10 +57,10 @@ const CollectionCentresTable: React.FC = () => {
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [existingRowData, setExistingRowData] = useState<CollectionCentresTableRow | null>(null);
     const [timeSlotModalIsOpen, setTimeSlotModalIsOpen] = useState<boolean>(false);
     const [selectedRowForTimeSlotEdit, setSelectedRowForTimeSlotEdit] =
         useState<CollectionCentresTableRow | null>(null);
+    const originalTimestampsRef = React.useRef<Record<string, string>>({});
 
     const getCollectionCentresForTable = useCallback(async () => {
         setErrorMessage(null);
@@ -98,6 +99,9 @@ const CollectionCentresTable: React.FC = () => {
     }, [getCollectionCentresForTable]);
 
     const handleSaveClick = (id: GridRowId) => () => {
+        if (errorMessage) {
+            return;
+        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View },
@@ -140,7 +144,13 @@ const CollectionCentresTable: React.FC = () => {
     const updateCollectionCentre = async (
         newRow: CollectionCentresTableRow
     ): Promise<UpdateCollectionCentreResult> => {
-        const { error: updateCollectionCentreError } = await updateDbCollectionCentre(newRow);
+        const originalLastUpdated = originalTimestampsRef.current[newRow.id];
+        const rowWithOriginal = {
+            ...newRow,
+            originalLastUpdated,
+        };
+        const { error: updateCollectionCentreError } =
+            await updateDbCollectionCentre(rowWithOriginal);
         const baseAuditLog = getBaseAuditLogForCollectionCentreAction(
             "update a collection centre",
             newRow
@@ -170,25 +180,35 @@ const CollectionCentresTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
-        if (newRow.isNew) {
-            const { data: newCollectionCentreData, error: newCollectionCentreError } =
-                await addNewCollectionCentre({
-                    ...newRow,
-                });
-            if (newCollectionCentreError) {
-                return { ...newRow, name: "", acronym: "", isShown: false };
-            }
-            return { ...newRow, id: newCollectionCentreData.collectionCentreId, isNew: false };
-        } else {
-            const { error: updateCollectionCentreError } = await updateCollectionCentre(newRow);
-            if (updateCollectionCentreError) {
-                if (existingRowData) {
-                    const rowToReturn = { ...existingRowData };
-                    setExistingRowData(null);
-                    return rowToReturn;
+        try {
+            if (newRow.isNew) {
+                const { data: newCollectionCentreData, error: newCollectionCentreError } =
+                    await addNewCollectionCentre({
+                        ...newRow,
+                    });
+                if (newCollectionCentreError) {
+                    const message = `Failed to add the collection centre. Log ID: ${newCollectionCentreError.logId}`;
+                    setErrorMessage(message);
+                    throw new Error(message);
+                }
+                return { ...newRow, id: newCollectionCentreData.collectionCentreId, isNew: false };
+            } else {
+                const { error: updateCollectionCentreError } = await updateCollectionCentre(newRow);
+                if (updateCollectionCentreError) {
+                    let message = `Failed to update the collection centre. Log ID: ${updateCollectionCentreError.logId}`;
+
+                    if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {
+                        message =
+                            "Record has been edited recently - please refresh the page." +
+                            `Log ID: ${updateCollectionCentreError.logId}`;
+                    }
+                    setErrorMessage(message);
+                    throw new Error(message);
                 }
             }
             return newRow;
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -200,8 +220,10 @@ const CollectionCentresTable: React.FC = () => {
     };
 
     const handleEditClick = (id: GridRowId) => () => {
-        const existingRowIndex = rows.map((row) => row.id).indexOf(id.toString());
-        setExistingRowData(rows[existingRowIndex]);
+        const row = rows.find((slot) => slot.id === id);
+        if (row) {
+            originalTimestampsRef.current[id] = row.lastUpdated;
+        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.Edit },
@@ -223,7 +245,6 @@ const CollectionCentresTable: React.FC = () => {
         } else if (editedRow.isNew) {
             setRows((currentValue) => currentValue.filter((row) => row.id !== id));
         }
-        setExistingRowData(null);
     };
 
     const collectionCentreColumns: GridColDef[] = [
@@ -337,7 +358,20 @@ const CollectionCentresTable: React.FC = () => {
                     columns={collectionCentreColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
-                    onRowModesModelChange={setRowModesModel}
+                    onProcessRowUpdateError={(error) => {
+                        setErrorMessage(error.message);
+                    }}
+                    onRowModesModelChange={(newModel) => {
+                        setRowModesModel(newModel);
+
+                        const isEditing = Object.values(newModel).some(
+                            (mode) => mode.mode === GridRowModes.Edit
+                        );
+
+                        if (!isEditing) {
+                            setErrorMessage(null);
+                        }
+                    }}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
                     slots={{

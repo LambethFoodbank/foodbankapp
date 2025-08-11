@@ -279,6 +279,7 @@ export type Database = {
           acronym: string
           is_delivery: boolean
           is_shown: boolean
+          last_updated: string
           name: string
           primary_key: string
           time_slots:
@@ -289,6 +290,7 @@ export type Database = {
           acronym?: string
           is_delivery?: boolean
           is_shown?: boolean
+          last_updated?: string
           name?: string
           primary_key?: string
           time_slots?:
@@ -299,6 +301,7 @@ export type Database = {
           acronym?: string
           is_delivery?: boolean
           is_shown?: boolean
+          last_updated?: string
           name?: string
           primary_key?: string
           time_slots?:
