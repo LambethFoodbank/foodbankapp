@@ -6,10 +6,12 @@ import CheckboxGroupPopup from "../DataInput/CheckboxGroupPopup";
 import { ViewColumnOutlined } from "@mui/icons-material";
 import styled from "styled-components";
 
+type ToggleableKey = "Referral Details" | "referralAgency" | "referrerName" | "referrerEmail" | "referrerPhone";
+
 interface ColumnTogglePopupProps<Data> {
     toggleableHeaders?: readonly (keyof Data)[];
     shownHeaderKeys: readonly (keyof Data)[];
-    setShownHeaderKeys: (headers: (keyof Data)[]) => void;
+    setShownHeaderKeys: (headers: (keyof Data | string)[]) => void;
     headers: TableHeaders<Data>;
 }
 
@@ -24,13 +26,24 @@ const ColumnTogglePopup = <Data,>({
     setShownHeaderKeys,
     headers,
 }: ColumnTogglePopupProps<Data>): React.ReactElement => {
+    // "Referral Details" is needed to allow toggling functionality
+    const referralDetails = [
+        "Referral Details",
+        "referralAgency",
+        "referrerName",
+        "referrerEmail",
+        "referrerPhone",
+    ] as const;
+
     const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const checkboxKey = event.target.name as keyof Data;
-        if (event.target.checked) {
-            setShownHeaderKeys([...shownHeaderKeys, checkboxKey]);
-        } else {
-            setShownHeaderKeys(shownHeaderKeys.filter((shownKey) => shownKey !== checkboxKey));
-        }
+        const isReferralDetails = checkboxKey === "Referral Details";
+        const keysToUpdate = isReferralDetails ? referralDetails : [checkboxKey];
+
+        const newKeys = event.target.checked
+            ? Array.from(new Set([...shownHeaderKeys, ...keysToUpdate]))
+            : shownHeaderKeys.filter((key) => !keysToUpdate.includes(key));
+        setShownHeaderKeys(newKeys);
     };
 
     return (
