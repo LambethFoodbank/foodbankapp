@@ -6,8 +6,10 @@ import { ErrorText } from "@/components/Form/formStyling";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ParcelCardProps } from "../ParcelForm";
 import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
+import { Schema } from "@/databaseUtils";
 
 interface DateCardProps extends ParcelCardProps {
+    deliveryPrimaryKey: Schema["collection_centres"]["primary_key"];
     availableDaysForSelectedCentre: DbCollectionCentreAvailableDaysType;
 }
 
@@ -16,6 +18,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
     errorSetter,
     formErrors,
     fields,
+    deliveryPrimaryKey,
     availableDaysForSelectedCentre,
 }) => {
     const isCentreClosedOnDay = (day: Dayjs): boolean => {
@@ -27,6 +30,11 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
 
         return !availableDaysForSelectedCentre[dayIndex].is_active;
     };
+
+    const isDisabledFormInput =
+        !fields.collectionCentre ||
+        fields.collectionCentre == deliveryPrimaryKey ||
+        !availableDaysForSelectedCentre?.find((dayObject) => dayObject.is_active);
 
     return (
         <GenericFormCard
@@ -42,7 +50,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
                     label="Date"
                     value={fields.collectionDate ? dayjs(fields.collectionDate) : null}
                     shouldDisableDate={isCentreClosedOnDay}
-                    disabled={!fields.collectionCentre}
+                    disabled={isDisabledFormInput}
                 />
                 <ErrorText>{getErrorText(formErrors.collectionDate)}</ErrorText>
             </>

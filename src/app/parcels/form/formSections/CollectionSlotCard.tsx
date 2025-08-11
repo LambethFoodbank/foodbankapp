@@ -4,10 +4,16 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ParcelCardProps } from "../ParcelForm";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import { CollectionTimeSlotsLabelsAndValues } from "@/common/fetch";
+import {
+    CollectionTimeSlotsLabelsAndValues,
+    DbCollectionCentreAvailableDaysType,
+} from "@/common/fetch";
+import { Schema } from "@/databaseUtils";
 
 interface CollectionSlotsCardProps extends ParcelCardProps {
+    deliveryPrimaryKey: Schema["collection_centres"]["primary_key"];
     collectionTimeSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues;
+    availableDaysForSelectedCentre: DbCollectionCentreAvailableDaysType;
 }
 
 const CollectionSlotCard: React.FC<CollectionSlotsCardProps> = ({
@@ -15,8 +21,15 @@ const CollectionSlotCard: React.FC<CollectionSlotsCardProps> = ({
     fieldSetter,
     formErrors,
     fields,
+    deliveryPrimaryKey,
+    availableDaysForSelectedCentre,
     collectionTimeSlotsLabelsAndValues,
 }) => {
+    const isDisabledFormInput =
+        !fields.collectionCentre ||
+        fields.collectionCentre == deliveryPrimaryKey ||
+        !availableDaysForSelectedCentre?.find((dayObject) => dayObject.is_active);
+
     return (
         <GenericFormCard
             title="Collection Slots"
@@ -30,7 +43,7 @@ const CollectionSlotCard: React.FC<CollectionSlotsCardProps> = ({
                     listTitle="Collection Slot"
                     value={fields.collectionSlot ?? ""}
                     onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "collectionSlot")}
-                    disabled={!fields.collectionCentre}
+                    disabled={isDisabledFormInput}
                 />
                 <ErrorText>{getErrorText(formErrors.collectionSlot)}</ErrorText>
             </>
