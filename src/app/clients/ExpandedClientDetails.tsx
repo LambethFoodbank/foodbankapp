@@ -2,6 +2,7 @@ import { CircularProgress } from "@mui/material";
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import ClientParcelsTable from "@/app/clients/ClientParcelsTable";
+import ClientParcelStats from "@/app/clients/ClientParcelsStats";
 import {
     ExpandedClientParcelDetails,
     getClientParcelsDetails,
@@ -17,6 +18,7 @@ import DataViewer, {
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { updateClientNotes } from "./updateClientNotes";
 import { ErrorSecondaryText } from "../errorStylingandMessages";
+import { ExpandedClientParcelStats, getClientParcelsStats } from "./getClientParcelsStats";
 
 interface Props {
     clientId: string;
@@ -36,6 +38,9 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
     const [clientParcelsDetails, setClientParcelsDetails] = useState<
         ExpandedClientParcelDetails[] | null
     >(null);
+    const [clientParcelsStats, setClientParcelsStats] = useState<
+        ExpandedClientParcelStats[] | null
+    >(null);
 
     const [originalNotes, setOriginalNotes] = useState<string | null>("");
     const [notes, setNotes] = useState<string | null>("");
@@ -47,10 +52,24 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
         (async () => {
             setIsLoading(true);
             setClientDetails(await getExpandedClientDetails(clientId));
+
             setClientParcelsDetails(
                 displayClientsParcels ? await getClientParcelsDetails(clientId) : null
             );
             setOriginalNotes(clientDetails?.notes ? clientDetails?.notes : "");
+            if (displayClientsParcels) {
+                const { data: clientParcelStats, error: clientParcelStatsError } =
+                    await getClientParcelsStats(clientId);
+
+                if (clientParcelStatsError) {
+                    setErrorMessage(
+                        `${clientParcelStatsError.errorMessage} Log ID: ${clientParcelStatsError.logId}`
+                    );
+                }
+                setClientParcelsStats(clientParcelStats);
+            } else {
+                setClientParcelsStats(null);
+            }
             setIsLoading(false);
         })();
     }, [clientId, displayClientsParcels, clientDetails?.notes]);
@@ -129,6 +148,9 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
                 <ErrorSecondaryText>{errorMessage}</ErrorSecondaryText>
                 {clientParcelsDetails && displayClientsParcels && (
                     <ClientParcelsTable parcelsData={clientParcelsDetails} />
+                )}
+                {clientParcelsStats && displayClientsParcels && (
+                    <ClientParcelStats parcelsData={clientParcelsStats} />
                 )}
             </>
         )

@@ -1,6 +1,7 @@
 import React from "react";
 import DataViewerFallback from "@/components/DataViewer/DataViewerFallback";
 import ClientParcelsTable from "@/app/clients/ClientParcelsTable";
+import ClientParcelStats from "@/app/clients/ClientParcelsStats";
 
 const clientDetailFields = [
     "VOUCHER #",
@@ -21,6 +22,7 @@ const ExpandedClientDetailsFallback: React.FC = () => {
         <>
             <DataViewerFallback fieldPlaceholders={clientDetailFields} />;
             <ClientParcelsTable parcelsData={[]} />
+            <ClientParcelStats parcelsData={[]} />
         </>
     );
 };
