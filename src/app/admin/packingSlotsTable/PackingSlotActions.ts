@@ -105,8 +105,7 @@ export const updateDbPackingSlot = async (
             { count: "exact" }
         )
         .eq("primary_key", processedData.primary_key)
-        .eq("last_updated", lastUpdated)
-        .select();
+        .eq("last_updated", lastUpdated);
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update packing slot", {
