@@ -12,7 +12,7 @@ type CollectionCentre = Pick<
 
 type PackingSlot = Pick<Schema["packing_slots"], "primary_key" | "is_shown" | "name">;
 
-type Client = Pick<Schema["clients"], "delivery_instructions">;
+type ClientWithDeliveryInstructions = Pick<Schema["clients"], "delivery_instructions">;
 
 type DatabaseProfile = Pick<
     Schema["profiles"],
@@ -39,7 +39,7 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     primary_key: string;
     voucher_number: string | null;
     last_updated: string | undefined;
-    client: Client | null;
+    client: ClientWithDeliveryInstructions | null;
     referral_agency: string | null;
     referrer_name: string | null;
     referrer_email: string | null;
@@ -52,6 +52,7 @@ export type FetchParcelResponse =
     | { data: null; error: FetchParcelError };
 
 export type FetchParcelErrorType = "failedToFetchParcel" | "noMatchingParcels";
+
 export interface FetchParcelError extends Record<string, string> {
     type: FetchParcelErrorType;
     logId: string;
@@ -71,12 +72,12 @@ export const fetchParcel = async (
                 primary_key,
                 is_shown
             ),
-            packing_slot: packing_slots (
+            packing_slot:packing_slots (
                 name,
                 primary_key,
                 is_shown
             ),
-            client: clients(
+            client:clients(
                 delivery_instructions
             )`
         )
@@ -339,6 +340,7 @@ type PackingSlotsResponse =
           error: PackingSlotsError;
       };
 type PackingSlotsErrorType = "packingSlotsFetchFailed";
+
 export interface PackingSlotsError {
     type: PackingSlotsErrorType;
     logId: string;
@@ -386,6 +388,7 @@ interface WikiRowsQuerySuccessType {
     data: DbWikiRow[];
     error: null;
 }
+
 interface WikiRowsQueryFailureType {
     data: null;
     error: PostgrestError;
