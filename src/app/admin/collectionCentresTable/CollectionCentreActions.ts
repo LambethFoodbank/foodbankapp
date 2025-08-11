@@ -230,7 +230,7 @@ export const updateDbCollectionCentreAvailableDays = async (
     const processedData = formatAvailableDaysToDBCollectionCentreAvailableDays(
         availableDaysWithPrimaryKey.availableDays
     );
-    const { error } = await supabase
+    const { error, count } = await supabase
         .from("collection_centres")
         .update({ available_days: processedData })
         .eq("primary_key", availableDaysWithPrimaryKey.primaryKey);
