@@ -97,7 +97,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
     const isInputValid =
         props.actionModalProps.selectedParcels.length > 0
             ? undefined
-            : dateRange.from.isSameOrBefore(dateRange.to);
+            : dateRange.from.isBefore(dateRange.to) || dateRange.from.isSame(dateRange.to);
     // this is used for the reports that use a time interval to determine what information to be put in the report
     // and is unused for the reports that use a list of parcels as the information for the report
 
