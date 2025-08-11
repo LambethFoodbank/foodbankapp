@@ -187,7 +187,9 @@ const CollectionCentresTable: React.FC = () => {
                         ...newRow,
                     });
                 if (newCollectionCentreError) {
-                    return { ...newRow, name: "", acronym: "", isShown: false };
+                    const message = `Failed to add the collection centre. Log ID: ${newCollectionCentreError.logId}`;
+                    setErrorMessage(message);
+                    throw new Error(message);
                 }
                 return { ...newRow, id: newCollectionCentreData.collectionCentreId, isNew: false };
             } else {
@@ -197,10 +199,11 @@ const CollectionCentresTable: React.FC = () => {
 
                     if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {
                         message =
-                            "This collection centre has been edited recently.\n" +
+                            "Record has been edited recently - please refresh the page.\n" +
                             `Log ID: ${updateCollectionCentreError.logId}`;
                     }
                     setErrorMessage(message);
+                    throw new Error(message);
                 }
             }
             return newRow;
@@ -355,6 +358,9 @@ const CollectionCentresTable: React.FC = () => {
                     columns={collectionCentreColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
+                    onProcessRowUpdateError={(error) => {
+                        setErrorMessage(error.message);
+                    }}
                     onRowModesModelChange={(newModel) => {
                         setRowModesModel(newModel);
 

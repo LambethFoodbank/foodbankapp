@@ -133,6 +133,13 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
             setTimeSlotModalErrorMessage(
                 `Failed to update the collection centre time slots. Log ID: ${updateTimeSlotError.logId}`
             );
+            let message = `Failed to update the collection centre time slots. Log ID: ${updateTimeSlotError.logId}`;
+            if ((updateTimeSlotError as any).type === "ConcurrentEditCollectionCentre") {
+                message =
+                    "Record has been edited recently - please refresh the page.\n" +
+                    `Log ID: ${updateTimeSlotError.logId}`;
+            }
+            setTimeSlotModalErrorMessage(message);
             await sendAuditLog({
                 ...baseAuditLog,
                 wasSuccess: false,
