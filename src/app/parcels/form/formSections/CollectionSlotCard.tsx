@@ -30,6 +30,7 @@ const CollectionSlotCard: React.FC<CollectionSlotsCardProps> = ({
                     listTitle="Collection Slot"
                     value={fields.collectionSlot ?? ""}
                     onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "collectionSlot")}
+                    disabled={!fields.collectionCentre}
                 />
                 <ErrorText>{getErrorText(formErrors.collectionSlot)}</ErrorText>
             </>

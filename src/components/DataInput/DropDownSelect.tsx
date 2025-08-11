@@ -12,6 +12,7 @@ interface GenericProps<ValueType> {
     selectLabelId: string;
     focusOnDropdown?: boolean;
     error?: boolean;
+    disabled?: boolean;
 }
 
 interface ControlledProps<ValueType> {
@@ -22,6 +23,7 @@ interface ControlledProps<ValueType> {
     selectLabelId: string;
     focusOnDropdown?: boolean;
     error?: boolean;
+    disabled?: boolean;
 }
 
 interface UncontrolledProps<ValueType> {
@@ -51,6 +53,7 @@ const GenericSelect = <ValueType,>(props: GenericProps<ValueType>): React.ReactE
                 label={props.listTitle}
                 inputRef={dropdownInputFocusRef}
                 error={props.error}
+                disabled={props.disabled}
             >
                 {props.labelsAndValues.map(([label, value]) => {
                     return (
@@ -75,6 +78,7 @@ export const ControlledSelect = <ValueType,>(
             labelsAndValues={props.labelsAndValues}
             onChange={props.onChange}
             error={props.error}
+            disabled={props.disabled}
         />
     );
 };
