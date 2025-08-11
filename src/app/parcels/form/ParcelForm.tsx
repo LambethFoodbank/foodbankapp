@@ -33,16 +33,16 @@ import {
     WriteParcelToDatabaseErrors,
     WriteParcelToDatabaseFunction,
 } from "@/app/parcels/form/submitFormHelpers";
+import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
 import {
     CollectionCentresLabelsAndValues,
     CollectionTimeSlotsLabelsAndValues,
+    getActiveTimeSlotsForCollectionCentre,
+    PackingSlotsLabelsAndValues,
     DbCollectionCentreAvailableDaysType,
     DbCollectionCentreType,
-    getActiveTimeSlotsForCollectionCentre,
     getAvailableDaysForCollectionCentres,
-    PackingSlotsLabelsAndValues,
 } from "@/common/fetch";
-import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
 import getExpandedClientDetails, {
     ExpandedClientData,
 } from "@/app/clients/getExpandedClientDetails";
