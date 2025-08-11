@@ -141,29 +141,24 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     useEffect(() => {
         const subscriptionChannel = supabase
             .channel("parcels-table-changes")
-
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "parcels" },
                 () => loadCountAndDataWithTimer
             )
-
             .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () =>
                 loadCountAndDataWithTimer("events")
             )
-
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "families" },
                 () => loadCountAndDataWithTimer
             )
-
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "collection_centres" },
                 () => loadCountAndDataWithTimer
             )
-
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "clients" },
