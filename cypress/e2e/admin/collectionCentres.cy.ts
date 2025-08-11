@@ -168,6 +168,76 @@ describe("Edit a collection centre on admins page", () => {
         cy.get("@timeSlots").eq(1).should("have.text", "13:15");
         cy.get("@timeSlots").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
     });
+
+    it("Adds a collection centre and edits available days successfully", () => {
+        toggleCollectionCentreSection();
+        cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+            .find(".MuiDataGrid-row", { timeout: 5000 })
+            .should("be.visible");
+
+        const newCollectionCentreName = `${uuidv4()}`;
+        cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+            .find(newCollectionCentreName)
+            .should("not.exist"); // If this fails then the random UUID is already there
+
+        startAddingNewCollectionCentre();
+        cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+            .find(".MuiDataGrid-row--editing", { timeout: 5000 })
+            .should("exist");
+
+        fillOutNewCollectionCentreRowAndSave(newCollectionCentreName);
+        cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+            .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
+            .should("exist");
+
+        // Open modal
+        clickEditAvailableDaysButtonForCentre(newCollectionCentreName);
+        cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+            .should("be.visible");
+
+        // Tick the first day
+        cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+            .find('[aria-label="List of defined available days"]') // eslint-disable-line quotes
+            .find('[aria-label="Available Day"]') // eslint-disable-line quotes
+            .as("availableDays");
+        cy.get("@availableDays").eq(0).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
+
+        cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
+        cy.get("@availableDays").eq(1).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
+
+        // Prepare to track update requests
+        cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
+            "patchCollectionCentreRequest"
+        );
+        cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
+            "getCollectionCentresRequest"
+        );
+
+        // Save to close modal
+        cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+            .find('[data-testid="SaveDaysCloseModal"]') // eslint-disable-line quotes
+            .click();
+        cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+            .should("not.exist");
+
+        // Wait for background save to complete, then table update
+        cy.wait("@patchCollectionCentreRequest");
+        cy.wait("@getCollectionCentresRequest");
+        cy.wait(1000); // eslint-disable-line cypress/no-unnecessary-waiting
+
+        // Open modal for same collection centre
+        clickEditAvailableDaysButtonForCentre(newCollectionCentreName);
+        cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+            .should("be.visible");
+
+        // Check list of days was saved
+        cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+            .find('[aria-label="List of defined available days"]', { timeout: 5000 }) // eslint-disable-line quotes
+            .find('[aria-label="Available Day"]') // eslint-disable-line quotes
+            .as("availableDays");
+        cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
+        cy.get("@availableDays").eq(1).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
+    });
 });
 
 const toggleCollectionCentreSection = (): void => {
@@ -257,4 +327,10 @@ const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
         .find('[data-testid="SaveSlotsCloseModal"]') // eslint-disable-line quotes
         .click();
     cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]').should("not.exist"); // eslint-disable-line quotes
+};
+
+const clickEditAvailableDaysButtonForCentre = (collectionCentreName: string): void => {
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find('[aria-label="Edit available collection days for ' + collectionCentreName + '"]') // eslint-disable-line quotes
+        .click();
 };
