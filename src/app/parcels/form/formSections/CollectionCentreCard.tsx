@@ -8,7 +8,7 @@ import { ParcelCardProps } from "../ParcelForm";
 
 interface CollectionCentreCardProps extends ParcelCardProps {
     collectionCentresLabelsAndValues: CollectionCentresLabelsAndValues;
-    availableDays: DbCollectionCentreType[];
+    collectionAvailableDays: DbCollectionCentreType[];
 }
 
 const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
@@ -17,9 +17,9 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     formErrors,
     fields,
     collectionCentresLabelsAndValues,
-    availableDays,
+    collectionAvailableDays,
 }) => {
-    const availableDaysNamesArray = availableDays?.map((availableDaysObject) => {
+    const availableDaysNamesArray = collectionAvailableDays?.map((availableDaysObject) => {
         if (!availableDaysObject) {
             return "This centre is closed all week";
         }

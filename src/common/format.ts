@@ -180,15 +180,3 @@ export const formatDayjsToHoursAndMinutes = (dayjsTime: Dayjs): string => {
     const minutes = String(dayjsTime.minute()).padStart(2, "0");
     return `${hours}:${minutes}`;
 };
-
-export const getAvailableDaysIndices = (
-    available_days: DbCollectionCentreAvailableDaysType
-): number[] | null => {
-    if (available_days == null) {
-        return [];
-    }
-
-    return available_days.map((available_day) => {
-        return DAYSOFWEEK_ARRAY.indexOf(available_day.day != null ? available_day.day : "");
-    });
-};
