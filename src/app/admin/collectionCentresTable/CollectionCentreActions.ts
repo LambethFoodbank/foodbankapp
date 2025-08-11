@@ -179,10 +179,6 @@ export const updateDbCollectionCentreTimeSlots = async (
     const processedData = formatTimeSlotToDBCollectionCentreTimeSlot(
         timeSlotsWithPrimaryKey.timeSlots
     );
-    const baseAuditLogProps = {
-        action: "update collection centres time slots",
-        content: { data: processedData },
-    };
     const { error, count } = await supabase
         .from("collection_centres")
         .update({ time_slots: processedData }, { count: "exact" })
@@ -198,7 +194,6 @@ export const updateDbCollectionCentreTimeSlots = async (
     }
     if (count === 0) {
         const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
-        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
         return { error: { type: "ConcurrentEditCollectionCentre", logId } };
     }
 

@@ -197,7 +197,7 @@ const CollectionCentresTable: React.FC = () => {
 
                     if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {
                         message =
-                            "This packing slot was modified by someone else.\n" +
+                            "This collection centre has been edited recently.\n" +
                             `Log ID: ${updateCollectionCentreError.logId}`;
                     }
                     setErrorMessage(message);
@@ -356,9 +356,6 @@ const CollectionCentresTable: React.FC = () => {
                     columns={collectionCentreColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
-                    onProcessRowUpdateError={(error) => {
-                        console.error("Error while updating row:", error);
-                    }}
                     onRowModesModelChange={(newModel) => {
                         setRowModesModel(newModel);
 
