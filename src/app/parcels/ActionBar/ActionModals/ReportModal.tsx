@@ -94,12 +94,11 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [dateRange, setDateRange] = useState<DateRangeState>({ from: dayjs(), to: dayjs() });
 
+    // This is used to enable or disable the download button only for date range reports - the selected parcels report is handled before opening the modal
     const isInputValid =
         props.actionModalProps.selectedParcels.length > 0
             ? undefined
             : dateRange.from.isBefore(dateRange.to) || dateRange.from.isSame(dateRange.to);
-    // this is used for the reports that use a time interval to determine what information to be put in the report
-    // and is unused for the reports that use a list of parcels as the information for the report
 
     useEffect(() => {
         if (props.actionModalProps.selectedParcels.length > 0) {
