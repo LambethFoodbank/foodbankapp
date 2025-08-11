@@ -2,7 +2,6 @@ import supabase from "@/supabaseClient";
 import { Data } from "@/components/DataViewer/DataViewer";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { ExpandedClientParcelDetails, getClientParcelsDetails } from "./getClientParcelsData";
-import { isAfter, isBefore, sub } from "date-fns";
 
 export interface ExpandedClientParcelStats extends Data {
     totalParcels: number;
@@ -73,15 +72,17 @@ export const getClientParcelsStats = async (
         (parcel) => parcel.last_event_is_successfully_completed
     );
 
-    const todayTime = new Date();
-    const sixMonthsAgo = sub(todayTime, { months: 6 });
+    const todayTime = new Date().getTime();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(new Date().getMonth() - 6);
+    const sixMonthsAgoTime = sixMonthsAgo.getTime();
 
     const deliveredLastSixMonths = deliveredParcels.filter((parcel) => {
         if (!parcel.last_event_timestamp) {
             return false;
         }
-        const time = new Date(parcel.last_event_timestamp);
-        return isAfter(time, sixMonthsAgo) && isBefore(time, todayTime);
+        const time = Date.parse(parcel.last_event_timestamp);
+        return time >= sixMonthsAgoTime && time <= todayTime;
     });
     return {
         data: [
