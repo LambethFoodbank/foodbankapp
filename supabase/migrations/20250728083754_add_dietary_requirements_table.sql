@@ -2,15 +2,15 @@ create type "public"."item_dietary_status" as enum ('included', 'excluded', 'not
 
 create table "public"."dietary_requirements" (
     "id" uuid not null default gen_random_uuid(),
-    "halal" item_dietary_status not null default 'not_specified',
-    "vegetarian" item_dietary_status not null default 'not_specified',
-    "vegan" item_dietary_status not null default 'not_specified',
-    "meat" item_dietary_status not null default 'not_specified',
-    "gluten_free" item_dietary_status not null default 'not_specified',
-    "pescatarian" item_dietary_status not null default 'not_specified',
-    "dairy_free" item_dietary_status not null default 'not_specified',
-    "seafood_allergy" item_dietary_status not null default 'not_specified',
-    "pet_food" item_dietary_status not null default 'not_specified'
+    "halal" item_dietary_status default 'not_specified',
+    "vegetarian" item_dietary_status default 'not_specified',
+    "vegan" item_dietary_status default 'not_specified',
+    "meat" item_dietary_status default 'not_specified',
+    "gluten_free" item_dietary_status default 'not_specified',
+    "pescatarian" item_dietary_status default 'not_specified',
+    "dairy_free" item_dietary_status default 'not_specified',
+    "seafood_allergy" item_dietary_status default 'not_specified',
+    "pet_food" item_dietary_status default 'not_specified'
 );
 
 alter table "public"."dietary_requirements" enable row level security;
