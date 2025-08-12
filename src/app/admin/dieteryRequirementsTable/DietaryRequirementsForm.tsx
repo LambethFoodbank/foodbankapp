@@ -50,51 +50,59 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
     const [newExcluded, setNewExcluded] = useState<(string | null)[]>([]);
     const [wasSaved, setWasSaved] = useState<boolean>(false);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
-    const [warningMessage, setWarningMessage] = useState(false);
+    const [warningSaveMessage, setWarningSaveMessage] = useState<string>("");
+
+    const fetchData = async (selectedType: string): Promise<void> => {
+        const { data, error } = await supabase
+            .from("dietary_requirements_plus")
+            .select()
+            .order("item_name");
+
+        if (error) {
+            console.error("Error fetching dietary requirements data:", error);
+            return;
+        }
+
+        setItems(data);
+
+        const included: (string | null)[] = [
+            ...data
+                .filter((row) => row[selectedType as keyof typeof row] === "included")
+                .map((row) => row.id),
+        ];
+
+        const excluded: (string | null)[] = [
+            ...data
+                .filter((row) => row[selectedType as keyof typeof row] === "excluded")
+                .map((row) => row.id),
+        ];
+
+        setInitialIncluded(included);
+        setInitialExcluded(excluded);
+
+        setNewIncluded(included);
+        setNewExcluded(excluded);
+    };
 
     useEffect(() => {
         if (!isOpen) {
             return;
         }
+        void fetchData(selectedType);
 
-        const fetchData = async (): Promise<void> => {
-            const { data, error } = await supabase
-                .from("dietary_requirements_plus")
-                .select()
-                .order("item_name");
-
-            if (error) {
-                console.error("Error fetching dietary requirements data:", error);
-                return;
-            }
-
-            setItems(data);
-
-            const included: (string | null)[] = [
-                ...data
-                    .filter((row) => row[selectedType as keyof typeof row] === "included")
-                    .map((row) => row.id),
-            ];
-
-            const excluded: (string | null)[] = [
-                ...data
-                    .filter((row) => row[selectedType as keyof typeof row] === "excluded")
-                    .map((row) => row.id),
-            ];
-
-            setInitialIncluded(included);
-            setInitialExcluded(excluded);
-
-            setNewIncluded(included);
-            setNewExcluded(excluded);
-
-            setWasSaved(false);
-            setHasChanges(false);
-            setWarningMessage(false);
-        };
-
-        void fetchData();
+        setWasSaved(false);
+        setHasChanges(false);
     }, [isOpen, selectedType]);
+
+    useEffect(() => {
+        if (warningSaveMessage) {
+            const timer = setTimeout(() => {
+                setWarningSaveMessage("");
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [warningSaveMessage]);
 
     const handleSubmit = async (): Promise<void> => {
         const changedItems = items.filter((item) => {
@@ -112,6 +120,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         if (changedItems.length === 0) {
             setHasChanges(false);
+            setWarningSaveMessage("No changes detected.");
             return;
         }
 
@@ -138,9 +147,29 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         }
 
         setWasSaved(true);
-        setHasChanges(true);
-        setWarningMessage(false);
+        setHasChanges(false);
+        setWarningSaveMessage("");
+
+        void fetchData(selectedType);
     };
+
+    function checkArraysAreEqual(
+        firstArray: (string | null)[],
+        secondArray: (string | null)[]
+    ): boolean {
+        if (firstArray.length !== secondArray.length) {
+            return false;
+        }
+        firstArray.sort();
+        secondArray.sort();
+
+        for (let index = 0; index < firstArray.length; index++) {
+            if (firstArray[index] !== secondArray[index]) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     const handleToggle = (id: string | null, type: "included" | "excluded"): void => {
         let toggleList = type === "included" ? newIncluded : newExcluded;
@@ -156,20 +185,24 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         if (type === "included") {
             setNewIncluded(toggleList);
             setNewExcluded(oppositeList);
+
+            setHasChanges(
+                !checkArraysAreEqual(toggleList, initialIncluded) ||
+                    !checkArraysAreEqual(oppositeList, initialExcluded)
+            );
         } else {
             setNewExcluded(toggleList);
             setNewIncluded(oppositeList);
-        }
 
-        setHasChanges(
-            JSON.stringify(toggleList) !== JSON.stringify(initialIncluded) ||
-                JSON.stringify(oppositeList) !== JSON.stringify(initialExcluded)
-        );
+            setHasChanges(
+                !checkArraysAreEqual(toggleList, initialExcluded) ||
+                    !checkArraysAreEqual(oppositeList, initialIncluded)
+            );
+        }
     };
 
     const handleTypeChange = (newType: string): void => {
         if (hasChanges && !wasSaved) {
-            setWarningMessage(true);
             return;
         }
         setSelectedType(newType);
@@ -210,16 +243,20 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                 </Select>
             </Box>
 
-            {wasSaved && (
+            {wasSaved && !hasChanges && (
                 <Alert severity="success">
                     The dietary requirement has been successfully saved.
                 </Alert>
             )}
 
-            {warningMessage && (
+            {hasChanges && (
                 <Alert severity="warning">
                     Please save your changes before switching the dietary requirement.
                 </Alert>
+            )}
+
+            {warningSaveMessage && !hasChanges && (
+                <Alert severity="info">{warningSaveMessage}</Alert>
             )}
 
             <Box sx={{ mt: 4, mb: 4 }}>
