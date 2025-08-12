@@ -19,9 +19,7 @@ interface Props {
     onClose: () => void;
 }
 
-type DietaryRequirementsPlusTableRow = {
-    id: string | null;
-    item_name: string | null;
+type BaseDietaryRequirements = {
     halal: DatabaseEnums["item_dietary_status"] | null;
     vegetarian: DatabaseEnums["item_dietary_status"] | null;
     vegan: DatabaseEnums["item_dietary_status"] | null;
@@ -33,17 +31,13 @@ type DietaryRequirementsPlusTableRow = {
     pet_food: DatabaseEnums["item_dietary_status"] | null;
 };
 
-type DietaryRequirementsTableRow = {
+type DietaryRequirementsPlusTableRow = BaseDietaryRequirements & {
+    id: string | null;
+    item_name: string | null;
+};
+
+type DietaryRequirementsTableRow = BaseDietaryRequirements & {
     id: string;
-    halal: DatabaseEnums["item_dietary_status"] | null;
-    vegetarian: DatabaseEnums["item_dietary_status"] | null;
-    vegan: DatabaseEnums["item_dietary_status"] | null;
-    meat: DatabaseEnums["item_dietary_status"] | null;
-    gluten_free: DatabaseEnums["item_dietary_status"] | null;
-    pescatarian: DatabaseEnums["item_dietary_status"] | null;
-    dairy_free: DatabaseEnums["item_dietary_status"] | null;
-    seafood_allergy: DatabaseEnums["item_dietary_status"] | null;
-    pet_food: DatabaseEnums["item_dietary_status"] | null;
 };
 
 export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose }) => {
