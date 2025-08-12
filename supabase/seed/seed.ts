@@ -63,6 +63,7 @@ const main = async (): Promise<never> => {
             return {
                 full_name: () => copycat.fullName(ctx.seed),
                 phone_number: () => copycat.phoneNumber(ctx.seed),
+                email: () => copycat.email(ctx.seed),
                 address_1: () => copycat.streetAddress(ctx.seed),
                 address_2: () => copycat.streetAddress(ctx.seed),
                 address_town: () => copycat.city(ctx.seed),
@@ -176,9 +177,7 @@ const main = async (): Promise<never> => {
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
                     referrer_email: () => (agency ? copycat.email(ctx.seed) : ""),
                     referrer_phone: () => (agency ? copycat.phoneNumber(ctx.seed) : ""),
-
                     notes: () => copycat.oneOf(ctx.seed, defaultParcelNotes),
-
                     created_at: parcelCreationDateTime,
                 };
             }),
