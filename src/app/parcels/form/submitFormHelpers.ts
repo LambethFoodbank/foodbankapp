@@ -1,4 +1,3 @@
-import { updateClientDeliveryInstructions } from "@/app/clients/updateDeliveryInstructions";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
