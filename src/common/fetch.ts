@@ -77,7 +77,7 @@ export const fetchParcel = async (
                 primary_key,
                 is_shown
             ),
-            client:clients(
+            client:clients (
                 delivery_instructions
             )`
         )
