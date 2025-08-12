@@ -3,3 +3,4 @@ create type "public"."day_of_week" as enum ('Monday', 'Tuesday', 'Wednesday', 'T
 create type "public"."collection_availability_days" as ("day" day_of_week, "is_active" boolean);
 
 alter table "public"."collection_centres" add column "available_days" collection_availability_days[];
+alter table "public"."collection_centres" alter column "available_days" set not null;

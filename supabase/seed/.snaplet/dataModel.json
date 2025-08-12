@@ -1452,20 +1452,6 @@
           "maxLength": null
         },
         {
-          "id": "public.collection_centres.available_days",
-          "name": "available_days",
-          "columnName": "available_days",
-          "type": "collection_availability_days[]",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.collection_centres.last_updated",
           "name": "last_updated",
           "columnName": "last_updated",
@@ -1476,6 +1462,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.collection_centres.available_days",
+          "name": "available_days",
+          "columnName": "available_days",
+          "type": "collection_availability_days[]",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
         },

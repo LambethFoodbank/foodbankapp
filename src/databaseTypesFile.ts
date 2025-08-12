@@ -287,9 +287,7 @@ export type Database = {
       collection_centres: {
         Row: {
           acronym: string
-          available_days:
-            | Database["public"]["CompositeTypes"]["collection_availability_days"][]
-            | null
+          available_days: Database["public"]["CompositeTypes"]["collection_availability_days"][]
           is_delivery: boolean
           is_shown: boolean
           last_updated: string
@@ -301,9 +299,7 @@ export type Database = {
         }
         Insert: {
           acronym?: string
-          available_days?:
-            | Database["public"]["CompositeTypes"]["collection_availability_days"][]
-            | null
+          available_days: Database["public"]["CompositeTypes"]["collection_availability_days"][]
           is_delivery?: boolean
           is_shown?: boolean
           last_updated?: string
@@ -315,9 +311,7 @@ export type Database = {
         }
         Update: {
           acronym?: string
-          available_days?:
-            | Database["public"]["CompositeTypes"]["collection_availability_days"][]
-            | null
+          available_days?: Database["public"]["CompositeTypes"]["collection_availability_days"][]
           is_delivery?: boolean
           is_shown?: boolean
           last_updated?: string
