@@ -31,13 +31,13 @@ const ColumnTogglePopup = <Data,>({
         "referrerName",
         "referrerEmail",
         "referrerPhone",
-    ] as const;
+    ];
 
     const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const checkboxKey = event.target.name;
         const isReferralDetails = checkboxKey === "Referral Details";
         const keysToUpdate = isReferralDetails
-            ? (referralDetails as unknown as (keyof Data)[])
+            ? (referralDetails as (keyof Data)[])
             : [checkboxKey as keyof Data];
 
         const newKeys = event.target.checked
@@ -53,7 +53,7 @@ const ColumnTogglePopup = <Data,>({
                 labelsAndKeys={(toggleableHeaders ?? []).map((key) => {
                     const headerLabel =
                         headers.find(([headerKey]) => headerKey === key)?.[1] ?? key.toString();
-                    return [headerLabel, key.toString()];
+                    return [headerLabel, key as string];
                 })}
                 checkedKeys={shownHeaderKeys.map((key) => key as string)}
                 onChange={onChangeCheckbox}
