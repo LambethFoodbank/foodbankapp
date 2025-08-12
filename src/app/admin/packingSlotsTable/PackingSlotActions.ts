@@ -1,9 +1,9 @@
-import supabase from "@/supabaseClient";
-import { DatabaseError } from "@/app/errorClasses";
-import { PackingSlotRow } from "@/app/admin/packingSlotsTable/PackingSlotsTable";
-import { Tables } from "@/databaseTypesFile";
-import { logErrorReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
+import { PackingSlotRow } from "@/app/admin/packingSlotsTable/PackingSlotsTable";
+import { DatabaseError } from "@/app/errorClasses";
+import { Tables } from "@/databaseTypesFile";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import supabase from "@/supabaseClient";
 
 type DbPackingSlot = Tables<"packing_slots">;
 type NewDbPackingSlot = Omit<DbPackingSlot, "primary_key">;
@@ -22,6 +22,8 @@ export const fetchPackingSlots = async (): Promise<PackingSlotRow[]> => {
             isShown: row.is_shown,
             order: row.order,
             isNew: false,
+            lastUpdated: row.last_updated,
+            originalLastUpdated: row.last_updated,
         })
     );
 };
@@ -32,6 +34,7 @@ const formatExistingRowToDBPackingSlot = (row: PackingSlotRow): DbPackingSlot =>
         name: row.name,
         is_shown: row.isShown,
         order: row.order,
+        last_updated: row.lastUpdated,
     };
 };
 
@@ -40,6 +43,7 @@ const formatNewRowToDBPackingSlot = (newRow: PackingSlotRow): NewDbPackingSlot =
         name: newRow.name,
         is_shown: newRow.isShown,
         order: newRow.order,
+        last_updated: newRow.lastUpdated,
     };
 };
 
@@ -79,7 +83,7 @@ export const insertNewPackingSlot = async (
 
 type UpdatePackingSlotResult = {
     error: {
-        dbError: PostgrestError;
+        type: "UpdatePackingSlotsFailed" | "ConcurrentEditPackingSlots";
         logId: string;
     } | null;
 };
@@ -88,10 +92,20 @@ export const updateDbPackingSlot = async (
     row: PackingSlotRow
 ): Promise<UpdatePackingSlotResult> => {
     const processedData = formatExistingRowToDBPackingSlot(row);
-    const { error } = await supabase
+    const lastUpdated = row.originalLastUpdated;
+
+    const { error, count } = await supabase
         .from("packing_slots")
-        .update(processedData)
-        .eq("primary_key", processedData.primary_key);
+        .update(
+            {
+                name: processedData.name,
+                is_shown: processedData.is_shown,
+                order: processedData.order,
+            },
+            { count: "exact" }
+        )
+        .eq("primary_key", processedData.primary_key)
+        .eq("last_updated", lastUpdated);
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update packing slot", {
@@ -99,7 +113,11 @@ export const updateDbPackingSlot = async (
             newPackingSlotData: processedData,
         });
 
-        return { error: { dbError: error, logId } };
+        return { error: { type: "UpdatePackingSlotsFailed", logId } };
+    }
+    if (count === 0) {
+        const logId = await logWarningReturnLogId("Concurrent editing of packing slots");
+        return { error: { type: "ConcurrentEditPackingSlots", logId } };
     }
 
     return { error: null };
