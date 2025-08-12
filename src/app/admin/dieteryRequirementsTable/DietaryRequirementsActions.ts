@@ -76,24 +76,6 @@ export const fetchDietaryRequirementsForTable =
         return { data: formattedData, error: null };
     };
 
-export interface ListItem {
-    id: string;
-    name: string;
-}
-
-export const fetchAllItems = async (): Promise<ListItem[]> => {
-    const { data, error } = await supabase.from("lists").select("primary_key, item_name");
-
-    if (error) {
-        throw error;
-    }
-
-    return data.map((row) => ({
-        id: row.primary_key,
-        name: row.item_name,
-    }));
-};
-
 function getFormattedData(rawData: DietaryRequirementsRawData[]): DietaryRequirementsTableRow[] {
     if (!rawData || rawData.length === 0) {
         return [];
