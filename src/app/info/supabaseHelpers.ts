@@ -26,12 +26,14 @@ export async function deleteItemInWikiTable(wiki_key: string): Promise<Postgrest
 export async function updateItemInWikiTable(
     newTitle: string,
     newContent: string,
-    key: string
+    key: string,
+    lastUpdated: string
 ): Promise<PostgrestError | null> {
     const updateResponse = (await supabase.from("wiki").upsert({
         title: newTitle,
         content: newContent,
         wiki_key: key,
+        last_updated: lastUpdated,
     })) as WikiRowQueryType;
 
     return updateResponse.error;
