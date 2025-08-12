@@ -20,13 +20,15 @@ import TableSurface from "@/components/Tables/TableSurface";
 import CommentBox from "@/app/lists/CommentBox";
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import { ClientSideFilter } from "@/components/Tables/Filters";
+import { DistributeClientFilter } from "@/components/Tables/Filters";
 import { ListType } from "@/common/databaseListTypes";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export type ListFilter = ClientSideFilter<ListRow, string>;
+export type ListFilter =
+    DistributeClientFilter<ListRow, string | string[]>;
+    // | DistributeClientFilter<ListRow, string[]>;
 
 export interface ListRow {
     primaryKey: string;
@@ -282,10 +284,20 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
         }
     };
 
+    const isArrayStateFilter = (
+        filter: ListFilter
+    ): filter is DistributeClientFilter<ListRow, string[]> => Array.isArray(filter.state);
+
     useEffect(() => {
         setListData(
             listOfIngredients.filter((row) => {
                 return primaryFilters.every((filter) => {
+                    // without this if we have the following error:
+                    // Argument of type string | string[] is not assignable to parameter of type string & string[]
+                    if (isArrayStateFilter(filter)) {
+                        return filter.method(row, filter.state, filter.rowKey);
+                    }
+                    // Here state is string
                     return filter.method(row, filter.state, filter.rowKey);
                 });
             })
@@ -323,7 +335,7 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
 
             <TableSurface>
                 <CommentBox originalComment={comment} />
-                <ClientPaginatedTable<ListRow, string>
+                <ClientPaginatedTable<ListRow, string | string[]>
                     headerKeysAndLabels={listsHeaderKeysAndLabels}
                     toggleableHeaders={toggleableHeaders}
                     showToggleableHeadersInTableContainer={false}

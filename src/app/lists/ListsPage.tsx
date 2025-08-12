@@ -20,6 +20,7 @@ import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionSta
 import { clientSideButtonGroupFilter, filterRowbyButton } from "@/components/Tables/ButtonFilter";
 import { buildClientSideTextFilter, filterRowByText } from "@/components/Tables/TextFilter";
 import { clientSideDropdownFilter } from "@/components/Tables/DropdownFilter";
+import { clientSideChecklistFilter } from "@/components/Tables/ChecklistFilter";
 import { itemTypeLabels } from "@/common/databaseItemTypes";
 
 interface FetchedListsData {
@@ -95,11 +96,15 @@ const filterRowByAvailability = <Data,>(row: Data, state: string, rowKey?: keyof
     return (row as never)[rowKey] === desired;
 };
 
-const filterRowByItemType = <Data,>(row: Data, state: string, rowKey?: keyof Data): boolean => {
-    if (state === "all" || !rowKey) {
+const filterRowByItemTypes = <Data,>(row: Data, state: string[], rowKey?: keyof Data): boolean => {
+    if (!rowKey || state.length === 0) {
         return true;
     }
-    return (row as never)[rowKey] === state;
+    const value = (row as never)[rowKey] as string | undefined;
+    if (value === undefined || value === null) {
+        return false;
+    }
+    return state.includes(String(value));
 };
 
 const filters: ListFilter[] = [
@@ -130,18 +135,17 @@ const filters: ListFilter[] = [
         initialSelected: "all",
         method: filterRowByAvailability,
     }),
-    clientSideDropdownFilter({
+    clientSideChecklistFilter({
         key: "itemType",
         rowKey: "item_type",
-        label: "Item Type",
+        filterLabel: "Item Type",
         itemLabelsAndKeys: [
-            ["All", "all"],
             ...Object.entries(itemTypeLabels).map(
                 ([key, label]) => [label, key] as [string, string]
             ),
         ],
-        initialSelected: "all",
-        method: filterRowByItemType,
+        initialCheckedKeys: [],
+        method: filterRowByItemTypes,
     }),
 ];
 
