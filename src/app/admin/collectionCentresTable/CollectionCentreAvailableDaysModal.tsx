@@ -13,7 +13,6 @@ import {
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Heading } from "@/app/parcels/ActionBar/ActionModals/GeneralActionModal";
-import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 import CheckboxInput from "@/components/DataInput/CheckboxInput";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
@@ -62,7 +61,7 @@ const formatCollectionCentreAvailableDaysDbData = (
     } else {
         formattedAvailableDays = row.availableDays.map((availableDays) => {
             return {
-                day: availableDays.day !== null ? availableDays.day : ("" as DaysOfWeekType),
+                day: availableDays.day,
                 isActive: availableDays.is_active !== null ? availableDays.is_active : false,
             };
         });
@@ -123,7 +122,7 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
         }
 
         const availableDaysIndex = availableDaysModalData.availableDays.findIndex(
-            (availableday) => availableday.day === dayLabel
+            (availableDay) => availableDay.day === dayLabel
         );
         const availableDay = availableDaysModalData.availableDays[availableDaysIndex];
         if (!availableDay) {
@@ -178,20 +177,24 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
                                 {availableDaysModalData &&
                                     availableDaysModalData.availableDays.map((availableDay) => {
                                         return (
-                                            <ModalAvailableDaysRow key={availableDay.day}>
-                                                <SpaceBetween>
-                                                    <CheckboxInput
-                                                        label={availableDay.day}
-                                                        checked={availableDay.isActive}
-                                                        onChange={() =>
-                                                            toggleAvailableDaysInModalData(
-                                                                availableDay.day
-                                                            )
-                                                        }
-                                                        ariaLabel="Available Day"
-                                                    />
-                                                </SpaceBetween>
-                                            </ModalAvailableDaysRow>
+                                            <>
+                                                {availableDay.day != null && (
+                                                    <ModalAvailableDaysRow key={availableDay.day}>
+                                                        <SpaceBetween>
+                                                            <CheckboxInput
+                                                                label={availableDay.day}
+                                                                checked={availableDay.isActive}
+                                                                onChange={() =>
+                                                                    toggleAvailableDaysInModalData(
+                                                                        availableDay.day
+                                                                    )
+                                                                }
+                                                                ariaLabel="Available Day"
+                                                            />
+                                                        </SpaceBetween>
+                                                    </ModalAvailableDaysRow>
+                                                )}
+                                            </>
                                         );
                                     })}
                             </FormGroup>
