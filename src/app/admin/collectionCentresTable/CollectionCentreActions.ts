@@ -116,7 +116,7 @@ const formatAvailableDaysToDBCollectionCentreAvailableDays = (
 ): DbCollectionCentreAvailableDays => {
     return availableDaysData.map((availableDays) => {
         return {
-            day: availableDays.day === "" ? null : availableDays.day,
+            day: availableDays.day,
             is_active: availableDays.isActive,
         };
     });
@@ -147,7 +147,7 @@ const formatNewRowToDBCollectionCentre = (
         time_slots: newRow.timeSlots,
         available_days: initialCollectionAvailableDays.map((collectionAvailableDay) => {
             return {
-                day: collectionAvailableDay.day == "" ? null : collectionAvailableDay.day,
+                day: collectionAvailableDay.day,
                 is_active: collectionAvailableDay.isActive,
             };
         }),
