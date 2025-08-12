@@ -11,8 +11,9 @@ import {
     Select,
     Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "@/components/Modal/Modal";
+import Alert from "@mui/material/Alert";
 
 interface Props {
     isOpen: boolean;
@@ -47,6 +48,9 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
     const [initialExcluded, setInitialExcluded] = useState<(string | null)[]>([]);
     const [newIncluded, setNewIncluded] = useState<(string | null)[]>([]);
     const [newExcluded, setNewExcluded] = useState<(string | null)[]>([]);
+    const [wasSaved, setWasSaved] = useState<boolean>(false);
+    const [hasChanges, setHasChanges] = useState<boolean>(false);
+    const [warningMessage, setWarningMessage] = useState(false);
 
     useEffect(() => {
         if (!isOpen) {
@@ -83,6 +87,10 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
             setNewIncluded(included);
             setNewExcluded(excluded);
+
+            setWasSaved(false);
+            setHasChanges(false);
+            setWarningMessage(false);
         };
 
         void fetchData();
@@ -103,7 +111,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         });
 
         if (changedItems.length === 0) {
-            onClose();
+            setHasChanges(false);
             return;
         }
 
@@ -127,9 +135,11 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         if (error) {
             console.error("Error updating dietary requirements:", error);
-        } else {
-            onClose();
         }
+
+        setWasSaved(true);
+        setHasChanges(true);
+        setWarningMessage(false);
     };
 
     const handleToggle = (id: string | null, type: "included" | "excluded"): void => {
@@ -150,6 +160,19 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             setNewExcluded(toggleList);
             setNewIncluded(oppositeList);
         }
+
+        setHasChanges(
+            JSON.stringify(toggleList) !== JSON.stringify(initialIncluded) ||
+                JSON.stringify(oppositeList) !== JSON.stringify(initialExcluded)
+        );
+    };
+
+    const handleTypeChange = (newType: string): void => {
+        if (hasChanges && !wasSaved) {
+            setWarningMessage(true);
+            return;
+        }
+        setSelectedType(newType);
     };
 
     return (
@@ -177,11 +200,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                 <Select
                     fullWidth
                     value={selectedType}
-                    onChange={(event) => {
-                        setSelectedType(event.target.value);
-                        // setIncluded(new Set());
-                        // setExcluded(new Set());
-                    }}
+                    onChange={(event) => handleTypeChange(event.target.value)}
                 >
                     {dietaryRequirementTypes.map((dietary) => (
                         <MenuItem key={dietary.key} value={dietary.key}>
@@ -190,6 +209,18 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                     ))}
                 </Select>
             </Box>
+
+            {wasSaved && (
+                <Alert severity="success">
+                    The dietary requirement has been successfully saved.
+                </Alert>
+            )}
+
+            {warningMessage && (
+                <Alert severity="warning">
+                    Please save your changes before switching the dietary requirement.
+                </Alert>
+            )}
 
             <Box sx={{ mt: 4, mb: 4 }}>
                 <Typography fontWeight="bold" variant="h6" gutterBottom>
