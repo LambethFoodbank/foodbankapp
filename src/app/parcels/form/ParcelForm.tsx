@@ -212,7 +212,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         useState<CollectionTimeSlotsLabelsAndValues>([]);
     const [collectionAvailableDays, setAvailableDays] = useState<DbCollectionCentreType[]>([]);
     const [availableDaysForCentre, setAvailableDaysForCentre] =
-        useState<DbCollectionCentreAvailableDaysType>(null);
+        useState<DbCollectionCentreAvailableDaysType>([]);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 
@@ -263,7 +263,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                     (centre) => centre?.primary_key == collectionCentre
                 )?.available_days;
 
-                setAvailableDaysForCentre(availableDays ? availableDays : null);
+                setAvailableDaysForCentre(availableDays ? availableDays : []);
             }
         };
 

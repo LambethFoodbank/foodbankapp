@@ -185,6 +185,7 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
                                                                 label={availableDay.day}
                                                                 checked={availableDay.isActive}
                                                                 onChange={() =>
+                                                                    !!availableDay.day &&
                                                                     toggleAvailableDaysInModalData(
                                                                         availableDay.day
                                                                     )
