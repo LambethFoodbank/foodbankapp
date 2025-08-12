@@ -175,7 +175,7 @@ interface Props<Data, DbData extends Record<string, unknown>, PaginationType, Fi
     >;
     rowBreakPointConfigs?: BreakPointConfig[];
     defaultShownHeaders?: readonly (keyof Data)[];
-    toggleableHeaders?: readonly (keyof Data)[];
+    toggleableHeaders?: readonly (keyof Data | string)[];
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>;
     columnStyleOptions?: ColumnStyles<Data>;
     editableConfig: EditableConfig<Data>;

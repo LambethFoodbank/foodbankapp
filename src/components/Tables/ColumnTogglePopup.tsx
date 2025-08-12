@@ -7,7 +7,7 @@ import { ViewColumnOutlined } from "@mui/icons-material";
 import styled from "styled-components";
 
 interface ColumnTogglePopupProps<Data> {
-    toggleableHeaders?: readonly (keyof Data)[];
+    toggleableHeaders?: readonly (keyof Data | string)[];
     shownHeaderKeys: readonly (keyof Data)[];
     setShownHeaderKeys: (headers: (keyof Data)[]) => void;
     headers: TableHeaders<Data>;
@@ -24,13 +24,27 @@ const ColumnTogglePopup = <Data,>({
     setShownHeaderKeys,
     headers,
 }: ColumnTogglePopupProps<Data>): React.ReactElement => {
+    // "Referral Details" is needed to allow toggling functionality
+    const referralDetails = [
+        "Referral Details",
+        "referralAgency",
+        "referrerName",
+        "referrerEmail",
+        "referrerPhone",
+    ];
+
     const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const checkboxKey = event.target.name as keyof Data;
-        if (event.target.checked) {
-            setShownHeaderKeys([...shownHeaderKeys, checkboxKey]);
-        } else {
-            setShownHeaderKeys(shownHeaderKeys.filter((shownKey) => shownKey !== checkboxKey));
-        }
+        const checkboxKey = event.target.name;
+        const isReferralDetails = checkboxKey === "Referral Details";
+        const keysToUpdate = isReferralDetails
+            ? (referralDetails as (keyof Data)[])
+            : [checkboxKey as keyof Data];
+
+        const newKeys = event.target.checked
+            ? Array.from(new Set([...shownHeaderKeys, ...keysToUpdate]))
+            : shownHeaderKeys.filter((key) => !keysToUpdate.includes(key as keyof Data));
+
+        setShownHeaderKeys(newKeys as (keyof Data)[]);
     };
 
     return (

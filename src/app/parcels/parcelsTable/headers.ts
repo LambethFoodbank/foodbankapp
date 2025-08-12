@@ -9,6 +9,10 @@ export const parcelTableHeaderKeysAndLabels: TableHeaders<ParcelsTableRow> = [
     ["phoneNumber", "Phone"],
     ["email", "Email"],
     ["voucherNumber", "Voucher"],
+    ["referralAgency", "Referral Agency"],
+    ["referrerName", "Referrer Name"],
+    ["referrerEmail", "Referrer Email"],
+    ["referrerPhone", "Referrer Phone"],
     ["deliveryCollection", "Method"],
     ["packingDate", "Packing Date"],
     ["packingSlot", "Packing Slot"],
@@ -27,13 +31,14 @@ export const parcelTableDefaultShownHeaders: (keyof ParcelsTableRow)[] = [
     "lastStatus",
 ];
 
-export const parcelTableToggleableHeaders: (keyof ParcelsTableRow)[] = [
+export const parcelTableToggleableHeaders: (keyof ParcelsTableRow | "Referral Details")[] = [
     "fullName",
     "familyCategory",
     "addressPostcode",
     "phoneNumber",
     "email",
     "voucherNumber",
+    "Referral Details",
     "deliveryCollection",
     "packingDate",
     "packingSlot",
