@@ -21,7 +21,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {
     insertNewDeliveryAreas,
     fetchDeliveryAreas,
-    updateDbDeliveryAreas,
     deleteDbDeliveryAreas,
 } from "@/app/admin/deliveryAreasTable/DeliveryAreasActions";
 import { LinearProgress } from "@mui/material";
@@ -31,6 +30,7 @@ import Header from "../websiteDataTable/Header";
 import StyledDataGrid from "../common/StyledDataGrid";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
+import { prefixPostcodeRegex } from "@/common/format";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -44,30 +44,7 @@ export interface DeliveryAreasRow {
     isNew: boolean;
 }
 
-const removeCurrentCharacter = (value: string): string => {
-    return value.slice(0, value.length - 1);
-};
-
-const formatPostcode = (value: string): string => {
-    value = value.toUpperCase().slice(0, 4);
-    const currentChar = value.charAt(value.length - 1);
-    const previousChar = value.charAt(value.length - 2);
-
-    if (!value.charAt(0).match(/[A-Z]/)) {
-        value = value.slice(0, 0);
-    }
-    if (previousChar.match(/[0-9]/) && currentChar.match(/[A-Z]/)) {
-        value = removeCurrentCharacter(value);
-    }
-    if (!currentChar.match(/[A-Z0-9]/)) {
-        value = removeCurrentCharacter(value);
-    }
-    if (value.length === 3 && !currentChar.match(/[0-9]/)) {
-        value = removeCurrentCharacter(value);
-    }
-
-    return value;
-};
+const isValidPostcode = (value: string): boolean => prefixPostcodeRegex.test(value);
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
     const { setRows, setRowModesModel, rows } = props;
@@ -99,7 +76,7 @@ function getBaseAuditLogForDeliveryAreasAction(
         content: {
             deliveryAreasPostcode: deliveryAreasRow.postcode,
         },
-        deliveryAreasId: deliveryAreasRow.id,
+        deliveryAreasId: deliveryAreasRow.isNew ? undefined : deliveryAreasRow.id,
     };
 }
 
@@ -169,6 +146,22 @@ const DeliveryAreasTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
+        if (!isValidPostcode(row.postcode)) {
+            setIsLoading(false);
+            if (row.postcode.length === 0) {
+                setErrorMessage("Please specify a delivery area.");
+            } else if (row.postcode.includes(" ")) {
+                setErrorMessage("The specified delivery area contains whitespaces.");
+            } else {
+                setErrorMessage(
+                    "Invalid postcode format. Please enter a valid UK prefix postcode (e.g. EC1A)."
+                );
+            }
+            throw new Error("Invalid postcode format");
+        }
+
+        row.postcode = row.postcode.toUpperCase();
+
         if (row.isNew) {
             const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
                 await insertNewDeliveryAreas(row);
@@ -179,7 +172,7 @@ const DeliveryAreasTable: React.FC = () => {
 
             if (insertDeliveryAreasError) {
                 setErrorMessage(
-                    `Failed to add the delivery area. Log ID: ${insertDeliveryAreasError.logId}`
+                    `The specified delivery area already exists. Log ID: ${insertDeliveryAreasError.logId}`
                 );
                 setRows((rows) => rows.slice(0, -1));
                 void sendAuditLog({
@@ -194,29 +187,9 @@ const DeliveryAreasTable: React.FC = () => {
                     wasSuccess: true,
                 });
             }
-        } else {
-            const { error: updateDeliveryAreasError } = await updateDbDeliveryAreas(row);
-            const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "update a delivery area",
-                row
-            );
-
-            if (updateDeliveryAreasError) {
-                setErrorMessage(
-                    `Failed to update the delivery area. Log ID: ${updateDeliveryAreasError.logId}`
-                );
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    wasSuccess: false,
-                    logId: updateDeliveryAreasError.logId,
-                });
-            } else {
-                void sendAuditLog({ ...baseAuditLog, wasSuccess: true });
-            }
         }
 
         setIsLoading(false);
-
         return row;
     };
 
@@ -261,9 +234,7 @@ const DeliveryAreasTable: React.FC = () => {
             flex: 1,
             editable: true,
             align: "center",
-            valueParser: (params) => {
-                return formatPostcode(params);
-            },
+            valueParser: (value) => value,
             renderHeader: (params) => <Header {...params} />,
             disableColumnMenu: true,
         },
@@ -325,6 +296,7 @@ const DeliveryAreasTable: React.FC = () => {
             {rows && (
                 <StyledDataGrid
                     rows={rows}
+                    aria-label="Delivery Areas Table"
                     initialState={{
                         sorting: {
                             sortModel: [{ field: "postcode", sort: "asc" }],
@@ -333,9 +305,10 @@ const DeliveryAreasTable: React.FC = () => {
                     sortingOrder={["asc", "desc"]}
                     columns={deliveryAreasColumns}
                     editMode="row"
-                    isCellEditable={(params) =>
-                        rowModesModel[params.id]?.mode === GridRowModes.Edit
-                    }
+                    onCellDoubleClick={(params, event) => {
+                        event.defaultMuiPrevented = true;
+                        return false;
+                    }}
                     rowModesModel={rowModesModel}
                     onRowModesModelChange={setRowModesModel}
                     onRowEditStop={handleRowEditStop}

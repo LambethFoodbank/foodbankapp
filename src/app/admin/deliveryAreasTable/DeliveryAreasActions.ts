@@ -1,11 +1,8 @@
 import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
 import { DeliveryAreasRow } from "@/app/admin/deliveryAreasTable/DeliveryAreasTable";
-import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
-
-type DbDeliveryAreas = Tables<"delivery_areas">;
 
 export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
     const { data, error } = await supabase.from("delivery_areas").select();
@@ -22,13 +19,6 @@ export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
             isNew: false,
         })
     );
-};
-
-const formatExistingRowToDbDeliveryAreas = (row: DeliveryAreasRow): DbDeliveryAreas => {
-    return {
-        id: row.id,
-        postcode: row.postcode,
-    };
 };
 
 type InsertDeliveryAreasResult =
@@ -72,43 +62,52 @@ type UpdateDeliveryAreasResult = {
     } | null;
 };
 
-export const updateDbDeliveryAreas = async (
-    row: DeliveryAreasRow
-): Promise<UpdateDeliveryAreasResult> => {
-    const processedData = formatExistingRowToDbDeliveryAreas(row);
-    const { error } = await supabase
-        .from("delivery_areas")
-        .update(processedData)
-        .eq("id", processedData.id);
-
-    if (error) {
-        const logId = await logErrorReturnLogId("Failed to update delivery area", {
-            error,
-            newDeliveryAreasData: processedData,
-        });
-
-        return { error: { dbError: error, logId } };
-    }
-
-    return { error: null };
-};
-
 export const deleteDbDeliveryAreas = async (
     row: DeliveryAreasRow
 ): Promise<UpdateDeliveryAreasResult> => {
-    const processedData = formatExistingRowToDbDeliveryAreas(row);
-    const { error } = await supabase
+    const { error: auditUpdateError } = await supabase
+        .from("audit_log")
+        .update({ delivery_areas_id: null })
+        .eq("delivery_areas_id", row.id);
+
+    if (auditUpdateError) {
+        const logId = await logErrorReturnLogId(
+            "Failed to clear audit_log references before delete",
+            {
+                error: auditUpdateError,
+                rowData: row,
+            }
+        );
+        return { error: { dbError: auditUpdateError, logId } };
+    }
+
+    const { data, error } = await supabase
         .from("delivery_areas")
         .delete()
-        .eq("postcode", processedData.postcode);
+        .eq("id", row.id)
+        .select();
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to delete delivery area", {
             error,
-            newDeliveryAreasData: processedData,
+            rowData: row,
         });
-
         return { error: { dbError: error, logId } };
+    }
+
+    if (!data || data.length === 0) {
+        const logId = await logErrorReturnLogId("Delete did not match any records", {
+            attemptedId: row.id,
+        });
+        return {
+            error: {
+                dbError: {
+                    message: "No rows deleted",
+                    details: "ID did not match any rows",
+                } as unknown as PostgrestError,
+                logId,
+            },
+        };
     }
 
     return { error: null };
