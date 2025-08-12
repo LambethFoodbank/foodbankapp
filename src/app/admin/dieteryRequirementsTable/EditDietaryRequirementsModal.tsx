@@ -1,6 +1,7 @@
 import { dietaryRequirementTypes } from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsActions";
 import { DatabaseEnums } from "@/databaseUtils";
 import FloatingToast from "@/components/FloatingToast";
+import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import {
     Box,
@@ -169,34 +170,41 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             .from("dietary_requirements")
             .upsert(updates, { onConflict: "id" });
 
-        const auditContent = items
-            .map((item) => ({
-                name: item.item_name,
-                value: updates.find((val) => val.id === item.id)?.[selectedType] ?? "not_specified",
-            }))
-            .filter((item) => item.value !== "not_specified");
-
-        const includedItems = auditContent.filter((item) => item.value === "included");
-        const excludedItems = auditContent.filter((item) => item.value === "excluded");
-
-        const includedItemsName = includedItems.map((item) => item.name);
-        const excludedItemsName = excludedItems.map((item) => item.name);
-
-        await sendAuditLog({
-            action: "update dietary requirements",
-            wasSuccess: !error,
-            content: { included: includedItemsName, excluded: excludedItemsName },
-            dietaryRequirement:
-                dietaryRequirementTypes.find((type) => type.key === selectedType)?.label ??
-                "unknown",
+        const includedItemsName = newIncluded.map((id) => {
+            const item = items.find((item) => item.id === id);
+            return item ? item.item_name : "Unnamed Item";
         });
 
+        const excludedItemsName = newExcluded.map((id) => {
+            const item = items.find((item) => item.id === id);
+            return item ? item.item_name : "Unnamed Item";
+        });
+
+        const label =
+            dietaryRequirementTypes.find((type) => type.key === selectedType)?.label ?? "unknown";
+
+        const auditLog = {
+            action: "update dietary requirements",
+            content: { included: includedItemsName, excluded: excludedItemsName },
+            dietaryRequirement: label,
+        };
+
+        onClose();
+
         if (error) {
-            setErrorMessage("Error saving data:" + error.message);
+            const logId = await logErrorReturnLogId(
+                `Error with updating dietary requirements for ${label}`,
+                {
+                    error: error,
+                }
+            );
+            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+
+            setErrorMessage(`Failed to update dietary requirements for ${label}. Log ID: ${logId}`);
             return;
         }
 
-        onClose();
+        await sendAuditLog({ ...auditLog, wasSuccess: true });
 
         setWasSaved(true);
         setHasChanges(false);
