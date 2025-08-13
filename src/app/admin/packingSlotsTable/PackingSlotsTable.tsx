@@ -47,6 +47,9 @@ export interface PackingSlotRow {
     order: number;
     isNew: boolean;
     lastUpdated: string;
+}
+
+export interface PackingSlotRowWithOriginalLastUpdated extends PackingSlotRow {
     originalLastUpdated: string;
 }
 
@@ -238,6 +241,13 @@ const PackingSlotsTable: React.FC = () => {
             return { ...newRow, isNew: false };
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleRowEditStart: GridEventListener<"rowEditStart"> = (params) => {
+        const row = rows.find((slot) => slot.id === params.id);
+        if (row) {
+            originalTimestampsRef.current[params.id] = row.lastUpdated;
         }
     };
 
@@ -484,6 +494,7 @@ const PackingSlotsTable: React.FC = () => {
                             setErrorMessage(null);
                         }
                     }}
+                    onRowEditStart={handleRowEditStart}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
                     slots={{

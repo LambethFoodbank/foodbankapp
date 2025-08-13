@@ -1,5 +1,8 @@
 import { PostgrestError } from "@supabase/supabase-js";
-import { PackingSlotRow } from "@/app/admin/packingSlotsTable/PackingSlotsTable";
+import {
+    PackingSlotRow,
+    PackingSlotRowWithOriginalLastUpdated,
+} from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import { DatabaseError } from "@/app/errorClasses";
 import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
@@ -23,7 +26,6 @@ export const fetchPackingSlots = async (): Promise<PackingSlotRow[]> => {
             order: row.order,
             isNew: false,
             lastUpdated: row.last_updated,
-            originalLastUpdated: row.last_updated,
         })
     );
 };
@@ -89,10 +91,10 @@ type UpdatePackingSlotResult = {
 };
 
 export const updateDbPackingSlot = async (
-    row: PackingSlotRow
+    rowWithOriginalLastUpdated: PackingSlotRowWithOriginalLastUpdated
 ): Promise<UpdatePackingSlotResult> => {
-    const processedData = formatExistingRowToDBPackingSlot(row);
-    const lastUpdated = row.originalLastUpdated;
+    const processedData = formatExistingRowToDBPackingSlot(rowWithOriginalLastUpdated);
+    const lastUpdated = rowWithOriginalLastUpdated.originalLastUpdated;
 
     const { error, count } = await supabase
         .from("packing_slots")
