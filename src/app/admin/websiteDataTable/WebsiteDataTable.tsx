@@ -39,7 +39,9 @@ const WebsiteDataTable: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const dataGridRef = useGridApiRef();
-    const [lastEditedRowTimestamp, setLastEditedRowTimestamp] = useState<string | undefined>("");
+    const [lastEditedRowTimestamps, setLastEditedRowTimestamps] = useState<{
+        [rowId: string]: string | undefined;
+    }>({});
 
     const fetchAndSetWebsiteData = useCallback(async () => {
         setIsLoading(true);
@@ -96,14 +98,23 @@ const WebsiteDataTable: React.FC = () => {
         setErrorMessage(null);
         setIsLoading(true);
 
-        const { error } = await updateDbWebsiteData(newRow, lastEditedRowTimestamp);
+        const { error } = await updateDbWebsiteData(newRow, lastEditedRowTimestamps[newRow.id]);
 
         if (error) {
             switch (error.type) {
                 case "failedToUpdateWebsiteData":
                     setErrorMessage(`Failed to update website data. Log ID ${error.logId}`);
                     break;
+
+                case "concurrentEditWebsiteData":
+                    setErrorMessage(
+                        `Record has been edited recently - please refresh the page. Log ID: ${error.logId}`
+                    );
+                    break;
             }
+
+            setIsLoading(false);
+            return rows.find((row) => row.id === newRow.id) || newRow;
         }
 
         setIsLoading(false);
@@ -135,7 +146,7 @@ const WebsiteDataTable: React.FC = () => {
                 setErrorMessage("Table error, please try again");
             }
         }
-        setLastEditedRowTimestamp(editedRow?.lastUpdated);
+        setLastEditedRowTimestamps((prev) => ({ ...prev, [id]: editedRow?.lastUpdated }));
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
