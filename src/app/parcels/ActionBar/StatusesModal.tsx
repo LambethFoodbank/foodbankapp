@@ -32,6 +32,8 @@ const ModalInner = styled.div`
 
 const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     const [date, setDate] = useState(dayjs(new Date()));
+    const [callNoResponseStatuses, setCallNoResponseStatuses] = useState<string[]>([]);
+    const noResponseStatuses = ["Voicemail", "Text", "Email"];
 
     useEffect(() => {
         setDate(dayjs(new Date()));
@@ -53,8 +55,6 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
         );
 
     const maxParcelsToShow = 5;
-
-    const [callNoResponseStatuses, setCallNoResponseStatuses] = useState<string[]>([]);
 
     useEffect(() => {
         if (props.isOpen) {
@@ -106,33 +106,18 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                         >
                             Did you send any of the following?
                         </FormLabel>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={callNoResponseStatuses.includes("Voicemail")}
-                                    onChange={() => toggleCallNoResponseStatuses("Voicemail")}
-                                />
-                            }
-                            label="Voicemail"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={callNoResponseStatuses.includes("Text")}
-                                    onChange={() => toggleCallNoResponseStatuses("Text")}
-                                />
-                            }
-                            label="Text"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={callNoResponseStatuses.includes("Email")}
-                                    onChange={() => toggleCallNoResponseStatuses("Email")}
-                                />
-                            }
-                            label="Email"
-                        />
+                        {noResponseStatuses.map((status) => (
+                            <FormControlLabel
+                                key={status}
+                                control={
+                                    <Checkbox
+                                        checked={callNoResponseStatuses.includes(status)}
+                                        onChange={() => toggleCallNoResponseStatuses(status)}
+                                    />
+                                }
+                                label={status}
+                            />
+                        ))}
                     </FormGroup>
                 )}
                 <Centerer>
