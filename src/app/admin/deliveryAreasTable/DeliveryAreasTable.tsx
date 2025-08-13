@@ -47,10 +47,10 @@ export interface DeliveryAreasRow {
 const isValidPostcode = (value: string): boolean => prefixPostcodeRegex.test(value);
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
-    const { setRows, setRowModesModel, rows } = props;
+    const { setRows, setRowModesModel } = props;
 
     const handleClick = (): void => {
-        const id = rows.length + 1;
+        const id = `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
         setRowModesModel((oldModel) => ({
             ...oldModel,
@@ -108,7 +108,16 @@ const DeliveryAreasTable: React.FC = () => {
                     setErrorMessage(null);
                     try {
                         const deliveryAreas = await fetchDeliveryAreas();
-                        setRows(deliveryAreas);
+                        setRows((prevRows) => {
+                            const unsavedLocalRows = prevRows.filter((row) => row.isNew);
+                            return [
+                                ...deliveryAreas,
+                                ...unsavedLocalRows.filter(
+                                    (localRow) =>
+                                        !deliveryAreas.some((dbRow) => dbRow.id === localRow.id)
+                                ),
+                            ];
+                        });
                     } catch (error) {
                         setRows([]);
                         if (error instanceof Error) {
@@ -174,13 +183,18 @@ const DeliveryAreasTable: React.FC = () => {
                 setErrorMessage(
                     `The specified delivery area already exists. Log ID: ${insertDeliveryAreasError.logId}`
                 );
-                setRows((rows) => rows.slice(0, -1));
+                setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
                 void sendAuditLog({
                     ...baseAuditLog,
                     wasSuccess: false,
                     logId: insertDeliveryAreasError.logId,
                 });
             } else {
+                setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
+                setRowModesModel((prev) => {
+                    const { [String(row.id)]: removed, ...rest } = prev;
+                    return rest;
+                });
                 void sendAuditLog({
                     ...baseAuditLog,
                     deliveryAreasId: createdDeliveryAreas.deliveryAreasId,
