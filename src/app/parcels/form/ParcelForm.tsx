@@ -104,7 +104,7 @@ export const initialParcelFields: ParcelFields = {
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
-    listType: Errors.initial,
+    listType: Errors.none,
     voucherNumber: Errors.initial,
     packingDate: Errors.initial,
     packingSlot: Errors.initial,
@@ -242,9 +242,14 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             setFormErrors((prevErrors) => ({
                 ...prevErrors,
                 collectionCentre:
-                    fields.collectionCentre == deliveryPrimaryKey ? Errors.initial : Errors.none,
+                    fields.collectionCentre == null || fields.collectionCentre == deliveryPrimaryKey
+                        ? Errors.initial
+                        : Errors.none,
                 collectionDate: fields.collectionDate == null ? Errors.initial : Errors.none,
-                collectionSlot: fields.collectionSlot == "-" ? Errors.initial : Errors.none,
+                collectionSlot:
+                    fields.collectionSlot == null || fields.collectionSlot == "-"
+                        ? Errors.initial
+                        : Errors.none,
             }));
         }
     }, [
