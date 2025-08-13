@@ -6,7 +6,6 @@ import { sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 
 export interface CollectionCentresTableRow {
-    originalLastUpdated: string;
     acronym: Schema["collection_centres"]["acronym"];
     name: Schema["collection_centres"]["name"];
     id: Schema["collection_centres"]["primary_key"];
@@ -15,6 +14,11 @@ export interface CollectionCentresTableRow {
     timeSlots: Schema["collection_centres"]["time_slots"];
     isNew: boolean;
     lastUpdated: Schema["collection_centres"]["last_updated"];
+}
+
+export interface CollectionCentresTableRowWithOriginalLastUpdated
+    extends CollectionCentresTableRow {
+    originalLastUpdated: string;
 }
 
 export interface FormattedTimeSlot {
@@ -30,6 +34,7 @@ export interface FormattedTimeSlotsWithPrimaryKey {
 
 type DbCollectionCentre = Omit<Tables<"collection_centres">, "last_updated">;
 type NewDbCollectionCentre = Omit<DbCollectionCentre, "primary_key">;
+type DbCollectionCentreTimeSlots = Schema["collection_centres"]["time_slots"];
 
 type FetchCollectionCentresResult =
     | {
@@ -58,7 +63,6 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
             timeSlots: row.time_slots,
             isNew: false,
             lastUpdated: row.last_updated,
-            originalLastUpdated: row.last_updated,
         })
     );
 
@@ -132,14 +136,14 @@ export type UpdateCollectionCentreResult = {
 };
 
 export const updateDbCollectionCentre = async (
-    row: CollectionCentresTableRow
+    rowWithOriginalLastUpdated: CollectionCentresTableRowWithOriginalLastUpdated
 ): Promise<UpdateCollectionCentreResult> => {
-    const processedData = formatExistingRowToDBCollectionCentre(row);
+    const processedData = formatExistingRowToDBCollectionCentre(rowWithOriginalLastUpdated);
     const baseAuditLogProps = {
         action: "update collection centres information",
         content: { data: processedData },
     };
-    const lastUpdated = row.originalLastUpdated;
+    const lastUpdated = rowWithOriginalLastUpdated.originalLastUpdated;
     const { error, count } = await supabase
         .from("collection_centres")
         .update(processedData, { count: "exact" })
