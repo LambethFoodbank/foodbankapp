@@ -30,6 +30,8 @@ import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard
 import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
 import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
 import {
+    switchErrorForCollectionDate,
+    switchErrorForCollectionSlot,
     WriteParcelToDatabaseErrors,
     WriteParcelToDatabaseFunction,
 } from "@/app/parcels/form/submitFormHelpers";
@@ -263,7 +265,9 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                     (centre) => centre?.primary_key == collectionCentre
                 )?.available_days;
 
-                setAvailableDaysForCentre(availableDays ? availableDays : []);
+                if (availableDays) {
+                    setAvailableDaysForCentre(availableDays);
+                }
             }
         };
 
@@ -298,22 +302,17 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             setFormErrors((prevErrors) => ({
                 ...prevErrors,
                 collectionCentre:
-                    fields.collectionCentre == null || fields.collectionCentre == deliveryPrimaryKey
-                        ? Errors.initial
-                        : Errors.none,
-                collectionDate: fields.collectionDate == null ? Errors.initial : Errors.none,
-                collectionSlot:
-                    fields.collectionSlot == "-" || !fields.collectionSlot
-                        ? Errors.initial
-                        : collectionSlotsLabelsAndValues.some(
-                                (slotLabelAndValue) =>
-                                    slotLabelAndValue[1] === fields.collectionSlot
-                            )
-                          ? Errors.none
-                          : Errors.invalidCollectionSlot,
+                    fields.collectionCentre == deliveryPrimaryKey ? Errors.initial : Errors.none,
+                collectionDate: switchErrorForCollectionDate(fields, availableDaysForCentre),
+                collectionSlot: switchErrorForCollectionSlot(
+                    fields,
+                    collectionSlotsLabelsAndValues
+                ),
             }));
         }
     }, [
+        availableDaysForCentre,
+        collectionSlotsLabelsAndValues,
         deliveryPrimaryKey,
         fields.collectionCentre,
         fields.collectionDate,

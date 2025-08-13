@@ -1,7 +1,7 @@
+import supabase from "@/supabaseClient";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import supabase from "@/supabaseClient";
 
 export type WriteParcelToDatabaseFunction = UpdateParcel | InsertParcel;
 export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelErrorType;
@@ -28,6 +28,41 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
             delivery_instructions: deliveryInstructions,
         }
     );
+export function switchErrorForCollectionDate(
+    fields: ParcelFields,
+    availableDaysForCentre: DbCollectionCentreAvailableDaysType
+): Errors {
+    const collectionDateDayIndex =
+        dayjs(fields.collectionDate).day() != 0 ? dayjs(fields.collectionDate).day() - 1 : 6;
+
+    return fields.collectionDate == null
+        ? Errors.initial
+        : !availableDaysForCentre ||
+            !availableDaysForCentre.length ||
+            availableDaysForCentre[collectionDateDayIndex].is_active
+          ? Errors.none
+          : Errors.invalidCollectionDate;
+}
+
+export function switchErrorForCollectionSlot(
+    fields: ParcelFields,
+    collectionSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues
+): Errors {
+    return fields.collectionSlot == "-" || !fields.collectionSlot
+        ? Errors.initial
+        : collectionSlotsLabelsAndValues.some(
+                (slotLabelAndValue) => slotLabelAndValue[1] === fields.collectionSlot
+            )
+          ? Errors.none
+          : Errors.invalidCollectionSlot;
+}
+
+export const insertParcel: InsertParcel = async (parcelRecord) => {
+    const { data, error } = await supabase
+        .from("parcels")
+        .insert(parcelRecord)
+        .select("primary_key")
+        .single();
 
     const auditLog = {
         action: "add a parcel",

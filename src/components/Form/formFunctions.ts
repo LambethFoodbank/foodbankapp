@@ -23,6 +23,7 @@ export enum Errors {
     tooLong = "The text is too long, reduce the number of characters.",
     invalidPackingSlot = "The previous packing slot is no longer available, please select a new packing slot.",
     invalidCollectionCentre = "The previous collection centre is no longer available, please select a new collection centre.",
+    invalidCollectionDate = "The previous collection date is no longer available, please select a new collection date.",
     invalidCollectionSlot = "The previous timeslot is no longer available, please select a new timeslot.",
     noCollectionSlotsSet = "There are no collection slots set for this collection centre, please select a different collection centre or contact admin.",
 }
