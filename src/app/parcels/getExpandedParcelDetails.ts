@@ -153,10 +153,12 @@ const getExpandedParcelDetails = async (
                     isActive: true,
                     clientId: client.primary_key,
                     voucherNumber: rawParcelDetails.voucher_number ?? "",
-                    referralAgency: rawParcelDetails.referral_agency ?? "",
-                    referrerName: rawParcelDetails.referrer_name ?? "",
-                    referrerEmail: rawParcelDetails.referrer_email ?? "",
-                    referrerPhone: rawParcelDetails.referrer_phone ?? "",
+                    referralDetails: formatReferralDetails(
+                        rawParcelDetails.referral_agency ?? "",
+                        rawParcelDetails.referrer_name ?? "",
+                        rawParcelDetails.referrer_email ?? "",
+                        rawParcelDetails.referrer_phone ?? ""
+                    ),
                     fullName: client.full_name ?? "",
                     listType: rawParcelDetails.list_type,
                     address: formatAddressFromClientDetails(client),
@@ -220,10 +222,12 @@ const getExpandedParcelDetails = async (
                 isActive: false,
                 clientId: client.primary_key,
                 voucherNumber: rawParcelDetails.voucher_number ?? "",
-                referralAgency: rawParcelDetails.referral_agency ?? "",
-                referrerName: rawParcelDetails.referrer_name ?? "",
-                referrerEmail: rawParcelDetails.referrer_email ?? "",
-                referrerPhone: rawParcelDetails.referrer_phone ?? "",
+                referralDetails: formatReferralDetails(
+                    rawParcelDetails.referral_agency ?? "",
+                    rawParcelDetails.referrer_name ?? "",
+                    rawParcelDetails.referrer_email ?? "",
+                    rawParcelDetails.referrer_phone ?? ""
+                ),
                 listType: rawParcelDetails.list_type,
                 clientNotes: client.notes,
                 notes: rawParcelDetails.notes,
@@ -251,10 +255,7 @@ interface ParcelDataIndependentOfClient extends Data {
     deliveryOrCollection: string;
     createdAt: string;
     listType: ListType;
-    referralAgency: string;
-    referrerName: string;
-    referrerEmail: string;
-    referrerPhone: string;
+    referralDetails: string;
     notes: string | null;
 }
 
@@ -331,6 +332,18 @@ const formatSignpostingCall = (
     );
 };
 
+const formatReferralDetails = (
+    referralAgency: string,
+    referrerName: string,
+    referrerPhone: string,
+    referrerEmail: string
+): string => {
+    return [referralAgency, referrerName, referrerPhone, referrerEmail]
+        .map((referral) => (referral ?? "").trim())
+        .filter((referral) => referral.length > 0)
+        .join(", ");
+};
+
 export const processEventsDetails = (
     events: Pick<Schema["events"], "event_data" | "new_parcel_status" | "timestamp">[]
 ): EventTableRow[] => {
@@ -356,22 +369,6 @@ export const getExpandedParcelDataForDataViewer = (
     };
     parcelDetailsForDataViewer["listType"] = {
         value: capitaliseWords(parcelDetails["listType"]),
-    };
-    parcelDetailsForDataViewer["referralAgency"] = {
-        value: parcelDetails["referralAgency"],
-        hide: !parcelDetails["referralAgency"],
-    };
-    parcelDetailsForDataViewer["referrerName"] = {
-        value: parcelDetails["referrerName"],
-        hide: !parcelDetails["referrerName"],
-    };
-    parcelDetailsForDataViewer["referrerEmail"] = {
-        value: parcelDetails["referrerEmail"],
-        hide: !parcelDetails["referrerEmail"],
-    };
-    parcelDetailsForDataViewer["referrerPhone"] = {
-        value: parcelDetails["referrerPhone"],
-        hide: !parcelDetails["referrerPhone"],
     };
 
     return parcelDetailsForDataViewer;
