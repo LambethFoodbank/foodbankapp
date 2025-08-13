@@ -34,7 +34,6 @@ export interface FormattedTimeSlotsWithPrimaryKey {
 
 type DbCollectionCentre = Omit<Tables<"collection_centres">, "last_updated">;
 type NewDbCollectionCentre = Omit<DbCollectionCentre, "primary_key">;
-type DbCollectionCentreTimeSlots = Schema["collection_centres"]["time_slots"];
 
 type FetchCollectionCentresResult =
     | {
