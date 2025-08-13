@@ -16,7 +16,7 @@ type FetchWebsiteDataErrorReturn =
           data: WebsiteDataRow[];
           error: null;
       };
-type UpdateWebsiteDataErrors = "failedToUpdateWebsiteData";
+type UpdateWebsiteDataErrors = "failedToUpdateWebsiteData" | "concurrentEditWebsiteData";
 type UpdateWebsiteDataErrorReturn =
     | {
           error: { type: UpdateWebsiteDataErrors; logId: string };
@@ -54,13 +54,15 @@ export const updateDbWebsiteData = async (
         last_updated: newRow.lastUpdated,
     };
 
-    const { data: updatedWebsiteData, error } = await supabase
+    const {
+        data: updatedWebsiteData,
+        error,
+        count,
+    } = await supabase
         .from("website_data")
-        .update({ value: processedData.value })
+        .update({ value: processedData.value }, { count: "exact" })
         .eq("name", processedData.name)
-        .eq("last_updated", oldTimestamp)
-        .select()
-        .single();
+        .eq("last_updated", oldTimestamp);
 
     const auditLog = {
         action: "update website data",
@@ -73,6 +75,13 @@ export const updateDbWebsiteData = async (
         void sendAuditLog({ ...auditLog, wasSuccess: false, logId });
         return { error: { type: "failedToUpdateWebsiteData", logId } };
     }
+
+    if (count == 0) {
+        const logId = await logErrorReturnLogId("Concurrent editing of website data");
+        void sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+        return { error: { type: "concurrentEditWebsiteData", logId } };
+    }
+
     void sendAuditLog({ ...auditLog, wasSuccess: true, content: updatedWebsiteData });
     return { error: null };
 };
