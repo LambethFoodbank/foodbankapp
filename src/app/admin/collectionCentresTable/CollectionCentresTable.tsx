@@ -71,8 +71,6 @@ const CollectionCentresTable: React.FC = () => {
             return;
         }
         setRows(data);
-        console.log("data");
-        console.log(data);
         setIsLoading(false);
     }, []);
 
@@ -147,10 +145,9 @@ const CollectionCentresTable: React.FC = () => {
     const updateCollectionCentre = async (
         newRow: CollectionCentresTableRow
     ): Promise<UpdateCollectionCentreResult> => {
-        const originalLastUpdated = originalTimestampsRef.current[newRow.id];
         const rowWithOriginal = {
             ...newRow,
-            originalLastUpdated,
+            originalLastUpdated: originalTimestampsRef.current[newRow.id],
         };
         const { error: updateCollectionCentreError } =
             await updateDbCollectionCentre(rowWithOriginal);
@@ -177,6 +174,39 @@ const CollectionCentresTable: React.FC = () => {
         return { error: null };
     };
 
+    const refreshRow = async (id: string): Promise<CollectionCentresTableRow | null> => {
+        const { data: latestRow, error } = await supabase
+            .from("collection_centres")
+            .select("*")
+            .eq("primary_key", id)
+            .single();
+
+        if (error || !latestRow) {
+            return null;
+        }
+
+        const mappedRow: CollectionCentresTableRow = {
+            id: latestRow.primary_key,
+            name: latestRow.name,
+            acronym: latestRow.acronym,
+            isDelivery: latestRow.is_delivery,
+            isShown: latestRow.is_shown,
+            lastUpdated: latestRow.last_updated,
+            timeSlots:
+                latestRow.time_slots?.map((slot) => ({
+                    time: slot.time,
+                    is_active: slot.is_active,
+                })) || [],
+            isNew: false,
+        };
+
+        setRows((prevRows) =>
+            prevRows.map((row) => (row.id === mappedRow.id ? { ...row, ...mappedRow } : row))
+        );
+
+        return mappedRow;
+    };
+
     const processRowUpdate = async (
         newRow: CollectionCentresTableRow
     ): Promise<CollectionCentresTableRow> => {
@@ -196,13 +226,12 @@ const CollectionCentresTable: React.FC = () => {
                 }
                 return { ...newRow, id: newCollectionCentreData.collectionCentreId, isNew: false };
             } else {
-                console.log("newRow.timeSlots");
-                console.log(newRow.timeSlots);
                 const { error: updateCollectionCentreError } = await updateCollectionCentre(newRow);
                 if (updateCollectionCentreError) {
                     let message = `Failed to update the collection centre. Log ID: ${updateCollectionCentreError.logId}`;
 
                     if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {
+                        await refreshRow(newRow.id);
                         message =
                             "Record has been edited recently - please refresh the page." +
                             `Log ID: ${updateCollectionCentreError.logId}`;
@@ -220,7 +249,6 @@ const CollectionCentresTable: React.FC = () => {
     const handleRowEditStart: GridEventListener<"rowEditStart"> = (params) => {
         const row = rows.find((slot) => slot.id === params.id);
         if (row) {
-            console.log(row.timeSlots);
             originalTimestampsRef.current[params.id] = row.lastUpdated;
         }
     };
@@ -438,10 +466,7 @@ const CollectionCentresTable: React.FC = () => {
                                     : null,
                                 is_active: slot.isActive ?? false,
                             })),
-                            lastUpdated: payload.lastUpdated,
                         };
-                        console.log("updatedRow.timeSlots");
-                        console.log(updatedRow.timeSlots);
                         setRows((prevRows) =>
                             prevRows.map((row) =>
                                 row.id === updatedRow.id ? { ...row, ...updatedRow } : row
