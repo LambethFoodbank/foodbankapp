@@ -279,10 +279,15 @@ const CollectionCentresTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             renderCell: (params) => {
                 const handleEditCollectionCentreTimeSlot = (): void => {
-                    setSelectedRowForTimeSlotEdit(params.row as CollectionCentresTableRow);
+                    const row = params.row as CollectionCentresTableRow;
+                    originalTimestampsRef.current[row.id] = row.lastUpdated;
+                    setRowModesModel((currentValue) => ({
+                        ...currentValue,
+                        [row.id]: { mode: GridRowModes.Edit },
+                    }));
+                    setSelectedRowForTimeSlotEdit(row);
                     setTimeSlotModalIsOpen(true);
                 };
-
                 return (
                     <Button
                         variant="outlined"
@@ -400,6 +405,38 @@ const CollectionCentresTable: React.FC = () => {
                     isOpen={timeSlotModalIsOpen}
                     onClose={() => {
                         setTimeSlotModalIsOpen(false);
+                    }}
+                    originalTimestamp={
+                        selectedRowForTimeSlotEdit
+                            ? originalTimestampsRef.current[selectedRowForTimeSlotEdit.id]
+                            : undefined
+                    }
+                    onSave={(updated) => {
+                        setRows((prev) =>
+                            prev.map((row) =>
+                                row.id === updated.primaryKey
+                                    ? {
+                                          ...row,
+                                          timeSlots: updated.timeSlots.map((ts) => ({
+                                              time: ts.time,
+                                              is_active: ts.isActive,
+                                          })),
+                                      }
+                                    : row
+                            )
+                        );
+
+                        setSelectedRowForTimeSlotEdit((prev) =>
+                            prev && prev.id === updated.primaryKey
+                                ? {
+                                      ...prev,
+                                      timeSlots: updated.timeSlots.map((ts) => ({
+                                          time: ts.time,
+                                          is_active: ts.isActive,
+                                      })),
+                                  }
+                                : prev
+                        );
                     }}
                 ></CollectionCentreTimeSlotsModal>
             )}
