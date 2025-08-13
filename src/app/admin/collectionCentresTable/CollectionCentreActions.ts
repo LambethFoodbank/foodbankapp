@@ -28,9 +28,8 @@ export interface FormattedTimeSlotsWithPrimaryKey {
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
 
-type DbCollectionCentre = Tables<"collection_centres">;
+type DbCollectionCentre = Omit<Tables<"collection_centres">, "last_updated">;
 type NewDbCollectionCentre = Omit<DbCollectionCentre, "primary_key">;
-type DbCollectionCentreTimeSlots = Schema["collection_centres"]["time_slots"];
 
 type FetchCollectionCentresResult =
     | {
@@ -66,14 +65,6 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
     return { data: formattedData, error: null };
 };
 
-const formatTimeSlotToDBCollectionCentreTimeSlot = (
-    timeSlotData: FormattedTimeSlot[]
-): DbCollectionCentreTimeSlots => {
-    return timeSlotData.map((timeSlot) => {
-        return { time: timeSlot.time, is_active: timeSlot.isActive };
-    });
-};
-
 const formatExistingRowToDBCollectionCentre = (
     row: CollectionCentresTableRow
 ): DbCollectionCentre => {
@@ -84,7 +75,6 @@ const formatExistingRowToDBCollectionCentre = (
         is_shown: row.isShown,
         is_delivery: row.isDelivery,
         time_slots: row.timeSlots,
-        last_updated: row.lastUpdated,
     };
 };
 
@@ -97,7 +87,6 @@ const formatNewRowToDBCollectionCentre = (
         is_shown: newRow.isShown,
         is_delivery: newRow.isDelivery,
         time_slots: newRow.timeSlots,
-        last_updated: newRow.lastUpdated,
     };
 };
 
@@ -167,33 +156,6 @@ export const updateDbCollectionCentre = async (
     if (count === 0) {
         const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
         await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
-        return { error: { type: "ConcurrentEditCollectionCentre", logId } };
-    }
-
-    return { error: null };
-};
-
-export const updateDbCollectionCentreTimeSlots = async (
-    timeSlotsWithPrimaryKey: FormattedTimeSlotsWithPrimaryKey
-): Promise<UpdateCollectionCentreResult> => {
-    const processedData = formatTimeSlotToDBCollectionCentreTimeSlot(
-        timeSlotsWithPrimaryKey.timeSlots
-    );
-    const { error, count } = await supabase
-        .from("collection_centres")
-        .update({ time_slots: processedData }, { count: "exact" })
-        .eq("primary_key", timeSlotsWithPrimaryKey.primaryKey)
-        .eq("last_updated", timeSlotsWithPrimaryKey.lastUpdated);
-    if (error) {
-        const logId = await logErrorReturnLogId("Failed to update collection centre time slots", {
-            error,
-            newCollectionCentreData: processedData,
-        });
-
-        return { error: { type: "UpdateCollectionCentreFailed", logId } };
-    }
-    if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
         return { error: { type: "ConcurrentEditCollectionCentre", logId } };
     }
 
