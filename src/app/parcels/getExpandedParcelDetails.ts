@@ -154,10 +154,10 @@ const getExpandedParcelDetails = async (
                     clientId: client.primary_key,
                     voucherNumber: rawParcelDetails.voucher_number ?? "",
                     referralDetails: formatReferralDetails(
-                        rawParcelDetails.referral_agency?.trim() || "",
-                        rawParcelDetails.referrer_name?.trim() || "",
-                        rawParcelDetails.referrer_email?.trim() || "",
-                        rawParcelDetails.referrer_phone?.trim() || ""
+                        rawParcelDetails.referral_agency ?? "",
+                        rawParcelDetails.referrer_name ?? "",
+                        rawParcelDetails.referrer_email ?? "",
+                        rawParcelDetails.referrer_phone ?? ""
                     ),
                     fullName: client.full_name ?? "",
                     listType: rawParcelDetails.list_type,
