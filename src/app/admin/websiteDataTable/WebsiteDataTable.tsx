@@ -42,6 +42,7 @@ const WebsiteDataTable: React.FC = () => {
     const [lastEditedRowTimestamps, setLastEditedRowTimestamps] = useState<{
         [rowId: string]: string | undefined;
     }>({});
+    const [hasError, setHasError] = useState<boolean>(false);
 
     const fetchAndSetWebsiteData = useCallback(async () => {
         setIsLoading(true);
@@ -97,10 +98,12 @@ const WebsiteDataTable: React.FC = () => {
     const processRowUpdate = async (newRow: WebsiteDataRow): Promise<WebsiteDataRow> => {
         setErrorMessage(null);
         setIsLoading(true);
+        setHasError(false);
 
         const { error } = await updateDbWebsiteData(newRow, lastEditedRowTimestamps[newRow.id]);
 
         if (error) {
+            setHasError(true);
             switch (error.type) {
                 case "failedToUpdateWebsiteData":
                     setErrorMessage(`Failed to update website data. Log ID ${error.logId}`);
@@ -126,7 +129,7 @@ const WebsiteDataTable: React.FC = () => {
             params.reason === GridRowEditStopReasons.rowFocusOut ||
             params.reason === GridRowEditStopReasons.enterKeyDown
         ) {
-            //prevents default behaviour of saving the edited state when clicking away from row being edited, force user to use save or cancel buttons
+            // prevents default behaviour of saving the edited state when clicking away from row being edited, force user to use save or cancel buttons
             event.defaultMuiPrevented = true;
         }
     };
@@ -280,6 +283,7 @@ const WebsiteDataTable: React.FC = () => {
                             : "datagrid-row-odd"
                     }
                     hideFooter
+                    onCellDoubleClick={(params) => handleEditClick(params.id)()}
                 />
             )}
         </>
