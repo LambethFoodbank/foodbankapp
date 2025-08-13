@@ -1,6 +1,7 @@
 "use client";
 
 import { Dayjs } from "dayjs";
+import { logErrorReturnLogId } from "@/logger/logger";
 import React from "react";
 import ReportCsvButton, {
     ButtonProps,
@@ -12,7 +13,7 @@ import ReportCsvButton, {
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
-import { logErrorReturnLogId } from "@/logger/logger";
+import supabase from "@/supabaseClient";
 
 const getPendingMoreInfoParcelIdsAndStatus = async (
     fromDate: Dayjs,
@@ -49,7 +50,7 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
 const getPendingMoreInfoRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
+    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -130,11 +131,13 @@ const PendingMoreInfoReportCsvButton = ({
     const props: ButtonProps = {
         fromDate: fromDate,
         toDate: toDate,
+        parcels: [],
         onFileCreationCompleted: onFileCreationCompleted,
         onFileCreationFailed: onFileCreationFailed,
         disabled: disabled,
         getReportDataByDate: getPendingMoreInfoReportData,
         fileName: "PendingMoreInfoReport.csv",
+        reportType: "dateInterval",
     };
     return ReportCsvButton(props);
 };

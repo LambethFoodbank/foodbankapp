@@ -11,6 +11,7 @@ const SignPostingReportModal: React.FC<ActionModalProps> = (props) => {
             actionModalProps={{ ...props }}
             csvButton={SignpostingReportCsvButton}
             reportName="Signposting Report"
+            reportType="dateInterval"
         />
     );
 };

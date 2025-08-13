@@ -11,6 +11,7 @@ const MissingVoucherNumberReportModal: React.FC<ActionModalProps> = (props) => {
             actionModalProps={{ ...props }}
             csvButton={MissingVoucherNumberReportCsvButton}
             reportName="Missing Voucher Number Report"
+            reportType="dateInterval"
         />
     );
 };

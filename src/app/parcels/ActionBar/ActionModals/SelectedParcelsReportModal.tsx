@@ -11,6 +11,7 @@ const SelectedParcelsReportModal: React.FC<ActionModalProps> = (props) => {
             actionModalProps={{ ...props }}
             csvButton={SelectedParcelsReportCsvButton}
             reportName="Selected Parcels Report"
+            reportType="parcelList"
         />
     );
 };

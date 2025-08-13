@@ -12,6 +12,7 @@ import ReportCsvButton, {
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
+import supabase from "@/supabaseClient";
 
 const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
@@ -43,11 +44,12 @@ const getSelectedParcelsParcelIdsAndStatus = async (
 const getSelectedParcelsRawParcelList = async (
     parcelIds: string[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
+    console.log(parcelIds);
+    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
         .in("primary_key", parcelIds)
         .order("packing_date")
         .order("primary_key");
-
+    console.log(rawParcelList, parcelFetchError);
     if (parcelFetchError) {
         const logId = await logErrorReturnLogId(
             "Failed to fetch Selected Parcels Report Parcel data",
@@ -85,6 +87,7 @@ const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchR
         await getSelectedParcelsParcelIdsAndStatus(parcelIds);
 
     if (idAndStatusError) {
+        console.log("idAndStatus Error");
         return {
             data: null,
             error: idAndStatusError,
@@ -95,6 +98,7 @@ const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchR
         await getSelectedParcelsRawParcelList(parcelIds);
 
     if (rawParcelError) {
+        console.log("rawParcel Error");
         return {
             data: null,
             error: rawParcelError,
@@ -107,13 +111,19 @@ const SelectedParcelsReportCsvButton = ({
     onFileCreationCompleted,
     onFileCreationFailed,
     parcels,
+    fromDate,
+    toDate,
+    reportType,
 }: ButtonProps): React.ReactElement => {
     const props: ButtonProps = {
+        fromDate: null,
+        toDate: null,
         parcels: parcels,
         onFileCreationCompleted: onFileCreationCompleted,
         onFileCreationFailed: onFileCreationFailed,
         getReportDataByList: getSelectedParcelsReportData,
         fileName: "SelectedParcels.csv",
+        reportType: "parcelList",
     };
     return ReportCsvButton(props);
 };

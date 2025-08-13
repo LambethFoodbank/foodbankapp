@@ -13,6 +13,7 @@ import ReportCsvButton, {
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
+import supabase from "@/supabaseClient";
 
 const getSignpostingParcelIdsAndStatus = async (
     fromDate: Dayjs,
@@ -49,7 +50,7 @@ const getSignpostingParcelIdsAndStatus = async (
 const getSignpostingRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
+    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -126,11 +127,13 @@ const SignpostingReportCsvButton = ({
     const props: ButtonProps = {
         fromDate: fromDate,
         toDate: toDate,
+        parcels: [],
         onFileCreationCompleted: onFileCreationCompleted,
         onFileCreationFailed: onFileCreationFailed,
         disabled: disabled,
         getReportDataByDate: getSignpostingReportData,
         fileName: "SignpostingReport.csv",
+        reportType: "dateInterval",
     };
     return ReportCsvButton(props);
 };

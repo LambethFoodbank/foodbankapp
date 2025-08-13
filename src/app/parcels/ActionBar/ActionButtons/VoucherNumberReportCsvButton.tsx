@@ -13,6 +13,7 @@ import ReportCsvButton, {
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
+import supabase from "@/supabaseClient";
 
 const getMissingVoucherNumberParcelIdsAndStatus = async (
     fromDate: Dayjs,
@@ -50,7 +51,7 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
 const getMissingVoucherNumberRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
+    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -130,11 +131,13 @@ const MissingVoucherNumberReportCsvButton = ({
     const props: ButtonProps = {
         fromDate: fromDate,
         toDate: toDate,
+        parcels: [],
         onFileCreationCompleted: onFileCreationCompleted,
         onFileCreationFailed: onFileCreationFailed,
         disabled: disabled,
         getReportDataByDate: getMissingVoucherNumberReportData,
         fileName: "MissingVoucherNumberReport.csv",
+        reportType: "dateInterval",
     };
     return ReportCsvButton(props);
 };

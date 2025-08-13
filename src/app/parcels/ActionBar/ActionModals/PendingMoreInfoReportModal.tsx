@@ -2,8 +2,8 @@
 
 import React from "react";
 import { ActionModalProps } from "./GeneralActionModal";
-import PendingMoreInfoReportCsvButton from "../ActionButtons/PendingMoreInfoReportCsvButton";
 import ReportModal from "./ReportModal";
+import PendingMoreInfoReportCsvButton from "../ActionButtons/PendingMoreInfoReportCsvButton";
 
 const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
     return (
@@ -11,6 +11,7 @@ const PendingMoreInfoReportModal: React.FC<ActionModalProps> = (props) => {
             actionModalProps={{ ...props }}
             csvButton={PendingMoreInfoReportCsvButton}
             reportName="Pending More Info Report"
+            reportType="dateInterval"
         />
     );
 };
