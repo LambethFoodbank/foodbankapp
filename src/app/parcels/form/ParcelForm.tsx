@@ -303,9 +303,14 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                         : Errors.none,
                 collectionDate: fields.collectionDate == null ? Errors.initial : Errors.none,
                 collectionSlot:
-                    fields.collectionSlot == null || fields.collectionSlot == "-"
+                    fields.collectionSlot == "-" || !fields.collectionSlot
                         ? Errors.initial
-                        : Errors.none,
+                        : collectionSlotsLabelsAndValues.some(
+                                (slotLabelAndValue) =>
+                                    slotLabelAndValue[1] === fields.collectionSlot
+                            )
+                          ? Errors.none
+                          : Errors.invalidCollectionSlot,
             }));
         }
     }, [
