@@ -22,7 +22,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
     availableDaysForSelectedCentre,
 }) => {
     const isCentreClosedOnDay = (day: Dayjs): boolean => {
-        if (!availableDaysForSelectedCentre) {
+        if (!availableDaysForSelectedCentre || !availableDaysForSelectedCentre.length) {
             return true;
         }
 
