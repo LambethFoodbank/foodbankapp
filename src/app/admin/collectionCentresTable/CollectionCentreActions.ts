@@ -2,7 +2,6 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { Tables } from "@/databaseTypesFile";
 import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
-import { sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 
 export interface CollectionCentresTableRow {
@@ -138,16 +137,14 @@ export const updateDbCollectionCentre = async (
     rowWithOriginalLastUpdated: CollectionCentresTableRowWithOriginalLastUpdated
 ): Promise<UpdateCollectionCentreResult> => {
     const processedData = formatExistingRowToDBCollectionCentre(rowWithOriginalLastUpdated);
-    const baseAuditLogProps = {
-        action: "update collection centres information",
-        content: { data: processedData },
-    };
     const lastUpdated = rowWithOriginalLastUpdated.originalLastUpdated;
+
     const { error, count } = await supabase
         .from("collection_centres")
         .update(processedData, { count: "exact" })
         .eq("primary_key", processedData.primary_key)
         .eq("last_updated", lastUpdated);
+
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update collection centre", {
             error,
@@ -156,9 +153,9 @@ export const updateDbCollectionCentre = async (
 
         return { error: { type: "UpdateCollectionCentreFailed", logId } };
     }
+
     if (count === 0) {
         const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
-        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
         return { error: { type: "ConcurrentEditCollectionCentre", logId } };
     }
 

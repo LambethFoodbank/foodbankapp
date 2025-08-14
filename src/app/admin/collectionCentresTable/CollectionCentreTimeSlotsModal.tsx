@@ -31,7 +31,6 @@ interface Props {
     selectedCollectionCentreInfo: CollectionCentresTableRow | null;
     isOpen: boolean;
     onClose: () => void;
-    originalTimestamp?: string;
     onSave: (updated: FormattedTimeSlotsWithPrimaryKey) => void;
 }
 
@@ -104,7 +103,6 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
         }
         const payload: FormattedTimeSlotsWithPrimaryKey = {
             ...timeSlotModalData,
-            lastUpdated: props.originalTimestamp || timeSlotModalData.lastUpdated,
         };
         props.onSave(payload);
         props.onClose();
