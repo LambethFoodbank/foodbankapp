@@ -110,10 +110,23 @@ const WebsiteDataTable: React.FC = () => {
                     errorMessageTmp = `Failed to update website data. Log ID ${error.logId}`;
                     break;
 
-                case "concurrentEditWebsiteData":
+                case "concurrentEditWebsiteData": {
                     errorMessageTmp = `Record has been edited recently - please refresh the page. Log ID: ${error.logId}`;
                     setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
+
+                    // Force a refetch of the data to get the latest timestamp
+                    const { data: latestData } = await fetchWebsiteData();
+                    if (latestData) {
+                        const latestRow = latestData.find((row) => row.id === newRow.id);
+                        if (latestRow) {
+                            setLastEditedRowTimestamps((prev) => ({
+                                ...prev,
+                                [newRow.id]: latestRow.lastUpdated,
+                            }));
+                        }
+                    }
                     break;
+                }
             }
 
             setRowModesModel((prev) => ({
@@ -144,6 +157,9 @@ const WebsiteDataTable: React.FC = () => {
             copyBlockedRows.delete(newRow.id);
             return copyBlockedRows;
         });
+
+        setErrorMessage(null);
+        setIsLoading(false);
 
         return newRow;
     };
