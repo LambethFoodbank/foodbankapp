@@ -20,14 +20,14 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
     toDate: Dayjs
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await supabase
-        .from('parcels_plus')
+        .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
-        .eq("last_status_event_name","Pending More Info")
+        .eq("last_status_event_name", "Pending More Info")
         .eq("client_is_active", true)
-        .not("parcel_id", 'is', null);
+        .not("parcel_id", "is", null);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -53,7 +53,9 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
 const getPendingMoreInfoRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery)
+    const { data: rawParcelList, error: parcelFetchError } = await supabase
+        .from("parcels")
+        .select(getRawParcelListQuery)
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)

@@ -21,12 +21,12 @@ const getSignpostingParcelIdsAndStatus = async (
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await supabase
         // eslint-disable-next-line quotes
-        .from('parcels_plus')
+        .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         .eq("client_is_active", true)
-        .not("parcel_id", 'is', null)
+        .not("parcel_id", "is", null)
         .eq("client_signposting_call_required", true);
 
     if (idFetchError) {
@@ -53,7 +53,10 @@ const getSignpostingParcelIdsAndStatus = async (
 const getSignpostingRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
+    const { data: rawParcelList, error: parcelFetchError } = await supabase
+        .from("parcels")
+        .select(getRawParcelListQuery)
+        .limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)

@@ -21,14 +21,14 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await supabase
         // eslint-disable-next-line quotes
-        .from('parcels_plus')
+        .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.ilike."", voucher_number.is.null')
         .eq("client_is_active", true)
-        .not("parcel_id", 'is', null);
+        .not("parcel_id", "is", null);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -54,7 +54,10 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
 const getMissingVoucherNumberRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
+    const { data: rawParcelList, error: parcelFetchError } = await supabase
+        .from("parcels")
+        .select(getRawParcelListQuery)
+        .limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)

@@ -15,15 +15,13 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { formatDatetimeAsDate, getDbDate } from "@/common/format";
+import { formatDatetimeAsDate } from "@/common/format";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import CsvButton, {
     formatNumberAsStringForCsv,
 } from "@/components/FileGenerationButtons/CsvButton";
-import supabase from "@/supabaseClient";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 import { ParcelsTableRow } from "../../parcelsTable/types";
-import { todo } from "node:test";
 
 export type FetchReportResult =
     | {
@@ -136,8 +134,7 @@ export interface rawParcel {
     } | null;
 }
 
-export const getRawParcelListQuery = 
-    `
+export const getRawParcelListQuery = `
         primary_key,
         voucher_number,
         packing_date,
@@ -299,7 +296,7 @@ const ReportCsvButton = ({
     toDate,
     parcels,
     getReportDataByDate,
-    getReportDataByList
+    getReportDataByList,
 }: ButtonProps): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<ReportRow[], FetchReportErrorType>
@@ -313,7 +310,12 @@ const ReportCsvButton = ({
                 data: { fileData: requiredData, fileName: fileName },
                 error: null,
             };
-        } else if (reportType === "parcelList" && parcels && parcels.length > 0 && getReportDataByList) {
+        } else if (
+            reportType === "parcelList" &&
+            parcels &&
+            parcels.length > 0 &&
+            getReportDataByList
+        ) {
             const parcelIds = parcels.map((parcel) => {
                 return parcel.parcelId;
             });

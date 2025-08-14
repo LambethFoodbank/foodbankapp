@@ -60,38 +60,45 @@ export const ReportModalContent: React.FC<ContentProps> = ({
 }) => {
     return (
         <>
-            { reportType === "dateInterval" && selectedParcels && selectedParcels?.length == 0 && dateRange && setRange && (
-                <form>
-                    <ReportInput dateRange={dateRange} setRange={setRange} />
-                    <Centerer>
+            {reportType === "dateInterval" &&
+                selectedParcels &&
+                selectedParcels?.length == 0 &&
+                dateRange &&
+                setRange && (
+                    <form>
+                        <ReportInput dateRange={dateRange} setRange={setRange} />
+                        <Centerer>
+                            {csvButton({
+                                fromDate: dateRange.from,
+                                toDate: dateRange.to,
+                                parcels: [],
+                                reportType: "dateInterval",
+                                onFileCreationCompleted,
+                                onFileCreationFailed,
+                                disabled: !isInputValid,
+                            })}
+                        </Centerer>
+                    </form>
+                )}
+            {reportType === "parcelList" &&
+                selectedParcels &&
+                selectedParcels?.length > 0 &&
+                maxParcelsToShow && (
+                    <>
+                        <SelectedParcelsOverview
+                            parcels={selectedParcels}
+                            maxParcelsToShow={maxParcelsToShow}
+                        />
                         {csvButton({
-                            fromDate: dateRange.from,
-                            toDate: dateRange.to,
-                            parcels: [],
-                            reportType: "dateInterval",
+                            fromDate: null,
+                            toDate: null,
+                            reportType: "parcelList",
+                            parcels: selectedParcels,
                             onFileCreationCompleted,
                             onFileCreationFailed,
-                            disabled: !isInputValid,
                         })}
-                    </Centerer>
-                </form>
-            )}
-            { reportType === "parcelList" && selectedParcels && selectedParcels?.length > 0 && maxParcelsToShow && (
-                <>
-                    <SelectedParcelsOverview
-                        parcels={selectedParcels}
-                        maxParcelsToShow={maxParcelsToShow}
-                    />
-                    {csvButton({
-                        fromDate: null,
-                        toDate: null,
-                        reportType: "parcelList",
-                        parcels: selectedParcels,
-                        onFileCreationCompleted,
-                        onFileCreationFailed,
-                    })}
-                </>
-            )}
+                    </>
+                )}
         </>
     );
 };
@@ -131,21 +138,21 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
         setActionCompleted(true);
         let content;
         if (
-            props.reportType === "parcelList" && 
+            props.reportType === "parcelList" &&
             props.actionModalProps.selectedParcels &&
             props.actionModalProps.selectedParcels.length > 0
         ) {
             content = {
                 parcelIds: props.actionModalProps.selectedParcels.map((parcel) => parcel.parcelId),
             };
-        } else if ( props.reportType === "dateInterval"){
+        } else if (props.reportType === "dateInterval") {
             content = {
                 fromDate: dateRange.from.toString(),
                 toDate: dateRange.to.toString(),
             };
         } else {
             console.log("invalid report type");
-            content = {error: "invalid report type"};
+            content = { error: "invalid report type" };
         }
         void sendAuditLog({
             action: `generate ${props.reportName}`,
@@ -168,7 +175,6 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
             } else {
                 setErrorMessage("Nobody knows");
             }
-                
         } else {
             setErrorMessage(`Failed to fetch ${props.reportName} data`);
         }

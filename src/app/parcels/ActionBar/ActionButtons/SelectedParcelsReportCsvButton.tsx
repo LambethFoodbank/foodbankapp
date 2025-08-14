@@ -17,10 +17,10 @@ const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await supabase
-        .from('parcels_plus')
+        .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
         .eq("client_is_active", true)
-        .not("parcel_id", 'is', null)
+        .not("parcel_id", "is", null)
         .in("parcel_id", parcelIds);
 
     if (idFetchError) {
@@ -46,7 +46,10 @@ const getSelectedParcelsParcelIdsAndStatus = async (
 const getSelectedParcelsRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
+    const { data: rawParcelList, error: parcelFetchError } = await supabase
+        .from("parcels")
+        .select(getRawParcelListQuery)
+        .limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -112,9 +115,6 @@ const SelectedParcelsReportCsvButton = ({
     onFileCreationCompleted,
     onFileCreationFailed,
     parcels,
-    fromDate,
-    toDate,
-    reportType,
 }: ButtonProps): React.ReactElement => {
     const props: ButtonProps = {
         fromDate: null,
