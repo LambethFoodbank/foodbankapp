@@ -192,6 +192,7 @@ const DeliveryAreasTable: React.FC = () => {
             } else {
                 setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
                 setRowModesModel((prev) => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { [String(row.id)]: removed, ...rest } = prev;
                     return rest;
                 });
