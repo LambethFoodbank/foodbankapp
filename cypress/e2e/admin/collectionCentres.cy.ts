@@ -126,13 +126,6 @@ describe("Edit a collection centre on admins page", () => {
         cy.get("@timeSlots").eq(1).should("have.text", "13:15");
         cy.get("@timeSlots").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
 
-        // Save to close modal
-        // cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
-        //     .find('[data-testid="SaveSlotsCloseModal"]') // eslint-disable-line quotes
-        //     .click();
-        // cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
-        //     .should("not.exist");
-
         saveTimeSlotsForCentre(newCollectionCentreName);
         // Open modal for same collection centre
         clickEditSlotsButtonForCentre(newCollectionCentreName);

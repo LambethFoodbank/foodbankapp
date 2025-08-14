@@ -82,7 +82,6 @@ const formatCollectionCentreTimeSlotDbData = (
 const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
     const [timeSlotModalData, setTimeSlotModalData] =
         useState<FormattedTimeSlotsWithPrimaryKey | null>(null);
-    // const [timeSlotModalErrorMessage, setTimeSlotModalErrorMessage] = useState<string | null>(null);
     const [timeSlotEditIsShown, setTimeSlotEditIsShown] = useState<boolean>(false);
     const [collectionTimeSlotValue, setCollectionTimeSlotValue] = useState<Dayjs>();
     const [addCollectionTimeSlotError, setAddCollectionTimeSlotError] = useState<string | null>(
@@ -307,11 +306,6 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                         </ModalTimeSlotsContainer>
                     </Centerer>
                 </ContentDiv>
-                {/*<ButtonsDiv>*/}
-                {/*    {timeSlotModalErrorMessage && (*/}
-                {/*        <ErrorSecondaryText>{timeSlotModalErrorMessage}</ErrorSecondaryText>*/}
-                {/*    )}*/}
-                {/*</ButtonsDiv>*/}
             </OutsideDiv>
         </Modal>
     );
