@@ -1,29 +1,32 @@
 "use client";
 
 import { Dayjs } from "dayjs";
+import { logErrorReturnLogId } from "@/logger/logger";
 import React from "react";
 import ReportCsvButton, {
     ButtonProps,
     convertRawParcelListToReportResult,
     FetchReportError,
     FetchReportResult,
-    getParcelIdsAndStatusQuery,
     getRawParcelListQuery,
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
-import { logErrorReturnLogId } from "@/logger/logger";
+import supabase from "@/supabaseClient";
+import { getDbDate } from "@/common/format";
 
 const getPendingMoreInfoParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
-        fromDate,
-        toDate,
-    })
-        // eslint-disable-next-line quotes
-        .or('last_status_event_name.eq."Pending More Info"');
+    const { data: idAndStatusList, error: idFetchError } = await supabase
+        .from("parcels_plus")
+        .select("parcel_id, last_status_event_name")
+        .gte("packing_date", getDbDate(fromDate))
+        .lte("packing_date", getDbDate(toDate))
+        .eq("last_status_event_name", "Pending More Info")
+        .eq("client_is_active", true)
+        .not("parcel_id", "is", null);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -49,7 +52,9 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
 const getPendingMoreInfoRawParcelList = async (
     idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
+    const { data: rawParcelList, error: parcelFetchError } = await supabase
+        .from("parcels")
+        .select(getRawParcelListQuery)
         .in(
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
@@ -130,11 +135,13 @@ const PendingMoreInfoReportCsvButton = ({
     const props: ButtonProps = {
         fromDate: fromDate,
         toDate: toDate,
+        parcels: [],
         onFileCreationCompleted: onFileCreationCompleted,
         onFileCreationFailed: onFileCreationFailed,
         disabled: disabled,
         getReportDataByDate: getPendingMoreInfoReportData,
         fileName: "PendingMoreInfoReport.csv",
+        reportType: "dateInterval",
     };
     return ReportCsvButton(props);
 };

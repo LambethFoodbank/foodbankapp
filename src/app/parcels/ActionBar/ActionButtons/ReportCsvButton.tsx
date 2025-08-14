@@ -15,12 +15,11 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { formatDatetimeAsDate, getDbDate } from "@/common/format";
+import { formatDatetimeAsDate } from "@/common/format";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import CsvButton, {
     formatNumberAsStringForCsv,
 } from "@/components/FileGenerationButtons/CsvButton";
-import supabase from "@/supabaseClient";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 
@@ -84,35 +83,6 @@ export interface idAndStatus {
     last_status_event_name: string | null;
 }
 
-type IdAndStatusQueryParams = {
-    fromDate?: Dayjs;
-    toDate?: Dayjs;
-    parcelIds?: string[];
-};
-
-export const getParcelIdsAndStatusQuery = ({
-    fromDate,
-    toDate,
-    parcelIds,
-}: IdAndStatusQueryParams): typeof query => {
-    // Find IDs of non-deleted parcels in the period. This is done before the complex query because
-    // joining clients and families to the view does not behave as expected.
-    let query = supabase
-        .from("parcels_plus")
-        .select("parcel_id, last_status_event_name")
-        // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
-
-    if (fromDate && toDate) {
-        query = query
-            .gte("packing_date", getDbDate(fromDate))
-            .lte("packing_date", getDbDate(toDate));
-    } else if (parcelIds) {
-        query = query.in("parcel_id", parcelIds);
-    }
-    return query;
-};
-
 export interface rawParcel {
     primary_key: string;
     voucher_number: string | null;
@@ -165,10 +135,7 @@ export interface rawParcel {
     } | null;
 }
 
-export const getRawParcelListQuery = supabase
-    .from("parcels")
-    .select(
-        `
+export const getRawParcelListQuery = `
         primary_key,
         voucher_number,
         packing_date,
@@ -219,9 +186,7 @@ export const getRawParcelListQuery = supabase
                 recorded_as_child
             )
         )
-        `
-    )
-    .limit(1, { foreignTable: "clients" });
+    `;
 
 export const convertRawParcelListToReportResult = (
     rawParcelList: rawParcel[],
@@ -310,32 +275,34 @@ export const convertRawParcelListToReportResult = (
 };
 
 export interface ButtonProps {
-    fromDate?: Dayjs;
-    toDate?: Dayjs;
-    parcels?: ParcelsTableRow[];
     onFileCreationCompleted: () => void;
     onFileCreationFailed: (error: FetchReportError) => void;
     disabled?: boolean;
-    getReportDataByDate?: (fromDate: Dayjs, toDate: Dayjs) => Promise<FetchReportResult>;
-    getReportDataByList?: (parcels: string[]) => Promise<FetchReportResult>;
     fileName?: string;
+    reportType: "parcelList" | "dateInterval";
+    getReportDataByDate?: (fromDate: Dayjs, toDate: Dayjs) => Promise<FetchReportResult>;
+    fromDate: Dayjs | null;
+    toDate: Dayjs | null;
+    getReportDataByList?: (parcels: string[]) => Promise<FetchReportResult>;
+    parcels: ParcelsTableRow[];
 }
 
 const ReportCsvButton = ({
-    fromDate,
-    toDate,
-    parcels,
     onFileCreationCompleted,
     onFileCreationFailed,
     disabled,
+    fileName = "Report.csv",
+    reportType,
+    fromDate,
+    toDate,
+    parcels,
     getReportDataByDate,
     getReportDataByList,
-    fileName = "Report.csv",
 }: ButtonProps): React.ReactElement => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<ReportRow[], FetchReportErrorType>
     > => {
-        if (fromDate && toDate && getReportDataByDate && !parcels) {
+        if (reportType === "dateInterval" && fromDate && toDate && getReportDataByDate) {
             const { data: requiredData, error } = await getReportDataByDate(fromDate, toDate);
             if (error) {
                 return { data: null, error };
@@ -344,7 +311,12 @@ const ReportCsvButton = ({
                 data: { fileData: requiredData, fileName: fileName },
                 error: null,
             };
-        } else if (parcels && parcels.length > 0 && getReportDataByList) {
+        } else if (
+            reportType === "parcelList" &&
+            parcels &&
+            parcels.length > 0 &&
+            getReportDataByList
+        ) {
             const parcelIds = parcels.map((parcel) => {
                 return parcel.parcelId;
             });

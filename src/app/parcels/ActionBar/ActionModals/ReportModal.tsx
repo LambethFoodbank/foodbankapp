@@ -19,6 +19,7 @@ interface ReportModalProps {
     actionModalProps: ActionModalProps;
     csvButton: (props: ButtonProps) => React.ReactElement;
     reportName: string;
+    reportType: "parcelList" | "dateInterval";
 }
 interface ContentProps {
     onFileCreationCompleted: () => void;
@@ -29,6 +30,7 @@ interface ContentProps {
     isInputValid?: boolean;
     selectedParcels?: ParcelsTableRow[];
     maxParcelsToShow?: number;
+    reportType: "parcelList" | "dateInterval";
 }
 
 const InputContainer = styled.div`
@@ -54,36 +56,49 @@ export const ReportModalContent: React.FC<ContentProps> = ({
     onFileCreationCompleted,
     onFileCreationFailed,
     csvButton,
+    reportType,
 }) => {
     return (
         <>
-            {selectedParcels && selectedParcels?.length == 0 && dateRange && setRange && (
-                <form>
-                    <ReportInput dateRange={dateRange} setRange={setRange} />
-                    <Centerer>
+            {reportType === "dateInterval" &&
+                selectedParcels &&
+                selectedParcels?.length == 0 &&
+                dateRange &&
+                setRange && (
+                    <form>
+                        <ReportInput dateRange={dateRange} setRange={setRange} />
+                        <Centerer>
+                            {csvButton({
+                                fromDate: dateRange.from,
+                                toDate: dateRange.to,
+                                parcels: [],
+                                reportType: "dateInterval",
+                                onFileCreationCompleted,
+                                onFileCreationFailed,
+                                disabled: !isInputValid,
+                            })}
+                        </Centerer>
+                    </form>
+                )}
+            {reportType === "parcelList" &&
+                selectedParcels &&
+                selectedParcels?.length > 0 &&
+                maxParcelsToShow && (
+                    <>
+                        <SelectedParcelsOverview
+                            parcels={selectedParcels}
+                            maxParcelsToShow={maxParcelsToShow}
+                        />
                         {csvButton({
-                            fromDate: dateRange.from,
-                            toDate: dateRange.to,
+                            fromDate: null,
+                            toDate: null,
+                            reportType: "parcelList",
+                            parcels: selectedParcels,
                             onFileCreationCompleted,
                             onFileCreationFailed,
-                            disabled: !isInputValid,
                         })}
-                    </Centerer>
-                </form>
-            )}
-            {selectedParcels && selectedParcels?.length > 0 && maxParcelsToShow && (
-                <>
-                    <SelectedParcelsOverview
-                        parcels={selectedParcels}
-                        maxParcelsToShow={maxParcelsToShow}
-                    />
-                    {csvButton({
-                        parcels: selectedParcels,
-                        onFileCreationCompleted,
-                        onFileCreationFailed,
-                    })}
-                </>
-            )}
+                    </>
+                )}
         </>
     );
 };
@@ -123,20 +138,23 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
         setActionCompleted(true);
         let content;
         if (
+            props.reportType === "parcelList" &&
             props.actionModalProps.selectedParcels &&
             props.actionModalProps.selectedParcels.length > 0
         ) {
             content = {
                 parcelIds: props.actionModalProps.selectedParcels.map((parcel) => parcel.parcelId),
             };
-        } else {
+        } else if (props.reportType === "dateInterval") {
             content = {
                 fromDate: dateRange.from.toString(),
                 toDate: dateRange.to.toString(),
             };
+        } else {
+            content = { error: "invalid report type" };
         }
         void sendAuditLog({
-            action: `generate ${props.reportName.toLowerCase}`,
+            action: `generate ${props.reportName}`,
             wasSuccess: true,
             content: content,
         });
@@ -149,13 +167,13 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
 
     const onFileCreationFailed = (csvError: FetchReportError): void => {
         if (csvError.type === "noRowsForInterval") {
-            setErrorMessage(`No parcels with specified status to create ${props.reportName}.`);
+            setErrorMessage(`No parcels found for the ${props.reportName}.`);
         } else {
             setErrorMessage(`Failed to fetch ${props.reportName} data`);
         }
         setActionCompleted(true);
         void sendAuditLog({
-            action: `generate ${props.reportName.toLowerCase}`,
+            action: `generate ${props.reportName}`,
             wasSuccess: false,
             content: {
                 fromDate: dateRange.from.toString(),
@@ -182,6 +200,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
                     onFileCreationCompleted={onFileCreationCompleted}
                     onFileCreationFailed={onFileCreationFailed}
                     csvButton={props.csvButton}
+                    reportType={props.reportType}
                 />
             )}
         </GeneralActionModal>

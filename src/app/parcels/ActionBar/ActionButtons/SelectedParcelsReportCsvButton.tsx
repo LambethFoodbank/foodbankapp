@@ -7,18 +7,21 @@ import ReportCsvButton, {
     convertRawParcelListToReportResult,
     FetchReportError,
     FetchReportResult,
-    getParcelIdsAndStatusQuery,
     getRawParcelListQuery,
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
+import supabase from "@/supabaseClient";
 
 const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
-        parcelIds,
-    }).in("parcel_id", parcelIds);
+    const { data: idAndStatusList, error: idFetchError } = await supabase
+        .from("parcels_plus")
+        .select("parcel_id, last_status_event_name")
+        .eq("client_is_active", true)
+        .not("parcel_id", "is", null)
+        .in("parcel_id", parcelIds);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -41,13 +44,18 @@ const getSelectedParcelsParcelIdsAndStatus = async (
     };
 };
 const getSelectedParcelsRawParcelList = async (
-    parcelIds: string[]
+    idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    const { data: rawParcelList, error: parcelFetchError } = await getRawParcelListQuery
-        .in("primary_key", parcelIds)
+    const { data: rawParcelList, error: parcelFetchError } = await supabase
+        .from("parcels")
+        .select(getRawParcelListQuery)
+        .limit(1, { foreignTable: "clients" })
+        .in(
+            "primary_key",
+            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
+        )
         .order("packing_date")
         .order("primary_key");
-
     if (parcelFetchError) {
         const logId = await logErrorReturnLogId(
             "Failed to fetch Selected Parcels Report Parcel data",
@@ -92,7 +100,7 @@ const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchR
     }
 
     const { data: rawParcelList, error: rawParcelError } =
-        await getSelectedParcelsRawParcelList(parcelIds);
+        await getSelectedParcelsRawParcelList(idAndStatusList);
 
     if (rawParcelError) {
         return {
@@ -109,11 +117,14 @@ const SelectedParcelsReportCsvButton = ({
     parcels,
 }: ButtonProps): React.ReactElement => {
     const props: ButtonProps = {
+        fromDate: null,
+        toDate: null,
         parcels: parcels,
         onFileCreationCompleted: onFileCreationCompleted,
         onFileCreationFailed: onFileCreationFailed,
         getReportDataByList: getSelectedParcelsReportData,
         fileName: "SelectedParcels.csv",
+        reportType: "parcelList",
     };
     return ReportCsvButton(props);
 };
