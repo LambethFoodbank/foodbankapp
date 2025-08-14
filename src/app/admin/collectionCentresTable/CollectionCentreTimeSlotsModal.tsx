@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import styled, { useTheme } from "styled-components";
-import { ErrorSecondaryText, ErrorTextModalFooter } from "@/app/errorStylingandMessages";
+import { ErrorTextModalFooter } from "@/app/errorStylingandMessages";
 import { FormGroup } from "@mui/material";
 import Icon from "@/components/Icons/Icon";
 import { faShoePrints, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import {
-    ButtonsDiv,
     Centerer,
     ContentDiv,
     InputContainer,
@@ -26,14 +25,13 @@ import {
     CollectionCentresTableRow,
     FormattedTimeSlot,
     FormattedTimeSlotsWithPrimaryKey,
-    updateDbCollectionCentreTimeSlots,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
 
 interface Props {
     selectedCollectionCentreInfo: CollectionCentresTableRow | null;
     isOpen: boolean;
     onClose: () => void;
+    onSave: (updated: FormattedTimeSlotsWithPrimaryKey) => void;
 }
 
 const ModalTimeSlotsContainer = styled.div`
@@ -54,24 +52,6 @@ const RowContainer = styled.div`
     display: flex;
     flex-direction: row;
 `;
-
-function getBaseAuditLogForCollectionCentreTimeSlots(
-    action: string,
-    timeSlotsWithPrimaryKey: FormattedTimeSlotsWithPrimaryKey
-): Pick<AuditLog, "action" | "content" | "collectionCentreId"> {
-    const timeSlots = Object.fromEntries(
-        timeSlotsWithPrimaryKey.timeSlots.map((timeSlot) => [timeSlot.time, timeSlot.isActive])
-    );
-    const lastUpdated = timeSlotsWithPrimaryKey.lastUpdated;
-    return {
-        action,
-        content: {
-            timeSlots,
-            lastUpdated,
-        },
-        collectionCentreId: timeSlotsWithPrimaryKey.primaryKey,
-    };
-}
 
 const formatCollectionCentreTimeSlotDbData = (
     row: CollectionCentresTableRow
@@ -101,7 +81,6 @@ const formatCollectionCentreTimeSlotDbData = (
 const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
     const [timeSlotModalData, setTimeSlotModalData] =
         useState<FormattedTimeSlotsWithPrimaryKey | null>(null);
-    const [timeSlotModalErrorMessage, setTimeSlotModalErrorMessage] = useState<string | null>(null);
     const [timeSlotEditIsShown, setTimeSlotEditIsShown] = useState<boolean>(false);
     const [collectionTimeSlotValue, setCollectionTimeSlotValue] = useState<Dayjs>();
     const [addCollectionTimeSlotError, setAddCollectionTimeSlotError] = useState<string | null>(
@@ -122,33 +101,10 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
         if (timeSlotModalData === null) {
             return;
         }
-        const { error: updateTimeSlotError } =
-            await updateDbCollectionCentreTimeSlots(timeSlotModalData);
-        const baseAuditLog = getBaseAuditLogForCollectionCentreTimeSlots(
-            "update collection centre time slots",
-            timeSlotModalData
-        );
-
-        if (updateTimeSlotError) {
-            setTimeSlotModalErrorMessage(
-                `Failed to update the collection centre time slots. Log ID: ${updateTimeSlotError.logId}`
-            );
-            let message = `Failed to update the collection centre time slots. Log ID: ${updateTimeSlotError.logId}`;
-            if ((updateTimeSlotError as any).type === "ConcurrentEditCollectionCentre") {
-                message =
-                    "Record has been edited recently - please refresh the page." +
-                    `Log ID: ${updateTimeSlotError.logId}`;
-            }
-            setTimeSlotModalErrorMessage(message);
-            await sendAuditLog({
-                ...baseAuditLog,
-                wasSuccess: false,
-                logId: updateTimeSlotError.logId,
-            });
-            return;
-        }
-
-        await sendAuditLog({ ...baseAuditLog, wasSuccess: true });
+        const payload: FormattedTimeSlotsWithPrimaryKey = {
+            ...timeSlotModalData,
+        };
+        props.onSave(payload);
         props.onClose();
     };
 
@@ -348,11 +304,6 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                         </ModalTimeSlotsContainer>
                     </Centerer>
                 </ContentDiv>
-                <ButtonsDiv>
-                    {timeSlotModalErrorMessage && (
-                        <ErrorSecondaryText>{timeSlotModalErrorMessage}</ErrorSecondaryText>
-                    )}
-                </ButtonsDiv>
             </OutsideDiv>
         </Modal>
     );

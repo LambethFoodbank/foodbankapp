@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
     CollectionCentresTableRow,
     fetchCollectionCentresForTable,
+    FormattedTimeSlotsWithPrimaryKey,
     InsertCollectionCentreResult,
     insertNewCollectionCentre,
     UpdateCollectionCentreResult,
@@ -99,9 +100,6 @@ const CollectionCentresTable: React.FC = () => {
     }, [getCollectionCentresForTable]);
 
     const handleSaveClick = (id: GridRowId) => () => {
-        if (errorMessage) {
-            return;
-        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View },
@@ -144,10 +142,9 @@ const CollectionCentresTable: React.FC = () => {
     const updateCollectionCentre = async (
         newRow: CollectionCentresTableRow
     ): Promise<UpdateCollectionCentreResult> => {
-        const originalLastUpdated = originalTimestampsRef.current[newRow.id];
         const rowWithOriginal = {
             ...newRow,
-            originalLastUpdated,
+            originalLastUpdated: originalTimestampsRef.current[newRow.id],
         };
         const { error: updateCollectionCentreError } =
             await updateDbCollectionCentre(rowWithOriginal);
@@ -157,9 +154,6 @@ const CollectionCentresTable: React.FC = () => {
         );
 
         if (updateCollectionCentreError) {
-            setErrorMessage(
-                `Failed to update the collection centre. Log ID: ${updateCollectionCentreError.logId}`
-            );
             await sendAuditLog({
                 ...baseAuditLog,
                 wasSuccess: false,
@@ -172,6 +166,33 @@ const CollectionCentresTable: React.FC = () => {
         await sendAuditLog({ ...baseAuditLog, wasSuccess: true });
         setIsLoading(false);
         return { error: null };
+    };
+
+    const refreshRow = async (id: string): Promise<CollectionCentresTableRow | null> => {
+        const { data: latestRow, error } = await supabase
+            .from("collection_centres")
+            .select("*")
+            .eq("primary_key", id)
+            .single();
+
+        if (error || !latestRow) {
+            return null;
+        }
+
+        const mappedRow: CollectionCentresTableRow = {
+            id: latestRow.primary_key,
+            name: latestRow.name,
+            acronym: latestRow.acronym,
+            isDelivery: latestRow.is_delivery,
+            isShown: latestRow.is_shown,
+            lastUpdated: latestRow.last_updated,
+            timeSlots: latestRow.time_slots,
+            isNew: false,
+        };
+
+        setRows((prevRows) => prevRows.map((row) => (row.id === id ? mappedRow : row)));
+        setErrorMessage(null);
+        return mappedRow;
     };
 
     const processRowUpdate = async (
@@ -212,6 +233,13 @@ const CollectionCentresTable: React.FC = () => {
         }
     };
 
+    const handleRowEditStart: GridEventListener<"rowEditStart"> = (params) => {
+        const row = rows.find((slot) => slot.id === params.id);
+        if (row) {
+            originalTimestampsRef.current[params.id] = row.lastUpdated;
+        }
+    };
+
     const handleRowEditStop: GridEventListener<"rowEditStop"> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
             //prevents default behaviour of saving the edited state when clicking away from row being edited, force user to use save or cancel buttons
@@ -219,7 +247,7 @@ const CollectionCentresTable: React.FC = () => {
         }
     };
 
-    const handleEditClick = (id: GridRowId) => () => {
+    const handleEditClick = (id: GridRowId) => async () => {
         const row = rows.find((slot) => slot.id === id);
         if (row) {
             originalTimestampsRef.current[id] = row.lastUpdated;
@@ -230,7 +258,7 @@ const CollectionCentresTable: React.FC = () => {
         }));
     };
 
-    const handleCancelClick = (id: GridRowId) => () => {
+    const handleCancelClick = (id: GridRowId) => async () => {
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -244,6 +272,8 @@ const CollectionCentresTable: React.FC = () => {
             setErrorMessage(`Table error, please try again. Log ID: ${logId}`);
         } else if (editedRow.isNew) {
             setRows((currentValue) => currentValue.filter((row) => row.id !== id));
+        } else {
+            await refreshRow(editedRow.id);
         }
     };
 
@@ -279,10 +309,15 @@ const CollectionCentresTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             renderCell: (params) => {
                 const handleEditCollectionCentreTimeSlot = (): void => {
-                    setSelectedRowForTimeSlotEdit(params.row as CollectionCentresTableRow);
+                    const row = params.row as CollectionCentresTableRow;
+                    handleEditClick(row.id)();
+                    setRowModesModel((currentValue) => ({
+                        ...currentValue,
+                        [row.id]: { mode: GridRowModes.Edit },
+                    }));
+                    setSelectedRowForTimeSlotEdit(row);
                     setTimeSlotModalIsOpen(true);
                 };
-
                 return (
                     <Button
                         variant="outlined"
@@ -357,6 +392,10 @@ const CollectionCentresTable: React.FC = () => {
                     aria-label="Collection Centres Table"
                     columns={collectionCentreColumns}
                     editMode="row"
+                    onCellDoubleClick={(params, event) => {
+                        event.defaultMuiPrevented = true;
+                        handleEditClick(params.id)();
+                    }}
                     rowModesModel={rowModesModel}
                     onProcessRowUpdateError={(error) => {
                         setErrorMessage(error.message);
@@ -372,6 +411,7 @@ const CollectionCentresTable: React.FC = () => {
                             setErrorMessage(null);
                         }
                     }}
+                    onRowEditStart={handleRowEditStart}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
                     slots={{
@@ -396,6 +436,26 @@ const CollectionCentresTable: React.FC = () => {
                     isOpen={timeSlotModalIsOpen}
                     onClose={() => {
                         setTimeSlotModalIsOpen(false);
+                    }}
+                    onSave={async (payload: FormattedTimeSlotsWithPrimaryKey) => {
+                        if (!selectedRowForTimeSlotEdit) {
+                            return;
+                        }
+
+                        const updatedRow: CollectionCentresTableRow = {
+                            ...selectedRowForTimeSlotEdit,
+                            timeSlots: payload.timeSlots.map((slot) => ({
+                                time: slot.time
+                                    ? `${slot.time.length === 5 ? slot.time + ":00" : slot.time}`
+                                    : null,
+                                is_active: slot.isActive ?? false,
+                            })),
+                        };
+                        setRows((prevRows) =>
+                            prevRows.map((row) =>
+                                row.id === updatedRow.id ? { ...row, ...updatedRow } : row
+                            )
+                        );
                     }}
                 ></CollectionCentreTimeSlotsModal>
             )}

@@ -7,12 +7,6 @@ describe("Edit a collection centre on admins page", () => {
     });
 
     it("Adds a collection centre and hides it successfully", () => {
-        cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
-            "getCollectionCentresRequest"
-        );
-        cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
-            "patchCollectionCentreRequest"
-        );
         toggleCollectionCentreSection();
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .find(".MuiDataGrid-row", { timeout: 5000 })
@@ -32,8 +26,6 @@ describe("Edit a collection centre on admins page", () => {
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
             .should("exist");
-
-        cy.wait("@getCollectionCentresRequest");
 
         startEditingCollectionCentreRow(newCollectionCentreName);
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
@@ -58,13 +50,6 @@ describe("Edit a collection centre on admins page", () => {
     });
 
     it("Adds a collection centre and edits collection slots successfully", () => {
-        cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
-            "getCollectionCentresRequest"
-        );
-        cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
-            "patchCollectionCentreRequest"
-        );
-
         toggleCollectionCentreSection();
 
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
@@ -85,8 +70,6 @@ describe("Edit a collection centre on admins page", () => {
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
             .should("exist");
-
-        cy.wait("@getCollectionCentresRequest");
 
         // Open modal
         clickEditSlotsButtonForCentre(newCollectionCentreName);
@@ -143,26 +126,7 @@ describe("Edit a collection centre on admins page", () => {
         cy.get("@timeSlots").eq(1).should("have.text", "13:15");
         cy.get("@timeSlots").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
 
-        // Prepare to track update requests
-        cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
-            "patchCollectionCentreRequest"
-        );
-        cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
-            "getCollectionCentresRequest"
-        );
-
-        // Save to close modal
-        cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
-            .find('[data-testid="SaveSlotsCloseModal"]') // eslint-disable-line quotes
-            .click();
-        cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
-            .should("not.exist");
-
-        // Wait for background save to complete, then table update
-        cy.wait("@patchCollectionCentreRequest");
-        cy.wait("@getCollectionCentresRequest");
-        cy.wait(1000); // eslint-disable-line cypress/no-unnecessary-waiting
-
+        saveTimeSlotsForCentre(newCollectionCentreName);
         // Open modal for same collection centre
         clickEditSlotsButtonForCentre(newCollectionCentreName);
         cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
@@ -254,4 +218,20 @@ const addNewTimeSlotInModal = (hrs: string, min: string): void => {
     cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
         .find('[data-testid="AddSlot"]') // eslint-disable-line quotes
         .click();
+};
+
+const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
+    void collectionCentreName;
+    cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
+        .find('[data-testid="SaveSlotsCloseModal"]') // eslint-disable-line quotes
+        .click();
+    cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]').should("not.exist"); // eslint-disable-line quotes
+
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(".MuiDataGrid-row--editing")
+        .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
+        .click();
+
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(500);
 };
