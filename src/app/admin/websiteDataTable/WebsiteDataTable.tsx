@@ -42,7 +42,7 @@ const WebsiteDataTable: React.FC = () => {
     const [lastEditedRowTimestamps, setLastEditedRowTimestamps] = useState<{
         [rowId: string]: string | undefined;
     }>({});
-    const [hasError, setHasError] = useState<boolean>(false);
+    const [blockedSaveRows, setBlockedSaveRows] = useState<Set<GridRowId>>(new Set());
 
     const fetchAndSetWebsiteData = useCallback(async () => {
         setIsLoading(true);
@@ -96,14 +96,11 @@ const WebsiteDataTable: React.FC = () => {
     };
 
     const processRowUpdate = async (newRow: WebsiteDataRow): Promise<WebsiteDataRow> => {
-        setErrorMessage(null);
         setIsLoading(true);
-        setHasError(false);
 
         const { error } = await updateDbWebsiteData(newRow, lastEditedRowTimestamps[newRow.id]);
 
         if (error) {
-            setHasError(true);
             switch (error.type) {
                 case "failedToUpdateWebsiteData":
                     setErrorMessage(`Failed to update website data. Log ID ${error.logId}`);
@@ -113,14 +110,22 @@ const WebsiteDataTable: React.FC = () => {
                     setErrorMessage(
                         `Record has been edited recently - please refresh the page. Log ID: ${error.logId}`
                     );
+                    setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
                     break;
             }
-
             setIsLoading(false);
-            return rows.find((row) => row.id === newRow.id) || newRow;
+            return newRow;
         }
 
+        setErrorMessage(null);
         setIsLoading(false);
+
+        setBlockedSaveRows((prev) => {
+            const copyBlockedRows = new Set(prev);
+            copyBlockedRows.delete(newRow.id);
+            return copyBlockedRows;
+        });
+
         return newRow;
     };
 
@@ -157,6 +162,12 @@ const WebsiteDataTable: React.FC = () => {
             ...currentValue,
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
         }));
+
+        setBlockedSaveRows((prev) => {
+            const copyBlockedRows = new Set(prev);
+            copyBlockedRows.delete(id);
+            return copyBlockedRows;
+        });
 
         const editedRow = rows.find((row) => row.id === id);
         if (editedRow === undefined) {
@@ -213,6 +224,7 @@ const WebsiteDataTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             getActions: ({ id }) => {
                 const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+                const isBlocked = blockedSaveRows.has(id);
 
                 if (isInEditMode) {
                     return [
@@ -222,7 +234,7 @@ const WebsiteDataTable: React.FC = () => {
                             sx={{
                                 color: "primary.main",
                             }}
-                            onClick={handleSaveClick(id)}
+                            onClick={isBlocked ? undefined : handleSaveClick(id)}
                             key="Save"
                         />,
                         <GridActionsCellItem
