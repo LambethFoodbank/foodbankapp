@@ -82,6 +82,7 @@ export interface idAndStatus {
     parcel_id: string | null;
     last_status_event_name: string | null;
 }
+
 export interface rawParcel {
     primary_key: string;
     voucher_number: string | null;

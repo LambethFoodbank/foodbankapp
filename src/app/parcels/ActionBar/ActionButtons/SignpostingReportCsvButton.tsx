@@ -76,9 +76,7 @@ const getSignpostingRawParcelList = async (
         };
     }
     if (!rawParcelList || rawParcelList.length === 0) {
-        const logId = await logErrorReturnLogId(
-            "No parcels with specified status to create Signposting report"
-        );
+        const logId = await logErrorReturnLogId("No parcels with signposting required");
         return {
             data: [],
             error: {

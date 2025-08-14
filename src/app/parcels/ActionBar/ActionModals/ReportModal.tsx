@@ -151,7 +151,6 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
                 toDate: dateRange.to.toString(),
             };
         } else {
-            console.log("invalid report type");
             content = { error: "invalid report type" };
         }
         void sendAuditLog({
@@ -168,13 +167,7 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
 
     const onFileCreationFailed = (csvError: FetchReportError): void => {
         if (csvError.type === "noRowsForInterval") {
-            if (props.reportType === "dateInterval") {
-                setErrorMessage(`No parcels with specified status to create ${props.reportName}.`);
-            } else if (props.reportType === "parcelList") {
-                setErrorMessage(`No parcels found for ${props.reportName}.`);
-            } else {
-                setErrorMessage("Nobody knows");
-            }
+            setErrorMessage(`No parcels found for the ${props.reportName}.`);
         } else {
             setErrorMessage(`Failed to fetch ${props.reportName} data`);
         }
