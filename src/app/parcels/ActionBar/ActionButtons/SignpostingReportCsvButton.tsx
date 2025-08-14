@@ -8,23 +8,25 @@ import ReportCsvButton, {
     convertRawParcelListToReportResult,
     FetchReportError,
     FetchReportResult,
-    getParcelIdsAndStatusQuery,
     getRawParcelListQuery,
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
 import supabase from "@/supabaseClient";
+import { getDbDate } from "@/common/format";
 
 const getSignpostingParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
-        fromDate,
-        toDate,
-    })
+    const { data: idAndStatusList, error: idFetchError } = await supabase
         // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
+        .from('parcels_plus')
+        .select("parcel_id, last_status_event_name")
+        .gte("packing_date", getDbDate(fromDate))
+        .lte("packing_date", getDbDate(toDate))
+        .eq("client_is_active", true)
+        .not("parcel_id", 'is', null);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -55,11 +57,9 @@ const getSignpostingRawParcelList = async (
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
-        .eq("client.is_active", true)
         .eq("client.signposting_call_required", true)
         .order("packing_date")
         .order("client_id");
-
     if (parcelFetchError) {
         const logId = await logErrorReturnLogId("Failed to fetch Signposting Report parcel data", {
             error: parcelFetchError,

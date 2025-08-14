@@ -23,6 +23,7 @@ import CsvButton, {
 import supabase from "@/supabaseClient";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 import { ParcelsTableRow } from "../../parcelsTable/types";
+import { todo } from "node:test";
 
 export type FetchReportResult =
     | {
@@ -83,36 +84,6 @@ export interface idAndStatus {
     parcel_id: string | null;
     last_status_event_name: string | null;
 }
-
-type IdAndStatusQueryParams = {
-    fromDate?: Dayjs;
-    toDate?: Dayjs;
-    parcelIds?: string[];
-};
-
-export const getParcelIdsAndStatusQuery = ({
-    fromDate,
-    toDate,
-    parcelIds,
-}: IdAndStatusQueryParams): typeof query => {
-    // Find IDs of non-deleted parcels in the period. This is done before the complex query because
-    // joining clients and families to the view does not behave as expected.
-    let query = supabase
-        .from("parcels_plus")
-        .select("parcel_id, last_status_event_name")
-        // eslint-disable-next-line quotes
-        .or('last_status_event_name.neq."Parcel Deleted",last_status_event_name.is.null');
-
-    if (fromDate && toDate) {
-        query = query
-            .gte("packing_date", getDbDate(fromDate))
-            .lte("packing_date", getDbDate(toDate));
-    } else if (parcelIds) {
-        query = query.in("parcel_id", parcelIds);
-    }
-    return query;
-};
-
 export interface rawParcel {
     primary_key: string;
     voucher_number: string | null;

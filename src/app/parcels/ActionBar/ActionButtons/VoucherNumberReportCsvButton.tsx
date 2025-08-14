@@ -8,24 +8,27 @@ import ReportCsvButton, {
     convertRawParcelListToReportResult,
     FetchReportError,
     FetchReportResult,
-    getParcelIdsAndStatusQuery,
     getRawParcelListQuery,
     idAndStatus,
     rawParcel,
 } from "./ReportCsvButton";
 import supabase from "@/supabaseClient";
+import { getDbDate } from "@/common/format";
 
 const getMissingVoucherNumberParcelIdsAndStatus = async (
     fromDate: Dayjs,
     toDate: Dayjs
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
-        fromDate,
-        toDate,
-    })
+    const { data: idAndStatusList, error: idFetchError } = await supabase
+        // eslint-disable-next-line quotes
+        .from('parcels_plus')
+        .select("parcel_id, last_status_event_name")
+        .gte("packing_date", getDbDate(fromDate))
+        .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.ilike."", voucher_number.is.null')
-        .eq("client_is_active", true);
+        .eq("client_is_active", true)
+        .not("parcel_id", 'is', null);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -58,7 +61,6 @@ const getMissingVoucherNumberRawParcelList = async (
         )
         .order("packing_date")
         .order("client_id");
-
     if (parcelFetchError) {
         const logId = await logErrorReturnLogId(
             "Failed to fetch Missing Voucher Number Report parcel data",

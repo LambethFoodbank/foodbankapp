@@ -7,7 +7,6 @@ import ReportCsvButton, {
     convertRawParcelListToReportResult,
     FetchReportError,
     FetchReportResult,
-    getParcelIdsAndStatusQuery,
     getRawParcelListQuery,
     idAndStatus,
     rawParcel,
@@ -17,9 +16,12 @@ import supabase from "@/supabaseClient";
 const getSelectedParcelsParcelIdsAndStatus = async (
     parcelIds: string[]
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
-    const { data: idAndStatusList, error: idFetchError } = await getParcelIdsAndStatusQuery({
-        parcelIds,
-    }).in("parcel_id", parcelIds);
+    const { data: idAndStatusList, error: idFetchError } = await supabase
+        .from('parcels_plus')
+        .select("parcel_id, last_status_event_name")
+        .eq("client_is_active", true)
+        .not("parcel_id", 'is', null)
+        .in("parcel_id", parcelIds);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -44,12 +46,10 @@ const getSelectedParcelsParcelIdsAndStatus = async (
 const getSelectedParcelsRawParcelList = async (
     parcelIds: string[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
-    console.log(parcelIds);
     const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
         .in("primary_key", parcelIds)
         .order("packing_date")
         .order("primary_key");
-    console.log(rawParcelList, parcelFetchError);
     if (parcelFetchError) {
         const logId = await logErrorReturnLogId(
             "Failed to fetch Selected Parcels Report Parcel data",
@@ -87,7 +87,6 @@ const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchR
         await getSelectedParcelsParcelIdsAndStatus(parcelIds);
 
     if (idAndStatusError) {
-        console.log("idAndStatus Error");
         return {
             data: null,
             error: idAndStatusError,
@@ -98,7 +97,6 @@ const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchR
         await getSelectedParcelsRawParcelList(parcelIds);
 
     if (rawParcelError) {
-        console.log("rawParcel Error");
         return {
             data: null,
             error: rawParcelError,
