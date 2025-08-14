@@ -5,7 +5,7 @@ import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/
 
 const textFilterDelimiter = ",";
 const defaultQueryFilterRegex = /[^a-zA-Z0-9 '\-+?]/g;
-const emailQueryFilterRegex = /[^a-zA-Z0-9 '\-@.+?]/g;
+const emailQueryFilterRegex = /[^a-zA-Z0-9+-_~!#$%&`./=^'{}|@]/g;
 
 export const dbFilterWithSubstringQueries = <DbData extends DbClientRow | DbParcelRow>(
     substringToSubqueryMap: (value: string) => string,

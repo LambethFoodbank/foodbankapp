@@ -20,7 +20,7 @@ export const phoneNumberFormatSymbolsRegex = /[\s-()]/g;
 export const phoneNumberRegex = /^((0|\+44)\d{9,11}|\+(?!44)\d{7,15})?$/;
 
 export const emailFormatSymbolsRegex = /[\s]/g;
-export const emailRegex = /^\S+@\S+$/;
+export const emailRegex = /^[^@\s]+@[^@\s]+$/;
 
 export const formatPhoneNumber = (value: string): string => {
     const numericInput = value.replace(/(\D)/g, "");
