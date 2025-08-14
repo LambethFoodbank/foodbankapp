@@ -24,7 +24,6 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
         .select("parcel_id, last_status_event_name")
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
-        // eslint-disable-next-line quotes
         .eq("last_status_event_name", "Pending More Info")
         .eq("client_is_active", true)
         .not("parcel_id", "is", null);

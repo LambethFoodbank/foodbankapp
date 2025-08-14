@@ -20,7 +20,6 @@ const getSignpostingParcelIdsAndStatus = async (
     toDate: Dayjs
 ): Promise<{ data: idAndStatus[]; error: FetchReportError | null }> => {
     const { data: idAndStatusList, error: idFetchError } = await supabase
-        // eslint-disable-next-line quotes
         .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
         .gte("packing_date", getDbDate(fromDate))
