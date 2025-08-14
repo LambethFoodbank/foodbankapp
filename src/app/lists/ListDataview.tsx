@@ -26,9 +26,7 @@ import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialo
 import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export type ListFilter =
-    DistributeClientFilter<ListRow, string | string[]>;
-    // | DistributeClientFilter<ListRow, string[]>;
+export type ListFilter = DistributeClientFilter<ListRow, string | string[]>;
 
 export interface ListRow {
     primaryKey: string;
