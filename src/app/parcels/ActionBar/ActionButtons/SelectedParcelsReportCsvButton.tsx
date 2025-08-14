@@ -44,10 +44,13 @@ const getSelectedParcelsParcelIdsAndStatus = async (
     };
 };
 const getSelectedParcelsRawParcelList = async (
-    parcelIds: string[]
+    idAndStatusList: idAndStatus[]
 ): Promise<{ data: rawParcel[]; error: FetchReportError | null }> => {
     const { data: rawParcelList, error: parcelFetchError } = await supabase.from("parcels").select(getRawParcelListQuery).limit(1, { foreignTable: "clients" })
-        .in("primary_key", parcelIds)
+        .in(
+            "primary_key",
+            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
+        )
         .order("packing_date")
         .order("primary_key");
     if (parcelFetchError) {
@@ -94,7 +97,7 @@ const getSelectedParcelsReportData = async (parcelIds: string[]): Promise<FetchR
     }
 
     const { data: rawParcelList, error: rawParcelError } =
-        await getSelectedParcelsRawParcelList(parcelIds);
+        await getSelectedParcelsRawParcelList(idAndStatusList);
 
     if (rawParcelError) {
         return {
