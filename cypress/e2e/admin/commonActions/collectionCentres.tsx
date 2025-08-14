@@ -1,0 +1,131 @@
+export const toggleCollectionCentreSection = (): void => {
+    cy.get('[aria-label="Section: Collection Centres"]').click(); // eslint-disable-line quotes
+};
+
+export const startAddingNewCollectionCentre = (): void => {
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find('[data-testid="AddIcon"]') // eslint-disable-line quotes
+        .click();
+};
+
+export const fillOutNewCollectionCentreRowAndSave = (newCollectionCentreName: string): void => {
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(".MuiDataGrid-row--editing")
+        .as("newRow");
+
+    cy.get("@newRow")
+        .find('[data-field="name"]') // eslint-disable-line quotes
+        .find('input[type="text"]') // eslint-disable-line quotes
+        .type(newCollectionCentreName);
+
+    cy.get("@newRow")
+        .find('[data-field="acronym"]') // eslint-disable-line quotes
+        .find('input[type="text"]') // eslint-disable-line quotes
+        .type(newCollectionCentreName);
+
+    cy.get("@newRow")
+        .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
+        .click();
+};
+
+export const startEditingCollectionCentreRow = (collectionCentreName: string): void => {
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .contains(collectionCentreName)
+        .parents(".MuiDataGrid-row")
+        .as("newlyAddedRow");
+
+    cy.get("@newlyAddedRow").find('[data-testid="EditIcon"]').click(); // eslint-disable-line quotes
+};
+
+export const uncheckIsShownInRowBeingEditedAndSave = (): void => {
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(".MuiDataGrid-row--editing")
+        .as("rowBeingEdited");
+
+    cy.get("@rowBeingEdited")
+        .find('[data-field="isShown"]') // eslint-disable-line quotes
+        .find('[type="checkbox"]') // eslint-disable-line quotes
+        .uncheck();
+
+    cy.get("@rowBeingEdited")
+        .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
+        .click();
+};
+
+export const addNewTimeSlotInModal = (hrs: string, min: string): void => {
+    cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
+        .find('[data-testid="DefineNewSlot"]') // eslint-disable-line quotes
+        .click();
+
+    cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
+        .find('input[placeholder="hh:mm"]', { timeout: 5000 }) // eslint-disable-line quotes
+        .as("timeSlotInput");
+
+    cy.get("@timeSlotInput").type(hrs + min);
+
+    cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
+        .find('[data-testid="AddSlot"]') // eslint-disable-line quotes
+        .click();
+};
+
+export const clickEditButtonForCentre = (
+    ariaLabel: string,
+    collectionCentreName: string,
+    modalName: string
+): void => {
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find('[aria-label="' + ariaLabel + " " + collectionCentreName + '"]') // eslint-disable-line quotes
+        .click();
+    cy.get('div[data-testid="' + modalName + '"]') // eslint-disable-line quotes
+        .should("be.visible");
+};
+
+export const saveToCloseModal = (modalId: string, buttonId: string): void => {
+    cy.get('div[data-testid="' + modalId + '"]') // eslint-disable-line quotes
+        .find('[data-testid="' + buttonId + '"]') // eslint-disable-line quotes
+        .click();
+
+    cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]', { timeout: 10000 }) // eslint-disable-line quotes
+        .should("not.exist");
+};
+
+export const addNewCollectionCentre = (newCollectionCentreName: string): void => {
+    toggleCollectionCentreSection();
+
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(".MuiDataGrid-row", { timeout: 5000 })
+        .should("be.visible");
+
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(newCollectionCentreName)
+        .should("not.exist"); // If this fails then the random UUID is already there
+
+    startAddingNewCollectionCentre();
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(".MuiDataGrid-row--editing", { timeout: 5000 })
+        .should("exist");
+
+    fillOutNewCollectionCentreRowAndSave(newCollectionCentreName);
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
+        .should("exist");
+};
+
+export const tickAvailabilityCheckbox = (checkboxIndex: number): void => {
+    cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+        .find('[aria-label="List of defined available days"]') // eslint-disable-line quotes
+        .find('[aria-label="Available Day"]') // eslint-disable-line quotes
+        .as("availableDays");
+    cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
+
+    const otherCheckboxIndex = (() => {
+        const index = Math.floor(Math.random() * 6);
+        return index >= checkboxIndex ? index + 1 : index;
+    })();
+
+    cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
+    cy.get("@availableDays")
+        .eq(otherCheckboxIndex)
+        .find('input[type="checkbox"]') // eslint-disable-line quotes
+        .should("not.be.checked"); // eslint-disable-line quotes
+};
