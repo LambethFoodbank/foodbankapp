@@ -392,10 +392,6 @@ const CollectionCentresTable: React.FC = () => {
                     aria-label="Collection Centres Table"
                     columns={collectionCentreColumns}
                     editMode="row"
-                    onCellDoubleClick={(params, event) => {
-                        event.defaultMuiPrevented = true;
-                        handleEditClick(params.id)();
-                    }}
                     rowModesModel={rowModesModel}
                     onProcessRowUpdateError={(error) => {
                         setErrorMessage(error.message);

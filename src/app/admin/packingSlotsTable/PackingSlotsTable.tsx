@@ -153,9 +153,6 @@ const PackingSlotsTable: React.FC = () => {
     }, []);
 
     const handleSaveClick = (id: GridRowId) => () => {
-        if (errorMessage) {
-            return;
-        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View },
