@@ -23,7 +23,7 @@ export const phoneNumberRegex = /^((0|\+44)\d{9,11}|\+(?!44)\d{7,15})?$/;
 export const emailFormatSymbolsRegex = /[\s]/g;
 export const emailRegex = /^\S+@\S+$/;
 export const prefixPostcodeRegex =
-    /^([Gg][Ii][Rr] 0[Aa]{2})|(([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))$/;
+    /^(([Gg][Ii][Rr])|(([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?)))))$/;
 
 export const formatPhoneNumber = (value: string): string => {
     const numericInput = value.replace(/(\D)/g, "");
