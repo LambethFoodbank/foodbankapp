@@ -71,32 +71,46 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const endPoint = currentPage * parcelCountPerPage - 1;
 
     const parcelsTableFetchAbortController = useRef<AbortController | null>(null);
+    const latestFetchRequestId = useRef<number>(0);
 
     const fetchAndDisplayParcelsData = useCallback(async (): Promise<void> => {
+        latestFetchRequestId.current += 1;
+        const currentFetchRequestId = latestFetchRequestId.current;
+
+        console.log("QQ: Fetching parcels data with request ID:", currentFetchRequestId);
+
         if (parcelsTableFetchAbortController.current) {
+            console.log(`QQ: Aborting previous fetch request (${currentFetchRequestId - 1})`);
             parcelsTableFetchAbortController.current.abort("stale request");
         }
 
         parcelsTableFetchAbortController.current = new AbortController();
 
-        if (parcelsTableFetchAbortController.current) {
-            setErrorMessage(null);
+        setErrorMessage(null);
 
-            const { data, error } = await getParcelsTableDataAndAllIds(
-                supabase,
-                appliedFilters,
-                sortState,
-                parcelsTableFetchAbortController.current.signal,
-                startPoint,
-                endPoint
-            );
+        const { data, error } = await getParcelsTableDataAndAllIds(
+            supabase,
+            appliedFilters,
+            sortState,
+            parcelsTableFetchAbortController.current.signal,
+            startPoint,
+            endPoint
+        );
 
+        if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
+                console.log(
+                    `QQ: Fetch request (${currentFetchRequestId}) encountered an error:`,
+                    error
+                );
+
                 const newErrorMessage = getParcelDataErrorMessage(error.type);
                 if (newErrorMessage !== null) {
                     setErrorMessage(`${newErrorMessage} Log ID: ${error.logId}`);
                 }
             } else {
+                console.log(`QQ: Fetch request (${currentFetchRequestId}) completed successfully`);
+
                 setParcelsDataPortion(data.parcelTableRows);
                 setFilteredParcelCount(data.allParcelIds.length);
                 setAllFilteredParcelIds(data.allParcelIds);
@@ -115,10 +129,13 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     );
                 }
             }
-
-            parcelsTableFetchAbortController.current = null;
-            setIsLoading(false);
+        } else {
+            // QQ If this fetch was stale, we don't want to update the state
+            console.log(`QQ: Fetch request (${currentFetchRequestId}) was stale, ignoring results`);
         }
+
+        parcelsTableFetchAbortController.current = null;
+        setIsLoading(false);
     }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
 
     useEffect(() => {
