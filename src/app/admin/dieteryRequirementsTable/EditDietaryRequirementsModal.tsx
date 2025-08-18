@@ -178,37 +178,40 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
     };
 
     const handleToggle = (id: string | null, type: "included" | "excluded"): void => {
-        let toggleList = type === "included" ? newIncluded : newExcluded;
-        let oppositeList = type === "included" ? newExcluded : newIncluded;
+        const currentList = type === "included" ? newIncluded : newExcluded;
+        const otherList = type === "included" ? newExcluded : newIncluded;
 
-        if (toggleList.includes(id)) {
-            toggleList = toggleList.filter((item) => item !== id);
-        } else {
-            toggleList = [...toggleList, id];
-            oppositeList = oppositeList.filter((item) => item !== id);
-        }
+        const initialCurrent = type === "included" ? initialIncluded : initialExcluded;
+        const initialOther = type === "included" ? initialExcluded : initialIncluded;
+
+        // toggled item will be added to the current list if not present, or removed if already present
+        const updatedCurrent = currentList.includes(id)
+            ? currentList.filter((item) => item !== id)
+            : [...currentList, id];
+
+        // Ensure the other list does not contain the same id (item cannot be both included and excluded)
+        const updatedOther = otherList.filter((item) => item !== id);
 
         if (type === "included") {
-            setNewIncluded(toggleList);
-            setNewExcluded(oppositeList);
-
-            setHasChanges(
-                !checkArraysAreEqual(toggleList, initialIncluded) ||
-                    !checkArraysAreEqual(oppositeList, initialExcluded)
-            );
+            setNewIncluded(updatedCurrent);
+            setNewExcluded(updatedOther);
         } else {
-            setNewExcluded(toggleList);
-            setNewIncluded(oppositeList);
+            setNewExcluded(updatedCurrent);
+            setNewIncluded(updatedOther);
+        }
 
-            setHasChanges(
-                !checkArraysAreEqual(toggleList, initialExcluded) ||
-                    !checkArraysAreEqual(oppositeList, initialIncluded)
-            );
+        setHasChanges(
+            !checkArraysAreEqual(updatedCurrent, initialCurrent) ||
+                !checkArraysAreEqual(updatedOther, initialOther)
+        );
+
+        if (hasChanges) {
+            setWasSaved(false);
         }
     };
 
     const handleTypeChange = (newType: keyof BaseDietaryRequirements): void => {
-        if (hasChanges && !wasSaved) {
+        if (hasChanges) {
             return;
         }
         setSelectedType(newType);
