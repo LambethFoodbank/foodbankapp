@@ -128,12 +128,14 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
         );
 
         if (updateError) {
-            console.log(updateError.message);
             if (updateError.message.includes("edited recently")) {
                 setErrorMessage(updateError.message);
+                void sendAuditLog({
+                    ...auditLog,
+                    wasSuccess: false,
+                });
                 return;
             }
-
             const logId = await logErrorReturnLogId("error updating wiki row item", updateError);
             setErrorMessage(`Failed to update wiki item. Log ID: ${logId}`);
             return;
