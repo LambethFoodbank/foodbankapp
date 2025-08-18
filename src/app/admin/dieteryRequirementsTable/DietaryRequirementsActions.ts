@@ -15,6 +15,18 @@ export interface DietaryRequirementsRawData {
     petFood: string | null;
 }
 
+export const dietaryRequirementTypes = [
+    { key: "halal", label: "Halal" },
+    { key: "vegetarian", label: "Vegetarian" },
+    { key: "vegan", label: "Vegan" },
+    { key: "meat", label: "Meat" },
+    { key: "gluten_free", label: "Gluten Free" },
+    { key: "pescatarian", label: "Pescatarian" },
+    { key: "dairy_free", label: "Dairy Free" },
+    { key: "seafood_allergy", label: "Seafood Allergy" },
+    { key: "pet_food", label: "Pet Food" },
+];
+
 export interface DietaryRequirementsTableRow {
     id: string;
     dietary_requirement: string;

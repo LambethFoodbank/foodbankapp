@@ -39,6 +39,12 @@ export const formatCamelCaseKey = (objectKey: string): string => {
     return withSpace.toUpperCase();
 };
 
+export const toSnakeCase = (str: string): string =>
+    str
+        .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+        .replace(/[\s-]+/g, "_")
+        .toLowerCase();
+
 export const displayList = (data: string[]): string => {
     return data.length === 0 ? "None" : data.join(", ");
 };

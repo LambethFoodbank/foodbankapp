@@ -364,6 +364,20 @@
           "maxLength": null
         },
         {
+          "id": "public.audit_log.dietary_requirement",
+          "name": "dietary_requirement",
+          "columnName": "dietary_requirement",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "clients",
           "type": "clients",
           "isRequired": false,
@@ -1540,7 +1554,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1554,7 +1568,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1568,7 +1582,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1582,7 +1596,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1596,7 +1610,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1610,7 +1624,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1624,7 +1638,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1638,7 +1652,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -1652,7 +1666,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
