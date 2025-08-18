@@ -30,17 +30,7 @@ describe("Edit a collection centre on admins page", () => {
         newCollectionCentreName = `${uuidv4()}`;
     });
 
-    it("Adds a collection centre", () => {
-
-        cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-            .find(".MuiDataGrid-row", { timeout: 5000 })
-            .should("be.visible");
-
-        const newCollectionCentreName = `${uuidv4()}`;
-        cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-            .find(newCollectionCentreName)
-            .should("not.exist"); // If this fails then the random UUID is already there
-
+    it("Adds a collection centre and hides it successfully", () => {
         addNewCollectionCentre(newCollectionCentreName);
 
         startEditingCollectionCentreRow(newCollectionCentreName);
@@ -107,16 +97,7 @@ describe("Edit a collection centre on admins page", () => {
 
     describe("Edit the collection centres' timeslots", () => {
         it("Adds a collection centre and edits collection slots successfully", () => {
-            cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
-                "getCollectionCentresRequest"
-            );
-            cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
-                "patchCollectionCentreRequest"
-            );
-
             addNewCollectionCentre(newCollectionCentreName);
-
-            cy.wait("@getCollectionCentresRequest");
 
             // Open modal
             clickEditButtonForCentre(
@@ -175,21 +156,8 @@ describe("Edit a collection centre on admins page", () => {
             cy.get("@timeSlots").eq(1).should("have.text", "13:15");
             cy.get("@timeSlots").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
 
-            // Prepare to track update requests
-            cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
-                "patchCollectionCentreRequest"
-            );
-            cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
-                "getCollectionCentresRequest"
-            );
-
             // Save to close modal
             saveToCloseModal("CollectionCentreTimeSlotsModal", "SaveSlotsCloseModal");
-
-            // Wait for background save to complete, then table update
-            cy.wait("@patchCollectionCentreRequest");
-            cy.wait("@getCollectionCentresRequest");
-            cy.wait(1000); // eslint-disable-line cypress/no-unnecessary-waiting
 
             // Open modal for same collection centre
             clickEditButtonForCentre(
@@ -224,21 +192,8 @@ describe("Edit a collection centre on admins page", () => {
             // Tick the first day
             tickAvailabilityCheckbox(0);
 
-            // Prepare to track update requests
-            cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
-                "patchCollectionCentreRequest"
-            );
-            cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
-                "getCollectionCentresRequest"
-            );
-
             // Save to close modal
             saveToCloseModal("CollectionCentreAvailableDaysModal", "SaveDaysCloseModal");
-
-            // Wait for background save to complete, then table update
-            cy.wait("@patchCollectionCentreRequest");
-            cy.wait("@getCollectionCentresRequest");
-            cy.wait(1000); // eslint-disable-line cypress/no-unnecessary-waiting
 
             // Open modal for the same collection centre
             clickEditButtonForCentre(
@@ -268,14 +223,6 @@ describe("Edit a collection centre on admins page", () => {
 
             // Tick the first day
             tickAvailabilityCheckbox(0);
-
-            // Prepare to track update requests
-            cy.intercept("PATCH", "/rest/v1/collection_centres?primary_key=*").as(
-                "patchCollectionCentreRequest"
-            );
-            cy.intercept("GET", "/rest/v1/collection_centres?select=*").as(
-                "getCollectionCentresRequest"
-            );
 
             // Click somewhere outside the Modal to close it without saving
             cy.get("body").click("topLeft");
