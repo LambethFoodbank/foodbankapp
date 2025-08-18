@@ -23,9 +23,15 @@ export const fillOutNewCollectionCentreRowAndSave = (newCollectionCentreName: st
         .find('input[type="text"]') // eslint-disable-line quotes
         .type(newCollectionCentreName);
 
+    cy.intercept("POST", "**/rest/v1/collection_centres?select=*").as("saveCollectionCentre");
+
     cy.get("@newRow")
         .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
+
+    cy.wait("@saveCollectionCentre");
+
+    cy.get("@newRow").should("not.exist");
 };
 
 export const startEditingCollectionCentreRow = (collectionCentreName: string): void => {
@@ -73,8 +79,8 @@ export const clickEditButtonForCentre = (
     collectionCentreName: string,
     modalName: string
 ): void => {
-    cy.get('div[aria-label="Collection Centres Table"]', { timeout: 10000 }) // eslint-disable-line quotes
-        .find('[aria-label="' + ariaLabel + " " + collectionCentreName + '"]') // eslint-disable-line quotes
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find('[aria-label="' + ariaLabel + " " + collectionCentreName + '"]', { timeout: 6000 }) // eslint-disable-line quotes
         .click();
     cy.get('div[data-testid="' + modalName + '"]') // eslint-disable-line quotes
         .should("be.visible");
