@@ -10,7 +10,6 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel,
-    GridRowsProp,
     useGridApiRef,
 } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -24,6 +23,7 @@ import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionSta
 import Header from "./Header";
 import StyledDataGrid from "../common/StyledDataGrid";
 import FloatingToast from "@/components/FloatingToast";
+import { getReadableWebsiteDataName } from "@/common/format";
 
 export interface WebsiteDataRow {
     dbName: string;
@@ -34,14 +34,12 @@ export interface WebsiteDataRow {
 }
 
 const WebsiteDataTable: React.FC = () => {
-    const [rows, setRows] = useState<GridRowsProp<WebsiteDataRow>>([]);
+    const [rows, setRows] = useState<WebsiteDataRow[]>([]);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const dataGridRef = useGridApiRef();
-    const [lastEditedRowTimestamps, setLastEditedRowTimestamps] = useState<{
-        [rowId: string]: string | undefined;
-    }>({});
+    const originalTimestampsRef = React.useRef<Record<string, string>>({});
     const [blockedSaveRows, setBlockedSaveRows] = useState<Set<GridRowId>>(new Set());
     const [rowErrors, setRowErrors] = useState<{ [id: string]: string }>({});
 
@@ -49,15 +47,11 @@ const WebsiteDataTable: React.FC = () => {
         setIsLoading(true);
         setErrorMessage(null);
         const { data: websiteData, error: websiteDataError } = await fetchWebsiteData();
+
         if (websiteDataError) {
+            const message = `Failed to retrieve website data. Log ID: ${websiteDataError.logId}`;
+            setErrorMessage(message);
             setRows([]);
-            switch (websiteDataError.type) {
-                case "failedToFetchWebsiteData":
-                    setErrorMessage(
-                        `Failed to retrieve website data. Log ID ${websiteDataError.logId}`
-                    );
-                    break;
-            }
         } else {
             setRows(websiteData);
         }
@@ -96,122 +90,126 @@ const WebsiteDataTable: React.FC = () => {
         }));
     };
 
-    const processRowUpdate = async (newRow: WebsiteDataRow): Promise<WebsiteDataRow> => {
-        setIsLoading(true);
+    const refreshRow = async (id: string): Promise<WebsiteDataRow | null> => {
+        const { data: latestData, error } = await supabase
+            .from("website_data")
+            .select("*")
+            .eq("name", id)
+            .single();
 
-        const oldTimestamp = lastEditedRowTimestamps[newRow.id] ?? newRow.lastUpdated;
-
-        const { error } = await updateDbWebsiteData(newRow, oldTimestamp);
-
-        if (error) {
-            let errorMessageTmp = "";
-            switch (error.type) {
-                case "failedToUpdateWebsiteData":
-                    errorMessageTmp = `Failed to update website data. Log ID ${error.logId}`;
-                    break;
-
-                case "concurrentEditWebsiteData": {
-                    errorMessageTmp = `Record has been edited recently - please refresh the page. Log ID: ${error.logId}`;
-                    setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
-
-                    // Force a refetch of the data to get the latest timestamp
-                    const { data: latestData } = await fetchWebsiteData();
-                    if (latestData) {
-                        const latestRow = latestData.find((row) => row.id === newRow.id);
-                        if (latestRow) {
-                            setLastEditedRowTimestamps((prev) => ({
-                                ...prev,
-                                [newRow.id]: latestRow.lastUpdated,
-                            }));
-                        }
-                    }
-                    break;
-                }
-            }
-
-            setRowModesModel((prev) => ({
-                ...prev,
-                [newRow.id]: { mode: GridRowModes.Edit },
-            }));
-
-            setRowErrors((prev) => ({ ...prev, [newRow.id]: errorMessageTmp }));
-
-            setErrorMessage(errorMessageTmp);
-
-            setIsLoading(false);
-
-            throw new Error("Failed to save row, keep in edit mode");
+        if (error || !latestData) {
+            const logId = await logErrorReturnLogId(
+                `Failed to refresh row ${id}: ${error?.message}`
+            );
+            setErrorMessage(`Failed to refresh data. Log ID: ${logId}`);
+            return null;
         }
 
+        const refreshedRow: WebsiteDataRow = {
+            id: latestData.name,
+            dbName: latestData.name,
+            readableName: getReadableWebsiteDataName(latestData.name),
+            value: latestData.value,
+            lastUpdated: latestData.last_updated,
+        };
+
+        setRows((prevRows) => prevRows.map((row) => (row.id === id ? refreshedRow : row)));
+
+        return refreshedRow;
+    };
+
+    const processRowUpdate = async (newRow: WebsiteDataRow): Promise<WebsiteDataRow> => {
         setErrorMessage(null);
-        setIsLoading(false);
+        setIsLoading(true);
 
-        setRowErrors((prev) => {
-            const copy = { ...prev };
-            delete copy[newRow.id];
-            return copy;
-        });
+        try {
+            const { error } = await updateDbWebsiteData(
+                newRow,
+                originalTimestampsRef.current[newRow.id]
+            );
 
-        setBlockedSaveRows((prev) => {
-            const copyBlockedRows = new Set(prev);
-            copyBlockedRows.delete(newRow.id);
-            return copyBlockedRows;
-        });
+            if (error) {
+                let message = `Failed to update website data. Log ID: ${error.logId}`;
 
-        setErrorMessage(null);
-        setIsLoading(false);
+                if (error.type === "concurrentEditWebsiteData") {
+                    message =
+                        "Record has been edited recently - please refresh the page. " +
+                        `Log ID: ${error.logId}`;
+                    setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
+                    await refreshRow(newRow.id);
+                }
 
-        return newRow;
+                setRowErrors((prev) => ({ ...prev, [newRow.id]: message }));
+                setErrorMessage(message);
+                throw new Error(message);
+            }
+
+            // Clear any previous errors for this row
+            setRowErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[newRow.id];
+                return newErrors;
+            });
+
+            setBlockedSaveRows((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(newRow.id);
+                return newSet;
+            });
+
+            return newRow;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleRowEditStart: GridEventListener<"rowEditStart"> = (params) => {
+        const row = rows.find((editedRow) => editedRow.id === params.id);
+        if (row) {
+            originalTimestampsRef.current[params.id] = row.lastUpdated;
+        }
     };
 
     const handleRowEditStop: GridEventListener<"rowEditStop"> = (params, event) => {
-        if (
-            params.reason === GridRowEditStopReasons.rowFocusOut ||
-            params.reason === GridRowEditStopReasons.enterKeyDown
-        ) {
-            // prevents default behaviour of saving the edited state when clicking away from row being edited, force user to use save or cancel buttons
+        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+            //prevents default behaviour of saving the edited state when clicking away from row being edited, force user to use save or cancel buttons
             event.defaultMuiPrevented = true;
         }
     };
 
-    const handleEditClick = (id: GridRowId) => () => {
+    const handleEditClick = (id: GridRowId) => async () => {
+        const row = rows.find((editedRow) => editedRow.id === id);
+        if (row) {
+            originalTimestampsRef.current[id] = row.lastUpdated;
+        }
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.Edit },
         }));
-
-        const editedRow = rows.find((row) => row.id === id);
-        if (editedRow === undefined) {
-            {
-                void logErrorReturnLogId(
-                    "Edited row in website data admin table is undefined onEditClick"
-                );
-                setErrorMessage("Table error, please try again");
-            }
-        }
-        setLastEditedRowTimestamps((prev) => ({ ...prev, [id]: editedRow?.lastUpdated }));
     };
 
-    const handleCancelClick = (id: GridRowId) => () => {
+    const handleCancelClick = (id: GridRowId) => async () => {
+        setRowErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[id];
+            return newErrors;
+        });
+
+        setBlockedSaveRows((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(id);
+            return newSet;
+        });
+
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
         }));
 
-        setBlockedSaveRows((prev) => {
-            const copyBlockedRows = new Set(prev);
-            copyBlockedRows.delete(id);
-            return copyBlockedRows;
-        });
-
-        const editedRow = rows.find((row) => row.id === id);
-        if (editedRow === undefined) {
-            {
-                void logErrorReturnLogId(
-                    "Edited row in website data admin table is undefined onCancelClick"
-                );
-                setErrorMessage("Table error, please try again");
-            }
+        const refreshedRow = await refreshRow(id.toString());
+        if (!refreshedRow) {
+            const logId = await logErrorReturnLogId("Failed to refresh row data on cancel");
+            setErrorMessage(`Failed to refresh data. Please try again. Log ID: ${logId}`);
         }
     };
 
@@ -320,7 +318,15 @@ const WebsiteDataTable: React.FC = () => {
                     editMode="row"
                     rowModesModel={rowModesModel}
                     onRowModesModelChange={setRowModesModel}
+                    onRowEditStart={handleRowEditStart}
                     onRowEditStop={handleRowEditStop}
+                    onProcessRowUpdateError={(error) => {
+                        setErrorMessage(error.message);
+                    }}
+                    onCellDoubleClick={(params, event) => {
+                        event.defaultMuiPrevented = true;
+                        handleEditClick(params.id)();
+                    }}
                     processRowUpdate={processRowUpdate}
                     slots={{
                         loadingOverlay: LinearProgress,
@@ -337,7 +343,6 @@ const WebsiteDataTable: React.FC = () => {
                             : "datagrid-row-odd"
                     }
                     hideFooter
-                    onCellDoubleClick={(params) => handleEditClick(params.id)()}
                 />
             )}
         </>
