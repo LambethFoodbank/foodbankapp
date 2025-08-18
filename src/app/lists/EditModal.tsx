@@ -1,6 +1,7 @@
 "use client";
 
 import Modal from "@/components/Modal/Modal";
+import { FormHelperText } from "@mui/material";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { SnackBarDiv } from "@/app/lists/ListDataview";
@@ -75,11 +76,12 @@ const listQuantityNoteAndLabels: [keyof Schema["lists"], keyof Schema["lists"], 
 ];
 
 const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
-    const [toSubmit, setToSubmit] = useState<Partial<Schema["lists"]> | null>(
-        data ?? { is_available: true }
-    );
-
+    const [toSubmit, setToSubmit] = useState<Partial<Schema["lists"]> | null>(data ?? null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [descriptionError, setDescriptionError] = useState<boolean>(
+        () => !data?.item_name || data.item_name.trim() === ""
+    );
+    const [itemTypeError, setItemTypeError] = useState<boolean>(() => !data?.item_type);
 
     const setKey = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -87,6 +89,9 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
     ): void => {
         const newValue = event.target.value;
         setToSubmit((prev) => ({ ...prev, [key]: newValue }));
+        if (key === "item_name") {
+            setDescriptionError(newValue.trim() === "");
+        }
     };
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -94,7 +99,9 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
     };
 
     const handleItemTypeChange = (event: SelectChangeEvent<ItemType>): void => {
-        setToSubmit((prev) => ({ ...prev, item_type: event.target.value as ItemType }));
+        const value = event.target.value as ItemType;
+        setToSubmit((prev) => ({ ...prev, item_type: value }));
+        setItemTypeError(value === null);
     };
 
     const addListItem = async (listItem: Partial<Schema["lists"]>): Promise<AddListReturn> => {
@@ -187,7 +194,12 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
 
     const Footer = (
         <>
-            <Button variant="contained" color="primary" onClick={() => onSubmit(currentList)}>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => onSubmit(currentList)}
+                disabled={descriptionError || itemTypeError}
+            >
                 Submit
             </Button>
             <Snackbar
@@ -220,6 +232,8 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                     defaultValue={toSubmit?.item_name ?? ""}
                     onChange={(event) => setKey(event, "item_name")}
                     label="Item Description"
+                    error={descriptionError}
+                    helperText={descriptionError ? "This is a required field" : undefined}
                 />
 
                 <FormControlLabel
@@ -235,7 +249,7 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                 />
 
                 <h3>Item Type</h3>
-                <FormControl fullWidth>
+                <FormControl fullWidth error={itemTypeError}>
                     <InputLabel id="item-type-select-label">Item Type</InputLabel>
                     <Select
                         labelId="item-type-select-label"
@@ -250,6 +264,9 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                             </MenuItem>
                         ))}
                     </Select>
+                    {itemTypeError && (
+                        <FormHelperText error>This is a required field</FormHelperText>
+                    )}
                 </FormControl>
                 {listQuantityNoteAndLabels.map(([quantityKey, noteKey, label]) => {
                     return (
