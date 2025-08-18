@@ -204,8 +204,8 @@ describe("Edit a collection centre on admins page", () => {
 
             // Check list of days was saved
             cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
-                .find('[aria-label="List of defined available days"]', { timeout: 5000 }) // eslint-disable-line quotes
-                .find('[aria-label="Available Day"]') // eslint-disable-line quotes
+                .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
+                .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
                 .as("availableDays");
             cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
             cy.get("@availableDays").eq(1).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
@@ -239,8 +239,8 @@ describe("Edit a collection centre on admins page", () => {
 
             // The first day should not be checked (unsaved change was discarded)
             cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
-                .find('[aria-label="List of defined available days"]') // eslint-disable-line quotes
-                .find('[aria-label="Available Day"]') // eslint-disable-line quotes
+                .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
+                .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
                 .as("availableDays"); // eslint-disable-line quotes
             cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
         });

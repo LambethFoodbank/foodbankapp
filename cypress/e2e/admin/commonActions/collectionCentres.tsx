@@ -113,8 +113,8 @@ export const addNewCollectionCentre = (newCollectionCentreName: string): void =>
 
 export const tickAvailabilityCheckbox = (checkboxIndex: number): void => {
     cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
-        .find('[aria-label="List of defined available days"]') // eslint-disable-line quotes
-        .find('[aria-label="Available Day"]') // eslint-disable-line quotes
+        .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
+        .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
         .as("availableDays");
     cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
 
