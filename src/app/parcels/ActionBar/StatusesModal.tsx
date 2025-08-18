@@ -8,11 +8,12 @@ import { ParcelsTableRow } from "../parcelsTable/types";
 import SelectedParcelsOverview from "./SelectedParcelsOverview";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import { Checkbox, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
+import { FormElementWithSpacing } from "@/components/Form/formStyling";
+import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
 
 interface StatusesModalProps extends React.ComponentProps<typeof Modal> {
     selectedParcels: ParcelsTableRow[];
-    onSubmit: (date: Dayjs, callNoResponseStatuses: string[]) => void;
+    onSubmit: (date: Dayjs, callNoResponseFollowUp: string[]) => void;
     selectedStatus?: string | null;
     errorText: string | null;
 }
@@ -32,8 +33,9 @@ const ModalInner = styled.div`
 
 const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     const [date, setDate] = useState(dayjs(new Date()));
-    const [callNoResponseStatuses, setCallNoResponseStatuses] = useState<string[]>([]);
-    const noResponseStatuses = ["Voicemail", "Text", "Email"];
+    const [callNoResponseFollowUp, setCallNoResponseFollowUp] = useState<string[]>([]);
+
+    const noResponseStatus = "Called and No Response";
 
     useEffect(() => {
         setDate(dayjs(new Date()));
@@ -58,19 +60,21 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
 
     useEffect(() => {
         if (props.isOpen) {
-            setCallNoResponseStatuses([]);
+            setCallNoResponseFollowUp([]);
         }
     }, [props.isOpen]);
 
-    const toggleCallNoResponseStatuses = (newNoResponseStatus: string): void => {
-        setCallNoResponseStatuses((prevCallNoResponseStatuses) =>
-            prevCallNoResponseStatuses.includes(newNoResponseStatus)
-                ? prevCallNoResponseStatuses.filter(
-                      (prevStatus) => prevStatus !== newNoResponseStatus
+    const toggleCallNoResponseFollowUp = (newNoResponseFollowUp: string): void => {
+        setCallNoResponseFollowUp((prevCallNoResponseFollowUp) =>
+            prevCallNoResponseFollowUp.includes(newNoResponseFollowUp)
+                ? prevCallNoResponseFollowUp.filter(
+                      (prevStatus) => prevStatus !== newNoResponseFollowUp
                   )
-                : [...prevCallNoResponseStatuses, newNoResponseStatus]
+                : [...prevCallNoResponseFollowUp, newNoResponseFollowUp]
         );
     };
+
+    const noResponseFollowUp = ["Voicemail", "Text", "Email"];
 
     return (
         <Modal {...props}>
@@ -93,38 +97,24 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                     parcels={props.selectedParcels}
                     maxParcelsToShow={maxParcelsToShow}
                 />
-                {props.selectedStatus === "Called and No Response" && (
-                    <FormGroup>
-                        <FormLabel
-                            component="p"
-                            style={{
-                                fontSize: 18,
-                                marginBottom: 8,
-                                marginTop: 8,
-                                color: "inherit",
-                            }}
-                        >
-                            Did you send any of the following?
-                        </FormLabel>
-                        {noResponseStatuses.map((status) => (
-                            <FormControlLabel
-                                key={status}
-                                control={
-                                    <Checkbox
-                                        checked={callNoResponseStatuses.includes(status)}
-                                        onChange={() => toggleCallNoResponseStatuses(status)}
-                                    />
-                                }
-                                label={status}
-                            />
-                        ))}
-                    </FormGroup>
+                {props.selectedStatus === noResponseStatus && (
+                    <FormElementWithSpacing>
+                        <CheckboxGroupInput
+                            groupLabel="Did you send any of the following?"
+                            labelsAndKeys={noResponseFollowUp.map((followUp) => [
+                                followUp,
+                                followUp,
+                            ])}
+                            checkedKeys={callNoResponseFollowUp}
+                            onChange={(event) => toggleCallNoResponseFollowUp(event.target.name)}
+                        />
+                    </FormElementWithSpacing>
                 )}
                 <Centerer>
                     <Button
                         type="button"
                         variant="contained"
-                        onClick={() => props.onSubmit(date, callNoResponseStatuses)}
+                        onClick={() => props.onSubmit(date, callNoResponseFollowUp)}
                     >
                         Submit
                     </Button>
