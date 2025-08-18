@@ -85,7 +85,6 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
             return;
         }
         const newPackingDate = getDbDate(dayjs(date));
-        console.log(newPackingDate);
 
         const packingDateUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
