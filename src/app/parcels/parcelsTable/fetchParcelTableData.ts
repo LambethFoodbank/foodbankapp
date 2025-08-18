@@ -226,7 +226,8 @@ export const getParcelsByIdsWithFiltersAndSorting = async (
     return runParcelsQueryAndConvertToParcelTableRows(query);
 };
 
-const runParcelsQueryAndConvertToParcelTableRows = async (                  // MAYBE IN THE CONVERT?
+const runParcelsQueryAndConvertToParcelTableRows = async (
+    // MAYBE IN THE CONVERT?
     query: DbQuery<DbParcelRow>
 ): Promise<ParcelsTableRow[]> => {
     const { data, error } = (await query) as {

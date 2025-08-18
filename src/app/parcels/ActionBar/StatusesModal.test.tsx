@@ -48,6 +48,7 @@ const mockData: ParcelsTableRow[] = [
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
         email: "john.smith@example.com",
+        lastUpdated: "2023-12-31T12:00:00+00:00",
     },
     {
         clientId: "primaryKey2",
@@ -88,6 +89,7 @@ const mockData: ParcelsTableRow[] = [
         createdAt: new Date("2023-12-31T12:00:00+00:00"),
         clientIsActive: true,
         email: "john.doe@example.com",
+        lastUpdated: "2023-12-31T12:00:00+00:00",
     },
 ];
 

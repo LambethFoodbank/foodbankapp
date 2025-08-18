@@ -49,7 +49,7 @@ export interface ParcelsTableRow {
 
 export interface ParcelsTableRowWithOriginalLastUpdated extends ParcelsTableRow {
     originalLastUpdated: string | null;
-};
+}
 
 export type GetParcelDataAndIdsResult =
     | {

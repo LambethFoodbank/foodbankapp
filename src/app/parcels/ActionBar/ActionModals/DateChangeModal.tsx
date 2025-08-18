@@ -77,8 +77,6 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
 
     const [date, setDate] = useState<Dayjs>();
     const [warningMessage, setWarningMessage] = useState<string>("");
-    const originalLastUpdated = useRef<Record<string, string>>({});
-
 
     const onDateSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
@@ -91,7 +89,10 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
 
         const packingDateUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingDate", newPackingDate, {...parcel, originalLastUpdated: parcel.lastUpdated});
+                return packingDateOrSlotUpdate("packingDate", newPackingDate, {
+                    ...parcel,
+                    originalLastUpdated: parcel.lastUpdated,
+                });
             })
         );
 

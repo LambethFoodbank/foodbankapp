@@ -1,6 +1,6 @@
 import { FetchParcelError, fetchParcel } from "@/common/fetch";
 import { UpdateParcelError } from "../../form/submitFormHelpers";
-import { ParcelsTableRow, ParcelsTableRowWithOriginalLastUpdated } from "../../parcelsTable/types";
+import { ParcelsTableRowWithOriginalLastUpdated } from "../../parcelsTable/types";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
@@ -101,12 +101,12 @@ export const packingDateOrSlotUpdate = async (
 
     if (updateResponse.count === 0) {
         const logId = await logWarningReturnLogId(`Concurrent editing of ${updateField}`);
-        return { 
+        return {
             parcelId: null,
             error: { type: "concurrentUpdateConflict", logId },
         };
     }
-    
+
     const parcelRecord = {
         client_id: parcelData.client_id,
         packing_date: parcelData.packing_date,
