@@ -11,6 +11,10 @@ import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { FormElementWithSpacing } from "@/components/Form/formStyling";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
 
+const NO_RESPONSE_FOLLOW_UP = ["Voicemail", "Text", "Email"];
+const NO_RESPONSE_STATUS = "Called and No Response";
+const MAX_PARCELS_TO_SHOW = 5;
+
 interface StatusesModalProps extends React.ComponentProps<typeof Modal> {
     selectedParcels: ParcelsTableRow[];
     onSubmit: (date: Dayjs, callNoResponseFollowUp: string[]) => void;
@@ -35,9 +39,6 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     const [date, setDate] = useState(dayjs(new Date()));
     const [callNoResponseFollowUp, setCallNoResponseFollowUp] = useState<string[]>([]);
 
-    const noResponseStatus = "Called and No Response";
-    const noResponseFollowUp = ["Voicemail", "Text", "Email"];
-
     useEffect(() => {
         setDate(dayjs(new Date()));
     }, [props.isOpen]);
@@ -56,8 +57,6 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                 .set("hour", newDate?.hour() ?? date.hour())
                 .set("minute", newDate?.minute() ?? date.minute())
         );
-
-    const maxParcelsToShow = 5;
 
     useEffect(() => {
         if (props.isOpen) {
@@ -94,13 +93,13 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                 </Centerer>
                 <SelectedParcelsOverview
                     parcels={props.selectedParcels}
-                    maxParcelsToShow={maxParcelsToShow}
+                    maxParcelsToShow={MAX_PARCELS_TO_SHOW}
                 />
-                {props.selectedStatus === noResponseStatus && (
+                {props.selectedStatus === NO_RESPONSE_STATUS && (
                     <FormElementWithSpacing>
                         <CheckboxGroupInput
                             groupLabel="Did you send any of the following?"
-                            labelsAndKeys={noResponseFollowUp.map((followUp) => [
+                            labelsAndKeys={NO_RESPONSE_FOLLOW_UP.map((followUp) => [
                                 followUp,
                                 followUp,
                             ])}
