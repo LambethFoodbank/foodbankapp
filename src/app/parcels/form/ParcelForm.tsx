@@ -314,6 +314,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         availableDaysForCentre,
         collectionSlotsLabelsAndValues,
         deliveryPrimaryKey,
+        fields,
         fields.collectionCentre,
         fields.collectionDate,
         fields.collectionSlot,
