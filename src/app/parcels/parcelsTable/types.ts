@@ -44,7 +44,12 @@ export interface ParcelsTableRow {
     createdAt: Date | null;
     clientIsActive: boolean;
     email: string | null;
+    lastUpdated: string | null;
 }
+
+export interface ParcelsTableRowWithOriginalLastUpdated extends ParcelsTableRow {
+    originalLastUpdated: string | null;
+};
 
 export type GetParcelDataAndIdsResult =
     | {

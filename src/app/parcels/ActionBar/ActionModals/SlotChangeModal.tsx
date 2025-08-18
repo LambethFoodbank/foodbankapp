@@ -104,7 +104,7 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
         }
         const packingSlotUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingSlot", slot, parcel);
+                return packingDateOrSlotUpdate("packingSlot", slot, {...parcel, originalLastUpdated: parcel.lastUpdated});
             })
         );
 

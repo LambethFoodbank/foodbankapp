@@ -39,7 +39,6 @@ const getParcelsQuery = (
     selectString = "*"
 ): DbQuery<DbParcelRow> => {
     let query = supabase.from("parcels_plus").select(selectString) as DbQuery<DbParcelRow>;
-
     filters.forEach((filter: ParcelsFiltersAllStates) => {
         // We know that filter.method and filter.state are compatible, but it doesn't work with filter defined
         // through interfaces. Ideally we would rewrite filters to be classes so it's all consistent.
@@ -227,7 +226,7 @@ export const getParcelsByIdsWithFiltersAndSorting = async (
     return runParcelsQueryAndConvertToParcelTableRows(query);
 };
 
-const runParcelsQueryAndConvertToParcelTableRows = async (
+const runParcelsQueryAndConvertToParcelTableRows = async (                  // MAYBE IN THE CONVERT?
     query: DbQuery<DbParcelRow>
 ): Promise<ParcelsTableRow[]> => {
     const { data, error } = (await query) as {

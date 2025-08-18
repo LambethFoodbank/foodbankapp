@@ -1032,6 +1032,7 @@ export type Database = {
           last_status_is_successfully_completed: boolean | null
           last_status_timestamp: string | null
           last_status_workflow_order: number | null
+          last_updated: string | null
           list_type: Database["public"]["Enums"]["list_type"] | null
           packing_date: string | null
           packing_slot_name: string | null

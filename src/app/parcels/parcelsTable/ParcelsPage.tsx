@@ -123,7 +123,7 @@ const ParcelsPage: React.FC = () => {
         if (checkedParcelIds.length === 0) {
             return [];
         }
-
+        // console.log(currentlyAppliedFilters);
         return await getParcelsByIdsWithFiltersAndSorting(
             supabase,
             currentlyAppliedFilters,

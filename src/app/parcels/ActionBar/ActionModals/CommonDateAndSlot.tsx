@@ -1,6 +1,6 @@
 import { FetchParcelError, fetchParcel } from "@/common/fetch";
 import { UpdateParcelError } from "../../form/submitFormHelpers";
-import { ParcelsTableRow } from "../../parcelsTable/types";
+import { ParcelsTableRow, ParcelsTableRowWithOriginalLastUpdated } from "../../parcelsTable/types";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
@@ -39,7 +39,8 @@ type UpdateField = "packingDate" | "packingSlot";
 export const packingDateOrSlotUpdate = async (
     updateField: UpdateField,
     packingDateOrSlotData: string,
-    parcel: ParcelsTableRow
+    // parcel: ParcelsTableRow
+    parcel: ParcelsTableRowWithOriginalLastUpdated
 ): Promise<{
     parcelId: string | null;
     error: FetchParcelError | UpdateParcelError | null;
@@ -48,6 +49,7 @@ export const packingDateOrSlotUpdate = async (
         packing_date?: string;
         packing_slot?: string;
     };
+    const lastUpdated = parcel.originalLastUpdated;
 
     const packingDateOrSlotDbUpdate = async (
         fieldToUpdate: FieldToUpdate
@@ -55,7 +57,8 @@ export const packingDateOrSlotUpdate = async (
         return supabase
             .from("parcels")
             .update(fieldToUpdate, { count: "exact" })
-            .eq("primary_key", parcel.parcelId);
+            .eq("primary_key", parcel.parcelId)
+            .eq("last_updated", lastUpdated);
     };
 
     let updateResponse: PostgrestSingleResponse<null>;
@@ -75,9 +78,7 @@ export const packingDateOrSlotUpdate = async (
             action = "change packing slot";
             break;
     }
-
     const { data: parcelData, error: fetchError } = await fetchParcel(parcel.parcelId, supabase);
-
     if (fetchError) {
         const logId = await logErrorReturnLogId("Error with fetching parcel data", fetchError);
         await sendAuditLog({
@@ -98,6 +99,14 @@ export const packingDateOrSlotUpdate = async (
         return { parcelId: parcel.parcelId, error: fetchError };
     }
 
+    if (updateResponse.count === 0) {
+        const logId = await logWarningReturnLogId(`Concurrent editing of ${updateField}`);
+        return { 
+            parcelId: null,
+            error: { type: "concurrentUpdateConflict", logId },
+        };
+    }
+    
     const parcelRecord = {
         client_id: parcelData.client_id,
         packing_date: parcelData.packing_date,
