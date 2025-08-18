@@ -36,6 +36,7 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     const [callNoResponseFollowUp, setCallNoResponseFollowUp] = useState<string[]>([]);
 
     const noResponseStatus = "Called and No Response";
+    const noResponseFollowUp = ["Voicemail", "Text", "Email"];
 
     useEffect(() => {
         setDate(dayjs(new Date()));
@@ -73,8 +74,6 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                 : [...prevCallNoResponseFollowUp, newNoResponseFollowUp]
         );
     };
-
-    const noResponseFollowUp = ["Voicemail", "Text", "Email"];
 
     return (
         <Modal {...props}>
