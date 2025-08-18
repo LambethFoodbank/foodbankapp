@@ -189,8 +189,6 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             dietaryRequirement: label,
         };
 
-        onClose();
-
         if (error) {
             const logId = await logErrorReturnLogId(
                 `Error with updating dietary requirements for ${label}`,
