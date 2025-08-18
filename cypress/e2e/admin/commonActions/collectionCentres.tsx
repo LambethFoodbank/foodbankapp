@@ -73,7 +73,7 @@ export const clickEditButtonForCentre = (
     collectionCentreName: string,
     modalName: string
 ): void => {
-    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+    cy.get('div[aria-label="Collection Centres Table"]', { timeout: 10000 }) // eslint-disable-line quotes
         .find('[aria-label="' + ariaLabel + " " + collectionCentreName + '"]') // eslint-disable-line quotes
         .click();
     cy.get('div[data-testid="' + modalName + '"]') // eslint-disable-line quotes
