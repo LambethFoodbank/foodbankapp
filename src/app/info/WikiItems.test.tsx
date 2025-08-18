@@ -7,7 +7,6 @@ import { expect, it } from "@jest/globals";
 import "@testing-library/jest-dom/jest-globals";
 import { RoleUpdateContext } from "@/app/roles";
 import userEvent from "@testing-library/user-event";
-import { fetchWikiRow } from "@/app/info/supabaseHelpers";
 
 const adminManagerAndStaffRoles: { [role: string]: UserRole }[] = [
     { role: "admin" },
