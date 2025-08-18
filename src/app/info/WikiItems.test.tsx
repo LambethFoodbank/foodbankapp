@@ -7,6 +7,7 @@ import { expect, it } from "@jest/globals";
 import "@testing-library/jest-dom/jest-globals";
 import { RoleUpdateContext } from "@/app/roles";
 import userEvent from "@testing-library/user-event";
+import { fetchWikiRow } from "@/app/info/supabaseHelpers";
 
 const adminManagerAndStaffRoles: { [role: string]: UserRole }[] = [
     { role: "admin" },
@@ -27,6 +28,13 @@ jest.mock("@/server/auditLog", () => ({
 
 jest.mock("@/app/info/supabaseHelpers", () => ({
     reorderTwoItemsInWikiTable: jest.fn(),
+    fetchWikiRow: jest.fn(async (key) => ({
+        wiki_key: key,
+        title: "Test 1",
+        content: "Test content 1",
+        row_order: 1,
+        last_updated: "2025-08-18T11:00:00.000Z",
+    })),
     deleteItemInWikiTable: jest.fn(),
     updateItemInWikiTable: jest.fn(),
     createItemInWikiTable: jest.fn(() => ({
@@ -35,6 +43,7 @@ jest.mock("@/app/info/supabaseHelpers", () => ({
             row_order: 4,
             title: "",
             wiki_key: "9bc00a7c-e552-40e5-889b-e6ae2cb184f1",
+            last_updated: "2025-08-18T11:00:00.000Z",
         },
         error: null,
     })),
@@ -60,21 +69,21 @@ describe("Wiki items component", () => {
                 content: "Test content 1",
                 wiki_key: "058049b5-7a7f-4f81-bf56-6dc9654e5a40",
                 row_order: 1,
-                last_updated: new Date().toISOString(),
+                last_updated: "2025-08-18T11:00:00.000Z",
             },
             {
                 title: "Test 3",
                 content: "Test content 3",
                 wiki_key: "9bc00a7c-e552-40e5-889b-e6ae2cb184g3",
                 row_order: 3,
-                last_updated: new Date().toISOString(),
+                last_updated: "2025-08-18T11:00:00.000Z",
             },
             {
                 title: "Test 2",
                 content: "Test content 2",
                 wiki_key: "731280a7-eb99-4229-aa49-84dbb112641c",
                 row_order: 2,
-                last_updated: new Date().toISOString(),
+                last_updated: "2025-08-18T11:00:00.000Z",
             },
         ];
     });
