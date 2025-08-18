@@ -3,7 +3,7 @@ This file is not type checked / linted in the pipeline as createSeedClient requi
 which only gets generated after running npx snaplet generate with local database running.
  */
 
-import { clientsScalars, ColumnValueCallbackContext, createSeedClient } from "@snaplet/seed";
+import { createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
 import { packingSlots } from "./packingSlotsSeed";
 import {

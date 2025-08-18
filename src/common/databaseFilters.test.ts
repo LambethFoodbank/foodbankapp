@@ -237,7 +237,11 @@ describe("test for phone number filter", () => {
         mockDbQuery = {} as DbQuery<DbParcelRow>;
         mockDbQuery.or = mockOr;
 
-        phoneFilter = phoneSearch<DbParcelRow>("client_phone_number", "client_is_active");
+        phoneFilter = phoneSearch<DbParcelRow>(
+            "client_phone_number",
+            "client_additional_phone_numbers_text",
+            "client_is_active"
+        );
     });
 
     it("should leave the query unchanged when phone input is empty", () => {

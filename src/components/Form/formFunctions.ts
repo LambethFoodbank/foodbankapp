@@ -27,6 +27,7 @@ export enum Errors {
     invalidCollectionSlot = "The previous timeslot is no longer available, please select a new timeslot.",
     noCollectionSlotsSet = "There are no collection slots set for this collection centre, please select a different collection centre or contact admin.",
     alreadyExists = "This phone number already exists, please add a different phone number.",
+    emptyPrimaryPhoneNumber = "The primary phone number should be filled in.",
 }
 
 export const numberRegex = /^\d+$/;
@@ -64,18 +65,30 @@ export const createSetter = <SpecificFields extends Fields>(
     };
 };
 
-const getErrorType = (
+export const getErrorType = (
     input: string,
     required?: boolean,
     regex?: RegExp,
     additionalCondition?: (value: string) => boolean,
     maxCharacters?: number,
     currentAdditionalPhoneNumbers?: string[] | null,
-    primaryPhoneNumber?: string | null
+    primaryPhoneNumber?: string | null,
+    index?: number
 ): Errors => {
+    console.log(primaryPhoneNumber);
+    if (
+        currentAdditionalPhoneNumbers &&
+        currentAdditionalPhoneNumbers.length > 0 &&
+        input == "" &&
+        index === undefined
+    ) {
+        return Errors.emptyPrimaryPhoneNumber;
+    }
+
     if (input == "") {
         return required ? Errors.required : Errors.none;
     }
+
     if (
         (regex !== undefined && !input.match(regex)) ||
         (additionalCondition !== undefined && !additionalCondition(input))
@@ -87,9 +100,14 @@ const getErrorType = (
         return Errors.tooLong;
     }
 
-    if (currentAdditionalPhoneNumbers) {
-        return currentAdditionalPhoneNumbers.includes(formatPhoneNumber(input)) ||
+    if (currentAdditionalPhoneNumbers && index !== undefined) {
+        return (currentAdditionalPhoneNumbers.includes(formatPhoneNumber(input)) &&
+            currentAdditionalPhoneNumbers.indexOf(formatPhoneNumber(input)) !== index) ||
             primaryPhoneNumber === formatPhoneNumber(input)
+            ? Errors.alreadyExists
+            : Errors.none;
+    } else if (currentAdditionalPhoneNumbers) {
+        return currentAdditionalPhoneNumbers.includes(formatPhoneNumber(input))
             ? Errors.alreadyExists
             : Errors.none;
     }
@@ -114,6 +132,7 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
     index: number,
     options?: OnChangeTextOptions<SpecificFields>
 ): SelectChangeEventHandler => {
+    console.log("Format optiuni:" + options?.additionalCondition);
     return (event) => {
         const input = event.target.value;
         const errorType = getErrorType(
@@ -125,7 +144,8 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
             options?.additionalCondition,
             options?.maxCharacters,
             currentAdditionalPhoneNumbers,
-            primaryPhoneNumber
+            primaryPhoneNumber,
+            index
         );
 
         errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });
@@ -135,12 +155,12 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
                 ? options.formattingFunction(input)
                 : input;
 
-            const updatedArray = [...currentAdditionalPhoneNumbers];
-            updatedArray[index] = newValue;
+            const updatedArray = [...(currentAdditionalPhoneNumbers || [])];
+            updatedArray[index] = newValue as string;
+                fieldSetter({ [key]: updatedArray } as {
+                    [key in keyof SpecificFields]: SpecificFields[key];
+                });
 
-            fieldSetter({ [key]: updatedArray } as {
-                [key in keyof SpecificFields]: SpecificFields[key];
-            });
         }
     };
 };
@@ -149,7 +169,9 @@ export const onChangeText = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     errorSetter: Setter<FormErrors<SpecificFields>> | Setter<Required<FormErrors<SpecificFields>>>,
     key: keyof SpecificFields,
-    options?: OnChangeTextOptions<SpecificFields>
+    options?: OnChangeTextOptions<SpecificFields>,
+    currentAdditionalPhoneNumbers?: string[] | null,
+    primaryPhoneNumber?: string | null
 ): SelectChangeEventHandler => {
     return (event) => {
         const input = event.target.value;
@@ -160,7 +182,9 @@ export const onChangeText = <SpecificFields extends Fields>(
             options?.required,
             options?.regex,
             options?.additionalCondition,
-            options?.maxCharacters
+            options?.maxCharacters,
+            currentAdditionalPhoneNumbers,
+            primaryPhoneNumber
         );
 
         errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });

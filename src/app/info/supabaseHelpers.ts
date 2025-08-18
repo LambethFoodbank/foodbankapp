@@ -15,16 +15,6 @@ export async function reorderTwoItemsInWikiTable(
     return error;
 }
 
-export async function searchByAdditionalPhoneNumber(searchPhoneNumber: string): Promise<{
-    data: DbClientTableRow[] | null;
-    error: null | PostgrestError;
-}> {
-    const { data, error } = await supabase.rpc("search_by_additional_phone_number", {
-        search_number: searchPhoneNumber,
-    });
-    return { data, error };
-}
-
 export async function deleteItemInWikiTable(wiki_key: string): Promise<PostgrestError | null> {
     const deleteResponse = (await supabase
         .from("wiki")

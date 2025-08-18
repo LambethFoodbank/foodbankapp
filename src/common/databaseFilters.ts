@@ -2,9 +2,6 @@ import { ServerSideFilterMethod } from "@/components/Tables/Filters";
 import { displayPostcodeForHomelessClient } from "./format";
 import { DbClientRow, DbParcelRow } from "@/databaseUtils";
 import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/format";
-import supabase from "@/supabaseClient";
-import { useState, useEffect } from "react";
-import { searchByAdditionalPhoneNumber } from "@/app/info/supabaseHelpers";
 
 const textFilterDelimiter = ",";
 const defaultQueryFilterRegex = /[^a-zA-Z0-9 '\-+?]/g;
