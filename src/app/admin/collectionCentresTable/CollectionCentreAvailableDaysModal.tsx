@@ -9,46 +9,19 @@ import {
     CollectionCentresTableRow,
     FormattedAvailableDayType,
     FormattedAvailableDaysWithPrimaryKey,
-    updateDbCollectionCentreAvailableDays,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
-import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Heading } from "@/app/parcels/ActionBar/ActionModals/GeneralActionModal";
 import CheckboxInput from "@/components/DataInput/CheckboxInput";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
-import {
-    ButtonsDiv,
-    Centerer,
-    ContentDiv,
-    OutsideDiv,
-    SpaceBetween,
-} from "@/components/Modal/ModalFormStyles";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import { Centerer, ContentDiv, OutsideDiv, SpaceBetween } from "@/components/Modal/ModalFormStyles";
 import { ModalAvailableDaysContainer, ModalAvailableDaysRow } from "@/app/admin/common/modalStyles";
 
 interface Props {
     selectedCollectionCentreInfo: CollectionCentresTableRow | null;
     isOpen: boolean;
     onClose: () => void;
-}
-
-function getBaseAuditLogForCollectionCentreAvailableDays(
-    action: string,
-    availableDaysWithPrimaryKey: FormattedAvailableDaysWithPrimaryKey
-): Pick<AuditLog, "action" | "content" | "collectionCentreId"> {
-    const availableDays = Object.fromEntries(
-        availableDaysWithPrimaryKey.availableDays.map((availaleDays) => [
-            availaleDays.day,
-            availaleDays.isActive,
-        ])
-    );
-    return {
-        action,
-        content: {
-            availableDays,
-        },
-        collectionCentreId: availableDaysWithPrimaryKey.primaryKey,
-    };
+    onSave: (updated: FormattedAvailableDaysWithPrimaryKey) => void;
 }
 
 const formatCollectionCentreAvailableDaysDbData = (
@@ -70,15 +43,13 @@ const formatCollectionCentreAvailableDaysDbData = (
     return {
         primaryKey: row.id,
         availableDays: formattedAvailableDays,
+        lastUpdated: row.lastUpdated,
     };
 };
 
 const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
     const [availableDaysModalData, setAvailableDaysModalData] =
         useState<FormattedAvailableDaysWithPrimaryKey | null>(null);
-    const [availableDaysModalErrorMessage, setAvailableDaysModalErrorMessage] = useState<
-        string | null
-    >(null);
 
     const theme = useTheme();
 
@@ -94,25 +65,10 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
         if (availableDaysModalData === null) {
             return;
         }
-        const { error: updateAvailableDaysError } =
-            await updateDbCollectionCentreAvailableDays(availableDaysModalData);
-        const baseAuditLog = getBaseAuditLogForCollectionCentreAvailableDays(
-            "update collection centre available days",
-            availableDaysModalData
-        );
-
-        if (updateAvailableDaysError) {
-            setAvailableDaysModalErrorMessage(
-                `Failed to update the collection centre available days. Log ID: ${updateAvailableDaysError.logId}`
-            );
-            await sendAuditLog({
-                ...baseAuditLog,
-                wasSuccess: false,
-                logId: updateAvailableDaysError.logId,
-            });
-        }
-
-        await sendAuditLog({ ...baseAuditLog, wasSuccess: true });
+        const payload: FormattedAvailableDaysWithPrimaryKey = {
+            ...availableDaysModalData,
+        };
+        props.onSave(payload);
         props.onClose();
     };
 
@@ -202,11 +158,6 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
                         </ModalAvailableDaysContainer>
                     </Centerer>
                 </ContentDiv>
-                <ButtonsDiv>
-                    {availableDaysModalErrorMessage && (
-                        <ErrorSecondaryText>{availableDaysModalErrorMessage}</ErrorSecondaryText>
-                    )}
-                </ButtonsDiv>
             </OutsideDiv>
         </Modal>
     );

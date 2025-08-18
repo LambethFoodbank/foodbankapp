@@ -41,6 +41,7 @@ export interface FormattedTimeSlotsWithPrimaryKey {
 export interface FormattedAvailableDaysWithPrimaryKey {
     primaryKey: Schema["collection_centres"]["primary_key"];
     availableDays: FormattedAvailableDayType[];
+    lastUpdated: Schema["collection_centres"]["last_updated"];
 }
 
 type DbCollectionCentre = Omit<Tables<"collection_centres">, "last_updated">;
@@ -109,17 +110,6 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
     );
 
     return { data: formattedData, error: null };
-};
-
-const formatAvailableDaysToDBCollectionCentreAvailableDays = (
-    availableDaysData: FormattedAvailableDayType[]
-): DbCollectionCentreAvailableDays => {
-    return availableDaysData.map((availableDays) => {
-        return {
-            day: availableDays.day,
-            is_active: availableDays.isActive,
-        };
-    });
 };
 
 const formatExistingRowToDBCollectionCentre = (
@@ -212,37 +202,6 @@ export const updateDbCollectionCentre = async (
             error,
             newCollectionCentreData: processedData,
         });
-
-        return { error: { type: "UpdateCollectionCentreFailed", logId } };
-    }
-
-    if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
-        return { error: { type: "ConcurrentEditCollectionCentre", logId } };
-    }
-
-    return { error: null };
-};
-
-export const updateDbCollectionCentreAvailableDays = async (
-    availableDaysWithPrimaryKey: FormattedAvailableDaysWithPrimaryKey
-): Promise<UpdateCollectionCentreResult> => {
-    const processedData = formatAvailableDaysToDBCollectionCentreAvailableDays(
-        availableDaysWithPrimaryKey.availableDays
-    );
-    const { error, count } = await supabase
-        .from("collection_centres")
-        .update({ available_days: processedData })
-        .eq("primary_key", availableDaysWithPrimaryKey.primaryKey);
-
-    if (error) {
-        const logId = await logErrorReturnLogId(
-            "Failed to update collection centre available days",
-            {
-                error,
-                newCollectionCentreData: processedData,
-            }
-        );
 
         return { error: { type: "UpdateCollectionCentreFailed", logId } };
     }

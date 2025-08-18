@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import styled, { useTheme } from "styled-components";
-import { ErrorSecondaryText, ErrorTextModalFooter } from "@/app/errorStylingandMessages";
+import { useTheme } from "styled-components";
+import { ErrorTextModalFooter } from "@/app/errorStylingandMessages";
 import { FormGroup } from "@mui/material";
 import Icon from "@/components/Icons/Icon";
 import { faShoePrints, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
@@ -26,6 +26,12 @@ import {
     FormattedTimeSlot,
     FormattedTimeSlotsWithPrimaryKey,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
+import {
+    ColumnContainer,
+    ModalTimeSlotRow,
+    ModalTimeSlotsContainer,
+    RowContainer,
+} from "@/app/admin/common/modalStyles";
 
 interface Props {
     selectedCollectionCentreInfo: CollectionCentresTableRow | null;
@@ -33,25 +39,6 @@ interface Props {
     onClose: () => void;
     onSave: (updated: FormattedTimeSlotsWithPrimaryKey) => void;
 }
-
-const ModalTimeSlotsContainer = styled.div`
-    max-height: 40vh;
-    overflow-y: auto;
-`;
-
-const ModalTimeSlotRow = styled.div`
-    width: 20rem;
-`;
-
-const ColumnContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-`;
-
-const RowContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-`;
 
 const formatCollectionCentreTimeSlotDbData = (
     row: CollectionCentresTableRow

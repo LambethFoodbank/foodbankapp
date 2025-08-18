@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
     CollectionCentresTableRow,
     fetchCollectionCentresForTable,
+    FormattedAvailableDaysWithPrimaryKey,
     FormattedTimeSlotsWithPrimaryKey,
     InsertCollectionCentreResult,
     insertNewCollectionCentre,
@@ -191,6 +192,7 @@ const CollectionCentresTable: React.FC = () => {
             isShown: latestRow.is_shown,
             lastUpdated: latestRow.last_updated,
             timeSlots: latestRow.time_slots,
+            availableDays: latestRow.available_days,
             isNew: false,
         };
 
@@ -343,7 +345,13 @@ const CollectionCentresTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             renderCell: (params) => {
                 const handleEditCollectionCentreAvailableDays = (): void => {
-                    setSelectedRowForAvailableDaysEdit(params.row as CollectionCentresTableRow);
+                    const row = params.row as CollectionCentresTableRow;
+                    handleEditClick(row.id)();
+                    setRowModesModel((currentValue) => ({
+                        ...currentValue,
+                        [row.id]: { mode: GridRowModes.Edit },
+                    }));
+                    setSelectedRowForAvailableDaysEdit(row);
                     setAvailableDaysModalIsOpen(true);
                 };
 
@@ -490,6 +498,24 @@ const CollectionCentresTable: React.FC = () => {
                     isOpen={availableDaysModalIsOpen}
                     onClose={() => {
                         setAvailableDaysModalIsOpen(false);
+                    }}
+                    onSave={async (payload: FormattedAvailableDaysWithPrimaryKey) => {
+                        if (!selectedRowForAvailableDaysEdit) {
+                            return;
+                        }
+
+                        const updatedRow: CollectionCentresTableRow = {
+                            ...selectedRowForAvailableDaysEdit,
+                            availableDays: payload.availableDays.map((availableDayObject) => ({
+                                day: availableDayObject.day,
+                                is_active: availableDayObject.isActive,
+                            })),
+                        };
+                        setRows((prevRows) =>
+                            prevRows.map((row) =>
+                                row.id === updatedRow.id ? { ...row, ...updatedRow } : row
+                            )
+                        );
                     }}
                 ></CollectionCentreAvailableDaysModal>
             )}
