@@ -21,6 +21,15 @@ interface SnapletList {
     notes_for_9?: string;
     quantity_for_10?: string;
     notes_for_10?: string;
+    is_available?: boolean;
+    item_type?:
+        | "regular_food"
+        | "alternative_food"
+        | "pet_food"
+        | "hygiene_product"
+        | "baby_product"
+        | "seasonal_product"
+        | "others";
 }
 
 interface SnapletListRequired {
@@ -46,6 +55,15 @@ interface SnapletListRequired {
     notes_for_9: string | null;
     quantity_for_10: string | undefined;
     notes_for_10: string | null;
+    is_available: boolean;
+    item_type:
+        | "regular_food"
+        | "alternative_food"
+        | "pet_food"
+        | "hygiene_product"
+        | "baby_product"
+        | "seasonal_product"
+        | "others";
 }
 
 const snapletListToRequired = (list: SnapletList): SnapletListRequired => {
@@ -72,6 +90,8 @@ const snapletListToRequired = (list: SnapletList): SnapletListRequired => {
         notes_for_9: list.notes_for_9 ?? null,
         quantity_for_10: list.quantity_for_10 ?? undefined,
         notes_for_10: list.notes_for_10 ?? null,
+        is_available: list.is_available ?? true,
+        item_type: list.item_type ?? "regular_food",
     };
 };
 
@@ -89,6 +109,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "Mixture",
         quantity_for_9: "Mixture",
         quantity_for_10: "Mixture",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -124,6 +146,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_10: "12",
         notes_for_10:
             "Please pack egg box into a packing box and not a bag to avoid potential humpty dumpties during delivery",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -141,6 +165,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "1",
         quantity_for_9: "1",
         quantity_for_10: "1",
+        is_available: true,
+        item_type: "hygiene_product",
     },
 
     {
@@ -163,6 +189,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "2 bags of 4 pods",
         quantity_for_10: "8 pods",
         notes_for_10: "2 bags of 4 pods",
+        is_available: false,
+        item_type: "hygiene_product",
     },
 
     {
@@ -186,6 +214,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "Please ask if unsure",
         quantity_for_10: "As Required",
         notes_for_10: "Please ask if unsure",
+        is_available: true,
+        item_type: "baby_product",
     },
 
     {
@@ -200,6 +230,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "1 bag",
         quantity_for_9: "1 bag",
         quantity_for_10: "1 bag",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -225,6 +257,35 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "Not always in stock",
         quantity_for_10: "3",
         notes_for_10: "Not always in stock",
+        is_available: false,
+        item_type: "regular_food",
+    },
+
+    {
+        item_name: "Gluten Free Bread",
+        row_order: 7,
+        quantity_for_1: "1",
+        notes_for_1: "Not always in stock",
+        quantity_for_2: "1",
+        notes_for_2: "Not always in stock",
+        quantity_for_3: "1",
+        notes_for_3: "Not always in stock",
+        quantity_for_4: "2",
+        notes_for_4: "Not always in stock",
+        quantity_for_5: "2",
+        notes_for_5: "Not always in stock",
+        quantity_for_6: "2",
+        notes_for_6: "Not always in stock",
+        quantity_for_7: "3",
+        notes_for_7: "Not always in stock",
+        quantity_for_8: "3",
+        notes_for_8: "Not always in stock",
+        quantity_for_9: "3",
+        notes_for_9: "Not always in stock",
+        quantity_for_10: "3",
+        notes_for_10: "Not always in stock",
+        is_available: true,
+        item_type: "alternative_food",
     },
 
     {
@@ -240,6 +301,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "pre-made box",
         quantity_for_9: "pre-made box",
         quantity_for_10: "pre-made box",
+        is_available: true,
+        item_type: "pet_food",
     },
 
     {
@@ -255,6 +318,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "2 large boxes cereals",
         quantity_for_9: "2 large boxes cereal",
         quantity_for_10: "2 large boxes cereal include one supersize if around.",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -280,6 +345,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "if neither listed, give tea",
         quantity_for_10: "120 teabags/large jar",
         notes_for_10: "if neither listed, give tea",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -305,6 +372,42 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "3 full fat or skimmed",
         quantity_for_10: "4",
         notes_for_10: "3 full fat or skimmed",
+        is_available: false,
+        item_type: "regular_food",
+    },
+
+    {
+        item_name: "Almond Milk",
+        row_order: 11,
+        quantity_for_1: "1 Litre",
+        quantity_for_2: "1 Litre",
+        quantity_for_3: "2",
+        quantity_for_4: "2",
+        quantity_for_5: "2",
+        quantity_for_6: "3",
+        quantity_for_7: "3",
+        quantity_for_8: "3",
+        quantity_for_9: "4",
+        quantity_for_10: "4",
+        is_available: true,
+        item_type: "alternative_food",
+    },
+
+    {
+        item_name: "Oat Milk",
+        row_order: 11,
+        quantity_for_1: "1 Litre",
+        quantity_for_2: "1 Litre",
+        quantity_for_3: "2",
+        quantity_for_4: "2",
+        quantity_for_5: "2",
+        quantity_for_6: "3",
+        quantity_for_7: "3",
+        quantity_for_8: "3",
+        quantity_for_9: "4",
+        quantity_for_10: "4",
+        is_available: true,
+        item_type: "alternative_food",
     },
 
     {
@@ -330,6 +433,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "Fruit Juice",
         quantity_for_10: "2",
         notes_for_10: "Fruit Juice",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -347,6 +452,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "1 large bottle (if no squash use fruit juice)",
         quantity_for_10: "1",
         notes_for_10: "1 large bottle (if no squash use fruit juice)",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -363,6 +470,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "10",
         quantity_for_9: "10",
         quantity_for_10: "10",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -387,6 +496,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "3 carrots",
         quantity_for_10: "5",
         notes_for_10: "3 carrots",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -402,6 +513,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "4",
         quantity_for_9: "4",
         quantity_for_10: "4",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -413,6 +526,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "1 bag",
         quantity_for_9: "1 bag",
         quantity_for_10: "1 bag",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -428,6 +543,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "8",
         quantity_for_9: "9",
         quantity_for_10: "10",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -443,6 +560,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "3",
         quantity_for_9: "3",
         quantity_for_10: "3",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -468,6 +587,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "Mixture",
         quantity_for_10: "8",
         notes_for_10: "Mixture",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -483,6 +604,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "6",
         quantity_for_9: "6",
         quantity_for_10: "7",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -508,6 +631,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "If client is veggie",
         quantity_for_10: "6",
         notes_for_10: "If client is veggie",
+        is_available: true,
+        item_type: "alternative_food",
     },
 
     {
@@ -523,6 +648,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "3",
         quantity_for_9: "3",
         quantity_for_10: "3",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -542,6 +669,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "4",
         quantity_for_9: "4",
         quantity_for_10: "4",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -557,6 +686,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "4",
         quantity_for_9: "4",
         quantity_for_10: "4",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -572,6 +703,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "2",
         quantity_for_9: "2",
         quantity_for_10: "2",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -584,6 +717,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "1",
         quantity_for_9: "1",
         quantity_for_10: "1",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -599,6 +734,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "3kg",
         quantity_for_9: "3kg",
         quantity_for_10: "4kg",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -626,6 +763,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "Only if requested in dietary info, use big bag if available",
         quantity_for_10: "2kg plus",
         notes_for_10: "Only if requested in dietary info, use big bag if available",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -633,6 +772,8 @@ const listsSeed: SnapletList[] = [
         row_order: 30,
         quantity_for_1: "2",
         notes_for_1: "Only if no cooking facilities",
+        is_available: false,
+        item_type: "alternative_food",
     },
 
     {
@@ -645,6 +786,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "2",
         quantity_for_9: "2",
         quantity_for_10: "2",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -660,6 +803,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "1",
         quantity_for_9: "1",
         quantity_for_10: "1",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -675,6 +820,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "1",
         quantity_for_9: "2",
         quantity_for_10: "2",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -698,6 +845,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "If very large tins please cut back",
         quantity_for_10: "4",
         notes_for_10: "If very large tins please cut back",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -713,6 +862,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "8",
         quantity_for_9: "9",
         quantity_for_10: "10",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -728,6 +879,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "2",
         quantity_for_9: "2",
         quantity_for_10: "2",
+        is_available: false,
+        item_type: "regular_food",
     },
 
     {
@@ -743,6 +896,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "3",
         quantity_for_9: "4",
         quantity_for_10: "4",
+        is_available: true,
+        item_type: "regular_food",
     },
 
     {
@@ -766,6 +921,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "as required. Add panty liners as well.",
         quantity_for_10: "1 pack per person",
         notes_for_10: "as required. Add panty liners as well.",
+        is_available: true,
+        item_type: "hygiene_product",
     },
 
     {
@@ -789,6 +946,8 @@ const listsSeed: SnapletList[] = [
         notes_for_9: "If required. Add panty liners as well.",
         quantity_for_10: "2 packs per person",
         notes_for_10: "If required. Add panty liners as well.",
+        is_available: false,
+        item_type: "hygiene_product",
     },
 
     {
@@ -804,6 +963,8 @@ const listsSeed: SnapletList[] = [
         quantity_for_8: "3",
         quantity_for_9: "3",
         quantity_for_10: "3",
+        is_available: true,
+        item_type: "hygiene_product",
     },
 
     {
