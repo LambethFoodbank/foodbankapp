@@ -93,14 +93,14 @@ const filterRowByAvailability = <Data,>(row: Data, state: string, rowKey?: keyof
         return true;
     }
     const desired = state === "true";
-    return (row as never)[rowKey] === desired;
+    return row[rowKey] === desired;
 };
 
 const filterRowByItemTypes = <Data,>(row: Data, state: string[], rowKey?: keyof Data): boolean => {
     if (!rowKey || state.length === 0) {
         return true;
     }
-    const value = (row as never)[rowKey] as string | undefined;
+    const value = row[rowKey] as string | undefined;
     if (value === undefined || value === null) {
         return false;
     }
@@ -139,11 +139,10 @@ const filters: ListFilter[] = [
         key: "itemType",
         rowKey: "item_type",
         filterLabel: "Item Type",
-        itemLabelsAndKeys: [
-            ...Object.entries(itemTypeLabels).map(
-                ([key, label]) => [label, key] as [string, string]
-            ),
-        ],
+        itemLabelsAndKeys: Object.entries(itemTypeLabels).map(([key, label]): [string, string] => [
+            label,
+            key,
+        ]),
         initialCheckedKeys: [],
         method: filterRowByItemTypes,
     }),

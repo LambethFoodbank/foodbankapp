@@ -37,8 +37,23 @@ interface ClientSideChecklistFilterProps<Data> {
     isHiddenInUrl?: boolean;
 }
 
-const areStringArrayStatesIdentical = (stateA: string[], stateB: string[]): boolean =>
-    stateA.length === stateB.length && stateA.every((optionA) => stateB.includes(optionA));
+const areStringArrayStatesIdentical = (stateA: string[], stateB: string[]): boolean => {
+    if (!stateA || !stateB) {
+        return stateA === stateB;
+    }
+
+    if (stateA.length !== stateB.length) {
+        return false;
+    }
+
+    if (stateA.length === 0) {
+        return true;
+    }
+
+    const sortedA = [...stateA].sort();
+    const sortedB = [...stateB].sort();
+    return sortedA.every((val, idx) => val === sortedB[idx]);
+};
 
 const generateChecklistUrlParam = (
     key: string,

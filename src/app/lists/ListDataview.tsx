@@ -121,10 +121,7 @@ const listDataViewColumnDisplayFunctions = {
     is_available: (value: boolean) => displayBoolean(value),
     item_type: (value: ItemType) => itemTypeLabels[value] ?? value,
     ...Object.fromEntries(
-        listsHeaderKeysAndLabels
-            .slice(1)
-            .filter(([key]) => !["is_available", "item_type"].includes(key))
-            .map(([key]) => [key, displayQuantityAndNotes])
+        listsHeaderKeysAndLabels.slice(3).map(([key]) => [key, displayQuantityAndNotes])
     ),
 } satisfies ColumnDisplayFunctions<ListRow>;
 
