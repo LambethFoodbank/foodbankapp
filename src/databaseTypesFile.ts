@@ -958,6 +958,7 @@ export type Database = {
           is_active: boolean | null
           is_deliverable: boolean | null
           phone_number: string | null
+          sorted_address_postcode: string | null
         }
         Relationships: []
       }
@@ -1106,6 +1107,12 @@ export type Database = {
           id2: string
         }
         Returns: undefined
+      }
+      sort_address_postcode: {
+        Args: {
+          pc: string
+        }
+        Returns: string
       }
       swap_two_wiki_rows: {
         Args: {
