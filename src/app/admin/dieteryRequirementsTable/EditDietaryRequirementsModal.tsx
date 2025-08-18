@@ -41,6 +41,28 @@ type DietaryRequirementsTableRow = BaseDietaryRequirements & {
     id: string;
 };
 
+function checkArraysAreEqual(
+    firstArray: (string | null)[],
+    secondArray: (string | null)[]
+): boolean {
+    if (firstArray.length !== secondArray.length) {
+        return false;
+    }
+
+    const firstArrayCopy = [...firstArray];
+    const secondArrayCopy = [...secondArray];
+
+    firstArrayCopy.sort();
+    secondArrayCopy.sort();
+
+    for (let index = 0; index < firstArrayCopy.length; index++) {
+        if (firstArrayCopy[index] !== secondArrayCopy[index]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose }) => {
     const [items, setItems] = useState<DietaryRequirementsPlusTableRow[]>([]);
     const [selectedType, setSelectedType] = useState<keyof BaseDietaryRequirements>("halal");
@@ -154,24 +176,6 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         void fetchData(selectedType);
     };
-
-    function checkArraysAreEqual(
-        firstArray: (string | null)[],
-        secondArray: (string | null)[]
-    ): boolean {
-        if (firstArray.length !== secondArray.length) {
-            return false;
-        }
-        firstArray.sort();
-        secondArray.sort();
-
-        for (let index = 0; index < firstArray.length; index++) {
-            if (firstArray[index] !== secondArray[index]) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     const handleToggle = (id: string | null, type: "included" | "excluded"): void => {
         let toggleList = type === "included" ? newIncluded : newExcluded;
