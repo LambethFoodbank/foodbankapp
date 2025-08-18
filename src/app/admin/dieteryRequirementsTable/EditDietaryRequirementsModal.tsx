@@ -43,7 +43,7 @@ type DietaryRequirementsTableRow = BaseDietaryRequirements & {
 
 export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose }) => {
     const [items, setItems] = useState<DietaryRequirementsPlusTableRow[]>([]);
-    const [selectedType, setSelectedType] = useState<string>("halal");
+    const [selectedType, setSelectedType] = useState<keyof BaseDietaryRequirements>("halal");
     const [initialIncluded, setInitialIncluded] = useState<(string | null)[]>([]);
     const [initialExcluded, setInitialExcluded] = useState<(string | null)[]>([]);
     const [newIncluded, setNewIncluded] = useState<(string | null)[]>([]);
@@ -104,19 +104,21 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         }
     }, [warningSaveMessage]);
 
+    const hasItemStatusChanged = (item: DietaryRequirementsPlusTableRow): boolean => {
+        if (!item.id) {
+            return false;
+        }
+
+        const wasIncluded = initialIncluded.includes(item.id);
+        const wasExcluded = initialExcluded.includes(item.id);
+        const isNowIncluded = newIncluded.includes(item.id);
+        const isNowExcluded = newExcluded.includes(item.id);
+
+        return wasIncluded !== isNowIncluded || wasExcluded !== isNowExcluded;
+    };
+
     const handleSubmit = async (): Promise<void> => {
-        const changedItems = items.filter((item) => {
-            if (!item.id) {
-                return false;
-            }
-
-            const wasIncluded = initialIncluded.includes(item.id);
-            const wasExcluded = initialExcluded.includes(item.id);
-            const isNowIncluded = newIncluded.includes(item.id);
-            const isNowExcluded = newExcluded.includes(item.id);
-
-            return wasIncluded !== isNowIncluded || wasExcluded !== isNowExcluded;
-        });
+        const changedItems = items.filter((item) => hasItemStatusChanged(item));
 
         if (changedItems.length === 0) {
             setHasChanges(false);
@@ -201,7 +203,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         }
     };
 
-    const handleTypeChange = (newType: string): void => {
+    const handleTypeChange = (newType: keyof BaseDietaryRequirements): void => {
         if (hasChanges && !wasSaved) {
             return;
         }
@@ -233,7 +235,9 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                 <Select
                     fullWidth
                     value={selectedType}
-                    onChange={(event) => handleTypeChange(event.target.value)}
+                    onChange={(event) =>
+                        handleTypeChange(event.target.value as keyof BaseDietaryRequirements)
+                    }
                 >
                     {dietaryRequirementTypes.map((dietary) => (
                         <MenuItem key={dietary.key} value={dietary.key}>

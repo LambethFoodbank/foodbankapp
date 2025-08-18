@@ -12,7 +12,7 @@ import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionSta
 import FloatingToast from "@/components/FloatingToast";
 import supabase from "@/supabaseClient";
 import { Button } from "@mui/material";
-import { EditDietaryRequirementsModal } from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsForm";
+import { EditDietaryRequirementsModal } from "@/app/admin/dieteryRequirementsTable/EditDietaryRequirementsModal";
 
 const DietaryRequirementsTable: React.FC = () => {
     const [rows, setRows] = useState<DietaryRequirementsTableRow[]>([]);
@@ -45,13 +45,7 @@ const DietaryRequirementsTable: React.FC = () => {
                 getDietaryRequirementsForTable
             )
             .subscribe((status, error) => {
-                if (
-                    subscriptionStatusRequiresErrorMessage(
-                        status,
-                        error,
-                        "dietary_requirements_plus"
-                    )
-                ) {
+                if (subscriptionStatusRequiresErrorMessage(status, error, "dietary_requirements")) {
                     setErrorMessage("Error fetching data, please reload");
                 } else {
                     setErrorMessage(null);
