@@ -62,7 +62,8 @@ export const updateDbWebsiteData = async (
         .from("website_data")
         .update({ value: processedData.value }, { count: "exact" })
         .eq("name", processedData.name)
-        .eq("last_updated", oldTimestamp);
+        .eq("last_updated", oldTimestamp)
+        .select();
 
     const auditLog = {
         action: "update website data",
