@@ -39,7 +39,6 @@ type UpdateField = "packingDate" | "packingSlot";
 export const packingDateOrSlotUpdate = async (
     updateField: UpdateField,
     packingDateOrSlotData: string,
-    // parcel: ParcelsTableRow
     parcel: ParcelsTableRowWithOriginalLastUpdated
 ): Promise<{
     parcelId: string | null;
