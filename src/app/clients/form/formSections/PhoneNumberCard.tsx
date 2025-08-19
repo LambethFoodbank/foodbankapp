@@ -6,6 +6,7 @@ import {
     getDefaultTextValue,
     onChangeText,
     onChangeAdditionalFields,
+    getErrorType,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
@@ -39,7 +40,21 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         if (phoneNumbers.length !== expectedLength) {
             setPhoneNumbers(Array.from({ length: expectedLength }, (_, index) => ({ id: index })));
         }
-    }, [fields.additionalPhoneNumbers?.length]);
+    }, [fields.additionalPhoneNumbers?.length]); //eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        const indexToRemove = fields.additionalPhoneNumbers?.indexOf("");
+        if (indexToRemove != -1 && indexToRemove !== undefined) {
+            const timer = setTimeout(() => {
+                phoneNumbers.splice(indexToRemove, 1);
+                const updatedAdditionalPhones = [...(fields.additionalPhoneNumbers || [])];
+                updatedAdditionalPhones.splice(indexToRemove, 1);
+                fieldSetter({ additionalPhoneNumbers: updatedAdditionalPhones });
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [fields.additionalPhoneNumbers]); //eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (errorMessage) {
@@ -51,12 +66,13 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         }
     }, [errorMessage]);
 
-    const handleAddPhoneNumber = () => {
+    const handleAddPhoneNumber = (): void => {
         const newId = phoneNumbers.length - 1;
         if (newId > 0) {
             if (
+                fields?.additionalPhoneNumbers &&
                 fields?.additionalPhoneNumbers[newId - 1] !== undefined &&
-                fields.additionalPhoneNumbers[newId - 1].length > 0
+                fields.additionalPhoneNumbers[newId - 1].length > 1
             ) {
                 setPhoneNumbers([...phoneNumbers, { id: newId }]);
             } else {
@@ -65,7 +81,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                 );
             }
         } else {
-            if (fields.phoneNumber?.length > 0) {
+            if (fields.phoneNumber && fields.phoneNumber?.length > 0) {
                 setPhoneNumbers([...phoneNumbers, { id: newId }]);
             } else {
                 setErrorMessage(
@@ -75,7 +91,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         }
     };
 
-    const handleRemovePhoneNumber = (indexToRemove: number) => {
+    const handleRemovePhoneNumber = (indexToRemove: number): void => {
         setPhoneNumbers((prevPhoneNumbers) =>
             prevPhoneNumbers.filter((_, index) => index !== indexToRemove)
         );
@@ -84,7 +100,18 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         updatedAdditionalPhones.splice(indexToRemove - 1, 1);
 
         fieldSetter({ additionalPhoneNumbers: updatedAdditionalPhones });
+        const errorType = getErrorType(
+            "phoneNumber",
+            phoneNumberIsRequired,
+            phoneNumberRegex,
+            undefined,
+            undefined,
+            fields.additionalPhoneNumbers,
+            fields.phoneNumber
+        );
+        errorSetter({ ["phoneNumber"]: errorType });
     };
+
     return (
         <GenericFormCard
             title="Phone Number"
