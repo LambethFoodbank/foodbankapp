@@ -1289,20 +1289,6 @@
           "maxLength": null
         },
         {
-          "id": "public.clients.additional_phone_numbers",
-          "name": "additional_phone_numbers",
-          "columnName": "additional_phone_numbers",
-          "type": "text[]",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.clients.email",
           "name": "email",
           "columnName": "email",
@@ -1313,6 +1299,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.clients.additional_phone_numbers",
+          "name": "additional_phone_numbers",
+          "columnName": "additional_phone_numbers",
+          "type": "text[]",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },

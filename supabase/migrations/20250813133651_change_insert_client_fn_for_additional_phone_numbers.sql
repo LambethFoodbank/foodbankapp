@@ -11,6 +11,7 @@ BEGIN
 INSERT INTO clients (
     full_name,
     phone_number,
+    email,
     address_1,
     address_2,
     address_town,
@@ -39,6 +40,7 @@ INSERT INTO clients (
 VALUES (
            clientRecord->>'full_name',
            clientRecord->>'phone_number',
+           clientRecord->>'email',
            clientRecord->>'address_1',
            clientRecord->>'address_2',
            clientRecord->>'address_town',

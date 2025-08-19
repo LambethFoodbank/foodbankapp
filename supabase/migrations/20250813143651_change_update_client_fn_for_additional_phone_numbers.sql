@@ -13,6 +13,7 @@ UPDATE clients
 SET
     full_name = clientRecord->>'full_name',
     phone_number = clientRecord->>'phone_number',
+    email = clientRecord->>'email',
     address_1 = clientRecord->>'address_1',
     address_2 = clientRecord->>'address_2',
     address_town = clientRecord->>'address_town',

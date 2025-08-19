@@ -23,14 +23,15 @@ select
     parcels_events.last_event_data as last_status_event_data,
     parcels_events.last_event_timestamp as last_status_timestamp,
     parcels_events.last_event_workflow_order as last_status_workflow_order,
+    parcels_events.last_event_is_successfully_completed as last_status_is_successfully_completed,
     parcels_events.all_events,
     clients.delivery_instructions as client_delivery_instructions,
     parcels.list_type,
-    parcels.notes as parcel_notes,
     parcels.referral_agency,
     parcels.referrer_name,
     parcels.referrer_email,
     parcels.referrer_phone,
+    clients.email as client_email,
     array_to_string(clients.additional_phone_numbers, ', ') as client_additional_phone_numbers_text
 from parcels
          left join collection_centres on parcels.collection_centre = collection_centres.primary_key
