@@ -78,7 +78,11 @@ const getRawClientDetails = async (clientId: string) => {
 };
 
 export const familyCountToFamilyCategory = (count: number): string => {
-    if (count <= 1) {
+    if (count == 0) {
+        return "No family";
+    }
+
+    if (count == 1) {
         return "Single";
     }
 
