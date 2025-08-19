@@ -24,7 +24,6 @@ const getSignpostingParcelIdsAndStatus = async (
         .select("parcel_id, last_status_event_name")
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
-        .eq("client_is_active", true)
         .not("parcel_id", "is", null)
         .eq("client_signposting_call_required", true);
 

@@ -19,7 +19,6 @@ const getSelectedParcelsParcelIdsAndStatus = async (
     const { data: idAndStatusList, error: idFetchError } = await supabase
         .from("parcels_plus")
         .select("parcel_id, last_status_event_name")
-        .eq("client_is_active", true)
         .not("parcel_id", "is", null)
         .in("parcel_id", parcelIds);
 

@@ -25,7 +25,6 @@ const getPendingMoreInfoParcelIdsAndStatus = async (
         .gte("packing_date", getDbDate(fromDate))
         .lte("packing_date", getDbDate(toDate))
         .eq("last_status_event_name", "Pending More Info")
-        .eq("client_is_active", true)
         .not("parcel_id", "is", null);
 
     if (idFetchError) {
@@ -59,7 +58,6 @@ const getPendingMoreInfoRawParcelList = async (
             "primary_key",
             idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
-        .eq("client.is_active", true)
         .order("packing_date")
         .order("client_id");
 
