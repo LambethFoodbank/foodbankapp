@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
@@ -54,6 +54,17 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
     fieldSetter,
     fields,
 }) => {
+    useEffect(() => {
+        if (fields.numberOfAdults > fields.adults.length) {
+            const newAdults = [...fields.adults];
+            while (newAdults.length < fields.numberOfAdults) {
+                newAdults.push({});
+            }
+            fieldSetter({ adults: newAdults });
+        } else if (fields.numberOfAdults < fields.adults.length) {
+            fieldSetter({ adults: fields.adults.slice(0, fields.numberOfAdults) });
+        }
+    }, [fields.numberOfAdults, fields.adults, fieldSetter]);
     return (
         <GenericFormCard
             title="Number of Adults"
@@ -77,6 +88,9 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                     })}
                 />
                 {fields.adults.map((adult: Person, index: number) => {
+                    if (index >= fields.numberOfAdults) {
+                        return null;
+                    }
                     return (
                         <StyledCard key={adult.primaryKey ?? `new-adult-${index}`}>
                             <FormText>Adult {index + 1}</FormText>

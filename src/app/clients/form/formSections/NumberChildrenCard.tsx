@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
@@ -59,6 +59,17 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
     fieldSetter,
     fields,
 }) => {
+    useEffect(() => {
+        if (fields.numberOfChildren > fields.children.length) {
+            const newChildren = [...fields.children];
+            while (newChildren.length < fields.numberOfChildren) {
+                newChildren.push({});
+            }
+            fieldSetter({ children: newChildren });
+        } else if (fields.numberOfChildren < fields.children.length) {
+            fieldSetter({ children: fields.children.slice(0, fields.numberOfChildren) });
+        }
+    }, [fields.numberOfChildren, fields.children, fieldSetter]);
     return (
         <GenericFormCard
             title="Number of Children"
@@ -84,6 +95,9 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                     })}
                 />
                 {fields.children.map((child: Person, index: number) => {
+                    if (index >= fields.numberOfChildren) {
+                        return null;
+                    }
                     return (
                         <StyledCard key={child.primaryKey ?? `new-child-${index}`}>
                             <FormText>Child {index + 1}</FormText>
