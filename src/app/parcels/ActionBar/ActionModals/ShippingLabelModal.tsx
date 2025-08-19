@@ -1,5 +1,7 @@
 "use client";
 
+import { getDeletedClientParcelsCount } from "@/app/parcels/ActionBar/ActionModals/getNumberOfDeletedClientParcels";
+import DeletedClientParcelsDownloadWarning from "@/app/parcels/ActionBar/DeletedClientParcelsDownloadWarning";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import GeneralActionModal, {
     Heading,
@@ -31,6 +33,7 @@ interface ContentProps {
     onPdfCreationFailed: (pdfError: ShippingLabelError) => void;
     onLabelQuantityChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     duplicateDownloadedPostcodes: (string | null)[];
+    deletedClientParcelsCount: number;
 }
 
 const ShippingLabelsInput = React.forwardRef<HTMLInputElement, ShippingLabelsInputProps>(
@@ -67,6 +70,9 @@ const getPdfErrorMessage = (error: ShippingLabelError): string => {
             errorMessage =
                 "No collection centre in the database matches that of the selected parcel.";
             break;
+        case "noActiveParcels":
+            errorMessage = "All selected parcels belong to deleted clients.";
+            break;
     }
     return `${errorMessage} LogId: ${error.logId}`;
 };
@@ -79,6 +85,7 @@ const ShippingLabelModalContent: React.FC<ContentProps> = ({
     onPdfCreationFailed,
     onLabelQuantityChange,
     duplicateDownloadedPostcodes,
+    deletedClientParcelsCount,
 }) => {
     const quantityInputFocusRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +103,11 @@ const ShippingLabelModalContent: React.FC<ContentProps> = ({
                 parcels={selectedParcels}
                 maxParcelsToShow={maxParcelsToShow}
             />
+            {deletedClientParcelsCount > 0 && (
+                <DeletedClientParcelsDownloadWarning
+                    deletedClientParcelsCount={deletedClientParcelsCount}
+                />
+            )}
             {duplicateDownloadedPostcodes.length > 0 && (
                 <DuplicateDownloadWarning postcodes={duplicateDownloadedPostcodes} />
             )}
@@ -120,6 +132,7 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
     const [duplicateDownloadedPostcodes, setDuplicateDownloadedPostcodes] = useState<
         (string | null)[]
     >([]);
+    const [deletedClientParcelsCount, setDeletedClientParcelsCount] = useState<number>(0);
 
     const onLabelQuantityChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -191,6 +204,10 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
         );
     }, [parcelIds]);
 
+    useEffect(() => {
+        void getDeletedClientParcelsCount(parcelIds, setDeletedClientParcelsCount, setErrorMessage);
+    }, [parcelIds]);
+
     return (
         <GeneralActionModal
             {...props}
@@ -207,6 +224,7 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
                     onPdfCreationFailed={onPdfCreationFailed}
                     onLabelQuantityChange={onLabelQuantityChange}
                     duplicateDownloadedPostcodes={duplicateDownloadedPostcodes}
+                    deletedClientParcelsCount={deletedClientParcelsCount}
                 />
             )}
         </GeneralActionModal>
