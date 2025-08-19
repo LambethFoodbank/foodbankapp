@@ -79,7 +79,6 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
 
     const cancelWikiItemEdit = async (): Promise<void> => {
         setErrorMessage("");
-        setIsInEditMode(false);
         !rowData.title && !rowData.content ? deleteWikiItem() : setIsInEditMode(false);
 
         try {
