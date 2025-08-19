@@ -19,9 +19,8 @@ const DeletedClientParcelsDownloadWarning: React.FC<DeletedClientParcelsDownload
 
     return (
         <StyledAlert severity="warning">
-            {deletedClientParcelsCount} deleted client{" "}
-            {deletedClientParcelsCount === 1 ? "parcel" : "parcels"} will not be included in this
-            download.
+            {deletedClientParcelsCount} {deletedClientParcelsCount === 1 ? "parcel" : "parcels"}{" "}
+            associated with deleted clients will be excluded from this action.
         </StyledAlert>
     );
 };

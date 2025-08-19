@@ -45,7 +45,11 @@ type ParcelsForDeliveryResponse =
           error: { type: ParcelsForDeliveryErrorType; logId: string };
       };
 
-type ParcelsForDeliveryErrorType = "parcelFetchFailed" | "noMatchingClient" | "noCollectionCentre";
+type ParcelsForDeliveryErrorType =
+    | "parcelFetchFailed"
+    | "noMatchingClient"
+    | "noCollectionCentre"
+    | "noActiveParcels";
 
 type DriverPdfResponse =
     | {
@@ -82,6 +86,7 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
 
     const dataWithNonNullClients: ParcelForDelivery[] = [];
     for (const parcel of data) {
+        // do we still need to check for null clients?
         if (parcel.client === null) {
             const logId = await logErrorReturnLogId(
                 "Error with fetch: Parcels. No matching client found"
@@ -94,6 +99,10 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
                 "Error with fetch: Parcels. No collection centre found"
             );
             return { data: null, error: { type: "noCollectionCentre", logId: logId } };
+        }
+
+        if (!parcel.client.is_active) {
+            continue;
         }
 
         const sortedParcelEvents = parcel.events.sort((event1, event2) => {
@@ -118,6 +127,11 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
             collection_centre: parcel.collection_centre,
             labelCount: Number.isNaN(labelCount) ? null : labelCount,
         });
+    }
+
+    if (dataWithNonNullClients.length === 0) {
+        const logId = await logErrorReturnLogId("All selected parcels belong to deleted clients.");
+        return { data: null, error: { type: "noActiveParcels", logId: logId } };
     }
 
     return { data: dataWithNonNullClients, error: null };
