@@ -76,10 +76,11 @@ export const getErrorType = (
     index?: number
 ): Errors => {
     console.log(primaryPhoneNumber);
+    console.log(currentAdditionalPhoneNumbers);
     if (
         currentAdditionalPhoneNumbers &&
         currentAdditionalPhoneNumbers.length > 0 &&
-        input == "" &&
+        input === "" &&
         index === undefined
     ) {
         return Errors.emptyPrimaryPhoneNumber;
@@ -132,7 +133,6 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
     index: number,
     options?: OnChangeTextOptions<SpecificFields>
 ): SelectChangeEventHandler => {
-    console.log("Format optiuni:" + options?.additionalCondition);
     return (event) => {
         const input = event.target.value;
         const errorType = getErrorType(
@@ -157,10 +157,9 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
 
             const updatedArray = [...(currentAdditionalPhoneNumbers || [])];
             updatedArray[index] = newValue as string;
-                fieldSetter({ [key]: updatedArray } as {
-                    [key in keyof SpecificFields]: SpecificFields[key];
-                });
-
+            fieldSetter({ [key]: updatedArray } as {
+                [key in keyof SpecificFields]: SpecificFields[key];
+            });
         }
     };
 };

@@ -6,7 +6,6 @@ import {
     getDefaultTextValue,
     onChangeText,
     onChangeAdditionalFields,
-    getErrorType,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
@@ -100,16 +99,6 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         updatedAdditionalPhones.splice(indexToRemove - 1, 1);
 
         fieldSetter({ additionalPhoneNumbers: updatedAdditionalPhones });
-        const errorType = getErrorType(
-            "phoneNumber",
-            phoneNumberIsRequired,
-            phoneNumberRegex,
-            undefined,
-            undefined,
-            fields.additionalPhoneNumbers,
-            fields.phoneNumber
-        );
-        errorSetter({ ["phoneNumber"]: errorType });
     };
 
     return (
@@ -131,11 +120,18 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                 defaultValue={getDefaultTextValue(fields, "phoneNumber")}
                                 error={errorExists(formErrors.phoneNumber)}
                                 helperText={getErrorText(formErrors.phoneNumber)}
-                                onChange={onChangeText(fieldSetter, errorSetter, "phoneNumber", {
-                                    required: phoneNumberIsRequired,
-                                    regex: phoneNumberRegex,
-                                    formattingFunction: formatPhoneNumber,
-                                })}
+                                onChange={onChangeText(
+                                    fieldSetter,
+                                    errorSetter,
+                                    "phoneNumber",
+                                    {
+                                        required: phoneNumberIsRequired,
+                                        regex: phoneNumberRegex,
+                                        formattingFunction: formatPhoneNumber,
+                                    },
+                                    fields.additionalPhoneNumbers,
+                                    fields.phoneNumber
+                                )}
                             />
                         )}
                         {index >= 1 && (
