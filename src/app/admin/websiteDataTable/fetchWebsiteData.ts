@@ -77,7 +77,7 @@ export const updateDbWebsiteData = async (
         return { error: { type: "failedToUpdateWebsiteData", logId } };
     }
 
-    if (count == 0) {
+    if (count == 0 || !processedData || processedData.value.length === 0) {
         const logId = await logErrorReturnLogId("Concurrent editing of website data");
         void sendAuditLog({ ...auditLog, wasSuccess: false, logId });
         return { error: { type: "concurrentEditWebsiteData", logId } };
