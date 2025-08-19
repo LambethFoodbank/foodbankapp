@@ -117,7 +117,6 @@ const getShoppingListDataForSingleParcel = async (
     const clientData = clientAndFamilyData.clientData;
 
     if (!clientData.is_active) {
-        // Instead of returning an error, skip this parcel by returning { data: null, error: null }
         return { data: null, error: null };
     }
 
