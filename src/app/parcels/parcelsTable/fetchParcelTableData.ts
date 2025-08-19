@@ -282,6 +282,45 @@ export const fetchParcelStatuses = async (): Promise<ParcelStatusesReturnType> =
     return { data: parcelStatusesList, error: null };
 };
 
+export const getInactiveClientCountByParcelIds = async (
+    parcelIds: string[]
+): Promise<{
+    data: number | null;
+    error: { type: string; logId: string } | null;
+}> => {
+    if (!parcelIds.length) {
+        return { data: 0, error: null };
+    }
+
+    const { data, error } = await supabase
+        .from("parcels")
+        .select("primary_key, client_id, client:clients(is_active)")
+        .in("primary_key", parcelIds);
+
+    if (error) {
+        const message = "Failed to fetch client IDs and is active status for parcels";
+        const logId = await logErrorReturnLogId(message, { error, parcelIds });
+        return { data: null, error: { type: "failedClientIdsAndIsActiveFetch", logId } };
+    }
+
+    const validParcels = data.filter((parcel) => parcel.client !== null);
+
+    if (validParcels.length !== data.length) {
+        const nullClientParcelIds = data
+            .filter((parcel) => parcel.client === null)
+            .map((parcel) => parcel.primary_key);
+
+        await logInfoReturnLogId("Some parcels have no matching clients", { nullClientParcelIds });
+    }
+
+    const inactiveClientCount = validParcels.filter((parcel) => !parcel?.client?.is_active).length;
+
+    return {
+        data: inactiveClientCount,
+        error: null,
+    };
+};
+
 export const getClientIdAndIsActive = async (parcelId: string): Promise<FetchClientIdResult> => {
     const { data, error } = await supabase
         .from("parcels")

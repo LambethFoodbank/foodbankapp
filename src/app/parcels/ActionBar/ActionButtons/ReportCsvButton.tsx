@@ -15,7 +15,7 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { formatDatetimeAsDate } from "@/common/format";
+import { displayNameForDeletedClient, formatDatetimeAsDate } from "@/common/format";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import CsvButton, {
     formatNumberAsStringForCsv,
@@ -264,7 +264,7 @@ const createReportRow = (
     } else {
         return {
             ...baseRow,
-            fullName: "Deleted Client",
+            fullName: displayNameForDeletedClient,
             signpostingCallRequired: false,
             flaggedForAttention: false,
             phoneNumber: "",

@@ -1,5 +1,6 @@
 "use client";
 
+import { getDeletedClientParcelsCount } from "@/app/parcels/ActionBar/ActionModals/getNumberOfDeletedClientParcels";
 import React, { useEffect, useState } from "react";
 import GeneralActionModal, { ActionModalProps, maxParcelsToShow } from "./GeneralActionModal";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
@@ -11,12 +12,14 @@ import DuplicateDownloadWarning from "@/app/parcels/ActionBar/DuplicateDownloadW
 import { getDuplicateDownloadedPostcodes } from "@/app/parcels/ActionBar/ActionModals/getDuplicateDownloadedPostcodes";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 import { saveParcelTableRowsStatus } from "../saveStatus";
+import DeletedClientParcelsDownloadWarning from "@/app/parcels/ActionBar/DeletedClientParcelsDownloadWarning";
 
 interface ContentProps {
     selectedParcels: ParcelsTableRow[];
     onPdfCreationCompleted: () => void;
     onPdfCreationFailed: (pdfError: ShoppingListPdfError) => void;
     duplicateDownloadedPostcodes: (string | null)[];
+    deletedClientParcelsCount: number;
 }
 
 const getPdfErrorMessage = (error: ShoppingListPdfError): string => {
@@ -48,7 +51,7 @@ const getPdfErrorMessage = (error: ShoppingListPdfError): string => {
             errorMessage = "Invalid family size for shopping list PDF.";
             break;
         case "inactiveClient":
-            errorMessage = "One or more selected parcels belong to inactive clients.";
+            errorMessage = "All selected parcels belong to deleted clients.";
             break;
     }
     return `${errorMessage} LogId: ${error.logId}`;
@@ -57,6 +60,7 @@ const getPdfErrorMessage = (error: ShoppingListPdfError): string => {
 const ShoppingListModalContent: React.FC<ContentProps> = ({
     selectedParcels,
     duplicateDownloadedPostcodes,
+    deletedClientParcelsCount,
     onPdfCreationCompleted,
     onPdfCreationFailed,
 }) => {
@@ -66,6 +70,11 @@ const ShoppingListModalContent: React.FC<ContentProps> = ({
                 parcels={selectedParcels}
                 maxParcelsToShow={maxParcelsToShow}
             />
+            {deletedClientParcelsCount > 0 && (
+                <DeletedClientParcelsDownloadWarning
+                    deletedClientParcelsCount={deletedClientParcelsCount}
+                />
+            )}
             {duplicateDownloadedPostcodes.length > 0 && (
                 <DuplicateDownloadWarning postcodes={duplicateDownloadedPostcodes} />
             )}
@@ -85,6 +94,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
     const [duplicateDownloadedPostcodes, setDuplicateDownloadedPostcodes] = useState<
         (string | null)[]
     >([]);
+    const [deletedClientParcelsCount, setDeletedClientParcelsCount] = useState<number>(0);
 
     const onClose = (): void => {
         props.onClose();
@@ -128,12 +138,16 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
     };
 
     useEffect(() => {
-        getDuplicateDownloadedPostcodes(
+        void getDuplicateDownloadedPostcodes(
             parcelIds,
             "Shopping List Downloaded",
             setDuplicateDownloadedPostcodes,
             setErrorMessage
         );
+    }, [parcelIds]);
+
+    useEffect(() => {
+        void getDeletedClientParcelsCount(parcelIds, setDeletedClientParcelsCount, setErrorMessage);
     }, [parcelIds]);
 
     return (
@@ -147,6 +161,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
                 <ShoppingListModalContent
                     selectedParcels={props.selectedParcels}
                     duplicateDownloadedPostcodes={duplicateDownloadedPostcodes}
+                    deletedClientParcelsCount={deletedClientParcelsCount}
                     onPdfCreationCompleted={onPdfCreationCompleted}
                     onPdfCreationFailed={onPdfCreationFailed}
                 />
