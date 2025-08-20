@@ -10,7 +10,6 @@ import {
     formatHouseholdFromFamilyDetails,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
-    formatAdditionalPhoneNumbers,
 } from "@/app/clients/getExpandedClientDetails";
 import { capitaliseWords, formatDateTime, formatDatetimeAsDate } from "@/common/format";
 import {
@@ -20,6 +19,7 @@ import {
 } from "@/components/DataViewer/DataViewer";
 import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
+import { formatAdditionalPhoneNumbers } from "@/common/format";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";

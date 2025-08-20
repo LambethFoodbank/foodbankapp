@@ -2,7 +2,7 @@ import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { formatAddress } from "@/common/format";
+import { formatAddress, formatAdditionalPhoneNumbers } from "@/common/format";
 import {
     getAdultAgeStringUsingBirthYear,
     getChildAgeStringUsingBirthYearAndMonth,
@@ -171,20 +171,6 @@ export const formatAddressFromClientDetails = (
     );
 };
 
-export const formatAdditionalPhoneNumbers = (
-    primaryPhoneNumber: string | null,
-    additionalPhoneNumbers: string[] | null
-): string => {
-    if (primaryPhoneNumber === null || primaryPhoneNumber.length === 0) {
-        return "None";
-    }
-    if (additionalPhoneNumbers) {
-        const allPhoneNumbers: string[] = [primaryPhoneNumber, ...additionalPhoneNumbers];
-        return allPhoneNumbers.join(", ");
-    } else {
-        return primaryPhoneNumber;
-    }
-};
 export const formatHouseholdFromFamilyDetails = (
     family: Pick<
         Schema["families"],

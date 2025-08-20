@@ -15,7 +15,7 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { formatDatetimeAsDate } from "@/common/format";
+import { formatAdditionalPhoneNumbers, formatDatetimeAsDate } from "@/common/format";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import CsvButton, {
     formatNumberAsStringForCsv,
@@ -107,6 +107,7 @@ export interface rawParcel {
         full_name: string | null;
         is_active: boolean;
         phone_number: string | null;
+        additional_phone_numbers: string[] | null;
         email: string | null;
         delivery_instructions: string | null;
         notes: string | null;
@@ -159,6 +160,7 @@ export const getRawParcelListQuery = `
             full_name,
             is_active,
             phone_number,
+            additional_phone_numbers,
             email,
             delivery_instructions,
             notes,
@@ -204,7 +206,13 @@ export const convertRawParcelListToReportResult = (
                     signpostingCallRequired: rawParcel.signposting_call_required ?? false,
                     flaggedForAttention: rawParcel.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
-                        ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
+                        ? formatNumberAsStringForCsv(
+                              formatAdditionalPhoneNumbers(
+                                  rawParcel.client.phone_number,
+                                  rawParcel.client.additional_phone_numbers,
+                                  true
+                              )
+                          )
                         : "",
                     email: rawParcel.client?.email ?? "",
                     signpostingCallReasons: formatRequirementsByCanonicalOrder(
