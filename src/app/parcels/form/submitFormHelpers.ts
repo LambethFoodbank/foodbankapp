@@ -58,8 +58,8 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
 
 type UpdateParcelErrorType =
     | "failedToUpdateParcel"
-    | "concurrentUpdateConflict"
-    | "failedToUpdateDeliveryInstructions";
+    | "failedToUpdateDeliveryInstructions"
+    | "concurrentUpdateConflict";
 export type UpdateParcelError = { type: UpdateParcelErrorType; logId: string };
 type UpdateParcelReturnType = {
     error: UpdateParcelError | null;
