@@ -191,7 +191,7 @@ const databaseErrorMessageFromErrorType = (
 const ParcelForm: React.FC<ParcelFormProps> = ({
     initialFields,
     initialFormErrors,
-    clientId = null,
+    clientId,
     writeParcelInfoToDatabase,
     deliveryPrimaryKey,
     collectionCentresLabelsAndValues,

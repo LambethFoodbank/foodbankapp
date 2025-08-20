@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION insert_parcel_with_delivery_instructions(
 ) RETURNS insert_parcel_result AS
 $$
 DECLARE
-rows_inserted INTEGER;
+    rows_inserted INTEGER;
     client_id UUID := (parcel_record->>'client_id')::UUID;
     parcel_primary_key UUID;
     return_values insert_parcel_result;
