@@ -199,7 +199,8 @@ export const formatHouseholdFromFamilyDetails = (
     }
 
     const familyCategory = familyCountToFamilyCategory(family.length);
-    const occupantDisplay = `Occupant${adultCount + childCount > 1 ? "s" : ""}`;
+    const totalFamilyMembers = adultCount + childCount;
+    const occupantDisplay = `${totalFamilyMembers === 0 ? "" : "Occupant"}${totalFamilyMembers > 1 ? "s" : ""}`;
 
     return `${familyCategory} ${occupantDisplay} (${adultChildBreakdown.join(", ")})`;
 };
