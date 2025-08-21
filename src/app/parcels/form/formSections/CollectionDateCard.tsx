@@ -5,12 +5,12 @@ import { getErrorText, onChangeDate } from "@/components/Form/formFunctions";
 import { ErrorText } from "@/components/Form/formStyling";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ParcelCardProps } from "../ParcelForm";
-import { DbCollectionCentreAvailableDaysType } from "@/common/fetch";
+import { DbAvailableDaysType } from "@/common/fetch";
 import { Schema } from "@/databaseUtils";
 
 interface DateCardProps extends ParcelCardProps {
     deliveryPrimaryKey: Schema["collection_centres"]["primary_key"];
-    availableDaysForSelectedCentre: DbCollectionCentreAvailableDaysType;
+    availableDaysForSelectedCentre: DbAvailableDaysType;
 }
 
 const CollectionDateCard: React.FC<DateCardProps> = ({
@@ -26,7 +26,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
             return true;
         }
 
-        const dayIndex = day.day() != 0 ? day.day() - 1 : 6;
+        const dayIndex = day.day() !== 0 ? day.day() - 1 : 6;
 
         return !availableDaysForSelectedCentre[dayIndex].is_active;
     };

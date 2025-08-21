@@ -4,16 +4,13 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ParcelCardProps } from "../ParcelForm";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import {
-    CollectionTimeSlotsLabelsAndValues,
-    DbCollectionCentreAvailableDaysType,
-} from "@/common/fetch";
+import { CollectionTimeSlotsLabelsAndValues, DbAvailableDaysType } from "@/common/fetch";
 import { Schema } from "@/databaseUtils";
 
 interface CollectionSlotsCardProps extends ParcelCardProps {
     deliveryPrimaryKey: Schema["collection_centres"]["primary_key"];
     collectionTimeSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues;
-    availableDaysForSelectedCentre: DbCollectionCentreAvailableDaysType;
+    availableDaysForSelectedCentre: DbAvailableDaysType;
 }
 
 const CollectionSlotCard: React.FC<CollectionSlotsCardProps> = ({

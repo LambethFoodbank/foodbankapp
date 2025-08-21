@@ -41,8 +41,8 @@ import {
     CollectionTimeSlotsLabelsAndValues,
     getActiveTimeSlotsForCollectionCentre,
     PackingSlotsLabelsAndValues,
-    DbCollectionCentreAvailableDaysType,
-    DbCollectionCentreType,
+    DbAvailableDaysType,
+    DbCollectionCentreWithAvailableDaysType,
     getAvailableDaysForCollectionCentres,
 } from "@/common/fetch";
 import getExpandedClientDetails, {
@@ -212,9 +212,10 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [clientDetails, setClientDetails] = useState<ExpandedClientData | null>(null);
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
-    const [collectionAvailableDays, setAvailableDays] = useState<DbCollectionCentreType[]>([]);
-    const [availableDaysForCentre, setAvailableDaysForCentre] =
-        useState<DbCollectionCentreAvailableDaysType>([]);
+    const [collectionAvailableDays, setAvailableDays] = useState<
+        DbCollectionCentreWithAvailableDaysType[]
+    >([]);
+    const [availableDaysForCentre, setAvailableDaysForCentre] = useState<DbAvailableDaysType>([]);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 

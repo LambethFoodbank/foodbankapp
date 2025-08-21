@@ -176,7 +176,7 @@ type DbCollectionTimeSlotType = {
 
 type FetchCollectionAvailableDaysResponse =
     | {
-          data: DbCollectionCentreType[];
+          data: DbCollectionCentreWithAvailableDaysType[];
           error: null;
       }
     | {
@@ -191,10 +191,10 @@ export type FetchCollectionAvailableDaysError = {
     logId: string;
 };
 
-export type DbCollectionCentreAvailableDaysType = Schema["collection_centres"]["available_days"];
+export type DbAvailableDaysType = Schema["collection_centres"]["available_days"];
 
-export type DbCollectionCentreType = {
-    available_days: Schema["collection_centres"]["available_days"];
+export type DbCollectionCentreWithAvailableDaysType = {
+    available_days: DbAvailableDaysType;
     primary_key: Schema["collection_centres"]["primary_key"];
 } | null;
 
