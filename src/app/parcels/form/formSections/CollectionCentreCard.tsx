@@ -1,5 +1,8 @@
 import React from "react";
-import { CollectionCentresLabelsAndValues, DbCollectionCentreType } from "@/common/fetch";
+import {
+    CollectionCentresLabelsAndValues,
+    DbCollectionCentreWithAvailableDaysType,
+} from "@/common/fetch";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
 import { ErrorText } from "@/components/Form/formStyling";
@@ -8,7 +11,7 @@ import { ParcelCardProps } from "../ParcelForm";
 
 interface CollectionCentreCardProps extends ParcelCardProps {
     collectionCentresLabelsAndValues: CollectionCentresLabelsAndValues;
-    collectionAvailableDays: DbCollectionCentreType[];
+    collectionAvailableDays: DbCollectionCentreWithAvailableDaysType[];
 }
 
 const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
@@ -24,8 +27,8 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
             return "This centre is closed all week";
         }
         return availableDaysObject.available_days
-            ?.filter((collectionDay) => collectionDay.is_active)
-            ?.map((collectionDay) => (collectionDay.day == undefined ? "" : collectionDay.day))
+            ?.filter((collectionDayObject) => collectionDayObject.is_active)
+            ?.map((collectionDayObject) => collectionDayObject.day)
             .join(", ");
     });
 
