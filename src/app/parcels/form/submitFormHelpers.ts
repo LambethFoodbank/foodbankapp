@@ -48,12 +48,14 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
         return { parcelId: null, error: { type: "failedToInsertParcel", logId } };
     }
 
+    const { parcel_primary_key } = parcelDataWithCount[0];
+
     await sendAuditLog({
         ...auditLog,
         wasSuccess: true,
-        parcelId: parcelDataWithCount.parcel_primary_key || undefined,
+        parcelId: parcel_primary_key,
     });
-    return { parcelId: parcelDataWithCount.parcel_primary_key, error: null };
+    return { parcelId: parcel_primary_key, error: null };
 };
 
 type UpdateParcelErrorType =
@@ -87,7 +89,7 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
             action: "edit a parcel",
             content: {
                 parcelDetails: { ...parcelRecord, deliveryInstructions },
-                count: parcelDataAndCount?.rows_updated,
+                count: parcelDataAndCount?.[0].rows_updated,
             },
             clientId: parcelRecord.client_id,
             collectionCentreId: parcelRecord.collection_centre
@@ -106,7 +108,9 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
             return { parcelId: null, error: { type: "failedToUpdateParcel", logId } };
         }
 
-        if (parcelDataAndCount.rows_updated === 0) {
+        const { rows_updated } = parcelDataAndCount[0];
+
+        if (rows_updated === 0) {
             const logId = await logWarningReturnLogId("Concurrent editing of parcel");
             await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
             return { parcelId: null, error: { type: "concurrentUpdateConflict", logId } };

@@ -1046,7 +1046,10 @@ export type Database = {
           parcel_record: Json
           delivery_instructions: string
         }
-        Returns: Database["public"]["CompositeTypes"]["insert_parcel_result"]
+        Returns: {
+          parcel_primary_key: string
+          rows_inserted: number
+        }[]
       }
       packing_slot_order_swap: {
         Args: {
@@ -1076,7 +1079,10 @@ export type Database = {
           delivery_instructions: string
           parcel_primary_key: string
         }
-        Returns: Database["public"]["CompositeTypes"]["update_parcel_result"]
+        Returns: {
+          parcel_primary_key: string
+          rows_updated: number
+        }[]
       }
       user_is_admin: {
         Args: Record<PropertyKey, never>
@@ -1102,17 +1108,9 @@ export type Database = {
         time: string | null
         is_active: boolean | null
       }
-      insert_parcel_result: {
-        parcel_primary_key: string | null
-        rows_inserted: number | null
-      }
       update_client_result: {
         clientid: string | null
         updatedrows: number | null
-      }
-      update_parcel_result: {
-        parcel_primary_key: string | null
-        rows_updated: number | null
       }
     }
   }
