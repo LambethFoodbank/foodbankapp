@@ -2,6 +2,10 @@ import supabase from "@/supabaseClient";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import { Errors } from "@/components/Form/formFunctions";
+import { ParcelFields } from "@/app/parcels/form/ParcelForm";
+import { CollectionTimeSlotsLabelsAndValues, DbAvailableDaysType } from "@/common/fetch";
+import dayjs from "dayjs";
 
 export type WriteParcelToDatabaseFunction = UpdateParcel | InsertParcel;
 export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelErrorType;
@@ -30,16 +34,14 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
     );
 export function switchErrorForCollectionDate(
     fields: ParcelFields,
-    availableDaysForCentre: DbCollectionCentreAvailableDaysType
+    availableDaysForCentre: DbAvailableDaysType
 ): Errors {
     const collectionDateDayIndex =
-        dayjs(fields.collectionDate).day() != 0 ? dayjs(fields.collectionDate).day() - 1 : 6;
+        dayjs(fields.collectionDate).day() !== 0 ? dayjs(fields.collectionDate).day() - 1 : 6;
 
     return fields.collectionDate == null
         ? Errors.initial
-        : !availableDaysForCentre ||
-            !availableDaysForCentre.length ||
-            availableDaysForCentre[collectionDateDayIndex].is_active
+        : !availableDaysForCentre.length || availableDaysForCentre[collectionDateDayIndex].is_active
           ? Errors.none
           : Errors.invalidCollectionDate;
 }
