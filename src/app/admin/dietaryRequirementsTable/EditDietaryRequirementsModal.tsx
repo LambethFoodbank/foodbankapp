@@ -1,5 +1,3 @@
-import { dietaryRequirementTypes } from "@/app/admin/dietaryRequirementsTable/DietaryRequirementsActions";
-import { DatabaseEnums } from "@/databaseUtils";
 import FloatingToast from "@/components/FloatingToast";
 import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
@@ -38,6 +36,7 @@ type DietaryRule = {
 type Item = {
     id: string;
     item_name: string | null;
+    item_type: string | null;
 };
 
 function checkArraysAreEqual(
@@ -88,12 +87,14 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         const { data: itemsData } = await supabase
             .from("lists")
-            .select("primary_key, item_name")
+            .select("primary_key, item_name, item_type")
+            .in("item_type", ["alternative_food", "regular_food"])
             .order("item_name");
         setItems(
             (itemsData || []).map((item) => ({
                 id: item.primary_key,
                 item_name: item.item_name,
+                item_type: item.item_type,
             }))
         );
 
@@ -233,31 +234,20 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
     const handleToggle = (id: string, type: "included" | "excluded"): void => {
         const currentList = type === "included" ? newIncluded : newExcluded;
-        const otherList = type === "included" ? newExcluded : newIncluded;
-
         const initialCurrent = type === "included" ? initialIncluded : initialExcluded;
-        const initialOther = type === "included" ? initialExcluded : initialIncluded;
 
         // toggled item will be added to the current list if not present, or removed if already present
         const updatedCurrent = currentList.includes(id)
             ? currentList.filter((item) => item !== id)
             : [...currentList, id];
 
-        // Ensure the other list does not contain the same id (item cannot be both included and excluded)
-        const updatedOther = otherList.filter((item) => item !== id);
-
         if (type === "included") {
             setNewIncluded(updatedCurrent);
-            setNewExcluded(updatedOther);
         } else {
             setNewExcluded(updatedCurrent);
-            setNewIncluded(updatedOther);
         }
 
-        setHasChanges(
-            !checkArraysAreEqual(updatedCurrent, initialCurrent) ||
-                !checkArraysAreEqual(updatedOther, initialOther)
-        );
+        setHasChanges(!checkArraysAreEqual(updatedCurrent, initialCurrent));
 
         if (hasChanges) {
             setWasSaved(false);
@@ -335,19 +325,21 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                         Included
                     </Typography>
                     <Grid container spacing={0.5}>
-                        {items.map((item) => (
-                            <Grid item xs={6} sm={4} md={4} key={`included-${item.id}`}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={newIncluded.includes(item.id)}
-                                            onChange={() => handleToggle(item.id, "included")}
-                                        />
-                                    }
-                                    label={item.item_name || "Unnamed Item"}
-                                />
-                            </Grid>
-                        ))}
+                        {items
+                            .filter((item) => item.item_type === "alternative_food")
+                            .map((item) => (
+                                <Grid item xs={6} sm={4} md={4} key={`included-${item.id}`}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={newIncluded.includes(item.id)}
+                                                onChange={() => handleToggle(item.id, "included")}
+                                            />
+                                        }
+                                        label={item.item_name || "Unnamed Item"}
+                                    />
+                                </Grid>
+                            ))}
                     </Grid>
                 </Box>
 
@@ -356,19 +348,21 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                         Excluded
                     </Typography>
                     <Grid container spacing={0.5}>
-                        {items.map((item) => (
-                            <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={newExcluded.includes(item.id)}
-                                            onChange={() => handleToggle(item.id, "excluded")}
-                                        />
-                                    }
-                                    label={item.item_name || "Unnamed Item"}
-                                />
-                            </Grid>
-                        ))}
+                        {items
+                            .filter((item) => item.item_type === "regular_food")
+                            .map((item) => (
+                                <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={newExcluded.includes(item.id)}
+                                                onChange={() => handleToggle(item.id, "excluded")}
+                                            />
+                                        }
+                                        label={item.item_name || "Unnamed Item"}
+                                    />
+                                </Grid>
+                            ))}
                     </Grid>
                 </Box>
             </Modal>
