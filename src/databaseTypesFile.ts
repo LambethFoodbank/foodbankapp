@@ -1080,7 +1080,7 @@ export type Database = {
           parcel_primary_key: string
         }
         Returns: {
-          parcel_primary_key: string
+          returned_parcel_primary_key: string
           rows_updated: number
         }[]
       }

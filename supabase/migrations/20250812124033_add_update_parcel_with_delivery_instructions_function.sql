@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION update_parcel_with_delivery_instructions(
     parcel_primary_key UUID
 )
 RETURNS TABLE (
-    parcel_primary_key uuid,
+    returned_parcel_primary_key uuid,
     rows_updated integer
 )
 LANGUAGE plpgsql AS
