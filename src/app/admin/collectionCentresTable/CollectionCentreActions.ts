@@ -4,6 +4,7 @@ import { Schema } from "@/databaseUtils";
 import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
+import { DbAvailableDaysType } from "@/common/fetch";
 
 export interface CollectionCentresTableRow {
     acronym: Schema["collection_centres"]["acronym"];
@@ -57,34 +58,34 @@ type FetchCollectionCentresResult =
           error: { type: "failedToFetchCollectionCentres"; logId: string };
       };
 
-export const initialCollectionAvailableDays: FormattedAvailableDayType[] = [
+export const initialCollectionAvailableDays: DbAvailableDaysType = [
     {
         day: "Monday",
-        isActive: false,
+        is_active: false,
     },
     {
         day: "Tuesday",
-        isActive: false,
+        is_active: false,
     },
     {
         day: "Wednesday",
-        isActive: false,
+        is_active: false,
     },
     {
         day: "Thursday",
-        isActive: false,
+        is_active: false,
     },
     {
         day: "Friday",
-        isActive: false,
+        is_active: false,
     },
     {
         day: "Saturday",
-        isActive: false,
+        is_active: false,
     },
     {
         day: "Sunday",
-        isActive: false,
+        is_active: false,
     },
 ];
 
@@ -135,12 +136,7 @@ const formatNewRowToDBCollectionCentre = (
         is_shown: newRow.isShown,
         is_delivery: newRow.isDelivery,
         time_slots: newRow.timeSlots,
-        available_days: initialCollectionAvailableDays.map((collectionAvailableDay) => {
-            return {
-                day: collectionAvailableDay.day,
-                is_active: collectionAvailableDay.isActive,
-            };
-        }),
+        available_days: initialCollectionAvailableDays,
     };
 };
 
