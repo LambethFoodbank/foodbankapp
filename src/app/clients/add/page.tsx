@@ -39,10 +39,15 @@ const AddClients: () => React.ReactElement = () => {
         additionalPhoneNumbers: [],
     };
 
+    const possibleErrorArrayLength =
+        initialFields?.additionalPhoneNumbers && initialFields.additionalPhoneNumbers?.length > 0
+            ? initialFields?.additionalPhoneNumbers.length + 1
+            : 1;
+
     const initialFormErrors: ClientErrors = {
         fullName: Errors.initial,
         phoneNumber: Errors.none,
-        additionalPhoneNumbers: [Errors.none],
+        additionalPhoneNumbers: Array(possibleErrorArrayLength).fill(Errors.none),
         email: Errors.none,
         addressLine1: Errors.initial,
         addressPostcode: Errors.initial,

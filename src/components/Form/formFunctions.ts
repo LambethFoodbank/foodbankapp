@@ -53,9 +53,7 @@ export interface Person {
 export type Fields = Record<string, unknown>;
 
 export type FormErrors<SpecificFields extends Fields> = {
-    [errorKey in keyof SpecificFields]?: errorKey extends "additionalPhoneNumbers"
-        ? Errors[]
-        : Errors;
+    [errorKey in keyof SpecificFields]?: Errors | Errors[];
 };
 
 export const createSetter = <SpecificFields extends Fields>(
@@ -150,7 +148,8 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
             index
         );
 
-        const currentErrors = Array.isArray((errorSetter as any).additionalPhoneNumbers)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const currentErrors = Array.isArray((errorSetter as any).additionalPhoneNumbers) // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ? [...(errorSetter as any).additionalPhoneNumbers]
             : [];
 
@@ -162,6 +161,7 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
 
         errorSetter({
             [key]: currentErrors,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as { [key in keyof FormErrors<SpecificFields>]: any });
 
         if (errorType === Errors.none) {
@@ -200,7 +200,9 @@ export const onChangeText = <SpecificFields extends Fields>(
             primaryPhoneNumber
         );
 
-        errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });
+        errorSetter({ [key]: errorType } as {
+            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
+        });
         if (errorType === Errors.none) {
             const newValue = options?.formattingFunction
                 ? options.formattingFunction(input)
@@ -230,7 +232,7 @@ export const onChangeTextDeferredError = <SpecificFields extends Fields>(
         const input = event.target.value;
         const errorType = getErrorType(input, required, regex, additionalCondition, maxCharacters);
         errorSetter({ [key]: errorType } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors;
+            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
         });
         const newValue = formattingFunction ? formattingFunction(input) : input;
         fieldSetter({ [key]: newValue } as {
@@ -282,7 +284,7 @@ export const valueOnChangeRadioGroup = <SpecificFields extends Fields>(
         const input = event.target.value;
         fieldSetter({ [key]: input } as { [key in keyof SpecificFields]: SpecificFields[key] });
         errorSetter({ [key]: Errors.none } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors;
+            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
         });
     };
 };
@@ -296,7 +298,7 @@ export const valueOnChangeDropdownList = <SpecificFields extends Fields>(
         const input = event.target.value;
         fieldSetter({ [key]: input } as { [key in keyof SpecificFields]: SpecificFields[key] });
         errorSetter({ [key]: Errors.none } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors;
+            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
         });
     };
 };
@@ -310,12 +312,14 @@ export const onChangeDateOrTime = <SpecificFields extends Fields>(
     if (value === null || isNaN(Date.parse(value.toString()))) {
         fieldSetter({ [key]: null } as { [key in keyof SpecificFields]: SpecificFields[key] });
         errorSetter({ [key]: Errors.invalid } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors;
+            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
         });
         return;
     }
     fieldSetter({ [key]: value } as { [key in keyof SpecificFields]: SpecificFields[key] });
-    errorSetter({ [key]: Errors.none } as { [key in keyof FormErrors<SpecificFields>]: Errors });
+    errorSetter({ [key]: Errors.none } as {
+        [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
+    });
 };
 
 export const onChangeDate = <SpecificFields extends Fields>(

@@ -71,10 +71,15 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
 
     const initialFields = clientData && familyData ? autofill(clientData, familyData) : null;
 
+    const possibleErrorArrayLength =
+        initialFields?.additionalPhoneNumbers && initialFields?.additionalPhoneNumbers?.length > 0
+            ? initialFields?.additionalPhoneNumbers.length + 1
+            : 0;
+
     const initialFormErrors: ClientErrors = {
         fullName: Errors.none,
         phoneNumber: Errors.none,
-        additionalPhoneNumbers: [Errors.none],
+        additionalPhoneNumbers: Array(possibleErrorArrayLength).fill(Errors.none),
         email: Errors.none,
         addressLine1: Errors.none,
         addressPostcode: Errors.none,
