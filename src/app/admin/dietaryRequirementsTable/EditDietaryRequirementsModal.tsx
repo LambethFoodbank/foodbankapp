@@ -23,25 +23,21 @@ interface Props {
     onClose: () => void;
 }
 
-type BaseDietaryRequirements = {
-    halal: DatabaseEnums["item_dietary_status"] | null;
-    vegetarian: DatabaseEnums["item_dietary_status"] | null;
-    vegan: DatabaseEnums["item_dietary_status"] | null;
-    meat: DatabaseEnums["item_dietary_status"] | null;
-    gluten_free: DatabaseEnums["item_dietary_status"] | null;
-    pescatarian: DatabaseEnums["item_dietary_status"] | null;
-    dairy_free: DatabaseEnums["item_dietary_status"] | null;
-    seafood_allergy: DatabaseEnums["item_dietary_status"] | null;
-    pet_food: DatabaseEnums["item_dietary_status"] | null;
+type Diet = {
+    primary_key: string;
+    name: string;
+    notes?: string | null;
 };
 
-type DietaryRequirementsPlusTableRow = BaseDietaryRequirements & {
-    id: string | null;
-    item_name: string | null;
+type DietaryRule = {
+    diet_id: string;
+    item_id: string;
+    status: "included" | "excluded" | "not_specified";
 };
 
-type DietaryRequirementsTableRow = BaseDietaryRequirements & {
+type Item = {
     id: string;
+    item_name: string | null;
 };
 
 function checkArraysAreEqual(
@@ -67,22 +63,20 @@ function checkArraysAreEqual(
 }
 
 export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose }) => {
-    const [items, setItems] = useState<DietaryRequirementsPlusTableRow[]>([]);
-    const [selectedType, setSelectedType] = useState<keyof BaseDietaryRequirements>("halal");
-    const [initialIncluded, setInitialIncluded] = useState<(string | null)[]>([]);
-    const [initialExcluded, setInitialExcluded] = useState<(string | null)[]>([]);
-    const [newIncluded, setNewIncluded] = useState<(string | null)[]>([]);
-    const [newExcluded, setNewExcluded] = useState<(string | null)[]>([]);
+    const [diets, setDiets] = useState<Diet[]>([]);
+    const [items, setItems] = useState<Item[]>([]);
+    const [selectedDietId, setSelectedDietId] = useState<string>("");
+    const [initialIncluded, setInitialIncluded] = useState<string[]>([]);
+    const [initialExcluded, setInitialExcluded] = useState<string[]>([]);
+    const [newIncluded, setNewIncluded] = useState<string[]>([]);
+    const [newExcluded, setNewExcluded] = useState<string[]>([]);
     const [wasSaved, setWasSaved] = useState<boolean>(false);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
     const [warningSaveMessage, setWarningSaveMessage] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const fetchData = async (selectedType: string): Promise<void> => {
-        const { data, error } = await supabase
-            .from("dietary_requirements_plus")
-            .select()
-            .order("item_name");
+    const fetchData = async (dietId: string): Promise<void> => {
+        const { data: dietsData, error } = await supabase.from("diets").select();
 
         if (error) {
             setErrorMessage("Error fetching dietary requirements data");
@@ -90,19 +84,30 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             return;
         }
 
-        setItems(data);
+        setDiets(dietsData || []);
 
-        const included: (string | null)[] = [
-            ...data
-                .filter((row) => row[selectedType as keyof typeof row] === "included")
-                .map((row) => row.id),
-        ];
+        const { data: itemsData } = await supabase
+            .from("lists")
+            .select("primary_key, item_name")
+            .order("item_name");
+        setItems(
+            (itemsData || []).map((item) => ({
+                id: item.primary_key,
+                item_name: item.item_name,
+            }))
+        );
 
-        const excluded: (string | null)[] = [
-            ...data
-                .filter((row) => row[selectedType as keyof typeof row] === "excluded")
-                .map((row) => row.id),
-        ];
+        const { data: rulesData } = await supabase
+            .from("dietary_rules")
+            .select()
+            .eq("diet_id", dietId);
+
+        const included = (rulesData || [])
+            .filter((rule) => rule.status === "included")
+            .map((rule) => rule.item_id);
+        const excluded = (rulesData || [])
+            .filter((rule) => rule.status === "excluded")
+            .map((rule) => rule.item_id);
 
         setInitialIncluded(included);
         setInitialExcluded(excluded);
@@ -115,11 +120,26 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         if (!isOpen) {
             return;
         }
-        void fetchData(selectedType);
 
+        (async () => {
+            const { data: dietsData } = await supabase.from("diets").select();
+            setDiets(dietsData || []);
+            if (dietsData && dietsData.length > 0) {
+                setSelectedDietId(dietsData[0].primary_key);
+                await fetchData(dietsData[0].primary_key);
+            }
+        })();
         setWasSaved(false);
         setHasChanges(false);
-    }, [isOpen, selectedType]);
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (selectedDietId) {
+            void fetchData(selectedDietId);
+            setWasSaved(false);
+            setHasChanges(false);
+        }
+    }, [selectedDietId]);
 
     useEffect(() => {
         if (warningSaveMessage) {
@@ -131,45 +151,60 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         }
     }, [warningSaveMessage]);
 
-    const hasItemStatusChanged = (item: DietaryRequirementsPlusTableRow): boolean => {
-        if (!item.id) {
-            return false;
-        }
-
-        const wasIncluded = initialIncluded.includes(item.id);
-        const wasExcluded = initialExcluded.includes(item.id);
-        const isNowIncluded = newIncluded.includes(item.id);
-        const isNowExcluded = newExcluded.includes(item.id);
-
+    const hasItemStatusChanged = (itemId: string): boolean => {
+        const wasIncluded = initialIncluded.includes(itemId);
+        const wasExcluded = initialExcluded.includes(itemId);
+        const isNowIncluded = newIncluded.includes(itemId);
+        const isNowExcluded = newExcluded.includes(itemId);
         return wasIncluded !== isNowIncluded || wasExcluded !== isNowExcluded;
     };
 
     const handleSubmit = async (): Promise<void> => {
-        const changedItems = items.filter((item) => hasItemStatusChanged(item));
+        const changedItemIds = items
+            .map((item) => item.id)
+            .filter((id) => hasItemStatusChanged(id));
 
-        if (changedItems.length === 0) {
+        if (changedItemIds.length === 0) {
             setHasChanges(false);
             setWarningSaveMessage("No changes detected.");
             return;
         }
 
-        // Only include changed fields in the update
-        const updates: DietaryRequirementsTableRow[] = changedItems.map((item) => {
-            const newStatus = newIncluded.includes(item.id)
-                ? "included"
-                : newExcluded.includes(item.id)
-                  ? "excluded"
-                  : "not_specified";
+        const { error: delError } = await supabase
+            .from("dietary_rules")
+            .delete()
+            .eq("diet_id", selectedDietId)
+            .in("item_id", changedItemIds);
 
-            return {
-                id: item.id,
-                [selectedType]: newStatus as DatabaseEnums["item_dietary_status"],
-            } as DietaryRequirementsTableRow;
-        });
+        if (delError) {
+            setErrorMessage("Failed to update dietary rules (delete phase).");
+            return;
+        }
 
-        const { error } = await supabase
-            .from("dietary_requirements")
-            .upsert(updates, { onConflict: "id" });
+        const newRules: DietaryRule[] = [
+            ...newIncluded
+                .filter((item_id) => changedItemIds.includes(item_id))
+                .map((item_id) => ({
+                    diet_id: selectedDietId,
+                    item_id,
+                    status: "included" as const,
+                })),
+            ...newExcluded
+                .filter((item_id) => changedItemIds.includes(item_id))
+                .map((item_id) => ({
+                    diet_id: selectedDietId,
+                    item_id,
+                    status: "excluded" as const,
+                })),
+        ];
+
+        if (newRules.length > 0) {
+            const { error: insError } = await supabase.from("dietary_rules").insert(newRules);
+            if (insError) {
+                setErrorMessage("Failed to update dietary rules (insert phase).");
+                return;
+            }
+        }
 
         const includedItemsName = newIncluded.map((id) => {
             const item = items.find((item) => item.id === id);
@@ -181,38 +216,22 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             return item ? item.item_name : "Unnamed Item";
         });
 
-        const label =
-            dietaryRequirementTypes.find((type) => type.key === selectedType)?.label ?? "unknown";
+        const label = diets.find((diet) => diet.primary_key === selectedDietId)?.name ?? "unknown";
 
         const auditLog = {
             action: "update dietary requirements",
             content: { included: includedItemsName, excluded: excludedItemsName },
             dietaryRequirement: label,
         };
-
-        if (error) {
-            const logId = await logErrorReturnLogId(
-                `Error with updating dietary requirements for ${label}`,
-                {
-                    error: error,
-                }
-            );
-            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-
-            setErrorMessage(`Failed to update dietary requirements for ${label}. Log ID: ${logId}`);
-            return;
-        }
-
         await sendAuditLog({ ...auditLog, wasSuccess: true });
 
         setWasSaved(true);
         setHasChanges(false);
         setWarningSaveMessage("");
-
-        void fetchData(selectedType);
+        void fetchData(selectedDietId);
     };
 
-    const handleToggle = (id: string | null, type: "included" | "excluded"): void => {
+    const handleToggle = (id: string, type: "included" | "excluded"): void => {
         const currentList = type === "included" ? newIncluded : newExcluded;
         const otherList = type === "included" ? newExcluded : newIncluded;
 
@@ -245,11 +264,11 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         }
     };
 
-    const handleTypeChange = (newType: keyof BaseDietaryRequirements): void => {
+    const handleDietChange = (dietId: string): void => {
         if (hasChanges) {
             return;
         }
-        setSelectedType(newType);
+        setSelectedDietId(dietId);
     };
 
     return (
@@ -284,14 +303,12 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                     </Typography>
                     <Select
                         fullWidth
-                        value={selectedType}
-                        onChange={(event) =>
-                            handleTypeChange(event.target.value as keyof BaseDietaryRequirements)
-                        }
+                        value={selectedDietId}
+                        onChange={(event) => handleDietChange(event.target.value as string)}
                     >
-                        {dietaryRequirementTypes.map((dietary) => (
-                            <MenuItem key={dietary.key} value={dietary.key}>
-                                {dietary.label}
+                        {diets.map((diet) => (
+                            <MenuItem key={diet.primary_key} value={diet.primary_key}>
+                                {diet.name}
                             </MenuItem>
                         ))}
                     </Select>
