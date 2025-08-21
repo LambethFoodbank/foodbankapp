@@ -196,18 +196,15 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
     };
 
     useEffect(() => {
-        getDuplicateDownloadedPostcodes(
+        void getDuplicateDownloadedPostcodes(
             parcelIds,
             "Shipping Labels Downloaded",
             setDuplicateDownloadedPostcodes,
             setErrorMessage
         );
-    }, [parcelIds]);
 
-    useEffect(() => {
         void getDeletedClientParcelsCount(parcelIds, setDeletedClientParcelsCount, setErrorMessage);
     }, [parcelIds]);
-
     return (
         <GeneralActionModal
             {...props}

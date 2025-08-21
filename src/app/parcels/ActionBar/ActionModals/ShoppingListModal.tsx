@@ -144,9 +144,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
             setDuplicateDownloadedPostcodes,
             setErrorMessage
         );
-    }, [parcelIds]);
 
-    useEffect(() => {
         void getDeletedClientParcelsCount(parcelIds, setDeletedClientParcelsCount, setErrorMessage);
     }, [parcelIds]);
 
