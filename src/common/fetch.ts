@@ -39,7 +39,7 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     primary_key: string;
     voucher_number: string | null;
     last_updated: string | undefined;
-    client: ClientWithDeliveryInstructions | null;
+    clientWithDeliveryInstructions: ClientWithDeliveryInstructions | null;
     referral_agency: string | null;
     referrer_name: string | null;
     referrer_email: string | null;
@@ -77,7 +77,7 @@ export const fetchParcel = async (
                 primary_key,
                 is_shown
             ),
-            client:clients (
+            clientWithDeliveryInstructions:clients (
                 delivery_instructions
             )`
         )
