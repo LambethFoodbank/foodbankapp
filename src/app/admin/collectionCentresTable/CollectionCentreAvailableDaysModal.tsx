@@ -32,10 +32,10 @@ const formatCollectionCentreAvailableDaysDbData = (
     if (row.availableDays === null || row.availableDays === undefined) {
         formattedAvailableDays = [];
     } else {
-        formattedAvailableDays = row.availableDays.map((availableDays) => {
+        formattedAvailableDays = row.availableDays.map((availableDayObject) => {
             return {
-                day: availableDays.day,
-                isActive: availableDays.is_active !== null ? availableDays.is_active : false,
+                day: availableDayObject.day,
+                isActive: availableDayObject.is_active ?? false,
             };
         });
     }
@@ -72,27 +72,27 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
         props.onClose();
     };
 
-    const toggleAvailableDaysInModalData = (dayLabel: string): void => {
+    const toggleAvailableDaysInModalData = (dayToToggle: string): void => {
         if (!availableDaysModalData) {
             return;
         }
 
-        const availableDaysIndex = availableDaysModalData.availableDays.findIndex(
-            (availableDay) => availableDay.day === dayLabel
+        setAvailableDaysModalData((previousAvailableDaysModalData) =>
+            previousAvailableDaysModalData
+                ? {
+                      ...previousAvailableDaysModalData,
+                      availableDays: previousAvailableDaysModalData.availableDays.map(
+                          (availableDayObject) =>
+                              availableDayObject.day === dayToToggle
+                                  ? {
+                                        ...availableDayObject,
+                                        isActive: !availableDayObject.isActive,
+                                    }
+                                  : availableDayObject
+                      ),
+                  }
+                : null
         );
-        const availableDay = availableDaysModalData.availableDays[availableDaysIndex];
-        if (!availableDay) {
-            return;
-        }
-
-        availableDay.isActive = !availableDay.isActive;
-
-        const updatedAvailableDaysData: FormattedAvailableDaysWithPrimaryKey = {
-            ...availableDaysModalData,
-            availableDays: availableDaysModalData.availableDays,
-        };
-
-        setAvailableDaysModalData(updatedAvailableDaysData);
     };
 
     return (
