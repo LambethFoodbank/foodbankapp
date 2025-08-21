@@ -73,7 +73,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
 
     const possibleErrorArrayLength =
         initialFields?.additionalPhoneNumbers && initialFields?.additionalPhoneNumbers?.length > 0
-            ? initialFields?.additionalPhoneNumbers.length + 1
+            ? initialFields?.additionalPhoneNumbers.length
             : 0;
 
     const initialFormErrors: ClientErrors = {

@@ -27,7 +27,7 @@ export enum Errors {
     invalidCollectionSlot = "The previous timeslot is no longer available, please select a new timeslot.",
     noCollectionSlotsSet = "There are no collection slots set for this collection centre, please select a different collection centre or contact admin.",
     alreadyExists = "This phone number already exists, please add a different phone number.",
-    emptyPrimaryPhoneNumber = "The primary phone number should be filled in.",
+    emptyPrimaryPhoneNumber = "The primary phone number should be filled in before any other phone number.",
 }
 
 export const numberRegex = /^\d+$/;
@@ -75,8 +75,6 @@ export const getErrorType = (
     primaryPhoneNumber?: string | null,
     index?: number
 ): Errors => {
-    console.log(primaryPhoneNumber);
-    console.log(currentAdditionalPhoneNumbers);
     if (
         currentAdditionalPhoneNumbers &&
         currentAdditionalPhoneNumbers.length > 0 &&
