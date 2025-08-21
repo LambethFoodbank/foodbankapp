@@ -84,7 +84,7 @@ export interface ClientFields extends Fields {
 export interface ClientErrors extends FormErrors<ClientFields> {
     fullName: Errors;
     phoneNumber: Errors;
-    additionalPhoneNumbers: Errors;
+    additionalPhoneNumbers: Errors[];
     email: Errors;
     addressLine1: Errors;
     addressPostcode: Errors;

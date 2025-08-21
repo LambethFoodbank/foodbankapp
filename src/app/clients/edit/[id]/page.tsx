@@ -74,7 +74,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
     const initialFormErrors: ClientErrors = {
         fullName: Errors.none,
         phoneNumber: Errors.none,
-        additionalPhoneNumbers: Errors.none,
+        additionalPhoneNumbers: [Errors.none],
         email: Errors.none,
         addressLine1: Errors.none,
         addressPostcode: Errors.none,

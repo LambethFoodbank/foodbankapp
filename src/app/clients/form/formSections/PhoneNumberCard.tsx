@@ -6,6 +6,7 @@ import {
     getDefaultTextValue,
     onChangeText,
     onChangeAdditionalFields,
+    Errors,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
@@ -142,8 +143,12 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                     id={`client-phone-number-${phone.id}`}
                                     label={`Phone Number ${index > 0 ? index + 1 : ""}`}
                                     defaultValue={fields.additionalPhoneNumbers?.[index - 1] || ""}
-                                    error={errorExists(formErrors.additionalPhoneNumbers)}
-                                    helperText={getErrorText(formErrors.additionalPhoneNumbers)}
+                                    error={errorExists(
+                                        formErrors.additionalPhoneNumbers?.[index - 1]
+                                    )}
+                                    helperText={getErrorText(
+                                        formErrors.additionalPhoneNumbers?.[index - 1]
+                                    )}
                                     onChange={onChangeAdditionalFields(
                                         fieldSetter,
                                         fields.additionalPhoneNumbers,
@@ -168,7 +173,8 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                     </GappedDiv>
                 ))}
                 {!errorExists(formErrors.phoneNumber) &&
-                    !errorExists(formErrors.additionalPhoneNumbers) && (
+                    (!formErrors.additionalPhoneNumbers ||
+                        formErrors.additionalPhoneNumbers.every((err) => !errorExists(err))) && (
                         <Button
                             color="primary"
                             startIcon={<AddIcon />}

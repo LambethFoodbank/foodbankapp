@@ -53,7 +53,9 @@ export interface Person {
 export type Fields = Record<string, unknown>;
 
 export type FormErrors<SpecificFields extends Fields> = {
-    [errorKey in keyof SpecificFields]?: Errors;
+    [errorKey in keyof SpecificFields]?: errorKey extends "additionalPhoneNumbers"
+        ? Errors[]
+        : Errors;
 };
 
 export const createSetter = <SpecificFields extends Fields>(
@@ -148,7 +150,19 @@ export const onChangeAdditionalFields = <SpecificFields extends Fields>(
             index
         );
 
-        errorSetter({ [key]: errorType } as { [key in keyof FormErrors<SpecificFields>]: Errors });
+        const currentErrors = Array.isArray((errorSetter as any).additionalPhoneNumbers)
+            ? [...(errorSetter as any).additionalPhoneNumbers]
+            : [];
+
+        while (currentErrors.length <= index) {
+            currentErrors.push(Errors.none);
+        }
+
+        currentErrors[index] = errorType;
+
+        errorSetter({
+            [key]: currentErrors,
+        } as { [key in keyof FormErrors<SpecificFields>]: any });
 
         if (errorType === Errors.none) {
             const newValue = options?.formattingFunction
@@ -379,19 +393,39 @@ export const checkErrorOnSubmit = <
 ): boolean => {
     let errorExists = false;
     let amendedErrorTypes = { ...errorType };
+
     for (const [errorKey, error] of Object.entries(errorType)) {
         if (!keysToCheck || keysToCheck.includes(errorKey)) {
-            if (error !== Errors.none) {
-                errorExists = true;
+            // Handle array of errors for additionalPhoneNumbers
+            if (errorKey === "additionalPhoneNumbers" && Array.isArray(error)) {
+                const hasError = error.some((err) => err !== Errors.none);
+                if (hasError) {
+                    errorExists = true;
+                }
+                // Update initial states to required for any remaining initial states
+                const updatedErrors = error.map((err) =>
+                    err === Errors.initial ? Errors.required : err
+                );
+                if (JSON.stringify(updatedErrors) !== JSON.stringify(error)) {
+                    amendedErrorTypes = {
+                        ...amendedErrorTypes,
+                        [errorKey]: updatedErrors,
+                    };
+                }
             }
-            if (error === Errors.initial) {
-                amendedErrorTypes = {
-                    ...amendedErrorTypes,
-                    [errorKey]: Errors.required,
-                };
+            // Handle regular error fields
+            else if (error !== Errors.none) {
+                errorExists = true;
+                if (error === Errors.initial) {
+                    amendedErrorTypes = {
+                        ...amendedErrorTypes,
+                        [errorKey]: Errors.required,
+                    };
+                }
             }
         }
     }
+
     if (errorExists) {
         errorSetter(amendedErrorTypes);
     }
