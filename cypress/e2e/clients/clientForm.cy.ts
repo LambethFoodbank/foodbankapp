@@ -7,6 +7,7 @@ describe("Add client form", () => {
     it("Add a client with no address", () => {
         fillName(fullName);
         fillPhoneNumber(phoneNumber);
+        fillAdditionalPhoneNumbers(additionalPhoneNumbers);
         fillEmail(email);
         fillNumberAdults("1");
         fillNumberChildren("0");
@@ -38,6 +39,19 @@ describe("Add client form", () => {
 
         assertPostcodeContentNotDisplayed();
     });
+
+    it("Try to add a client with the same additional phone number", () => {
+        fillName(fullName);
+        fillPhoneNumber(phoneNumber);
+        fillAdditionalPhoneNumbers(badAdditionalPhoneNumbers, true);
+        fillEmail(email);
+        fillNumberAdults("1");
+        fillNumberChildren("0");
+        chooseListType();
+        toggleNoAddress();
+        clickSubmitForm();
+        assertSubmitErrorShown();
+    });
 });
 
 const fullName = "First Last";
@@ -45,6 +59,8 @@ const phoneNumber = "01234567890";
 const email = "abc@example.com";
 const noAddressText = "No Address";
 const postcode = "N11AA";
+const additionalPhoneNumbers = ["01234567891", "01234567892"];
+const badAdditionalPhoneNumbers = ["01234567891", "01234567891"];
 
 function toggleNoAddress(): void {
     cy.contains(noAddressText, { matchCase: false }).click();
@@ -56,6 +72,19 @@ function fillName(value: string): void {
 
 function fillPhoneNumber(value: string): void {
     fillTextboxWithId("client-phone-number", value);
+}
+
+function fillAdditionalPhoneNumbers(values: string[], test?: boolean): void {
+    cy.contains("Add another phone number").click();
+    fillTextboxWithId("client-additional-phone-number-0", values[0]);
+    cy.contains("Add another phone number").click();
+    fillTextboxWithId("client-additional-phone-number-1", values[1]);
+    if (test) {
+        cy.contains(
+            "This phone number already exists, please add a different phone number."
+        ).should("exist");
+        cy.get('[id="remove-additional-phone-number-1"]').click(); // eslint-disable-line quotes
+    }
 }
 
 function fillEmail(value: string): void {
