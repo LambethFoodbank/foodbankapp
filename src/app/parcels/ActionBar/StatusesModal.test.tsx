@@ -132,7 +132,7 @@ describe("StatusesModal component", () => {
         expect(mockOnSubmit).toHaveBeenCalledWith(mockDate, []);
     });
 
-    it("selects 'Called and No Response' checkboxes and verifies the selection", () => {
+    it("saves the checked extra question fields when 'Called and No Response' status is selected", () => {
         cleanup();
         render(
             <Localization>
