@@ -1,8 +1,13 @@
 import React from "react";
-import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
+import {
+    FormErrors,
+    getErrorText,
+    Setter,
+    valueOnChangeDropdownList,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
-import { ParcelCardProps } from "../ParcelForm";
+import { ParcelCardProps, ParcelFields } from "../ParcelForm";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { CollectionTimeSlotsLabelsAndValues, DbAvailableDaysType } from "@/common/fetch";
 import { Schema } from "@/databaseUtils";
@@ -42,8 +47,12 @@ const CollectionSlotCard: React.FC<CollectionSlotsCardProps> = ({
                     labelsAndValues={collectionTimeSlotsLabelsAndValues}
                     listTitle="Collection Slot"
                     value={fields.collectionSlot ?? ""}
-                    onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "collectionSlot")}
                     disabled={isDisabledFormInput}
+                    onChange={valueOnChangeDropdownList(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ParcelFields>>,
+                        "collectionSlot"
+                    )}
                 />
                 <ErrorText>{getErrorText(formErrors.collectionSlot)}</ErrorText>
             </>

@@ -1,7 +1,6 @@
 import supabase from "@/supabaseClient";
 import { PostgrestError } from "@supabase/supabase-js";
 import { WikiRowQueryType } from "@/app/info/AddWikiItemButton";
-import { DbClientTableRow } from "@/databaseUtils";
 
 export async function reorderTwoItemsInWikiTable(
     key1: string,

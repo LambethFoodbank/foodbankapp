@@ -6,10 +6,11 @@ import {
     getDefaultTextValue,
     onChangeText,
     onChangeAdditionalFields,
-    Errors,
+    FormErrors,
+    Setter,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
+import { ClientCardProps, ClientFields } from "../ClientForm";
 import { formatPhoneNumber, phoneNumberRegex } from "@/common/format";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
@@ -118,12 +119,14 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                         {index === 1 && <FormText>Additional Phone Numbers</FormText>}
                         {index === 0 && (
                             <FreeFormTextInput
+                                id="client-phone-number"
+                                label="Primary Phone Number"
                                 defaultValue={getDefaultTextValue(fields, "phoneNumber")}
                                 error={errorExists(formErrors.phoneNumber)}
                                 helperText={getErrorText(formErrors.phoneNumber)}
                                 onChange={onChangeText(
                                     fieldSetter,
-                                    errorSetter,
+                                    errorSetter as Setter<FormErrors<ClientFields>>,
                                     "phoneNumber",
                                     {
                                         required: phoneNumberIsRequired,
@@ -140,12 +143,14 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                 <FreeFormTextInput
                                     disabled={errorExists(formErrors.phoneNumber)}
                                     key={phone.id}
-                                    id={`client-phone-number-${phone.id}`}
+                                    id={`client-additional-phone-number-${phone.id}`}
                                     label={`Phone Number ${index > 0 ? index + 1 : ""}`}
                                     defaultValue={fields.additionalPhoneNumbers?.[index - 1] || ""}
-                                    error={errorExists(
-                                        formErrors.additionalPhoneNumbers?.[index - 1]
-                                    )}
+                                    error={
+                                        formErrors.additionalPhoneNumbers?.[index - 1] !==
+                                            undefined &&
+                                        errorExists(formErrors.additionalPhoneNumbers?.[index - 1])
+                                    }
                                     helperText={getErrorText(
                                         formErrors.additionalPhoneNumbers?.[index - 1]
                                     )}
@@ -153,7 +158,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                         fieldSetter,
                                         fields.additionalPhoneNumbers,
                                         fields.phoneNumber,
-                                        errorSetter,
+                                        errorSetter as Setter<FormErrors<ClientFields>>,
                                         "additionalPhoneNumbers",
                                         index - 1,
                                         {
@@ -166,6 +171,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                 <Button
                                     color="error"
                                     startIcon={<DeleteIcon />}
+                                    id={`remove-additional-phone-number-${phone.id}`}
                                     onClick={() => handleRemovePhoneNumber(index)}
                                 ></Button>
                             </GappedRowDiv>

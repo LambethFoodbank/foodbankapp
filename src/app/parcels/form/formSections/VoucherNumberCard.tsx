@@ -1,10 +1,16 @@
 import React from "react";
 import { emailRegex, phoneNumberRegex } from "@/common/format";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import { errorExists, getErrorText, onChangeText } from "@/components/Form/formFunctions";
+import {
+    errorExists,
+    FormErrors,
+    getErrorText,
+    onChangeText,
+    Setter,
+} from "@/components/Form/formFunctions";
 import { GappedDiv } from "@/components/Form/formStyling";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ParcelCardProps } from "../ParcelForm";
+import { ParcelCardProps, ParcelFields } from "../ParcelForm";
 
 const voucherNumberIsRequired = true;
 
@@ -25,23 +31,38 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                     label="Voucher Number*"
                     error={errorExists(formErrors.voucherNumber)}
                     helperText={getErrorText(formErrors.voucherNumber)}
-                    onChange={onChangeText(fieldSetter, errorSetter, "voucherNumber", {
-                        required: voucherNumberIsRequired,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ParcelFields>>,
+                        "voucherNumber",
+                        {
+                            required: voucherNumberIsRequired,
+                        }
+                    )}
                     defaultValue={fields.voucherNumber}
                 />
                 <FreeFormTextInput
                     label="Referral Agency"
-                    onChange={onChangeText(fieldSetter, errorSetter, "referralAgency", {
-                        required: false,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ParcelFields>>,
+                        "referralAgency",
+                        {
+                            required: false,
+                        }
+                    )}
                     defaultValue={fields.referralAgency}
                 />
                 <FreeFormTextInput
                     label="Referrer Name"
-                    onChange={onChangeText(fieldSetter, errorSetter, "referrerName", {
-                        required: false,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ParcelFields>>,
+                        "referrerName",
+                        {
+                            required: false,
+                        }
+                    )}
                     defaultValue={fields.referrerName}
                 />
                 <FreeFormTextInput
@@ -52,10 +73,15 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                             ? getErrorText(formErrors.referrerEmail)
                             : undefined
                     }
-                    onChange={onChangeText(fieldSetter, errorSetter, "referrerEmail", {
-                        required: false,
-                        regex: emailRegex,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ParcelFields>>,
+                        "referrerEmail",
+                        {
+                            required: false,
+                            regex: emailRegex,
+                        }
+                    )}
                     defaultValue={fields.referrerEmail}
                 />
                 <FreeFormTextInput
@@ -66,10 +92,15 @@ const VoucherNumberCard: React.FC<ParcelCardProps> = ({
                             ? getErrorText(formErrors.referrerPhone)
                             : undefined
                     }
-                    onChange={onChangeText(fieldSetter, errorSetter, "referrerPhone", {
-                        required: false,
-                        regex: phoneNumberRegex,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ParcelFields>>,
+                        "referrerPhone",
+                        {
+                            required: false,
+                            regex: phoneNumberRegex,
+                        }
+                    )}
                     defaultValue={fields.referrerPhone}
                 />
             </GappedDiv>

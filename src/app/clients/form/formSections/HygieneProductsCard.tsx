@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import {
     checkboxGroupToArray,
+    FormErrors,
     getDefaultTextValue,
     onChangeCheckboxInGroup,
     onChangeText,
+    Setter,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
+import { ClientCardProps, ClientFields } from "../ClientForm";
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
@@ -55,9 +57,14 @@ const HygieneProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSett
                     <FreeFormTextInput
                         label="How Many"
                         defaultValue={getDefaultTextValue(fields, "hygieneProductsTampons")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "hygieneProductsTampons", {
-                            required: false,
-                        })}
+                        onChange={onChangeText(
+                            fieldSetter,
+                            errorSetter as Setter<FormErrors<ClientFields>>,
+                            "hygieneProductsTampons",
+                            {
+                                required: false,
+                            }
+                        )}
                     />
                 )}
 
@@ -69,9 +76,14 @@ const HygieneProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSett
                     <FreeFormTextInput
                         label="How Many"
                         defaultValue={getDefaultTextValue(fields, "hygieneProductsPads")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "hygieneProductsPads", {
-                            required: false,
-                        })}
+                        onChange={onChangeText(
+                            fieldSetter,
+                            errorSetter as Setter<FormErrors<ClientFields>>,
+                            "hygieneProductsPads",
+                            {
+                                required: false,
+                            }
+                        )}
                     />
                 )}
 
