@@ -110,6 +110,13 @@ export type Database = {
             foreignKeyName: "audit_log_list_id_fkey"
             columns: ["list_id"]
             isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
             referencedRelation: "lists"
             referencedColumns: ["primary_key"]
           },
@@ -365,6 +372,13 @@ export type Database = {
           vegetarian?: Database["public"]["Enums"]["item_dietary_status"] | null
         }
         Relationships: [
+          {
+            foreignKeyName: "dietary_requirements_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "dietary_requirements_id_fkey"
             columns: ["id"]
@@ -822,6 +836,13 @@ export type Database = {
             foreignKeyName: "audit_log_list_id_fkey"
             columns: ["list_id"]
             isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
             referencedRelation: "lists"
             referencedColumns: ["primary_key"]
           },
@@ -911,15 +932,7 @@ export type Database = {
           vegan: Database["public"]["Enums"]["item_dietary_status"] | null
           vegetarian: Database["public"]["Enums"]["item_dietary_status"] | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "dietary_requirements_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "lists"
-            referencedColumns: ["primary_key"]
-          },
-        ]
+        Relationships: []
       }
       family_count: {
         Row: {
