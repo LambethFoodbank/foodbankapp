@@ -178,17 +178,9 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                         )}
                     </GappedDiv>
                 ))}
-                {!errorExists(formErrors.phoneNumber) &&
-                    (!formErrors.additionalPhoneNumbers ||
-                        formErrors.additionalPhoneNumbers.every((err) => !errorExists(err))) && (
-                        <Button
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            onClick={handleAddPhoneNumber}
-                        >
-                            Add another phone number
-                        </Button>
-                    )}
+                <Button color="primary" startIcon={<AddIcon />} onClick={handleAddPhoneNumber}>
+                    Add another phone number
+                </Button>
                 {errorMessage && (
                     <FloatingToast
                         message={errorMessage}
