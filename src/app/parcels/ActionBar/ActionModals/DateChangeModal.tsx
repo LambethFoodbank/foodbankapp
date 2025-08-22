@@ -10,7 +10,11 @@ import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import SingleDateInput, { DateInputProps } from "@/components/DateInputs/SingleDateInput";
 import dayjs, { Dayjs } from "dayjs";
 import { getDbDate } from "@/common/format";
-import { getUpdateErrorMessage, packingDateOrSlotUpdate } from "./CommonDateAndSlot";
+import {
+    getUpdateErrorMessage,
+    packingDateorSlotCheckConcurrency,
+    packingDateOrSlotUpdate,
+} from "./CommonDateAndSlot";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 
@@ -85,6 +89,29 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
             return;
         }
         const newPackingDate = getDbDate(dayjs(date));
+
+        const packingDateConcurrencyUpdateFlag = await props.selectedParcels.reduce<
+            Promise<boolean>
+        >(async (accPromise, parcel) => {
+            const acc = await accPromise;
+            if (!acc) {
+                return false;
+            }
+
+            const result = await packingDateorSlotCheckConcurrency(
+                {
+                    ...parcel,
+                    originalLastUpdated: parcel.lastUpdated,
+                },
+                "packingDate"
+            );
+            return acc && result;
+        }, Promise.resolve(true));
+        if (!packingDateConcurrencyUpdateFlag) {
+            setErrorMessage("Record has been edited recently - please refresh the page.");
+            setActionCompleted(true);
+            return;
+        }
 
         const packingDateUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {

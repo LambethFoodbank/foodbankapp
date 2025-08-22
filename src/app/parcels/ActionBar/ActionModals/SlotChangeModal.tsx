@@ -10,7 +10,11 @@ import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import supabase from "@/supabaseClient";
 import { PackingSlotsLabelsAndValues, fetchPackingSlotsInfo } from "@/common/fetch";
 import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
-import { getUpdateErrorMessage, packingDateOrSlotUpdate } from "./CommonDateAndSlot";
+import {
+    getUpdateErrorMessage,
+    packingDateorSlotCheckConcurrency,
+    packingDateOrSlotUpdate,
+} from "./CommonDateAndSlot";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 
@@ -102,6 +106,30 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
             setWarningMessage("Please choose a valid packing slot.");
             return;
         }
+
+        const packingDateConcurrencyUpdateFlag = await props.selectedParcels.reduce<
+            Promise<boolean>
+        >(async (accPromise, parcel) => {
+            const acc = await accPromise;
+            if (!acc) {
+                return false;
+            }
+
+            const result = await packingDateorSlotCheckConcurrency(
+                {
+                    ...parcel,
+                    originalLastUpdated: parcel.lastUpdated,
+                },
+                "packingSlot"
+            );
+            return acc && result;
+        }, Promise.resolve(true));
+        if (!packingDateConcurrencyUpdateFlag) {
+            setErrorMessage("Record has been edited recently - please refresh the page.");
+            setActionCompleted(true);
+            return;
+        }
+
         const packingSlotUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
                 return packingDateOrSlotUpdate("packingSlot", slot, {

@@ -36,6 +36,63 @@ export const getUpdateErrorMessage = ({
 
 type UpdateField = "packingDate" | "packingSlot";
 
+export const packingDateorSlotCheckConcurrency = async (
+    parcel: ParcelsTableRowWithOriginalLastUpdated,
+    updateField: UpdateField
+): Promise<boolean> => {
+    const { data, error, count } = await supabase
+        .from("parcels")
+        .select("*", { count: "exact" })
+        .eq("primary_key", parcel.parcelId)
+        .eq("last_updated", parcel.lastUpdated);
+    let action = "Change Packing Slot";
+    if (updateField === "packingDate") {
+        action = "Change Packing Date";
+    }
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetching parcel data", error);
+        await sendAuditLog({
+            action: action,
+            content: {
+                before: { ...parcel }.toString(),
+                after: { ...parcel }.toString(),
+                parcelDetails: {
+                    client_id: parcel.clientId,
+                    packing_date: parcel.packingDate?.toString(),
+                    packing_slot: parcel.packingSlot,
+                    voucher_number: parcel.voucherNumber,
+                    collection_centre: parcel.deliveryCollection.collectionCentreName,
+                    collection_datetime: parcel.collectionDatetime?.toString(),
+                },
+                actionType: "Edit",
+            },
+            wasSuccess: false,
+            logId,
+        });
+    } else if (!data || data.length === 0 || count === 0) {
+        const logId = await logWarningReturnLogId(`Concurrent editing of ${updateField}.`);
+        await sendAuditLog({
+            action: action,
+            content: {
+                before: { ...parcel }.toString(),
+                after: { ...parcel }.toString(),
+                parcelDetails: {
+                    client_id: parcel.clientId,
+                    packing_date: parcel.packingDate?.toString(),
+                    packing_slot: parcel.packingSlot,
+                    voucher_number: parcel.voucherNumber,
+                    collection_centre: parcel.deliveryCollection.collectionCentreName,
+                    collection_datetime: parcel.collectionDatetime?.toString(),
+                },
+                actionType: "Edit",
+            },
+            wasSuccess: false,
+            logId,
+        });
+    }
+    return !(error || !data || data.length === 0 || count === 0);
+};
+
 export const packingDateOrSlotUpdate = async (
     updateField: UpdateField,
     packingDateOrSlotData: string,
@@ -77,7 +134,9 @@ export const packingDateOrSlotUpdate = async (
             action = "change packing slot";
             break;
     }
+
     const { data: parcelData, error: fetchError } = await fetchParcel(parcel.parcelId, supabase);
+
     if (fetchError) {
         const logId = await logErrorReturnLogId("Error with fetching parcel data", fetchError);
         await sendAuditLog({
