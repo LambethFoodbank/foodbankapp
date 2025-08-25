@@ -86,13 +86,36 @@ export const clickEditButtonForCentre = (
         .should("be.visible");
 };
 
-export const saveToCloseModal = (modalId: string, buttonId: string): void => {
-    cy.get('div[data-testid="' + modalId + '"]') // eslint-disable-line quotes
-        .find('[data-testid="' + buttonId + '"]') // eslint-disable-line quotes
+export const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
+    void collectionCentreName;
+    cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
+        .find('[data-testid="SaveSlotsCloseModal"]') // eslint-disable-line quotes
+        .click();
+    cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]').should("not.exist"); // eslint-disable-line quotes
+
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(".MuiDataGrid-row--editing")
+        .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
 
-    cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]', { timeout: 10000 }) // eslint-disable-line quotes
-        .should("not.exist");
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(500);
+};
+
+export const saveAvailableDaysForCentre = (collectionCentreName: string): void => {
+    void collectionCentreName;
+    cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+        .find('[data-testid="SaveAvailableDaysCloseModal"]') // eslint-disable-line quotes
+        .click();
+    cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]').should("not.exist"); // eslint-disable-line quotes
+
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .find(".MuiDataGrid-row--editing")
+        .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
+        .click();
+
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(500);
 };
 
 export const addNewCollectionCentre = (newCollectionCentreName: string): void => {
