@@ -158,7 +158,6 @@ describe("Edit a collection centre on admins page", () => {
             cy.get("@timeSlots").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
 
             // Save to close modal
-            //saveToCloseModal("CollectionCentreTimeSlotsModal", "SaveSlotsCloseModal");
             saveTimeSlotsForCentre(newCollectionCentreName);
             // Open modal for same collection centre
             clickEditButtonForCentre(
@@ -194,7 +193,6 @@ describe("Edit a collection centre on admins page", () => {
             tickAvailabilityCheckbox(0);
 
             // Save to close modal
-            //saveToCloseModal("CollectionCentreAvailableDaysModal", "SaveDaysCloseModal");
             saveAvailableDaysForCentre(newCollectionCentreName);
             // Open modal for the same collection centre
             clickEditButtonForCentre(

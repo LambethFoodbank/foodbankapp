@@ -99,13 +99,13 @@ export const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
         .click();
 
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(500);
+    cy.wait(5000);
 };
 
 export const saveAvailableDaysForCentre = (collectionCentreName: string): void => {
     void collectionCentreName;
     cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
-        .find('[data-testid="SaveAvailableDaysCloseModal"]') // eslint-disable-line quotes
+        .contains("button", "Save")
         .click();
     cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]').should("not.exist"); // eslint-disable-line quotes
 
@@ -115,7 +115,7 @@ export const saveAvailableDaysForCentre = (collectionCentreName: string): void =
         .click();
 
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(500);
+    cy.wait(5000);
 };
 
 export const addNewCollectionCentre = (newCollectionCentreName: string): void => {
