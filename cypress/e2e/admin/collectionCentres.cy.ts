@@ -6,7 +6,7 @@ import {
     saveAvailableDaysForCentre,
     saveTimeSlotsForCentre,
     startEditingCollectionCentreRow,
-    tickAvailabilityCheckbox,
+    //tickAvailabilityCheckbox,
     uncheckIsShownInRowBeingEditedAndSave,
 } from "./commonActions/collectionCentres";
 
