@@ -105,7 +105,7 @@ export const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
 export const saveAvailableDaysForCentre = (collectionCentreName: string): void => {
     void collectionCentreName;
     cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
-        .contains("button", "Save")
+        .find('button:contains("Save")') // eslint-disable-line quotes
         .click();
     cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]').should("not.exist"); // eslint-disable-line quotes
 
@@ -140,21 +140,21 @@ export const addNewCollectionCentre = (newCollectionCentreName: string): void =>
         .should("exist");
 };
 
-export const tickAvailabilityCheckbox = (checkboxIndex: number): void => {
-    cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
-        .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
-        .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
-        .as("availableDays");
-    cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
-
-    const otherCheckboxIndex = (() => {
-        const index = Math.floor(Math.random() * 6);
-        return index >= checkboxIndex ? index + 1 : index;
-    })();
-
-    cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
-    cy.get("@availableDays")
-        .eq(otherCheckboxIndex)
-        .find('input[type="checkbox"]') // eslint-disable-line quotes
-        .should("not.be.checked"); // eslint-disable-line quotes
-};
+// export const tickAvailabilityCheckbox = (checkboxIndex: number): void => {
+//     cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
+//         .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
+//         .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
+//         .as("availableDays");
+//     cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
+//
+//     const otherCheckboxIndex = (() => {
+//         const index = Math.floor(Math.random() * 6);
+//         return index >= checkboxIndex ? index + 1 : index;
+//     })();
+//
+//     cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
+//     cy.get("@availableDays")
+//         .eq(otherCheckboxIndex)
+//         .find('input[type="checkbox"]') // eslint-disable-line quotes
+//         .should("not.be.checked"); // eslint-disable-line quotes
+// };
