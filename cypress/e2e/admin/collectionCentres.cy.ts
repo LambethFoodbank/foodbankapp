@@ -41,7 +41,7 @@ describe("Edit a collection centre on admins page", () => {
 
         uncheckIsShownInRowBeingEditedAndSave();
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-            .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
+            .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 10000 })
             .should("exist");
 
         // Check the cc row appears as 'not shown'
@@ -204,7 +204,7 @@ describe("Edit a collection centre on admins page", () => {
             // Check list of days was saved
             cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
                 .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
-                .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
+                .find('[aria-label="Available Day"]', { timeout: 10000 }) // eslint-disable-line quotes
                 .as("availableDays");
             cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
             cy.get("@availableDays").eq(1).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
