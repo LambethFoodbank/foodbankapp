@@ -11,7 +11,7 @@ interface CloudWatchConfig {
     logLevel: string;
 }
 
-const PROD_LIKE_ENVIRONMENTS = ["production", "staging", "dev"];
+const PROD_LIKE_ENVIRONMENTS = ["production", "staging", "dev", "intern-dev"];
 
 const getRequiredEnvironmentVariable = (variableName: string): string => {
     const value = process.env[variableName];
