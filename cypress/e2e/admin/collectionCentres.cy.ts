@@ -7,6 +7,15 @@ describe("Edit a collection centre on admins page", () => {
     });
 
     it("Adds a collection centre and hides it successfully", () => {
+        cy.intercept({ method: "GET", url: "**/rest/v1/collection_centres*" }).as(
+            "getCollectionCentres"
+        );
+        cy.intercept({ method: "PATCH", url: "**/rest/v1/collection_centres*" }).as(
+            "updateCollectionCentre"
+        );
+        cy.intercept({ method: "POST", url: "**/rest/v1/collection_centres*" }).as(
+            "saveCollectionCentre"
+        );
         toggleCollectionCentreSection();
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .find(".MuiDataGrid-row", { timeout: 5000 })
@@ -50,6 +59,15 @@ describe("Edit a collection centre on admins page", () => {
     });
 
     it("Adds a collection centre and edits collection slots successfully", () => {
+        cy.intercept({ method: "GET", url: "**/rest/v1/collection_centres*" }).as(
+            "getCollectionCentres"
+        );
+        cy.intercept({ method: "PATCH", url: "**/rest/v1/collection_centres*" }).as(
+            "updateCollectionCentre"
+        );
+        cy.intercept({ method: "POST", url: "**/rest/v1/collection_centres*" }).as(
+            "saveCollectionCentre"
+        );
         toggleCollectionCentreSection();
 
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
@@ -127,7 +145,14 @@ describe("Edit a collection centre on admins page", () => {
         cy.get("@timeSlots").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
 
         saveTimeSlotsForCentre(newCollectionCentreName);
-        // Open modal for same collection centre
+
+        // Save row
+        cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+            .find(".MuiDataGrid-row--editing", { timeout: 5000 })
+            .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
+            .click();
+
+        // Open modal for the same collection centre
         clickEditSlotsButtonForCentre(newCollectionCentreName);
         cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
             .should("be.visible");
@@ -146,6 +171,7 @@ describe("Edit a collection centre on admins page", () => {
 
 const toggleCollectionCentreSection = (): void => {
     cy.get('[aria-label="Section: Collection Centres"]').click(); // eslint-disable-line quotes
+    cy.wait("@getCollectionCentres");
 };
 
 const startAddingNewCollectionCentre = (): void => {
@@ -156,7 +182,7 @@ const startAddingNewCollectionCentre = (): void => {
 
 const fillOutNewCollectionCentreRowAndSave = (newCollectionCentreName: string): void => {
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .find(".MuiDataGrid-row--editing")
+        .find(".MuiDataGrid-row--editing", { timeout: 5000 })
         .as("newRow");
 
     cy.get("@newRow")
@@ -172,6 +198,7 @@ const fillOutNewCollectionCentreRowAndSave = (newCollectionCentreName: string): 
     cy.get("@newRow")
         .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
+    cy.wait("@saveCollectionCentre");
 };
 
 const startEditingCollectionCentreRow = (collectionCentreName: string): void => {
@@ -185,7 +212,7 @@ const startEditingCollectionCentreRow = (collectionCentreName: string): void => 
 
 const uncheckIsShownInRowBeingEditedAndSave = (): void => {
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .find(".MuiDataGrid-row--editing")
+        .find(".MuiDataGrid-row--editing", { timeout: 5000 })
         .as("rowBeingEdited");
 
     cy.get("@rowBeingEdited")
@@ -196,11 +223,15 @@ const uncheckIsShownInRowBeingEditedAndSave = (): void => {
     cy.get("@rowBeingEdited")
         .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
+    cy.wait("@updateCollectionCentre");
 };
 
 const clickEditSlotsButtonForCentre = (collectionCentreName: string): void => {
+    cy.wait("@getCollectionCentres");
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .find('[aria-label="Edit collection slots for ' + collectionCentreName + '"]') // eslint-disable-line quotes
+        .find(`[aria-label="Edit collection slots for ${collectionCentreName}"]`, {
+            timeout: 5000,
+        })
         .click();
 };
 
@@ -226,12 +257,4 @@ const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
         .find('[data-testid="SaveSlotsCloseModal"]') // eslint-disable-line quotes
         .click();
     cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]').should("not.exist"); // eslint-disable-line quotes
-
-    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .find(".MuiDataGrid-row--editing")
-        .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
-        .click();
-
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(500);
 };
