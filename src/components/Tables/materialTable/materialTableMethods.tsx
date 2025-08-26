@@ -1,5 +1,10 @@
 import { MRT_ColumnDef } from "material-react-table";
-import { ColumnDisplayFunctions, TableHeaders } from "@/components/Tables/Table";
+import {
+    ColumnDisplayFunctions,
+    GenericSortMethod,
+    SortOptions,
+    TableHeaders,
+} from "@/components/Tables/Table";
 
 import React from "react";
 
@@ -21,9 +26,10 @@ const renderMRTCell = <Data extends object, K extends keyof Data>(
     return element;
 };
 
-export const mapHeadersToMRTColumns = <Data extends object>(
+export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends GenericSortMethod>(
     headers: TableHeaders<Data>,
-    columnVisibility: Record<string, boolean>,
+    toggleableHeaders: readonly (keyof Data | string)[],
+    sortableColumns: SortOptions<Data, SortMethod>[],
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>
 ): MRT_ColumnDef<Data>[] => {
     return headers.map(([key, label]) => {
@@ -36,7 +42,8 @@ export const mapHeadersToMRTColumns = <Data extends object>(
 
                 return renderMRTCell(value, key, renderer);
             },
-            visibleInShowHideMenu: columnVisibility[key as string],
+            visibleInShowHideMenu: toggleableHeaders.includes(key),
+            enableSorting: !!sortableColumns.find((column) => column.key === key),
         };
     });
 };
