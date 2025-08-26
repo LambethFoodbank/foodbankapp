@@ -102,4 +102,47 @@ export const possiblePostCodes = [
     null,
 ];
 
+export const possibleBabyFoods = [
+    "Pureed Carrots",
+    "Mashed Bananas",
+    "Applesauce",
+    "Sweet Potato Mash",
+    "Rice Cereal",
+    "Pea Puree",
+    "Pumpkin Puree",
+    "Pear Mash",
+    "Mixed Vegetable Puree",
+    "Other",
+    null,
+];
+
+export const possibleBabyFormula = [
+    "Similac Advance",
+    "Enfamil NeuroPro",
+    "Gerber Good Start Gentle",
+    "HiPP Combiotic",
+    "Holle Organic Formula",
+    "Kirkland Signature ProCare",
+    "Earth’s Best Organic Dairy",
+    "Bobbie Organic Infant Formula",
+    "Parent’s Choice Infant Formula",
+    "Other",
+    null,
+];
+
+export const defaultNotes = [
+    "E.g., Family prefers canned goods over dry items. Please avoid spicy products.",
+    null,
+];
+
+export const defaultDeliveryInstructions = [
+    "E.g., Leave the package at the back gate if no one answers the door.",
+    null,
+];
+
+export const defaultExtraInformation = [
+    "E.g., One family member has a gluten intolerance. Diabetic-friendly items preferred.",
+    null,
+];
+
 export const booleansWeightedToTrue = Array(9).fill(true).concat(Array(1).fill(false));
