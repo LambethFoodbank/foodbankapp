@@ -54,6 +54,24 @@ const main = async (): Promise<never> => {
 
     await seed.packing_slots(packingSlots);
 
+    await seed.drivers((generate) =>
+        generate(25, (ctx) => {
+            return {
+                name: () => copycat.fullName(ctx.seed),
+                circuit_id: () => copycat.uuid(ctx.seed),
+            };
+        })
+    );
+
+    await seed.drivers((generate) =>
+        generate(25, (ctx) => {
+            return {
+                name: () => copycat.fullName(ctx.seed),
+                circuit_id: () => null,
+            };
+        })
+    );
+
     const today = new Date();
     const thisYear = today.getFullYear();
 
