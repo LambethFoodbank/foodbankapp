@@ -19,4 +19,4 @@ Concurrency is a common concern across the site. While the handling may differ b
 
 ### 5. Maintain Data Consistency
 - If a concurrency conflict is detected, display the following message:
-  Record has been edited recently - please refresh the page. Log ID: ${error.logId}
+  *Record has been edited recently - please refresh the page. Log ID: ${error.logId}*
