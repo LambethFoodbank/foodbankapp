@@ -42,7 +42,9 @@ export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends G
 
                 return renderMRTCell(value, key, renderer);
             },
-            visibleInShowHideMenu: toggleableHeaders.includes(key),
+            ...(toggleableHeaders.length > 0 && {
+                visibleInShowHideMenu: toggleableHeaders.includes(key),
+            }),
             enableSorting: !!sortableColumns.find((column) => column.key === key),
         };
     });
