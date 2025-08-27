@@ -18,6 +18,7 @@ export type Database = {
           content: Json | null
           created_at: string
           dietary_requirement: string | null
+          driver_id: string | null
           event_id: string | null
           list_id: string | null
           log_id: string | null
@@ -38,6 +39,7 @@ export type Database = {
           content?: Json | null
           created_at?: string
           dietary_requirement?: string | null
+          driver_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -58,6 +60,7 @@ export type Database = {
           content?: Json | null
           created_at?: string
           dietary_requirement?: string | null
+          driver_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -98,6 +101,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "parcels_plus"
             referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "audit_log_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_event_id_fkey"
@@ -323,6 +333,27 @@ export type Database = {
           time_slots?:
             | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
             | null
+        }
+        Relationships: []
+      }
+      drivers: {
+        Row: {
+          circuit_id: string | null
+          id: string
+          last_updated: string
+          name: string
+        }
+        Insert: {
+          circuit_id?: string | null
+          id?: string
+          last_updated?: string
+          name: string
+        }
+        Update: {
+          circuit_id?: string | null
+          id?: string
+          last_updated?: string
+          name?: string
         }
         Relationships: []
       }

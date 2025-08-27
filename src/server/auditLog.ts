@@ -23,6 +23,7 @@ export interface AuditLog {
     websiteData?: string;
     wikiId?: string;
     dietaryRequirement?: string;
+    driversId?: string;
 }
 
 export async function sendAuditLog(auditLogProps: AuditLog): Promise<void> {
