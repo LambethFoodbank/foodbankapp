@@ -1,4 +1,4 @@
-import { BreakPointConfig, Row, ServerPaginatedTable } from "@/components/Tables/Table";
+import { BreakPointConfig } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import { ParcelsFilter, ParcelsSortState, ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { DbParcelRow } from "@/databaseUtils";
@@ -25,6 +25,8 @@ import { getParcelsTableDataAndAllIds } from "@/app/parcels/parcelsTable/fetchPa
 import supabase from "@/supabaseClient";
 import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
+import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
+import { MRT_Row } from "material-react-table";
 
 interface ParcelsTableProps {
     checkedParcelIds: string[];
@@ -64,9 +66,9 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const fetchParcelsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [parcelCountPerPage, setParcelCountPerPage] = useState(defaultNumberOfParcelsPerPage);
-    const [currentPage, setCurrentPage] = useState(1);
-    const startPoint = (currentPage - 1) * parcelCountPerPage;
-    const endPoint = currentPage * parcelCountPerPage - 1;
+    const [currentPage, setCurrentPage] = useState(0);
+    const startPoint = currentPage * parcelCountPerPage;
+    const endPoint = startPoint + parcelCountPerPage - 1;
 
     const parcelsTableFetchAbortController = useRef<AbortController | null>(null);
 
@@ -214,15 +216,25 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         }
     }, [filteredParcelCount, checkedParcelIds, isAllCheckBoxSelected]);
 
-    const onParcelTableRowClick = (row: Row<ParcelsTableRow>): void => {
-        openParcelModal(row.data.parcelId);
+    const onParcelTableRowClick = (row: MRT_Row<ParcelsTableRow>): void => {
+        openParcelModal(row.original.parcelId);
     };
 
     return (
         <TableSurface>
-            <ServerPaginatedTable<ParcelsTableRow, DbParcelRow, string | DateRangeState | string[]>
-                dataPortion={parcelsDataPortion}
+            <ServerPaginatedMaterialTable<
+                ParcelsTableRow,
+                DbParcelRow,
+                string | DateRangeState | string[]
+            >
+                data={parcelsDataPortion}
+                setData={setParcelsDataPortion}
+                headerKeysAndLabels={parcelTableHeaderKeysAndLabels}
+                defaultShownHeaders={parcelTableDefaultShownHeaders}
+                toggleableHeaders={parcelTableToggleableHeaders}
+                columnDisplayFunctions={parcelTableColumnDisplayFunctions}
                 isLoading={isLoading}
+                enableRowOrdering={true}
                 paginationConfig={{
                     enablePagination: true,
                     filteredCount: filteredParcelCount,
@@ -231,23 +243,17 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     defaultRowsPerPage: defaultNumberOfParcelsPerPage,
                     rowsPerPageOptions: numberOfParcelsPerPageOptions,
                 }}
-                headerKeysAndLabels={parcelTableHeaderKeysAndLabels}
-                columnDisplayFunctions={parcelTableColumnDisplayFunctions}
-                columnStyleOptions={parcelTableColumnStyleOptions}
-                onRowClick={onParcelTableRowClick}
                 sortConfig={{
                     sortPossible: true,
                     sortableColumns: parcelsSortableColumns,
                     setSortState: setSortState,
                 }}
                 defaultSortConfig={defaultParcelsSortConfig}
-                rowBreakPointConfigs={parcelRowBreakPointConfig}
                 filterConfig={{
                     primaryFiltersShown: false,
                     additionalFiltersShown: false,
                 }}
-                defaultShownHeaders={parcelTableDefaultShownHeaders}
-                toggleableHeaders={parcelTableToggleableHeaders}
+                onRowClick={onParcelTableRowClick}
                 checkboxConfig={{
                     displayed: true,
                     selectedRowIds: checkedParcelIds,
@@ -256,8 +262,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     onAllCheckboxClicked: () => toggleAllCheckBox(),
                     isRowChecked: (parcelData) => checkedParcelIds.includes(parcelData.parcelId),
                 }}
-                editableConfig={{ editable: false }}
-                pointerOnHover={true}
+                columnStyleOptions={parcelTableColumnStyleOptions}
             />
         </TableSurface>
     );
