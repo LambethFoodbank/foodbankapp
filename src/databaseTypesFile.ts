@@ -419,6 +419,41 @@ export type Database = {
           },
         ]
       }
+      emergency_bags: {
+        Row: {
+          amount: number
+          collection_centre: string
+          created_at: string
+          id: string
+          packing_date: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          collection_centre: string
+          created_at?: string
+          id?: string
+          packing_date: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          collection_centre?: string
+          created_at?: string
+          id?: string
+          packing_date?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_bags_collection_centre_fkey"
+            columns: ["collection_centre"]
+            isOneToOne: false
+            referencedRelation: "collection_centres"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
       events: {
         Row: {
           event_data: string | null
