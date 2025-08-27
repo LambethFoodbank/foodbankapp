@@ -140,7 +140,7 @@ const DriversTable: React.FC = () => {
                 }
             )
             .subscribe(async (status, error) => {
-                if (subscriptionStatusRequiresErrorMessage(status, error, "delivery_areas")) {
+                if (subscriptionStatusRequiresErrorMessage(status, error, "drivers")) {
                     setErrorMessage("Error fetching data, please reload");
                 } else {
                     setErrorMessage(null);
