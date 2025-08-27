@@ -16,6 +16,7 @@ import {
 } from "@mui/x-data-grid";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+    CollectionCentreAvailability,
     CollectionCentresTableRow,
     fetchCollectionCentresForTable,
     FormattedAvailableDaysWithPrimaryKey,
@@ -176,7 +177,12 @@ const CollectionCentresTable: React.FC = () => {
     const refreshRow = async (id: string): Promise<CollectionCentresTableRow | null> => {
         const { data: latestRow, error } = await supabase
             .from("collection_centres")
-            .select("*")
+            .select(
+                `
+      *,
+      collection_centres_availability!inner(day_index, is_active, time_slots)
+    `
+            )
             .eq("primary_key", id)
             .single();
 
@@ -190,13 +196,18 @@ const CollectionCentresTable: React.FC = () => {
             acronym: latestRow.acronym,
             isDelivery: latestRow.is_delivery,
             isShown: latestRow.is_shown,
-            lastUpdated: latestRow.last_updated,
-            timeSlots: latestRow.time_slots,
-            availableDays: latestRow.available_days,
+            availability: latestRow.collection_centres_availability
+                .sort((a, b) => a.day_index - b.day_index)
+                .map((day) => ({
+                    dayIndex: day.day_index,
+                    isActive: day.is_active,
+                    timeSlots: day.time_slots || [],
+                })),
             isNew: false,
+            lastUpdated: latestRow.last_updated,
         };
 
-        setRows((prevRows) => prevRows.map((row) => (row.id === id ? mappedRow : row)));
+        setRows((prev) => prev.map((row) => (row.id === id ? mappedRow : row)));
         setErrorMessage(null);
         return mappedRow;
     };
@@ -474,14 +485,18 @@ const CollectionCentresTable: React.FC = () => {
                         if (!selectedRowForTimeSlotEdit) {
                             return;
                         }
+                        const mappedTimeSlots = payload.timeSlots.map((slot) => ({
+                            time: slot.time
+                                ? `${slot.time.length === 5 ? slot.time + ":00" : slot.time}`
+                                : null,
+                            is_active: slot.isActive ?? false,
+                        }));
 
                         const updatedRow: CollectionCentresTableRow = {
                             ...selectedRowForTimeSlotEdit,
-                            timeSlots: payload.timeSlots.map((slot) => ({
-                                time: slot.time
-                                    ? `${slot.time.length === 5 ? slot.time + ":00" : slot.time}`
-                                    : null,
-                                is_active: slot.isActive ?? false,
+                            availability: selectedRowForTimeSlotEdit.availability.map((day) => ({
+                                ...day,
+                                timeSlots: mappedTimeSlots,
                             })),
                         };
                         setRows((prevRows) =>

@@ -43,20 +43,12 @@ interface Props {
 const formatCollectionCentreTimeSlotDbData = (
     row: CollectionCentresTableRow
 ): FormattedTimeSlotsWithPrimaryKey => {
-    let formattedTimeSlots: FormattedTimeSlot[];
-
-    if (row.timeSlots === null || row.timeSlots === undefined) {
-        formattedTimeSlots = [];
-    } else {
-        formattedTimeSlots = row.timeSlots.map((timeSlot) => {
-            return {
-                time: formatTimeStringToHoursAndMinutes(
-                    timeSlot.time !== null ? timeSlot.time : ""
-                ),
-                isActive: timeSlot.is_active !== null ? timeSlot.is_active : false,
-            };
-        });
-    }
+    const formattedTimeSlots: FormattedTimeSlot[] = row.availability
+        .flatMap((day) => day.timeSlots ?? [])
+        .map((timeSlot) => ({
+            time: formatTimeStringToHoursAndMinutes(timeSlot.time ?? ""),
+            isActive: timeSlot.is_active ?? false,
+        }));
 
     return {
         primaryKey: row.id,
