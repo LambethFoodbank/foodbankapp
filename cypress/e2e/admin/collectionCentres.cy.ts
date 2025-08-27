@@ -7,7 +7,7 @@ import {
     saveTimeSlotsForCentre,
     startEditingCollectionCentreRow,
     //tickAvailabilityCheckbox,
-    uncheckIsShownInRowBeingEditedAndSave,
+    checkIsShownInRowBeingEditedAndSave,
 } from "./commonActions/collectionCentres";
 
 describe("Edit a collection centre on admins page", () => {
@@ -31,15 +31,16 @@ describe("Edit a collection centre on admins page", () => {
         newCollectionCentreName = `${uuidv4()}`;
     });
 
-    it("Adds a collection centre and hides it successfully", () => {
+    it("Adds a collection centre", () => {
         addNewCollectionCentre(newCollectionCentreName);
 
         startEditingCollectionCentreRow(newCollectionCentreName);
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .find(".MuiDataGrid-row--editing", { timeout: 5000 })
-            .should("exist");
+            .should("exist")
+            .as("rowBeingEdited");
 
-        uncheckIsShownInRowBeingEditedAndSave();
+        checkIsShownInRowBeingEditedAndSave("@rowBeingEdited");
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
             .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
             .should("exist");
@@ -52,7 +53,7 @@ describe("Edit a collection centre on admins page", () => {
 
         cy.get("@newlyEditedRow")
             .find('[data-field="isShown"]') // eslint-disable-line quotes
-            .find('[data-testid="CloseIcon"]') // eslint-disable-line quotes
+            .find('[data-testid="CheckIcon"]') // eslint-disable-line quotes
             .should("exist");
     });
 

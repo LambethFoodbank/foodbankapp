@@ -10,7 +10,7 @@ export const startAddingNewCollectionCentre = (): void => {
 
 export const fillOutNewCollectionCentreRowAndSave = (newCollectionCentreName: string): void => {
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .find(".MuiDataGrid-row--editing")
+        .find(".MuiDataGrid-row--editing", { timeout: 5000 })
         .as("newRow");
 
     cy.get("@newRow")
@@ -31,6 +31,7 @@ export const fillOutNewCollectionCentreRowAndSave = (newCollectionCentreName: st
 
     cy.wait("@saveCollectionCentre");
 
+    // Wait for the row to exit editing mode completely
     cy.get("@newRow").should("not.exist");
 };
 
@@ -43,19 +44,21 @@ export const startEditingCollectionCentreRow = (collectionCentreName: string): v
     cy.get("@newlyAddedRow").find('[data-testid="EditIcon"]').click(); // eslint-disable-line quotes
 };
 
-export const uncheckIsShownInRowBeingEditedAndSave = (): void => {
+export const checkIsShownInRowBeingEditedAndSave = (row: string): void => {
+    cy.get(row)
+        .find('[data-field="isShown"]') // eslint-disable-line quotes
+        .find('[type="checkbox"]') // eslint-disable-line quotes
+        .check();
+
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
         .find(".MuiDataGrid-row--editing")
         .as("rowBeingEdited");
 
-    cy.get("@rowBeingEdited")
-        .find('[data-field="isShown"]') // eslint-disable-line quotes
-        .find('[type="checkbox"]') // eslint-disable-line quotes
-        .uncheck();
-
-    cy.get("@rowBeingEdited")
+    cy.get(row)
         .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
+
+    cy.wait("@updateCollectionCentre");
 };
 
 export const addNewTimeSlotInModal = (hrs: string, min: string): void => {
@@ -137,7 +140,11 @@ export const addNewCollectionCentre = (newCollectionCentreName: string): void =>
     fillOutNewCollectionCentreRowAndSave(newCollectionCentreName);
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
         .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
-        .should("exist");
+        .should("be.visible");
+
+    // Give a moment for the database subscription to refresh the data with proper timestamps
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000);
 };
 
 // export const tickAvailabilityCheckbox = (checkboxIndex: number): void => {
