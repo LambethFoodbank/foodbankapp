@@ -1696,6 +1696,124 @@
         }
       ]
     },
+    "emergency_bags": {
+      "id": "public.emergency_bags",
+      "schemaName": "public",
+      "tableName": "emergency_bags",
+      "fields": [
+        {
+          "id": "public.emergency_bags.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.emergency_bags.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.emergency_bags.collection_centre",
+          "name": "collection_centre",
+          "columnName": "collection_centre",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.emergency_bags.packing_date",
+          "name": "packing_date",
+          "columnName": "packing_date",
+          "type": "date",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.emergency_bags.type",
+          "name": "type",
+          "columnName": "type",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.emergency_bags.amount",
+          "name": "amount",
+          "columnName": "amount",
+          "type": "numeric",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "collection_centres",
+          "type": "collection_centres",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "emergency_bagsTocollection_centres",
+          "relationFromFields": [
+            "collection_centre"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "emergency_bags_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "dietary_requirements": {
       "id": "public.dietary_requirements",
       "schemaName": "public",
