@@ -282,6 +282,12 @@ const DriversTable: React.FC = () => {
             deleteDbDrivers(editedRow).then(() =>
                 setRows((oldRows) => oldRows.filter((row) => row.id !== id))
             );
+            const baseAuditLog = getBaseAuditLogForDriversAction("delete a driver", editedRow);
+            void sendAuditLog({
+                ...baseAuditLog,
+                driversId: editedRow.id,
+                wasSuccess: true,
+            });
         }
     };
 
