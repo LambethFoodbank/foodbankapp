@@ -129,6 +129,49 @@ describe("StatusesModal component", () => {
         const mockDate = dayjs("2024-01-01 12:00:00");
         fireEvent.click(screen.getByText("Submit"));
 
-        expect(mockOnSubmit).toHaveBeenCalledWith(mockDate);
+        expect(mockOnSubmit).toHaveBeenCalledWith(mockDate, []);
+    });
+
+    it("saves the checked extra question fields when 'Called and No Response' status is selected", () => {
+        cleanup();
+        render(
+            <Localization>
+                <StyleManager>
+                    <StatusesModal
+                        isOpen={true}
+                        onClose={mockOnClose}
+                        selectedParcels={mockSelectedParcels}
+                        onSubmit={mockOnSubmit}
+                        errorText={null}
+                        headerId="status-modal-header"
+                        header="Apply Status: Called and No Response"
+                        selectedStatus="Called and No Response"
+                    >
+                        children={null}
+                    </StatusesModal>
+                </StyleManager>
+            </Localization>
+        );
+
+        const voicemailCheckbox = screen.getByLabelText("Voicemail");
+        const textCheckbox = screen.getByLabelText("Text");
+        const emailCheckbox = screen.getByLabelText("Email");
+
+        expect(voicemailCheckbox).not.toBeChecked();
+        expect(textCheckbox).not.toBeChecked();
+        expect(emailCheckbox).not.toBeChecked();
+
+        fireEvent.click(voicemailCheckbox);
+        fireEvent.click(emailCheckbox);
+
+        expect(voicemailCheckbox).toBeChecked();
+        expect(textCheckbox).not.toBeChecked();
+        expect(emailCheckbox).toBeChecked();
+
+        fireEvent.click(screen.getByText("Submit"));
+
+        const mockDate = dayjs("2024-01-01 12:00:00");
+
+        expect(mockOnSubmit).toHaveBeenCalledWith(mockDate, ["Voicemail", "Email"]);
     });
 });
