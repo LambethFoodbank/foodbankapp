@@ -77,6 +77,7 @@ const listQuantityNoteAndLabels: [keyof Schema["lists"], keyof Schema["lists"], 
 
 const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
     const [toSubmit, setToSubmit] = useState<Partial<Schema["lists"]> | null>(data ?? null);
+    const [wasSubmitted, setWasSubmitted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [descriptionError, setDescriptionError] = useState<boolean>(
         () => !data?.item_name || data.item_name.trim() === ""
@@ -101,7 +102,7 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
     const handleItemTypeChange = (event: SelectChangeEvent<ItemType>): void => {
         const value = event.target.value as ItemType;
         setToSubmit((prev) => ({ ...prev, item_type: value }));
-        setItemTypeError(value === null);
+        setItemTypeError(!value);
     };
 
     const addListItem = async (listItem: Partial<Schema["lists"]>): Promise<AddListReturn> => {
@@ -164,7 +165,15 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
     };
 
     const onSubmit = async (currentList: ListType): Promise<void> => {
+        setWasSubmitted(true);
+
         if (toSubmit === null) {
+            return;
+        }
+
+        setDescriptionError(!toSubmit?.item_name || toSubmit.item_name.trim() === "");
+        setItemTypeError(!toSubmit?.item_type);
+        if (itemTypeError || descriptionError) {
             return;
         }
 
@@ -189,6 +198,15 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
             }
         }
         setToSubmit(null);
+        handleClose();
+    };
+
+    const handleClose = (): void => {
+        setWasSubmitted(false);
+        setErrorMessage(null);
+        setToSubmit(null);
+        setDescriptionError(true);
+        setItemTypeError(true);
         onClose();
     };
 
@@ -198,15 +216,11 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                 variant="contained"
                 color="primary"
                 onClick={() => onSubmit(currentList)}
-                disabled={descriptionError || itemTypeError}
+                disabled={wasSubmitted && (descriptionError || itemTypeError)}
             >
                 Submit
             </Button>
-            <Snackbar
-                message={errorMessage}
-                onClose={() => setErrorMessage(null)}
-                open={errorMessage !== null}
-            >
+            <Snackbar message={errorMessage} onClose={handleClose} open={errorMessage !== null}>
                 <SnackBarDiv>
                     <Alert severity="error">{errorMessage}</Alert>
                 </SnackBarDiv>
@@ -223,7 +237,7 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
             }
             headerId="editList"
             isOpen={data !== undefined}
-            onClose={onClose}
+            onClose={handleClose}
             footer={Footer}
         >
             <ModalInner>
@@ -232,8 +246,10 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                     defaultValue={toSubmit?.item_name ?? ""}
                     onChange={(event) => setKey(event, "item_name")}
                     label="Item Description"
-                    error={descriptionError}
-                    helperText={descriptionError ? "This is a required field" : undefined}
+                    error={wasSubmitted ? descriptionError : false}
+                    helperText={
+                        wasSubmitted && descriptionError ? "This is a required field" : undefined
+                    }
                 />
 
                 <FormControlLabel
@@ -249,7 +265,7 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                 />
 
                 <h3>Item Type</h3>
-                <FormControl fullWidth error={itemTypeError}>
+                <FormControl fullWidth error={wasSubmitted && itemTypeError}>
                     <InputLabel id="item-type-select-label">Item Type</InputLabel>
                     <Select
                         labelId="item-type-select-label"
@@ -264,7 +280,7 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                             </MenuItem>
                         ))}
                     </Select>
-                    {itemTypeError && (
+                    {wasSubmitted && itemTypeError && (
                         <FormHelperText error>This is a required field</FormHelperText>
                     )}
                 </FormControl>
