@@ -288,6 +288,34 @@ export const fetchLists = async (supabase: Supabase): Promise<FetchListsReponse>
     return { data: data, error: null };
 };
 
+export type FetchAlternativeItemsFromListReponse =
+    | {
+          data: string[];
+          error: null;
+      }
+    | {
+          data: null;
+          error: FetchListsError;
+      };
+
+export const fetchAlternativeItemsFromList = async (
+    supabase: Supabase
+): Promise<FetchAlternativeItemsFromListReponse> => {
+    const { data, error } = await supabase
+        .from("lists")
+        .select("item_name")
+        .eq("item_type", "alternative_food");
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Lists data", error);
+        return { data: null, error: { type: "listsFetchFailed", logId: logId } };
+    }
+
+    const alternativeItems = data.map((item) => item.item_name);
+
+    return { data: alternativeItems, error: null };
+};
+
 type FetchListsCommentResponse =
     | {
           data: string;
@@ -319,6 +347,33 @@ export const fetchListsComment = async (supabase: Supabase): Promise<FetchListsC
     }
 
     return { data: data.value, error: null };
+};
+
+export type FetchDietsResponse =
+    | { data: string[]; error: null }
+    | { data: null; error: FetchDietsError };
+
+export type FetchDietsErrorType = "failedToFetchDiets";
+export interface FetchDietsError extends Record<string, string> {
+    type: FetchDietsErrorType;
+    logId: string;
+}
+
+export const fetchDiets = async (supabase: Supabase): Promise<FetchDietsResponse> => {
+    const { data, error } = await supabase.from("diets").select("name");
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Diets data", { error });
+        return { data: null, error: { type: "failedToFetchDiets", logId: logId } };
+    }
+
+    if (!data) {
+        return { data: [], error: null };
+    }
+
+    const diets = data.map((diet) => diet.name);
+
+    return { data: diets, error: null };
 };
 
 export type PackingSlotsLabelsAndValues = [string, Schema["packing_slots"]["primary_key"]][];

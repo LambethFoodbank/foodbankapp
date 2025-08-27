@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import supabase from "@/supabaseClient";
+import { fetchAlternativeItemsFromList, fetchDiets } from "@/common/fetch";
 import { useRouter } from "next/navigation";
 import { returnPathQueryParam } from "@/common/constants";
 import { stringifyQueryParams } from "@/common/urlQueryParams";
@@ -27,6 +29,8 @@ import AddressCard from "@/app/clients/form/formSections/AddressCard";
 import NumberAdultsCard from "@/app/clients/form/formSections/NumberAdultsCard";
 import NumberChildrenCard from "@/app/clients/form/formSections/NumberChildrenCard";
 import DietaryRequirementCard from "@/app/clients/form/formSections/DietaryRequirementCard";
+import DietsCard from "@/app/clients/form/formSections/DietsCard";
+import PreferredItemsCard from "@/app/clients/form/formSections/PreferredItemsCard";
 import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
 import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
@@ -69,6 +73,8 @@ export interface ClientFields extends Fields {
     listType: ListType | null;
     cookingFacilities: BooleanGroup | null;
     dietaryRequirements: BooleanGroup | null;
+    diets: BooleanGroup;
+    preferredItems: BooleanGroup;
     hygieneProductsTampons: string | null;
     hygieneProductsPads: string | null;
     hygieneOtherItems: BooleanGroup;
@@ -113,6 +119,8 @@ const formSections = [
     ListTypeCard,
     CookingFacilitiesCard,
     DietaryRequirementCard,
+    DietsCard,
+    PreferredItemsCard,
     HygieneProductsCard,
     BabyProductsCard,
     PetFoodCard,
@@ -136,6 +144,9 @@ const ClientForm: React.FC<Props> = ({
     const [submitError, setSubmitError] = useState(Errors.none);
     const [submitErrorMessage, setSubmitErrorMessage] = useState("");
     const [submitDisabled, setSubmitDisabled] = useState(false);
+    const [diets, setDiets] = useState<string[]>([]);
+    const [preferredItems, setPreferredItems] = useState<string[]>([]);
+    const [fetchDataError, setFetchDataError] = useState<string | null>(null);
 
     useEffect(() => {
         if (fields.numberOfChildren <= fields.children.length) {
@@ -168,6 +179,32 @@ const ClientForm: React.FC<Props> = ({
             });
         fieldSetter({ adults: [...fields.adults, ...extraAdults] });
     }, [fields.numberOfAdults]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const getDiets = useCallback(async (): Promise<void> => {
+        const result = await fetchDiets(supabase);
+        if (result.error) {
+            setFetchDataError("Failed to fetch diets");
+        } else {
+            setDiets(result.data);
+        }
+    }, []);
+
+    useEffect(() => {
+        void getDiets();
+    }, [getDiets]);
+
+    const getPreferredItems = useCallback(async (): Promise<void> => {
+        const result = await fetchAlternativeItemsFromList(supabase);
+        if (result.error) {
+            setFetchDataError("Failed to fetch preferred items");
+        } else {
+            setPreferredItems(result.data);
+        }
+    }, []);
+
+    useEffect(() => {
+        void getPreferredItems();
+    }, [getPreferredItems]);
 
     const fieldSetter = createSetter(setFields, fields);
     const errorSetter = createSetter(setFormErrors, formErrors);
@@ -249,6 +286,8 @@ const ClientForm: React.FC<Props> = ({
                             errorSetter={errorSetter}
                             fieldSetter={fieldSetter}
                             fields={fields}
+                            diets={diets}
+                            items={preferredItems}
                         />
                     );
                 })}
