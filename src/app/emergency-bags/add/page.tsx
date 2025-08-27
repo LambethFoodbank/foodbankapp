@@ -8,7 +8,7 @@ import { Errors } from "@/components/Form/formFunctions";
 import EmergencyBagForm, {
     EmergencyBagErrors,
     EmergencyBagFields,
-} from "@/app/parcels/addEB/AddEmergencyBagForm";
+} from "@/app/emergency-bags/AddEmergencyBagForm";
 
 const AddEmergencyBag: () => React.ReactElement = () => {
     const initialFields: EmergencyBagFields = {

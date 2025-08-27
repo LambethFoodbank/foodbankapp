@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     CardProps,
@@ -21,7 +21,9 @@ import Button from "@mui/material/Button";
 import Title from "@/components/Title/Title";
 import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
 import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
-import TypeOfEmergencyBagCard from "@/app/parcels/form/formSections/TypeOfEmergencyBagCard";
+import TypeOfEmergencyBagCard from "@/app/emergency-bags/form/formSections/TypeOfEmergencyBagCard";
+import { getActiveCollectionCentres } from "@/common/fetch";
+import supabase from "@/supabaseClient";
 
 interface Props {
     initialFields: EmergencyBagFields;
@@ -71,6 +73,26 @@ const EmergencyBagForm: React.FC<Props> = ({
 
     const fieldSetter = createSetter(setFields, fields);
     const errorSetter = createSetter(setFormErrors, formErrors);
+
+    useEffect(() => {
+        const fetchCollectionCentres = async (): Promise<void> => {
+            const { data: collectionCentresData, error: collectionCentresError } =
+                await getActiveCollectionCentres(supabase);
+
+            if (collectionCentresError) {
+                console.error("Failed to fetch collection centres", collectionCentresError);
+                return;
+            }
+
+            if (collectionCentresData) {
+                setCollectionCentresLabelsAndValues(
+                    collectionCentresData.collectionCentresLabelsAndValues
+                );
+            }
+        };
+
+        void fetchCollectionCentres();
+    }, []);
 
     const submitForm = async (): Promise<void> => {
         setSubmitDisabled(true);

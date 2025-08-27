@@ -8,7 +8,7 @@ import {
     onChangeText,
     valueOnChangeDropdownList,
 } from "@/components/Form/formFunctions";
-import { EmergencyBagCardProps } from "@/app/parcels/addEB/AddEmergencyBagForm";
+import { EmergencyBagCardProps } from "@/app/emergency-bags/AddEmergencyBagForm";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 
 const EMERGENCY_BAG_TYPES = ["Emergency Parcels", "Out of Date Crates", "Other"];

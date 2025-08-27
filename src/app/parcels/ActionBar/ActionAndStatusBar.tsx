@@ -8,7 +8,6 @@ import Alert from "@mui/material/Alert";
 import Statuses from "@/app/parcels/ActionBar/Statuses";
 import Actions from "@/app/parcels/ActionBar/Actions";
 import { ArrowDropDown } from "@mui/icons-material";
-import Link from "next/link";
 import LinkButton from "@/components/Buttons/LinkButton";
 
 export interface ActionAndStatusBarProps {
@@ -49,7 +48,7 @@ const ActionAndStatusBar: React.FC<ActionAndStatusBarProps> = (props) => {
                     <Alert severity="error">{modalError}</Alert>
                 </AlertBox>
             )}
-            <LinkButton link={`/parcels/addEB`}>Add Emergency Bag</LinkButton>
+            <LinkButton link="/emergency-bags/add">Add Emergency Bag</LinkButton>
             <Button
                 variant="contained"
                 onClick={(event) => setStatusAnchorElement(event.currentTarget)}
