@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import Title from "@/components/Title/Title";
 import { Metadata } from "next";
-import DriversPage from "@/app/drivers/DriversPage";
+import DriversTable from "@/app/drivers/driversTable/DriversTable";
 
 // disables caching
 export const revalidate = 0;
@@ -10,7 +10,7 @@ const Drivers = async (): Promise<ReactElement> => {
     return (
         <main>
             <Title>Drivers Page</Title>
-            <DriversPage />
+            <DriversTable />
         </main>
     );
 };

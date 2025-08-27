@@ -32,6 +32,7 @@ import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
 import EditIcon from "@mui/icons-material/Edit";
+import TableSurface from "@/components/Tables/TableSurface";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -370,41 +371,49 @@ const DriversTable: React.FC = () => {
                 ></FloatingToast>
             )}
             {rows && (
-                <StyledDataGrid
-                    rows={rows}
-                    aria-label="Delivery Areas Table"
-                    initialState={{
-                        sorting: {
-                            sortModel: [{ field: "postcode", sort: "asc" }],
-                        },
-                    }}
-                    sortingOrder={["asc", "desc"]}
-                    columns={driversColumns}
-                    editMode="row"
-                    onCellDoubleClick={(params, event) => {
-                        event.defaultMuiPrevented = true;
-                        return false;
-                    }}
-                    rowModesModel={rowModesModel}
-                    onRowModesModelChange={setRowModesModel}
-                    onRowEditStart={handleRowEditStart}
-                    onRowEditStop={handleRowEditStop}
-                    processRowUpdate={processRowUpdate}
-                    slots={{
-                        toolbar: EditToolbar,
-                        loadingOverlay: LinearProgress,
-                    }}
-                    slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows },
-                    }}
-                    loading={isLoading}
-                    getRowClassName={(params) =>
-                        (params.indexRelativeToCurrentPage + 1) % 2 === 0
-                            ? "datagrid-row-even"
-                            : "datagrid-row-odd"
-                    }
-                    hideFooter
-                />
+                <TableSurface>
+                    <StyledDataGrid
+                        rows={rows}
+                        aria-label="Delivery Areas Table"
+                        initialState={{
+                            sorting: {
+                                sortModel: [{ field: "name", sort: "asc" }],
+                            },
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 10,
+                                    page: 0,
+                                },
+                            },
+                        }}
+                        sortingOrder={["asc", "desc"]}
+                        columns={driversColumns}
+                        editMode="row"
+                        onCellDoubleClick={(params, event) => {
+                            event.defaultMuiPrevented = true;
+                            return false;
+                        }}
+                        rowModesModel={rowModesModel}
+                        onRowModesModelChange={setRowModesModel}
+                        onRowEditStart={handleRowEditStart}
+                        onRowEditStop={handleRowEditStop}
+                        processRowUpdate={processRowUpdate}
+                        slots={{
+                            toolbar: EditToolbar,
+                            loadingOverlay: LinearProgress,
+                        }}
+                        slotProps={{
+                            toolbar: { setRows, setRowModesModel, rows },
+                        }}
+                        loading={isLoading}
+                        getRowClassName={(params) =>
+                            (params.indexRelativeToCurrentPage + 1) % 2 === 0
+                                ? "datagrid-row-even"
+                                : "datagrid-row-odd"
+                        }
+                        rowSelection={false}
+                    />
+                </TableSurface>
             )}
         </>
     );
