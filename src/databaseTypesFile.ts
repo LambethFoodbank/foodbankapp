@@ -284,6 +284,100 @@ export type Database = {
         }
         Relationships: []
       }
+      clients_diets: {
+        Row: {
+          client_id: string
+          diet_id: string | null
+          id: string
+        }
+        Insert: {
+          client_id?: string
+          diet_id?: string | null
+          id?: string
+        }
+        Update: {
+          client_id?: string
+          diet_id?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_diets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "clients_diets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_diets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_diets_diet_id_fkey"
+            columns: ["diet_id"]
+            isOneToOne: false
+            referencedRelation: "diets"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
+      clients_preferred_items: {
+        Row: {
+          client_id: string
+          id: string
+          item_id: string | null
+        }
+        Insert: {
+          client_id?: string
+          id?: string
+          item_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          id?: string
+          item_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_preferred_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
       collection_centres: {
         Row: {
           acronym: string
