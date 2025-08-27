@@ -8,12 +8,18 @@ import {
     MRT_SortingState,
     useMaterialReactTable,
 } from "material-react-table";
-import { PaginationType as PaginationTypeEnum } from "@/components/Tables/Filters";
+import {
+    DistributeClientFilter,
+    DistributeServerFilter,
+    PaginationType as PaginationTypeEnum,
+} from "@/components/Tables/Filters";
 import React, { useEffect, useMemo, useState } from "react";
 import {
     CheckboxConfig,
     ColumnDisplayFunctions,
+    ColumnStyles,
     DefaultSortConfig,
+    FilterConfig,
     PaginationConfig,
     SortConfig,
     TableHeaders,
@@ -22,7 +28,12 @@ import { mapHeadersToMRTColumns } from "@/components/Tables/materialTable/materi
 import { Box } from "@mui/material";
 import { ClientSideSortMethod, ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { SortOrder } from "react-data-table-component";
-import { useTheme } from "styled-components";
+import styled, { useTheme } from "styled-components";
+import TableFiltersBar from "@/components/Tables/TableFiltersBar";
+
+const RelativeContainerForTable = styled.div`
+    position: relative;
+`;
 
 type OnRowClickFunction<Data extends MRT_RowData> = (
     row: MRT_Row<Data>,
@@ -31,6 +42,7 @@ type OnRowClickFunction<Data extends MRT_RowData> = (
 
 interface MRTTableProps<
     PaginationType,
+    FilterState,
     Data extends MRT_RowData,
     DbData extends Record<string, unknown>,
 > {
@@ -41,17 +53,10 @@ interface MRTTableProps<
     defaultShownHeaders?: readonly (keyof Data)[];
     toggleableHeaders?: readonly (keyof Data | string)[];
     isLoading?: boolean;
-    // row selection
     checkboxConfig: CheckboxConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
-
-    // row ordering
     enableRowOrdering?: boolean;
-
-    // pagination
     paginationConfig: PaginationConfig;
-
-    // sorting
     sortConfig: SortConfig<
         Data,
         PaginationType extends PaginationTypeEnum.Client
@@ -59,14 +64,17 @@ interface MRTTableProps<
             : ServerSideSortMethod<DbData>
     >;
     defaultSortConfig?: DefaultSortConfig;
-
-    // filtering
-    manualFiltering?: boolean;
-    onColumnFiltersChange?: (updater: any) => void;
+    filterConfig: FilterConfig<
+        PaginationType extends PaginationTypeEnum.Client
+            ? DistributeClientFilter<Data, FilterState>
+            : DistributeServerFilter<Data, FilterState, DbData>
+    >;
+    columnStyleOptions?: ColumnStyles<Data>;
 }
 
 const MaterialTable = <
     PaginationType extends PaginationTypeEnum,
+    FilterState,
     Data extends MRT_RowData,
     DbData extends Record<string, unknown> = Record<string, never>,
 >({
@@ -80,10 +88,10 @@ const MaterialTable = <
     enableRowOrdering = false,
     paginationConfig,
     sortConfig,
-    defaultSortConfig,
     onRowClick,
     checkboxConfig,
-}: MRTTableProps<PaginationType, Data, DbData>): React.ReactElement => {
+    filterConfig,
+}: MRTTableProps<PaginationType, FilterState, Data, DbData>): React.ReactElement => {
     const theme = useTheme();
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
     const [pagination, setPagination] = useState<MRT_PaginationState>({
@@ -97,7 +105,12 @@ const MaterialTable = <
         [headerKeysAndLabels]
     );
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(() =>
-        Object.fromEntries(headerKeys.map((key) => [key, defaultShownHeaders.includes(key)]))
+        Object.fromEntries(
+            headerKeys.map((key) => [
+                key,
+                defaultShownHeaders.length > 0 ? defaultShownHeaders.includes(key) : true,
+            ])
+        )
     );
 
     const columns = useMemo<MRT_ColumnDef<Data>[]>(
@@ -152,22 +165,22 @@ const MaterialTable = <
     const table = useMaterialReactTable({
         columns,
         data: data,
-        getRowId: (row, index) => `parcelRow-${index}-${pagination.pageIndex}`,
+        getRowId: (row, index) => `row-${index}-${pagination.pageIndex}`,
         state: { isLoading, columnVisibility, pagination, sorting },
+        enableColumnFilters: false,
+        enableColumnActions: false,
         enableRowOrdering: enableRowOrdering,
         enableRowSelection: checkboxConfig.displayed,
-        manualPagination: paginationConfig.enablePagination,
-        manualSorting: sortConfig.sortPossible,
         muiPaginationProps: {
             rowsPerPageOptions: paginationConfig.enablePagination
                 ? paginationConfig.rowsPerPageOptions
                 : undefined,
         },
+        manualPagination: paginationConfig.enablePagination,
+        manualSorting: sortConfig.sortPossible,
         rowCount: paginationConfig.enablePagination ? paginationConfig.filteredCount : undefined,
         renderToolbarInternalActions: ({ table }) => (
-            <Box>
-                <MRT_ShowHideColumnsButton table={table} />
-            </Box>
+            <Box>{toggleableHeaders.length > 0 && <MRT_ShowHideColumnsButton table={table} />}</Box>
         ),
         muiTableBodyRowProps: ({ row }) => ({
             onClick: (event) => onRowClick?.(row, event),
@@ -220,7 +233,6 @@ const MaterialTable = <
             "mrt-row-drag": {
                 header: "",
                 size: 0,
-                enableColumnActions: false,
                 enableSorting: false,
             },
         },
@@ -229,28 +241,64 @@ const MaterialTable = <
         onSortingChange: setSorting,
     });
 
-    return <MaterialReactTable table={table} />;
+    return (
+        <div aria-live="polite">
+            {(filterConfig.primaryFiltersShown || filterConfig.additionalFiltersShown) && (
+                <TableFiltersBar<
+                    Data,
+                    PaginationType extends PaginationTypeEnum.Client
+                        ? DistributeClientFilter<Data, FilterState>
+                        : DistributeServerFilter<Data, FilterState, DbData>,
+                    FilterState
+                >
+                    setPrimaryFilters={
+                        filterConfig.primaryFiltersShown
+                            ? filterConfig.setPrimaryFilters
+                            : undefined
+                    }
+                    primaryFilters={
+                        filterConfig.primaryFiltersShown ? filterConfig.primaryFilters : undefined
+                    }
+                    additionalFilters={
+                        filterConfig.additionalFiltersShown
+                            ? filterConfig.additionalFilters
+                            : undefined
+                    }
+                    setAdditionalFilters={
+                        filterConfig.additionalFiltersShown
+                            ? filterConfig.setAdditionalFilters
+                            : undefined
+                    }
+                />
+            )}
+            <RelativeContainerForTable>
+                <MaterialReactTable table={table} />
+            </RelativeContainerForTable>
+        </div>
+    );
 };
 
 // Client-side pagination (default MRT mode)
 export const ClientPaginatedMaterialTable = <
     Data extends MRT_RowData,
     DbData extends Record<string, unknown>,
+    FilterState,
 >(
     props: Omit<
-        MRTTableProps<PaginationTypeEnum.Client, Data, DbData>,
+        MRTTableProps<PaginationTypeEnum.Client, FilterState, Data, DbData>,
         "manualPagination" | "manualSorting" | "manualFiltering"
     >
 ): React.ReactElement => (
-    <MaterialTable<PaginationTypeEnum.Client, Data, DbData> {...props} manualFiltering={false} />
+    <MaterialTable<PaginationTypeEnum.Client, FilterState, Data, DbData> {...props} />
 );
 
 // Server-side pagination/sorting/filtering
 export const ServerPaginatedMaterialTable = <
     Data extends MRT_RowData,
     DbData extends Record<string, unknown>,
+    FilterState,
 >(
-    props: MRTTableProps<PaginationTypeEnum.Server, Data, DbData>
+    props: MRTTableProps<PaginationTypeEnum.Server, FilterState, Data, DbData>
 ): React.ReactElement => (
-    <MaterialTable<PaginationTypeEnum.Server, Data, DbData> {...props} manualFiltering />
+    <MaterialTable<PaginationTypeEnum.Server, FilterState, Data, DbData> {...props} />
 );
