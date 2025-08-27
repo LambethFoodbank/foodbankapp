@@ -39,11 +39,11 @@ import {
     eventNamesWithNumberData,
 } from "./eventsSeed";
 import {
-  getFormattedVoucherNumber,
-  possibleReferralAgency,
-  defaultParcelNotes,
+    getFormattedVoucherNumber,
+    possibleReferralAgency,
+    defaultParcelNotes,
 } from "./parcelsSeed";
-import type { Enums } from "../../src/databaseTypesFile";
+import type { Enums } from "@/databaseTypesFile";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
