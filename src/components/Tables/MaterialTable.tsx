@@ -11,6 +11,7 @@ import {
 import { PaginationType as PaginationTypeEnum } from "@/components/Tables/Filters";
 import React, { useEffect, useMemo, useState } from "react";
 import {
+    CheckboxConfig,
     ColumnDisplayFunctions,
     DefaultSortConfig,
     PaginationConfig,
@@ -21,6 +22,12 @@ import { mapHeadersToMRTColumns } from "@/components/Tables/materialTable/materi
 import { Box } from "@mui/material";
 import { ClientSideSortMethod, ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { SortOrder } from "react-data-table-component";
+import { useTheme } from "styled-components";
+
+type OnRowClickFunction<Data extends MRT_RowData> = (
+    row: MRT_Row<Data>,
+    event: React.MouseEvent<Element, MouseEvent>
+) => void;
 
 interface MRTTableProps<
     PaginationType,
@@ -34,9 +41,9 @@ interface MRTTableProps<
     defaultShownHeaders?: readonly (keyof Data)[];
     toggleableHeaders?: readonly (keyof Data | string)[];
     isLoading?: boolean;
-    onRowClick?: (row: Data) => void;
     // row selection
-    enableRowSelection?: boolean;
+    checkboxConfig: CheckboxConfig<Data>;
+    onRowClick?: OnRowClickFunction<Data>;
 
     // row ordering
     enableRowOrdering?: boolean;
@@ -71,13 +78,13 @@ const MaterialTable = <
     toggleableHeaders = [],
     isLoading = false,
     enableRowOrdering = false,
-    enableRowSelection = false,
     paginationConfig,
     sortConfig,
     defaultSortConfig,
     onRowClick,
-    onColumnFiltersChange,
+    checkboxConfig,
 }: MRTTableProps<PaginationType, Data, DbData>): React.ReactElement => {
+    const theme = useTheme();
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
     const [pagination, setPagination] = useState<MRT_PaginationState>({
         pageIndex: 0,
@@ -145,10 +152,10 @@ const MaterialTable = <
     const table = useMaterialReactTable({
         columns,
         data: data,
-        getRowId: (_row, index) => `parcelRow-${pagination.pageIndex}-${index}`,
-        state: { isLoading: isLoading, columnVisibility, pagination, sorting },
+        getRowId: (row, index) => `parcelRow-${index}-${pagination.pageIndex}`,
+        state: { isLoading, columnVisibility, pagination, sorting },
         enableRowOrdering: enableRowOrdering,
-        enableRowSelection: enableRowSelection,
+        enableRowSelection: checkboxConfig.displayed,
         manualPagination: paginationConfig.enablePagination,
         manualSorting: sortConfig.sortPossible,
         muiPaginationProps: {
@@ -162,16 +169,50 @@ const MaterialTable = <
                 <MRT_ShowHideColumnsButton table={table} />
             </Box>
         ),
+        muiTableBodyRowProps: ({ row }) => ({
+            onClick: (event) => onRowClick?.(row, event),
+            sx: {
+                cursor: "pointer",
+                "&:hover > td": {
+                    backgroundColor: `${theme.primary.background[1]}`,
+                },
+                ...(checkboxConfig.displayed &&
+                    checkboxConfig.isRowChecked(row.original) && {
+                        "& > td": {
+                            backgroundColor: `${theme.primary.background[1]}`,
+                        },
+                    }),
+            },
+        }),
+        muiSelectCheckboxProps: ({ row }) => ({
+            inputProps: { "aria-label": `Select row ${row.id}` },
+            checked: checkboxConfig.displayed
+                ? checkboxConfig.isRowChecked(row.original)
+                : undefined,
+            onChange: checkboxConfig.displayed
+                ? () => {
+                      checkboxConfig.onCheckboxClicked(row.original);
+                  }
+                : undefined,
+        }),
+        muiSelectAllCheckboxProps: () => ({
+            inputProps: { "aria-label": "Select all rows" },
+            checked: checkboxConfig.displayed ? checkboxConfig.isAllCheckboxChecked : undefined,
+            onChange: checkboxConfig.displayed
+                ? () => {
+                      checkboxConfig.onAllCheckboxClicked(checkboxConfig.isAllCheckboxChecked);
+                  }
+                : undefined,
+        }),
         muiRowDragHandleProps: ({ table }) => ({
             onDragEnd: () => {
                 const { draggingRow, hoveredRow } = table.getState();
                 if (hoveredRow && draggingRow) {
-                    data.splice(
-                        (hoveredRow as MRT_Row<Data>).index,
-                        0,
-                        data.splice(draggingRow.index, 1)[0]
-                    );
-                    setData([...data]);
+                    const updatedData = [...data];
+
+                    const movedRow = updatedData.splice(draggingRow.index, 1)[0];
+                    updatedData.splice((hoveredRow as MRT_Row<Data>).index, 0, movedRow);
+                    setData(updatedData);
                 }
             },
         }),
