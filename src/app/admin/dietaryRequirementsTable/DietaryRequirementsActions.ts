@@ -40,14 +40,17 @@ export const fetchDietaryRequirementsForTable =
             return { data: null, error: { type: "failedToFetchDietaryRequirements", logId } };
         }
 
-        const rows: DietTableRow[] = (diets || []).map((diet) => {
-            const rulesForDiet = (rules || []).filter((rule) => rule.diet_id === diet.primary_key);
+        const rows: DietTableRow[] = (diets ?? []).map((diet) => {
+            const rulesForDiet = (rules ?? []).filter((rule) => rule.diet_id === diet.primary_key);
+
             const included = rulesForDiet
                 .filter((rule) => rule.status === "included")
-                .map((rule) => rule.item_name || "Unnamed Item");
+                .map((rule) => rule.item_name ?? "Unnamed Item");
+
             const excluded = rulesForDiet
                 .filter((rule) => rule.status === "excluded")
-                .map((rule) => rule.item_name || "Unnamed Item");
+                .map((rule) => rule.item_name ?? "Unnamed Item");
+
             return {
                 id: diet.primary_key,
                 dietary_requirement: diet.name,

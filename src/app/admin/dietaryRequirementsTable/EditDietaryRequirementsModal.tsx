@@ -83,7 +83,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             return;
         }
 
-        setDiets(dietsData || []);
+        setDiets(dietsData ?? []);
 
         const { data: itemsData } = await supabase
             .from("lists")
@@ -91,7 +91,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             .in("item_type", ["alternative_food", "regular_food"])
             .order("item_name");
         setItems(
-            (itemsData || []).map((item) => ({
+            (itemsData ?? []).map((item) => ({
                 id: item.primary_key,
                 item_name: item.item_name,
                 item_type: item.item_type,
@@ -103,10 +103,10 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             .select()
             .eq("diet_id", dietId);
 
-        const included = (rulesData || [])
+        const included = (rulesData ?? [])
             .filter((rule) => rule.status === "included")
             .map((rule) => rule.item_id);
-        const excluded = (rulesData || [])
+        const excluded = (rulesData ?? [])
             .filter((rule) => rule.status === "excluded")
             .map((rule) => rule.item_id);
 
@@ -124,7 +124,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         (async () => {
             const { data: dietsData } = await supabase.from("diets").select();
-            setDiets(dietsData || []);
+            setDiets(dietsData ?? []);
             if (dietsData && dietsData.length > 0) {
                 setSelectedDietId(dietsData[0].primary_key);
                 await fetchData(dietsData[0].primary_key);
@@ -336,7 +336,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                                                 onChange={() => handleToggle(item.id, "included")}
                                             />
                                         }
-                                        label={item.item_name || "Unnamed Item"}
+                                        label={item.item_name ?? "Unnamed Item"}
                                     />
                                 </Grid>
                             ))}
@@ -359,7 +359,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                                                 onChange={() => handleToggle(item.id, "excluded")}
                                             />
                                         }
-                                        label={item.item_name || "Unnamed Item"}
+                                        label={item.item_name ?? "Unnamed Item"}
                                     />
                                 </Grid>
                             ))}
