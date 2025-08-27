@@ -33,6 +33,7 @@ import { getClientParcelsDetails } from "../getClientParcelsData";
 import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
+import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -51,9 +52,9 @@ const ClientsPage: React.FC = () => {
     const [isDeleteClientDialogOpen, setIsDeleteClientDialogOpen] = useState<boolean>(false);
 
     const [perPage, setPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-    const startPoint = (currentPage - 1) * perPage;
-    const endPoint = currentPage * perPage - 1;
+    const [currentPage, setCurrentPage] = useState(0);
+    const startPoint = currentPage * perPage;
+    const endPoint = startPoint + perPage - 1;
 
     const fetchAndDisplayClientsData = useCallback(async () => {
         setIsLoading(true);
@@ -193,8 +194,13 @@ const ClientsPage: React.FC = () => {
                         <LinkButton link="/clients/add">Add Client</LinkButton>
                     </Centerer>
                     <TableSurface>
-                        <ServerPaginatedTable<ClientsTableRow, DbClientRow, string>
-                            dataPortion={clientsDataPortion}
+                        <ServerPaginatedMaterialTable<ClientsTableRow, DbClientRow, string>
+                            data={clientsDataPortion}
+                            setData={setClientsDataPortion}
+                            columnDisplayFunctions={{ addressPostcode: formatNullPostcode }}
+                            isLoading={isLoading}
+                            headerKeysAndLabels={clientsHeaders}
+                            checkboxConfig={{ displayed: false }}
                             paginationConfig={{
                                 enablePagination: true,
                                 filteredCount: filteredClientCount,
@@ -206,21 +212,15 @@ const ClientsPage: React.FC = () => {
                                 sortableColumns: clientsSortableColumns,
                                 setSortState: setSortState,
                             }}
-                            headerKeysAndLabels={clientsHeaders}
-                            onRowClick={(row) => {
-                                router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
-                            }}
                             filterConfig={{
                                 primaryFiltersShown: true,
                                 primaryFilters: primaryFilters,
                                 setPrimaryFilters: setPrimaryFilters,
                                 additionalFiltersShown: false,
                             }}
-                            checkboxConfig={{ displayed: false }}
-                            editableConfig={{ editable: false }}
-                            isLoading={isLoading}
-                            pointerOnHover={true}
-                            columnDisplayFunctions={{ addressPostcode: formatNullPostcode }}
+                            onRowClick={(row) => {
+                                router.push(`/clients?${clientIdParam}=${row.original.clientId}`);
+                            }}
                         />
                     </TableSurface>
 
