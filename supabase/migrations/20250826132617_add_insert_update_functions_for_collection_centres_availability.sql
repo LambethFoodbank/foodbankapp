@@ -1,61 +1,106 @@
-create or replace function insert_collection_centre_with_availability(
-    centre_data jsonb,
-    availability_data jsonb
-) returns collection_centres as $$
-declare
-new_centre collection_centres%rowtype;
-begin
-insert into collection_centres (name, acronym)
-values (centre_data->>'name', centre_data->>'acronym')
-    returning * into new_centre;
-
-insert into collection_centres_availability (
-    collection_centre_id, day_index, time_slots, is_active
-)
-select
-    new_centre.primary_key,
-    (v->>'day_index')::smallint,
-    v->>'time_slots'::collection_timeslot_type[],
-    (v->>'is_active')::boolean
-from jsonb_array_elements(availability_data) as v;
-
-return new_centre;
-end;
-$$ language plpgsql;
-
-create or replace function update_collection_centre_with_availability(
+CREATE OR REPLACE FUNCTION update_collection_centre_with_availability(
     centre_data jsonb,
     availability_data jsonb,
     original_last_updated timestamp
-) returns collection_centres as $$
-declare
+) RETURNS collection_centres AS $$
+DECLARE
 updated_centre collection_centres%rowtype;
-begin
-update collection_centres
-set name = centre_data->>'name',
+    time_slots_array collection_timeslot_type[];
+BEGIN
+UPDATE collection_centres
+SET
+    name = centre_data->>'name',
     acronym = centre_data->>'acronym',
+    is_shown = (centre_data->>'is_shown')::boolean,
+    is_delivery = (centre_data->>'is_delivery')::boolean,
     last_updated = now()
-where primary_key = (centre_data->>'primary_key')::uuid
-  and last_updated = original_last_updated
-    returning * into updated_centre;
+WHERE primary_key = (centre_data->>'primary_key')::uuid
+  AND last_updated = original_last_updated
+    RETURNING * INTO updated_centre;
 
-if updated_centre is null then
-        return null;
-end if;
+IF updated_centre IS NULL THEN
+        RETURN NULL;
+END IF;
 
-delete from collection_centres_availability
-where collection_centre_id = updated_centre.primary_key;
+DELETE FROM collection_centres_availability
+WHERE collection_centre_id = updated_centre.primary_key;
 
-insert into collection_centres_availability (
-    collection_centre_id, day_index, time_slots, is_active
+FOR day_record IN
+SELECT * FROM jsonb_array_elements(availability_data) AS d
+    LOOP
+SELECT array_agg(
+               (NULLIF(ts->>'time','')::time, (ts->>'is_active')::boolean)::collection_timeslot_type
+                ORDER BY NULLIF(ts->>'time','')::time
+       ) INTO time_slots_array
+FROM jsonb_array_elements(day_record->'time_slots') ts
+WHERE NULLIF(ts->>'time','') IS NOT NULL;
+
+time_slots_array := COALESCE(time_slots_array, '{}'::collection_timeslot_type[]);
+
+INSERT INTO collection_centres_availability (
+    collection_centre_id,
+    day_index,
+    time_slots,
+    is_active
+) VALUES (
+             updated_centre.primary_key,
+             (day_record->>'day_index')::smallint,
+             time_slots_array,
+             (day_record->>'is_active')::boolean
+         );
+END LOOP;
+
+RETURN updated_centre;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_collection_centre_with_availability(
+    centre_data jsonb,
+    availability_data jsonb
+) RETURNS collection_centres AS $$
+DECLARE
+new_centre collection_centres%rowtype;
+    time_slots_array collection_timeslot_type[];
+BEGIN
+INSERT INTO collection_centres (
+    name,
+    acronym,
+    is_shown,
+    is_delivery
 )
-select
-    updated_centre.primary_key,
-    (v->>'day_index')::smallint,
-    v->>'time_slots'::collection_timeslot_type[],
-    (v->>'is_active')::boolean
-from jsonb_array_elements(availability_data) as v;
+VALUES (
+           centre_data->>'name',
+           centre_data->>'acronym',
+           (centre_data->>'is_shown')::boolean,
+           (centre_data->>'is_delivery')::boolean
+       )
+    RETURNING * INTO new_centre;
 
-return updated_centre;
-end;
-$$ language plpgsql;
+FOR day_record IN
+SELECT * FROM jsonb_array_elements(availability_data) AS d
+    LOOP
+SELECT array_agg(
+               (NULLIF(ts->>'time','')::time, (ts->>'is_active')::boolean)::collection_timeslot_type
+                ORDER BY NULLIF(ts->>'time','')::time
+       ) INTO time_slots_array
+FROM jsonb_array_elements(day_record->'time_slots') ts
+WHERE NULLIF(ts->>'time','') IS NOT NULL;
+
+time_slots_array := COALESCE(time_slots_array, '{}'::collection_timeslot_type[]);
+
+INSERT INTO collection_centres_availability (
+    collection_centre_id,
+    day_index,
+    time_slots,
+    is_active
+) VALUES (
+             new_centre.primary_key,
+             (day_record->>'day_index')::smallint,
+             time_slots_array,
+             (day_record->>'is_active')::boolean
+         );
+END LOOP;
+
+RETURN new_centre;
+END;
+$$ LANGUAGE plpgsql;

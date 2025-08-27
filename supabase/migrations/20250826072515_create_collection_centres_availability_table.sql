@@ -7,6 +7,12 @@ create table "public"."collection_centres_availability" (
     "last_updated" timestamp with time zone default current_timestamp
 );
 
+alter table public.collection_centres_availability
+    add constraint fk_collection_centre
+        foreign key (collection_centre_id)
+            references public.collection_centres (primary_key)
+            on delete cascade;
+
 alter table "public"."collection_centres_availability" owner to "postgres";
 
 alter table only "public"."collection_centres_availability"
