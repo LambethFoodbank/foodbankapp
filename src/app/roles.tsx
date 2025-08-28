@@ -50,6 +50,13 @@ export const roleCanAccessPage = (role: UserRole | null, url: string): boolean =
     return accessList.some((page) => url.startsWith(page));
 };
 
+export const roleCanAccessModal = (
+    role: UserRole | null,
+    isDeliverable: boolean | null
+): boolean => {
+    return isDeliverable || (role !== null && role !== "volunteer");
+};
+
 export interface RoleUpdateContextType {
     role: UserRole | null;
     setRole: (_role: UserRole | null) => void;

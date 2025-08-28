@@ -25,7 +25,7 @@ import { getParcelsTableDataAndAllIds } from "@/app/parcels/parcelsTable/fetchPa
 import supabase from "@/supabaseClient";
 import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { RoleUpdateContext } from "@/app/roles";
+import { RoleUpdateContext, roleCanAccessModal } from "@/app/roles";
 
 interface ParcelsTableProps {
     checkedParcelIds: string[];
@@ -218,7 +218,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const { role } = useContext(RoleUpdateContext);
 
     const onParcelTableRowClick = (row: Row<ParcelsTableRow>): void => {
-        if (row.data.addressPostcode.isDeliverable || (role !== null && role !== "volunteer")) {
+        if (roleCanAccessModal(role, row.data.addressPostcode.isDeliverable)) {
             openParcelModal(row.data.parcelId);
         }
     };

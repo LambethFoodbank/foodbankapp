@@ -317,7 +317,6 @@ const DeliveryAreasTable: React.FC = () => {
                             sortModel: [{ field: "postcode", sort: "asc" }],
                         },
                     }}
-                    sortingOrder={["asc", "desc"]}
                     columns={deliveryAreasColumns}
                     editMode="row"
                     onCellDoubleClick={(params, event) => {
