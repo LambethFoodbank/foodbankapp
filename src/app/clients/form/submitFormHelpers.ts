@@ -99,13 +99,6 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     const clientDiets = formatClientDiets(fields.diets);
     const clientPreferredItems = formatPreferredItems(fields.preferredItems);
 
-    console.log("Payload for insert_client_and_family:", {
-        clientrecord: clientRecord,
-        familymembers: familyMembers,
-        clientdiets: clientDiets,
-        clientpreferreditems: clientPreferredItems,
-    });
-
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
         clientrecord: clientRecord,
         familymembers: familyMembers,
@@ -124,7 +117,6 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     } as const satisfies Partial<AuditLog>;
 
     if (error) {
-        console.log(error);
         const logId = await logErrorReturnLogId(
             "Error with inserting new client and their family",
             {
@@ -157,12 +149,17 @@ export const submitEditClientForm = async (
 ): Promise<editClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
+    const clientDiets = formatClientDiets(fields.diets);
+    const clientPreferredItems = formatPreferredItems(fields.preferredItems);
+
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
         "update_client_and_family",
         {
             clientrecord: clientRecord,
             familymembers: familyMembers,
             clientid: primaryKey,
+            clientdiets: clientDiets,
+            clientpreferreditems: clientPreferredItems,
         }
     );
 
@@ -171,6 +168,8 @@ export const submitEditClientForm = async (
         content: {
             clientDetails: clientRecord,
             familyMembers: familyMembers,
+            clientDiets: clientDiets,
+            clientPreferredItems: clientPreferredItems,
         },
         clientId: primaryKey,
     } as const satisfies Partial<AuditLog>;

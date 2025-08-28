@@ -1260,14 +1260,25 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_client_and_family: {
-        Args: {
-          clientrecord: Json
-          clientid: string
-          familymembers: Json
-        }
-        Returns: Database["public"]["CompositeTypes"]["update_client_result"]
-      }
+      update_client_and_family:
+        | {
+            Args: {
+              clientrecord: Json
+              clientid: string
+              familymembers: Json
+            }
+            Returns: Database["public"]["CompositeTypes"]["update_client_result"]
+          }
+        | {
+            Args: {
+              clientrecord: Json
+              clientid: string
+              familymembers: Json
+              clientdiets: Json
+              clientpreferreditems: Json
+            }
+            Returns: Database["public"]["CompositeTypes"]["update_client_result"]
+          }
       user_is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

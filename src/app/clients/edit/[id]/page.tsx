@@ -86,7 +86,6 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             }
             setDietsData(dietsData);
 
-            // Fetch preferred items data
             const { data: itemsData, error: itemsError } = await fetchClientPreferredItems(
                 params.id,
                 supabase
