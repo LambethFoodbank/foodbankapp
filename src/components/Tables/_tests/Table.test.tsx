@@ -1,34 +1,34 @@
 import React from "react";
 import "@testing-library/jest-dom/jest-globals";
 import { render, screen, fireEvent, within, act } from "@testing-library/react";
-import { ClientPaginatedTable } from "@/components/Tables/Table";
 import StyleManager from "@/app/themes";
 import {
     fakeData,
     fakeSmallerData,
     fakeMidData,
     fakeDataHeaders,
-    TestData,
+    MRT_RowData,
     fullNameTextFilterTest,
     typeButtonFilterTest,
 } from "./testHelpers";
 import { expect, it } from "@jest/globals";
 import WrappedTableForTest from "./WrappedTable";
 import userEvent from "@testing-library/user-event";
+import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 describe("Generic Table component", () => {
     describe("Table without features", () => {
         beforeEach(() => {
             render(
                 <StyleManager>
-                    <ClientPaginatedTable<TestData, string>
-                        dataPortion={fakeData}
+                    <ClientPaginatedMaterialTable<MRT_RowData, string>
+                        data={fakeData}
                         headerKeysAndLabels={fakeDataHeaders}
                         checkboxConfig={{ displayed: false }}
                         paginationConfig={{ enablePagination: false }}
                         sortConfig={{ sortPossible: false }}
                         filterConfig={{ primaryFiltersShown: false, additionalFiltersShown: false }}
-                        editableConfig={{ editable: false }}
+                        rowActionsConfig={{ editable: false }}
                     />
                 </StyleManager>
             );

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { TestTableWrapperConfig, TestData } from "./testHelpers";
+import { TestTableWrapperConfig } from "./testHelpers";
 import {
     CheckboxConfig,
-    ClientPaginatedTable,
     DefaultSortConfig,
     EditableConfig,
     FilterConfig,
@@ -16,10 +15,12 @@ import {
 import { ClientSideSortMethod } from "../sortMethods";
 import { SortOrder } from "react-data-table-component";
 import { ClientSideFilter } from "../Filters";
+import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
+import { MRT_RowData } from "material-react-table";
 
 interface MockTableProps {
-    mockData: TestData[];
-    mockHeaders: TableHeaders<TestData>;
+    mockData: MRT_RowData[];
+    mockHeaders: TableHeaders<MRT_RowData>;
     testableContent: TestTableWrapperConfig;
 }
 
@@ -43,7 +44,7 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
 }) => {
     const [shownText, setShownText] = useState<string>("");
 
-    const [testDataPortion, setTestDataPortion] = useState<TestData[]>(mockData);
+    const [testDataPortion, setTestDataPortion] = useState<MRT_RowData[]>(mockData);
 
     const [checkedRowIds, setCheckedRowIds] = useState<string[]>([]);
     const [isAllCheckBoxSelected, setAllCheckBoxSelected] = useState(false);
@@ -56,12 +57,12 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
         }
     }, [testDataPortion.length, checkedRowIds, isAllCheckBoxSelected]);
 
-    const checkboxConfig: CheckboxConfig<TestData> = isCheckboxIncluded
+    const checkboxConfig: CheckboxConfig<MRT_RowData> = isCheckboxIncluded
         ? {
               displayed: true,
               selectedRowIds: checkedRowIds,
               isAllCheckboxChecked: isAllCheckBoxSelected,
-              onCheckboxClicked: (data: TestData) => {
+              onCheckboxClicked: (data: MRT_RowData) => {
                   setCheckedRowIds((checkedIds) => {
                       if (checkedIds.includes(data.id)) {
                           return checkedIds.filter((checkedId) => checkedId !== data.id);
@@ -78,18 +79,18 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
                       setAllCheckBoxSelected(true);
                   }
               },
-              isRowChecked: (row: TestData) => checkedRowIds.includes(row.id),
+              isRowChecked: (row: MRT_RowData) => checkedRowIds.includes(row.id),
           }
         : { displayed: false };
 
-    const [primaryFilters, setPrimaryFilters] = useState<ClientSideFilter<TestData, string>[]>(
+    const [primaryFilters, setPrimaryFilters] = useState<ClientSideFilter<MRT_RowData, string>[]>(
         filters ? filters.primaryFilters : []
     );
     const [additionalFilters, setAdditionalFilters] = useState<
-        ClientSideFilter<TestData, string>[]
+        ClientSideFilter<MRT_RowData, string>[]
     >(filters ? filters.additionalFilters : []);
 
-    const filterConfig: FilterConfig<ClientSideFilter<TestData, string>> = filters
+    const filterConfig: FilterConfig<ClientSideFilter<MRT_RowData, string>> = filters
         ? {
               primaryFiltersShown: true,
               primaryFilters,
@@ -129,11 +130,11 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
         setTestDataPortion(secondaryFilteredData.slice(startPoint, endPoint + 1));
     }, [primaryFilters, additionalFilters, startPoint, endPoint, mockData]);
 
-    const [sortState, setSortState] = useState<SortState<TestData, ClientSideSortMethod>>({
+    const [sortState, setSortState] = useState<SortState<MRT_RowData, ClientSideSortMethod>>({
         sortEnabled: false,
     });
 
-    const sortableColumns: SortOptions<TestData, ClientSideSortMethod>[] = [];
+    const sortableColumns: SortOptions<MRT_RowData, ClientSideSortMethod>[] = [];
     for (const key of mockHeaders
         .map(([key, _]) => {
             return key;
@@ -145,7 +146,7 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
         });
     }
 
-    const sortConfig: SortConfig<TestData, ClientSideSortMethod> =
+    const sortConfig: SortConfig<MRT_RowData, ClientSideSortMethod> =
         sortingFlags.isSortingOptionsIncluded
             ? {
                   sortPossible: true,
@@ -167,7 +168,7 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
         }
     }, [sortState, testDataPortion]);
 
-    const editableConfig: EditableConfig<TestData> = isRowEditableIncluded
+    const editableConfig: EditableConfig<MRT_RowData> = isRowEditableIncluded
         ? {
               editable: true,
               setDataPortion: setTestDataPortion,
@@ -182,7 +183,7 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
           }
         : { editable: false };
 
-    const defaultShownHeaders: (keyof TestData)[] | undefined = isHeaderTogglesIncluded
+    const defaultShownHeaders: (keyof MRT_RowData)[] | undefined = isHeaderTogglesIncluded
         ? mockHeaders
               .map(([key, _]) => {
                   return key;
@@ -190,7 +191,7 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
               .slice(0, mockHeaders.length - 1)
         : undefined;
 
-    const toggleableHeaders: (keyof TestData)[] | undefined = isHeaderTogglesIncluded
+    const toggleableHeaders: (keyof MRT_RowData)[] | undefined = isHeaderTogglesIncluded
         ? mockHeaders
               .map(([key, _]) => {
                   return key;
@@ -198,29 +199,29 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
               .slice(1, mockHeaders.length)
         : undefined;
 
-    const onRowClick: OnRowClickFunction<TestData> | undefined = isRowClickIncluded
+    const onRowClick: OnRowClickFunction<MRT_RowData> | undefined = isRowClickIncluded
         ? (row) => {
-              setShownText("row clicked " + row.data[mockHeaders[0][0]]);
+              setShownText("row clicked " + row.original[mockHeaders[0][0]]);
           }
         : undefined;
 
     const columnDisplayFunction = isColumnDisplayFunctionsIncluded
         ? {
-              full_name: (fullName: TestData["full_name"]) => fullName.toUpperCase(),
+              full_name: (fullName: MRT_RowData["full_name"]) => fullName.toUpperCase(),
           }
         : undefined;
 
     return (
         <>
-            <ClientPaginatedTable
-                dataPortion={testDataPortion}
+            <ClientPaginatedMaterialTable
+                data={testDataPortion}
                 headerKeysAndLabels={mockHeaders}
                 checkboxConfig={checkboxConfig}
                 filterConfig={filterConfig}
                 paginationConfig={paginationConfig}
                 sortConfig={sortConfig}
                 defaultSortConfig={defaultSortConfig}
-                editableConfig={editableConfig}
+                rowActionsConfig={editableConfig}
                 defaultShownHeaders={defaultShownHeaders}
                 toggleableHeaders={toggleableHeaders}
                 onRowClick={onRowClick}
