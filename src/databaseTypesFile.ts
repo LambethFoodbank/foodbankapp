@@ -1229,13 +1229,22 @@ export type Database = {
         }
         Returns: undefined
       }
-      insert_client_and_family: {
-        Args: {
-          clientrecord: Json
-          familymembers: Json
-        }
-        Returns: string
-      }
+      insert_client_and_family:
+        | {
+            Args: {
+              clientrecord: Json
+              familymembers: Json
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              clientrecord: Json
+              familymembers: Json
+              clientdiets: Json
+            }
+            Returns: string
+          }
       packing_slot_order_swap: {
         Args: {
           id1: string

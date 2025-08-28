@@ -1,3 +1,4 @@
+import { Diet } from "@/components/Form/formFunctions";
 import { DbWikiRow, Schema } from "@/databaseUtils";
 import { Supabase } from "@/supabaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
@@ -350,7 +351,7 @@ export const fetchListsComment = async (supabase: Supabase): Promise<FetchListsC
 };
 
 export type FetchDietsResponse =
-    | { data: string[]; error: null }
+    | { data: Diet[]; error: null }
     | { data: null; error: FetchDietsError };
 
 export type FetchDietsErrorType = "failedToFetchDiets";
@@ -360,7 +361,7 @@ export interface FetchDietsError extends Record<string, string> {
 }
 
 export const fetchDiets = async (supabase: Supabase): Promise<FetchDietsResponse> => {
-    const { data, error } = await supabase.from("diets").select("name");
+    const { data, error } = await supabase.from("diets").select("primary_key, name");
 
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Diets data", { error });
@@ -371,30 +372,7 @@ export const fetchDiets = async (supabase: Supabase): Promise<FetchDietsResponse
         return { data: [], error: null };
     }
 
-    const diets = data.map((diet) => diet.name);
-
-    return { data: diets, error: null };
-};
-
-export const fetchDietsIdsForNames = async (
-    dietNames: string[],
-    supabase: Supabase
-): Promise<FetchDietsResponse> => {
-    const { data, error } = await supabase
-        .from("diets")
-        .select("primary_key")
-        .in("name", dietNames);
-
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: Diets data", { error });
-        return { data: null, error: { type: "failedToFetchDiets", logId: logId } };
-    }
-
-    if (!data) {
-        return { data: [], error: null };
-    }
-
-    const diets = data.map((diet) => diet.primary_key);
+    const diets = data.map((diet) => ({ primaryKey: diet.primary_key, name: diet.name }));
 
     return { data: diets, error: null };
 };

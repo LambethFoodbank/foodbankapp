@@ -46,6 +46,12 @@ export interface Person {
     primaryKey?: string;
 }
 
+export interface Diet {
+    primaryKey: string;
+    name: string;
+    isChecked?: boolean;
+}
+
 export type Fields = Record<string, unknown>;
 
 export type FormErrors<SpecificFields extends Fields> = {
