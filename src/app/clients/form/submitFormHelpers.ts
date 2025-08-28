@@ -1,3 +1,4 @@
+import { fetchDietsIdsForNames } from "@/common/fetch";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import supabase from "@/supabaseClient";
@@ -104,6 +105,55 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         );
         await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
         return { clientId: null, error: { type: "failedToInsertClientAndFamily", logId } };
+    }
+
+    const diets: string[] = Object.keys(fields.diets ?? {}).filter(
+        (key) => (fields.diets as Record<string, boolean>)[key]
+    );
+
+    if (diets.length === 0) {
+        await sendAuditLog({
+            ...auditLog,
+            wasSuccess: true,
+            clientId: clientId,
+        });
+        return { clientId: clientId, error: null };
+    }
+
+    console.log(diets);
+    const { data: dietsId, error: dietsIdError } = await fetchDietsIdsForNames(diets, supabase);
+
+    if (dietsIdError) {
+        const logId = await logErrorReturnLogId(
+            `Error fetching diet ids for new client. Client id ${clientId}`,
+            {
+                error,
+            }
+        );
+        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+        return { clientId: null, error: { type: "failedToInsertClientAndFamily", logId } };
+    }
+
+    console.log(dietsId);
+
+    if (dietsId && dietsId.length > 0) {
+        const { error: insertDietsError } = await supabase.from("clients_diets").insert(
+            dietsId.map((dietId) => ({
+                client_id: clientId,
+                diet_id: dietId,
+            }))
+        );
+
+        if (insertDietsError) {
+            const logId = await logErrorReturnLogId(
+                `Error inserting diet ids for new client. Client id ${clientId}`,
+                {
+                    error: insertDietsError,
+                }
+            );
+            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+            return { clientId: null, error: { type: "failedToInsertClientAndFamily", logId } };
+        }
     }
 
     await sendAuditLog({

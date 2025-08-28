@@ -266,6 +266,7 @@ const ClientForm: React.FC<Props> = ({
                 paramsRecord[returnPathQueryParam] = returnPath;
                 targetUrl += `?${stringifyQueryParams(paramsRecord)}`;
             }
+            console.log(targetUrl);
             router.push(targetUrl);
         }
     };

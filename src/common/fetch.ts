@@ -376,6 +376,29 @@ export const fetchDiets = async (supabase: Supabase): Promise<FetchDietsResponse
     return { data: diets, error: null };
 };
 
+export const fetchDietsIdsForNames = async (
+    dietNames: string[],
+    supabase: Supabase
+): Promise<FetchDietsResponse> => {
+    const { data, error } = await supabase
+        .from("diets")
+        .select("primary_key")
+        .in("name", dietNames);
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Diets data", { error });
+        return { data: null, error: { type: "failedToFetchDiets", logId: logId } };
+    }
+
+    if (!data) {
+        return { data: [], error: null };
+    }
+
+    const diets = data.map((diet) => diet.primary_key);
+
+    return { data: diets, error: null };
+};
+
 export type PackingSlotsLabelsAndValues = [string, Schema["packing_slots"]["primary_key"]][];
 type PackingSlotsResponse =
     | {

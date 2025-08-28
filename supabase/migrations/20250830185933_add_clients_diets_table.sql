@@ -18,44 +18,10 @@ alter table "public"."clients_diets" add constraint "clients_diets_diet_id_fkey"
 
 alter table "public"."clients_diets" validate constraint "clients_diets_diet_id_fkey";
 
-grant delete on table "public"."clients_diets" to "anon";
-
-grant insert on table "public"."clients_diets" to "anon";
-
-grant references on table "public"."clients_diets" to "anon";
-
-grant select on table "public"."clients_diets" to "anon";
-
-grant trigger on table "public"."clients_diets" to "anon";
-
-grant truncate on table "public"."clients_diets" to "anon";
-
-grant update on table "public"."clients_diets" to "anon";
-
-grant delete on table "public"."clients_diets" to "authenticated";
-
-grant insert on table "public"."clients_diets" to "authenticated";
-
-grant references on table "public"."clients_diets" to "authenticated";
-
-grant select on table "public"."clients_diets" to "authenticated";
-
-grant trigger on table "public"."clients_diets" to "authenticated";
-
-grant truncate on table "public"."clients_diets" to "authenticated";
-
-grant update on table "public"."clients_diets" to "authenticated";
-
-grant delete on table "public"."clients_diets" to "service_role";
-
-grant insert on table "public"."clients_diets" to "service_role";
-
-grant references on table "public"."clients_diets" to "service_role";
-
-grant select on table "public"."clients_diets" to "service_role";
-
-grant trigger on table "public"."clients_diets" to "service_role";
-
-grant truncate on table "public"."clients_diets" to "service_role";
-
-grant update on table "public"."clients_diets" to "service_role";
+create policy "Enable access for admin user, select for authenticated"
+on "public"."clients_diets"
+as permissive
+for all
+to authenticated
+using (true)
+with check (user_is_admin());

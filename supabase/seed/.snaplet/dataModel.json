@@ -1317,6 +1317,34 @@
           "hasDefaultValue": false
         },
         {
+          "name": "clients_diets",
+          "type": "clients_diets",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "clients_dietsToclients",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "clients_preferred_items",
+          "type": "clients_preferred_items",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "clients_preferred_itemsToclients",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "families",
           "type": "families",
           "isRequired": false,
@@ -1357,6 +1385,194 @@
           "name": "clients_family_id_key",
           "fields": [
             "family_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "clients_diets": {
+      "id": "public.clients_diets",
+      "schemaName": "public",
+      "tableName": "clients_diets",
+      "fields": [
+        {
+          "id": "public.clients_diets.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.clients_diets.client_id",
+          "name": "client_id",
+          "columnName": "client_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.clients_diets.diet_id",
+          "name": "diet_id",
+          "columnName": "diet_id",
+          "type": "uuid",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "clients",
+          "type": "clients",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "clients_dietsToclients",
+          "relationFromFields": [
+            "client_id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "diets",
+          "type": "diets",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "clients_dietsTodiets",
+          "relationFromFields": [
+            "diet_id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "clients_diets_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "clients_preferred_items": {
+      "id": "public.clients_preferred_items",
+      "schemaName": "public",
+      "tableName": "clients_preferred_items",
+      "fields": [
+        {
+          "id": "public.clients_preferred_items.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.clients_preferred_items.client_id",
+          "name": "client_id",
+          "columnName": "client_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.clients_preferred_items.item_id",
+          "name": "item_id",
+          "columnName": "item_id",
+          "type": "uuid",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "clients",
+          "type": "clients",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "clients_preferred_itemsToclients",
+          "relationFromFields": [
+            "client_id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "lists",
+          "type": "lists",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "clients_preferred_itemsTolists",
+          "relationFromFields": [
+            "item_id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "clients_preferred_items_pkey",
+          "fields": [
+            "id"
           ],
           "nullNotDistinct": false
         }
@@ -1853,6 +2069,20 @@
           "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
+        },
+        {
+          "name": "clients_diets",
+          "type": "clients_diets",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "clients_dietsTodiets",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
         },
         {
           "name": "dietary_rules",
@@ -3554,6 +3784,20 @@
           "isRequired": false,
           "kind": "object",
           "relationName": "audit_logTolists",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "clients_preferred_items",
+          "type": "clients_preferred_items",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "clients_preferred_itemsTolists",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,
