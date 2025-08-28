@@ -17,6 +17,7 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
+          emergency_bag_id: string | null
           delivery_areas_id: string | null
           dietary_requirement: string | null
           event_id: string | null
@@ -38,6 +39,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          emergency_bag_id?: string | null
           delivery_areas_id?: string | null
           dietary_requirement?: string | null
           event_id?: string | null
@@ -59,6 +61,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          emergency_bag_id?: string | null
           delivery_areas_id?: string | null
           dietary_requirement?: string | null
           event_id?: string | null
@@ -101,6 +104,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "parcels_plus"
             referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "audit_log_emergency_bag_id_fkey"
+            columns: ["emergency_bag_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_bags"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_delivery_areas_id_fkey"
