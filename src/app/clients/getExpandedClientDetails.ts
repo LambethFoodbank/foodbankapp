@@ -53,6 +53,21 @@ const getRawClientDetails = async (clientId: string) => {
 
             cooking_facilities,
             dietary_requirements,
+            
+            diets:clients_diets(
+                diet_id,
+                diet:diets(
+                    name
+                )
+            ),
+            
+            preferred_items:clients_preferred_items(
+                item_id,
+                item:lists(
+                    item_name
+                )
+            ),
+            
             hygiene_tampons,
             hygiene_pads,
             hygiene_other_items,
@@ -93,6 +108,14 @@ export const familyCountToFamilyCategory = (count: number): string => {
     return "Family of 10+";
 };
 
+export interface ClientDietWithName extends Pick<Schema["clients_diets"], "diet_id"> {
+    diet: { name: string | null } | null;
+}
+
+export interface ClientItemWithName extends Pick<Schema["clients_preferred_items"], "item_id"> {
+    item: { item_name: string | null } | null;
+}
+
 export interface ExpandedClientData {
     fullName: string;
     address: string;
@@ -104,6 +127,8 @@ export interface ExpandedClientData {
     children: string;
     cookingFacilities: string;
     dietaryRequirements: string;
+    diets: string;
+    preferredItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
@@ -136,6 +161,8 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.dietary_requirements,
             dietaryRequirementOptions
         ),
+        diets: formatBreakdownOfDietsFromClientDiets(client.diets ?? []),
+        preferredItems: formatBreakdownOfPreferredItemsFromClient(client.preferred_items ?? []),
         hygieneProducts: formatHygieneProducts(
             client.hygiene_tampons,
             client.hygiene_pads,
@@ -268,6 +295,26 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
     }
 
     return childDetails.join(", ");
+};
+
+export const formatBreakdownOfDietsFromClientDiets = (diets: ClientDietWithName[]): string => {
+    if (!diets || diets.length === 0) {
+        return "-";
+    }
+    const dietNames = diets.map((currentDiet) =>
+        currentDiet.diet?.name ? currentDiet.diet.name : currentDiet.diet_id
+    );
+    return dietNames.join(", ");
+};
+
+export const formatBreakdownOfPreferredItemsFromClient = (items: ClientItemWithName[]): string => {
+    if (!items || items.length === 0) {
+        return "-";
+    }
+    const itemNames = items.map((currentItem) =>
+        currentItem.item?.item_name ? currentItem.item.item_name : currentItem.item_id
+    );
+    return itemNames.join(", ");
 };
 
 export const formatRequirementsByCanonicalOrder = (
