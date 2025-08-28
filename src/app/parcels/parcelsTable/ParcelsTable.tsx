@@ -237,7 +237,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 toggleableHeaders={parcelTableToggleableHeaders}
                 columnDisplayFunctions={parcelTableColumnDisplayFunctions}
                 isLoading={isLoading}
-                enableRowOrdering={true}
                 paginationConfig={{
                     enablePagination: true,
                     filteredCount: filteredParcelCount,
@@ -265,6 +264,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     onAllCheckboxClicked: () => toggleAllCheckBox(),
                     isRowChecked: (parcelData) => checkedParcelIds.includes(parcelData.parcelId),
                 }}
+                rowActionsConfig={{ editable: false }}
                 columnStyleOptions={parcelTableColumnStyleOptions}
             />
         </TableSurface>

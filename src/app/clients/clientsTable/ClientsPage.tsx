@@ -4,7 +4,6 @@ import LinkButton from "@/components/Buttons/LinkButton";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { ButtonsDiv, Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
-import { ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import supabase from "@/supabaseClient";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -228,6 +227,7 @@ const ClientsPage: React.FC = () => {
                             onRowClick={(row) => {
                                 router.push(`/clients?${clientIdParam}=${row.original.clientId}`);
                             }}
+                            rowActionsConfig={{ editable: false }}
                         />
                     </TableSurface>
 
