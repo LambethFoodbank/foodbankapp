@@ -19,11 +19,12 @@ import {
 } from "@/components/Form/formStyling";
 import Button from "@mui/material/Button";
 import Title from "@/components/Title/Title";
-import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
-import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
 import TypeOfEmergencyBagCard from "@/app/emergency-bags/form/formSections/TypeOfEmergencyBagCard";
 import { getActiveCollectionCentres } from "@/common/fetch";
 import supabase from "@/supabaseClient";
+import HubCard from "@/app/emergency-bags/form/formSections/HubCard";
+import PackingDateEmergencyBagCard from "@/app/emergency-bags/form/formSections/PackingDateEmergencyBagCard";
+import AmountCard from "@/app/emergency-bags/form/formSections/AmountCard";
 
 interface Props {
     initialFields: EmergencyBagFields;
@@ -53,7 +54,7 @@ export type EmergencyBagSetter = Setter<EmergencyBagFields>;
 export type EmergencyBagErrorSetter = Setter<EmergencyBagErrors>;
 export type EmergencyBagCardProps = CardProps<EmergencyBagFields, EmergencyBagErrors>;
 
-const formSections = [CollectionCentreCard, PackingDateCard, TypeOfEmergencyBagCard];
+const formSections = [HubCard, PackingDateEmergencyBagCard, TypeOfEmergencyBagCard, AmountCard];
 
 const EmergencyBagForm: React.FC<Props> = ({
     initialFields,
@@ -68,26 +69,22 @@ const EmergencyBagForm: React.FC<Props> = ({
     const [submitErrorMessage, setSubmitErrorMessage] = useState("");
     const [submitDisabled, setSubmitDisabled] = useState(false);
 
-    const [collectionCentresLabelsAndValues, setCollectionCentresLabelsAndValues] =
-        useState<[string, string][]>([]);
+    const [hubLabelsAndValues, setHubLabelsAndValues] = useState<[string, string][]>([]);
 
     const fieldSetter = createSetter(setFields, fields);
     const errorSetter = createSetter(setFormErrors, formErrors);
 
     useEffect(() => {
         const fetchCollectionCentres = async (): Promise<void> => {
-            const { data: collectionCentresData, error: collectionCentresError } =
-                await getActiveCollectionCentres(supabase);
+            const { data: hubData, error: hubError } = await getActiveCollectionCentres(supabase);
 
-            if (collectionCentresError) {
-                console.error("Failed to fetch collection centres", collectionCentresError);
+            if (hubError) {
+                console.error("Failed to fetch collection centres", hubError);
                 return;
             }
 
-            if (collectionCentresData) {
-                setCollectionCentresLabelsAndValues(
-                    collectionCentresData.collectionCentresLabelsAndValues
-                );
+            if (hubData) {
+                setHubLabelsAndValues(hubData.collectionCentresLabelsAndValues);
             }
         };
 
@@ -95,9 +92,11 @@ const EmergencyBagForm: React.FC<Props> = ({
     }, []);
 
     const submitForm = async (): Promise<void> => {
-        setSubmitDisabled(true);
+        //setSubmitDisabled(true);
 
-        const inputError = checkErrorOnSubmit(formErrors, setFormErrors);
+
+        console.log(formErrors);
+        const inputError = checkErrorOnSubmit(formErrors, setFormErrors, ['type', 'collectionCentre', 'packingDate', 'amount'] );
         if (inputError) {
             setSubmitError(Errors.submit);
             setSubmitDisabled(false);
@@ -148,7 +147,7 @@ const EmergencyBagForm: React.FC<Props> = ({
                         errorSetter={errorSetter}
                         fieldSetter={fieldSetter}
                         fields={fields}
-                        collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
+                        hubLabelsAndValues={hubLabelsAndValues}
                     />
                 ))}
                 <CenterComponent>

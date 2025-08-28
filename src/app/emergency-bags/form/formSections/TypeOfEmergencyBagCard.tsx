@@ -39,7 +39,7 @@ const TypeOfEmergencyBagCard: React.FC<EmergencyBagCardProps> = ({
                         label="Extra information"
                         defaultValue={getDefaultTextValue(fields, "fullName")}
                         onChange={onChangeText(fieldSetter, errorSetter, "fullName", {
-                            required: true,
+                            required: false,
                         })}
                     />
                 )}
