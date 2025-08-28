@@ -118,6 +118,8 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         content: {
             clientDetails: clientRecord,
             familyMembers: familyMembers,
+            clientDiets: clientDiets,
+            clientPreferredItems: clientPreferredItems,
         },
     } as const satisfies Partial<AuditLog>;
 

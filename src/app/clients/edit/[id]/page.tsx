@@ -8,7 +8,12 @@ import { returnPathQueryParam } from "@/common/constants";
 import ClientForm, { ClientErrors } from "@/app/clients/form/ClientForm";
 import { Errors } from "@/components/Form/formFunctions";
 import autofill from "@/app/clients/edit/[id]/autofill";
-import { fetchClient, fetchFamily } from "@/common/fetch";
+import {
+    fetchClient,
+    fetchFamily,
+    fetchClientDiets,
+    fetchClientPreferredItems,
+} from "@/common/fetch";
 import { Schema } from "@/databaseUtils";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 
@@ -23,6 +28,10 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
 
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);
     const [familyData, setFamilyData] = useState<Schema["families"][] | null>(null);
+    const [dietsData, setDietsData] = useState<Schema["clients_diets"]["diet_id"][] | null>(null);
+    const [itemsData, setItemsData] = useState<
+        Schema["clients_preferred_items"]["item_id"][] | null
+    >(null);
     const [error, setError] = useState<string | null>();
     const [returnPath, setReturnPath] = useState<string | null>(null);
 
@@ -66,10 +75,34 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                 return;
             }
             setFamilyData(familyData);
+
+            const { data: dietsData, error: dietsError } = await fetchClientDiets(
+                params.id,
+                supabase
+            );
+            if (dietsError) {
+                setError(`Unable to fetch diets data. Log ID: ${dietsError.logId}`);
+                return;
+            }
+            setDietsData(dietsData);
+
+            // Fetch preferred items data
+            const { data: itemsData, error: itemsError } = await fetchClientPreferredItems(
+                params.id,
+                supabase
+            );
+            if (itemsError) {
+                setError(`Unable to fetch preferred items data. Log ID: ${itemsError.logId}`);
+                return;
+            }
+            setItemsData(itemsData);
         })();
     }, [params.id, searchParams]);
 
-    const initialFields = clientData && familyData ? autofill(clientData, familyData) : null;
+    const initialFields =
+        clientData && familyData && dietsData && itemsData
+            ? autofill(clientData, familyData, dietsData, itemsData)
+            : null;
 
     const initialFormErrors: ClientErrors = {
         fullName: Errors.none,

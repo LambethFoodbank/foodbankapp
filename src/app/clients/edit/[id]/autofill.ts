@@ -1,6 +1,7 @@
 import { Schema } from "@/databaseUtils";
 import { ClientFields } from "@/app/clients/form/ClientForm";
 import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
+import { Diet, Item } from "@/components/Form/formFunctions";
 import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
 import { getFormattedPeople } from "@/common/formatFamiliesData";
 
@@ -12,7 +13,9 @@ const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
 
 const autofill = (
     clientData: Schema["clients"],
-    familyData: Schema["families"][]
+    familyData: Schema["families"][],
+    dietsData: Schema["clients_diets"]["diet_id"][],
+    itemsData: Schema["clients_preferred_items"]["item_id"][]
 ): ClientFields => {
     const children = getFormattedPeople(familyData, isChildFamilyMember);
 
@@ -42,6 +45,8 @@ const autofill = (
             clientData.dietary_requirements !== null
                 ? arrayToBooleanGroup(clientData.dietary_requirements)
                 : null,
+        diets: dietsData.map((diet) => ({ primaryKey: diet }) as Diet),
+        preferredItems: itemsData.map((item) => ({ primaryKey: item }) as Item),
         hygieneProductsTampons: clientData.hygiene_tampons,
         hygieneProductsPads: clientData.hygiene_pads,
         hygieneOtherItems: arrayToBooleanGroup(clientData.hygiene_other_items ?? []),

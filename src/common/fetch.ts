@@ -444,3 +444,50 @@ interface WikiRowsQueryFailureType {
 }
 
 export type WikiRowsQueryType = WikiRowsQuerySuccessType | WikiRowsQueryFailureType;
+
+interface ClientDietsFetchError {
+    type: "dietsFetchFailed";
+    logId: string;
+}
+
+interface ClientPreferredItemsFetchError {
+    type: "preferredItemsFetchFailed";
+    logId: string;
+}
+
+export const fetchClientDiets = async (
+    clientId: string,
+    supabase: Supabase
+): Promise<{ data: Schema["clients_diets"]["diet_id"][]; error: ClientDietsFetchError | null }> => {
+    const { data, error } = await supabase
+        .from("clients_diets")
+        .select("diet_id")
+        .eq("client_id", clientId);
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Client diets", error);
+        return { data: [], error: { type: "dietsFetchFailed", logId } };
+    }
+
+    return { data: data.map((diet) => diet.diet_id), error: null };
+};
+
+export const fetchClientPreferredItems = async (
+    clientId: string,
+    supabase: Supabase
+): Promise<{
+    data: Schema["clients_preferred_items"]["item_id"][];
+    error: ClientPreferredItemsFetchError | null;
+}> => {
+    const { data, error } = await supabase
+        .from("clients_preferred_items")
+        .select("item_id")
+        .eq("client_id", clientId);
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Client preferred items", error);
+        return { data: [], error: { type: "preferredItemsFetchFailed", logId } };
+    }
+
+    return { data: data.map((item) => item.item_id), error: null };
+};
