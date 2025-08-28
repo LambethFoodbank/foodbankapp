@@ -1,12 +1,29 @@
 import { MRT_ColumnDef } from "material-react-table";
 import {
     ColumnDisplayFunctions,
+    ColumnStyleOptions,
+    ColumnStyles,
     GenericSortMethod,
     SortOptions,
     TableHeaders,
 } from "@/components/Tables/Table";
 
 import React from "react";
+
+const remToPx = (rem: string | undefined): number | undefined => {
+    if (!rem) {
+        return undefined;
+    }
+    return parseFloat(rem) * 16;
+};
+
+const mapColumnStyle = (columnStyleOptions: ColumnStyleOptions): object => {
+    return {
+        minSize: remToPx(columnStyleOptions.minWidth),
+        maxSize: remToPx(columnStyleOptions.maxWidth),
+        size: columnStyleOptions.grow ? columnStyleOptions.grow * 100 : undefined,
+    };
+};
 
 const renderMRTCell = <Data extends object, K extends keyof Data>(
     value: Data[K],
@@ -30,7 +47,8 @@ export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends G
     headers: TableHeaders<Data>,
     toggleableHeaders: readonly (keyof Data | string)[],
     sortableColumns: SortOptions<Data, SortMethod>[],
-    columnDisplayFunctions?: ColumnDisplayFunctions<Data>
+    columnDisplayFunctions?: ColumnDisplayFunctions<Data>,
+    columnStyleOptions?: ColumnStyles<Data>
 ): MRT_ColumnDef<Data>[] => {
     return headers.map(([key, label]) => {
         return {
@@ -46,6 +64,7 @@ export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends G
                 visibleInShowHideMenu: toggleableHeaders.includes(key),
             }),
             enableSorting: !!sortableColumns.find((column) => column.key === key),
+            ...(columnStyleOptions?.[key] && mapColumnStyle(columnStyleOptions?.[key])),
         };
     });
 };
