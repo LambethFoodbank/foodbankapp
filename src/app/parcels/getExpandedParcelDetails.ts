@@ -7,6 +7,8 @@ import {
     formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
+    formatBreakdownOfDietsFromClientDiets,
+    formatBreakdownOfPreferredItemsFromClient,
     formatHouseholdFromFamilyDetails,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
@@ -83,6 +85,21 @@ const getExpandedParcelDetails = async (
             is_active,
             cooking_facilities,
             dietary_requirements,
+            
+            diets:clients_diets(
+                diet_id,
+                diet:diets(
+                    name
+                )
+            ),
+            
+            preferred_items:clients_preferred_items(
+                item_id,
+                item:lists(
+                    item_name
+                )
+            ),
+            
             hygiene_tampons,
             hygiene_pads,
             hygiene_other_items,
@@ -187,6 +204,10 @@ const getExpandedParcelDetails = async (
                         client.dietary_requirements,
                         dietaryRequirementOptions
                     ),
+                    diets: formatBreakdownOfDietsFromClientDiets(client.diets),
+                    preferredItems: formatBreakdownOfPreferredItemsFromClient(
+                        client.preferred_items
+                    ),
                     hygieneProducts: formatHygieneProducts(
                         client.hygiene_tampons,
                         client.hygiene_pads,
@@ -277,6 +298,8 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     children: string;
     cookingFacilities: string;
     dietaryRequirements: string;
+    diets: string;
+    preferredItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
