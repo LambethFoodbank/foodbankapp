@@ -38,7 +38,7 @@ const EditAndReorderArrowDiv = styled.div`
     display: flex;
     flex-direction: row;
     width: 100%;
-    transform: translateX(-1.2rem);
+    transform: translateX(-0.8rem);
 `;
 
 const RelativeContainerForTable = styled.div`
@@ -57,7 +57,7 @@ interface MRTTableProps<
     DbData extends Record<string, unknown>,
 > {
     data: Data[];
-    setData: React.Dispatch<React.SetStateAction<Data[]>>;
+    setData?: React.Dispatch<React.SetStateAction<Data[]>>;
     headerKeysAndLabels: TableHeaders<Data>;
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>;
     defaultShownHeaders?: readonly (keyof Data)[];
@@ -236,13 +236,26 @@ const MaterialTable = <
                         )}
                 </EditAndReorderArrowDiv>
             ),
+        muiTablePaperProps: {
+            sx: {
+                margin: "0 !important",
+            },
+        },
+        muiTableProps: {
+            sx: {
+                tableLayout: "fixed",
+                width: "100%",
+            },
+        },
         muiTableHeadCellProps: {
             sx: {
                 backgroundColor: theme.main.background[2],
                 color: theme.main.foreground[2],
                 fontWeight: "bold",
                 borderColor: theme.main.border,
-                whiteSpace: "normal", // allow wrapping
+                whiteSpace: "normal",
+                wordBreak: "break-word",
+                overflowWrap: "anywhere",
             },
         },
         muiTableBodyProps: {
@@ -270,7 +283,7 @@ const MaterialTable = <
         muiTableBodyCellProps: {
             sx: {
                 whiteSpace: "normal",
-                wordBreak: "break-word", // or overflowWrap: "anywhere"
+                wordBreak: "break-word",
             },
         },
         muiSelectCheckboxProps: ({ row }) => ({
@@ -301,7 +314,7 @@ const MaterialTable = <
 
                     const movedRow = updatedData.splice(draggingRow.index, 1)[0];
                     updatedData.splice((hoveredRow as MRT_Row<Data>).index, 0, movedRow);
-                    setData(updatedData);
+                    setData?.(updatedData);
                 }
             },
         }),
