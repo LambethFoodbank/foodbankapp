@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
     CardProps,
     checkErrorOnSubmit,
@@ -9,7 +9,6 @@ import {
     Fields,
     FormErrors,
     createSetter,
-    Setter,
 } from "@/components/Form/formFunctions";
 import {
     CenterComponent,
@@ -46,6 +45,7 @@ export interface EmergencyBagFields extends Fields {
     packingDate: string;
     amount: number;
     lastUpdated: string;
+    otherInfo: string;
 }
 
 export interface EmergencyBagErrors extends FormErrors<EmergencyBagFields> {
@@ -53,6 +53,7 @@ export interface EmergencyBagErrors extends FormErrors<EmergencyBagFields> {
     hub: Errors;
     packingDate: Errors;
     amount: Errors;
+    otherInfo: Errors;
 }
 
 export const initialEmergencyBagFields: EmergencyBagFields = {
@@ -62,7 +63,7 @@ export const initialEmergencyBagFields: EmergencyBagFields = {
     packingDate: "",
     amount: 0,
     lastUpdated: "",
-
+    otherInfo: "",
 };
 
 export const initialEmergencyBagFormErrors: EmergencyBagErrors = {
@@ -70,10 +71,9 @@ export const initialEmergencyBagFormErrors: EmergencyBagErrors = {
     hub: Errors.initial,
     packingDate: Errors.initial,
     amount: Errors.initial,
+    otherInfo: Errors.initial,
 };
 
-// export type EmergencyBagSetter = Setter<EmergencyBagFields>;
-// export type EmergencyBagErrorSetter = Setter<EmergencyBagErrors>;
 export type EmergencyBagCardProps = CardProps<EmergencyBagFields, EmergencyBagErrors>;
 
 const formSections = [HubCard, PackingDateEmergencyBagCard, TypeOfEmergencyBagCard, AmountCard];
@@ -131,12 +131,13 @@ const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
         setSubmitErrorMessage("");
         setSubmitDisabled(true);
 
-        const inputError = checkErrorOnSubmit(formErrors, setFormErrors, [
-            "type",
-            "hub",
-            "packingDate",
-            "amount",
-        ]);
+        const fieldsToCheck = ["type", "hub", "packingDate", "amount"];
+        if (fields.type === "Other") {
+            fieldsToCheck.push("otherInfo");
+        }
+
+        const inputError = checkErrorOnSubmit(formErrors, setFormErrors, fieldsToCheck);
+
         if (inputError) {
             setSubmitError(Errors.submit);
             setSubmitDisabled(false);
@@ -147,7 +148,7 @@ const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
 
         const emergencyBagRecord = {
             collection_centre: fields.hub,
-            type: fields.type,
+            type: fields.type === "Other" ? fields.otherInfo : fields.type,
             packing_date: packingDate,
             amount: fields.amount,
             lastUpdated: fields.last_updated,
@@ -176,7 +177,7 @@ const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
     return (
         <>
             <CenterComponent>
-                <StyledForm>
+                <StyledForm style={{ width: "60%" }}>
                     <Title>Emergency Bag Form</Title>
                     <FormText>
                         Please provide the details about the Emergency Bag being created.
