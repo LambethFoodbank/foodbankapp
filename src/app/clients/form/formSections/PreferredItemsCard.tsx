@@ -8,7 +8,7 @@ interface PreferredItemsCardProps extends ClientCardProps {
     items: Item[];
 }
 
-const PreferredItems: React.FC<PreferredItemsCardProps> = ({ fieldSetter, fields, items }) => {
+const PreferredItemsCard: React.FC<PreferredItemsCardProps> = ({ fieldSetter, fields, items }) => {
     const selected: Item[] = (fields.preferredItems ?? []) as Item[];
     const selectedKeys = selected.map((item) => item.primaryKey);
 
@@ -31,4 +31,4 @@ const PreferredItems: React.FC<PreferredItemsCardProps> = ({ fieldSetter, fields
     );
 };
 
-export default PreferredItems;
+export default PreferredItemsCard;

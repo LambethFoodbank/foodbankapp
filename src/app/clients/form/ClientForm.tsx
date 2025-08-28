@@ -1,5 +1,6 @@
 "use client";
 
+import FloatingToast from "@/components/FloatingToast";
 import React, { useCallback, useEffect, useState } from "react";
 import supabase from "@/supabaseClient";
 import { fetchAlternativeItemsFromList, fetchDiets } from "@/common/fetch";
@@ -273,34 +274,39 @@ const ClientForm: React.FC<Props> = ({
     };
 
     return (
-        <CenterComponent>
-            <StyledForm>
-                <Title>Client Form</Title>
-                <FormText>
-                    Please provide or update the client&apos;s personal details, household
-                    composition, dietary restrictions and other needs.
-                </FormText>
-                {formSections.map((Card, index) => {
-                    return (
-                        <Card
-                            key={index} // eslint-disable-line react/no-array-index-key
-                            formErrors={formErrors}
-                            errorSetter={errorSetter}
-                            fieldSetter={fieldSetter}
-                            fields={fields}
-                            diets={diets}
-                            items={preferredItems}
-                        />
-                    );
-                })}
-                <CenterComponent>
-                    <Button variant="contained" onClick={submitForm} disabled={submitDisabled}>
-                        Submit
-                    </Button>
-                </CenterComponent>
-                <FormErrorText>{submitErrorMessage || submitError}</FormErrorText>
-            </StyledForm>
-        </CenterComponent>
+        <>
+            <CenterComponent>
+                <StyledForm>
+                    <Title>Client Form</Title>
+                    <FormText>
+                        Please provide or update the client&apos;s personal details, household
+                        composition, dietary restrictions and other needs.
+                    </FormText>
+                    {formSections.map((Card, index) => {
+                        return (
+                            <Card
+                                key={index} // eslint-disable-line react/no-array-index-key
+                                formErrors={formErrors}
+                                errorSetter={errorSetter}
+                                fieldSetter={fieldSetter}
+                                fields={fields}
+                                diets={diets}
+                                items={preferredItems}
+                            />
+                        );
+                    })}
+                    <CenterComponent>
+                        <Button variant="contained" onClick={submitForm} disabled={submitDisabled}>
+                            Submit
+                        </Button>
+                    </CenterComponent>
+                    <FormErrorText>{submitErrorMessage || submitError}</FormErrorText>
+                </StyledForm>
+            </CenterComponent>
+            {fetchDataError && (
+                <FloatingToast message={fetchDataError} severity="error" variant="filled" />
+            )}
+        </>
     );
 };
 
