@@ -50,7 +50,7 @@ export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends G
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>,
     columnStyleOptions?: ColumnStyles<Data>
 ): MRT_ColumnDef<Data>[] => {
-    return headers.map(([key, label]) => {
+    const baseColumns: MRT_ColumnDef<Data>[] = headers.map(([key, label]) => {
         return {
             accessorKey: key as string,
             header: label,
@@ -67,4 +67,6 @@ export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends G
             ...(columnStyleOptions?.[key] && mapColumnStyle(columnStyleOptions?.[key])),
         };
     });
+
+    return baseColumns;
 };
