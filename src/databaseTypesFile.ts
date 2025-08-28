@@ -435,6 +435,7 @@ export type Database = {
           collection_centre: string
           created_at: string
           id: string
+          last_updated: string
           packing_date: string
           type: string
         }
@@ -443,6 +444,7 @@ export type Database = {
           collection_centre: string
           created_at?: string
           id?: string
+          last_updated?: string
           packing_date: string
           type: string
         }
@@ -451,6 +453,7 @@ export type Database = {
           collection_centre?: string
           created_at?: string
           id?: string
+          last_updated?: string
           packing_date?: string
           type?: string
         }

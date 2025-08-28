@@ -1721,6 +1721,20 @@
           "maxLength": null
         },
         {
+          "id": "public.emergency_bags.last_updated",
+          "name": "last_updated",
+          "columnName": "last_updated",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "collection_centres",
           "type": "collection_centres",
           "isRequired": true,
