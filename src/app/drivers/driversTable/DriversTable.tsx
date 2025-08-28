@@ -220,7 +220,7 @@ const DriversTable: React.FC = () => {
                 }
                 const { data: createdDrivers, error: insertDriversError } =
                     await insertNewDrivers(row);
-                const baseAuditLog = getBaseAuditLogForDriversAction("add a new driver", row);
+                const baseAuditLog = getBaseAuditLogForDriversAction("add a driver", row);
 
                 if (insertDriversError) {
                     setErrorMessage(`Failed to add driver. Log ID: ${insertDriversError.logId}`);
@@ -253,9 +253,7 @@ const DriversTable: React.FC = () => {
                     let message = `Failed to update the packing slot. Log ID: ${updateDriverError.logId}`;
 
                     if (updateDriverError.type === "ConcurrentEditDrivers") {
-                        message =
-                            "Record has been edited recently - please refresh the page." +
-                            `Log ID: ${updateDriverError.logId}`;
+                        message = "Record has been edited recently - please refresh the page.";
                     }
 
                     setErrorMessage(message);
