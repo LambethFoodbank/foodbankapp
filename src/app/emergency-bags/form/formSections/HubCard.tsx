@@ -4,12 +4,12 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { CollectionCentresLabelsAndValues } from "@/common/fetch";
-import { EmergencyBagCardProps } from "@/app/emergency-bags/AddEmergencyBagForm";
+import { EmergencyBagCardProps } from "@/app/emergency-bags/form/EmergencyBagForm";
 
 interface HubCardProps extends EmergencyBagCardProps {
     hubLabelsAndValues: CollectionCentresLabelsAndValues;
 }
-const CollectionCentreCard: React.FC<HubCardProps> = ({
+const HubCard: React.FC<HubCardProps> = ({
     fieldSetter,
     errorSetter,
     formErrors,
@@ -26,18 +26,14 @@ const CollectionCentreCard: React.FC<HubCardProps> = ({
                 <ControlledSelect
                     selectLabelId="collection-centre-select-label"
                     labelsAndValues={hubLabelsAndValues}
-                    listTitle="Collection Centre"
-                    value={fields.collectionCentre ?? ""}
-                    onChange={valueOnChangeDropdownList(
-                        fieldSetter,
-                        errorSetter,
-                        "collectionCentre"
-                    )}
+                    listTitle="Hub"
+                    value={fields.hub ?? ""}
+                    onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "hub")}
                 />
-                <ErrorText>{getErrorText(formErrors.collectionCentre)}</ErrorText>
+                <ErrorText>{getErrorText(formErrors.hub)}</ErrorText>
             </>
         </GenericFormCard>
     );
 };
 
-export default CollectionCentreCard;
+export default HubCard;

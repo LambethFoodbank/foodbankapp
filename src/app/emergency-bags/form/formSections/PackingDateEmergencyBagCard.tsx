@@ -4,7 +4,7 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ErrorText } from "@/components/Form/formStyling";
 import dayjs from "dayjs";
-import { EmergencyBagCardProps } from "@/app/emergency-bags/AddEmergencyBagForm";
+import { EmergencyBagCardProps } from "@/app/emergency-bags/form/EmergencyBagForm";
 
 const PackingDateCard: React.FC<EmergencyBagCardProps> = ({
     errorSetter,

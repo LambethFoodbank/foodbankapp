@@ -7,8 +7,11 @@ import {
     numberRegex,
     onChangeText,
 } from "@/components/Form/formFunctions";
-import { EmergencyBagCardProps } from "@/app/emergency-bags/AddEmergencyBagForm";
-import { MAXIMUM_NUMBER_OF_EMERGENCY_BAGS, MINIMUM_NUMBER_OF_EMERGENCY_BAGS } from "@/app/clients/form/bounds";
+import { EmergencyBagCardProps } from "@/app/emergency-bags/form/EmergencyBagForm";
+import {
+    MAXIMUM_NUMBER_OF_EMERGENCY_BAGS,
+    MINIMUM_NUMBER_OF_EMERGENCY_BAGS,
+} from "@/app/clients/form/bounds";
 
 const numberOfEBRange = (value: string): boolean => {
     return (
