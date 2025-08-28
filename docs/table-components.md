@@ -2,14 +2,14 @@
 
 Main elements that need to be addressed:
 
-- [ ] Header, Column, and Row Formatting
-- [ ] Data and generic types
-- [ ] Action buttons
-- [ ] Sorting methods
-- [ ] Pagination
-- [ ] Filtering options
-- [ ] Conditional styling
-- [ ] Row reordering / drag and drop
+- [x] Header, Column, and Row Formatting
+- [x] Data and generic types
+- [x] Action buttons
+- [x] Sorting methods
+- [x] Pagination
+- [x] Filtering options
+- [x] Conditional styling
+- [x] Row reordering / drag and drop
 - [ ] Working with column-specific options
 
 ### Material Table Workflow & Components
@@ -111,6 +111,13 @@ useEffect(() => {
 }, [pagination.pageIndex, pagination.pageSize]);
 ```
 
+_Note: Indexing starts at 0, with the start and endpoints of each page being calculated as follows:_
+
+```typescript
+const startPoint = currentPage * perPage;
+const endPoint = startPoint + perPage - 1;
+```
+
 ### Manual Sorting
 
 Column sorting can be configured to be either manual (server-side) or automatic (client-side).
@@ -172,4 +179,68 @@ useEffect(() => {
   });
 }, [sorting]);  // although recommended, we don't include sortConfig in the dependency array to avoid an infinite render loop
 ```
+
+### Row selection & Checkboxes
+
+There are two different types of row selection that are considered:
+
+- Individual on-click events (mutually exclusive; sometimes results in a separate details panel being shown)
+- Multiple row selection (checkboxes; can be used for actions/report generation)
+
+**1. Individual on-click events**
+
+This is done by passing an `onRowClick` function inside the `muiTableBodyRowProps` MRT hook option.
+It's important to note that, besides the event argument, this method requires an **MRT_Row type assertion** for its row
+parameter.
+
+```typescript
+type OnRowClickFunction<Data extends MRT_RowData> = (
+  row: MRT_Row<Data>,
+  event: React.MouseEvent<Element, MouseEvent>
+) => void;
+
+const table = useMaterialReactTable({
+  muiTableBodyRowProps: ({ row }) => ({
+    onClick: (event) => {
+      onRowClick?.(row as MRT_Row<Parcel>, event);
+    },
+    sx: {
+      cursor: "pointer",
+    },
+  }),
+});
+```
+
+**2. Multiple row selection (checkboxes)**
+
+Because of the interferences between the internal and external row selection states, we handle checkbox configuration *
+*externally**, inside the parent component (e.g. `<ParcelTable />`).
+
+This implies that the MRT **does not** have an
+explicit `rowSelection` state, nor an `onRowSelectionChange` option; therefore, the table itself is **not** aware of the
+selected rows, and all conditional styling that involves selected rows is handled externally as well (displaying the
+selected row count, highlighting selected rows, etc.).
+
+```typescript
+export type CheckboxConfig<Data> =
+  | {
+  displayed: true;
+  selectedRowIds: string[];
+  isAllCheckboxChecked: boolean;
+  onCheckboxClicked: (row: Data) => void;
+  onAllCheckboxClicked: (isAllCheckboxChecked: boolean) => void;
+  isRowChecked: (data: Data) => boolean;
+}
+  | {
+  displayed: false;
+};
+```
+
+The `CheckboxConfig` type contains all the necessary information and functions to handle checkbox behavior. These
+methods are called inside the corresponding MRT hook options: `muiSelectCheckboxProps` (for individual row checkboxes)
+and `muiSelectAllCheckboxProps` (for the header checkbox).
+
+### Row Reordering / Drag and Drop
+
+Row reordering is activated by setting the `enableRowOrdering` option to `true` in the `useMaterialReactTable` hook.
 
