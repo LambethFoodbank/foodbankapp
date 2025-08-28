@@ -287,7 +287,7 @@ export type Database = {
       collection_centres: {
         Row: {
           acronym: string
-          available_days: Database["public"]["CompositeTypes"]["collection_availability_days"][]
+          available_days: Database["public"]["CompositeTypes"]["collection_availability_day"][]
           is_delivery: boolean
           is_shown: boolean
           last_updated: string
@@ -299,7 +299,7 @@ export type Database = {
         }
         Insert: {
           acronym?: string
-          available_days: Database["public"]["CompositeTypes"]["collection_availability_days"][]
+          available_days: Database["public"]["CompositeTypes"]["collection_availability_day"][]
           is_delivery?: boolean
           is_shown?: boolean
           last_updated?: string
@@ -311,7 +311,7 @@ export type Database = {
         }
         Update: {
           acronym?: string
-          available_days?: Database["public"]["CompositeTypes"]["collection_availability_days"][]
+          available_days?: Database["public"]["CompositeTypes"]["collection_availability_day"][]
           is_delivery?: boolean
           is_shown?: boolean
           last_updated?: string
@@ -1115,7 +1115,7 @@ export type Database = {
       role: "volunteer" | "admin" | "manager" | "staff"
     }
     CompositeTypes: {
-      collection_availability_days: {
+      collection_availability_day: {
         day: Database["public"]["Enums"]["day_of_week"] | null
         is_active: boolean | null
       }

@@ -1469,7 +1469,7 @@
           "id": "public.collection_centres.available_days",
           "name": "available_days",
           "columnName": "available_days",
-          "type": "collection_availability_days[]",
+          "type": "collection_availability_day[]",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
