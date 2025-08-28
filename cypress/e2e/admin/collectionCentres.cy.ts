@@ -6,7 +6,6 @@ import {
     saveAvailableDaysForCentre,
     saveTimeSlotsForCentre,
     startEditingCollectionCentreRow,
-    //tickAvailabilityCheckbox,
     checkIsShownInRowBeingEditedAndSave,
 } from "./commonActions/collectionCentres";
 
@@ -31,7 +30,7 @@ describe("Edit a collection centre on admins page", () => {
         newCollectionCentreName = `${uuidv4()}`;
     });
 
-    it("Adds a collection centre", () => {
+    it("Adds a collection centre and marks it as shown successfully", () => {
         addNewCollectionCentre(newCollectionCentreName);
 
         startEditingCollectionCentreRow(newCollectionCentreName);
@@ -159,7 +158,7 @@ describe("Edit a collection centre on admins page", () => {
             cy.get("@timeSlots").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
 
             // Save to close modal
-            saveTimeSlotsForCentre(newCollectionCentreName);
+            saveTimeSlotsForCentre();
             // Open modal for same collection centre
             clickEditButtonForCentre(
                 "Edit collection slots for",
@@ -189,9 +188,6 @@ describe("Edit a collection centre on admins page", () => {
                 newCollectionCentreName,
                 "CollectionCentreAvailableDaysModal"
             );
-
-            // Tick the first day
-            //tickAvailabilityCheckbox(0);
 
             cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
                 .find('[aria-label="List of defined available days"]') // eslint-disable-line quotes
@@ -230,14 +226,12 @@ describe("Edit a collection centre on admins page", () => {
                 "CollectionCentreAvailableDaysModal"
             );
 
-            // Tick the first day
-            //tickAvailabilityCheckbox(0);
-
             cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
                 .find('[aria-label="List of defined available days"]') // eslint-disable-line quotes
                 .find('[aria-label="Available Day"]') // eslint-disable-line quotes
                 .as("availableDays");
 
+            // Tick the first day
             cy.get("@availableDays").eq(0).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
 
             // Click somewhere outside the Modal to close it without saving

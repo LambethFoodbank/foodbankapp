@@ -23,8 +23,6 @@ export const fillOutNewCollectionCentreRowAndSave = (newCollectionCentreName: st
         .find('input[type="text"]') // eslint-disable-line quotes
         .type(newCollectionCentreName);
 
-    cy.intercept("POST", "**/rest/v1/collection_centres?select=*").as("saveCollectionCentre");
-
     cy.get("@newRow")
         .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
@@ -83,14 +81,13 @@ export const clickEditButtonForCentre = (
     modalName: string
 ): void => {
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .find('[aria-label="' + ariaLabel + " " + collectionCentreName + '"]', { timeout: 6000 }) // eslint-disable-line quotes
+        .find(`[aria-label="${ariaLabel}${collectionCentreName}"]`, { timeout: 6000 }) // eslint-disable-line quotes
         .click();
-    cy.get('div[data-testid="' + modalName + '"]') // eslint-disable-line quotes
+    cy.get(`div[data-testid="${modalName}"]`) // eslint-disable-line quotes
         .should("be.visible");
 };
 
-export const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
-    void collectionCentreName;
+export const saveTimeSlotsForCentre = (): void => {
     cy.get('div[data-testid="CollectionCentreTimeSlotsModal"]') // eslint-disable-line quotes
         .find('[data-testid="SaveSlotsCloseModal"]') // eslint-disable-line quotes
         .click();
@@ -102,7 +99,7 @@ export const saveTimeSlotsForCentre = (collectionCentreName: string): void => {
         .click();
 
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(5000);
+    cy.wait(500);
 };
 
 export const saveAvailableDaysForCentre = (collectionCentreName: string): void => {
@@ -118,7 +115,7 @@ export const saveAvailableDaysForCentre = (collectionCentreName: string): void =
         .click();
 
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(5000);
+    cy.wait(500);
 };
 
 export const addNewCollectionCentre = (newCollectionCentreName: string): void => {
@@ -138,6 +135,8 @@ export const addNewCollectionCentre = (newCollectionCentreName: string): void =>
         .should("exist");
 
     fillOutNewCollectionCentreRowAndSave(newCollectionCentreName);
+
+    // Wait for the data to reload and ensure the new item appears with proper data
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
         .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
         .should("be.visible");
@@ -146,22 +145,3 @@ export const addNewCollectionCentre = (newCollectionCentreName: string): void =>
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(1000);
 };
-
-// export const tickAvailabilityCheckbox = (checkboxIndex: number): void => {
-//     cy.get('div[data-testid="CollectionCentreAvailableDaysModal"]') // eslint-disable-line quotes
-//         .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
-//         .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
-//         .as("availableDays");
-//     cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
-//
-//     const otherCheckboxIndex = (() => {
-//         const index = Math.floor(Math.random() * 6);
-//         return index >= checkboxIndex ? index + 1 : index;
-//     })();
-//
-//     cy.get("@availableDays").eq(checkboxIndex).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
-//     cy.get("@availableDays")
-//         .eq(otherCheckboxIndex)
-//         .find('input[type="checkbox"]') // eslint-disable-line quotes
-//         .should("not.be.checked"); // eslint-disable-line quotes
-// };
