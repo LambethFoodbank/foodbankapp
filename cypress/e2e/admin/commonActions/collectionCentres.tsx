@@ -81,7 +81,7 @@ export const clickEditButtonForCentre = (
     modalName: string
 ): void => {
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .find(`[aria-label="${ariaLabel}${collectionCentreName}"]`, { timeout: 6000 }) // eslint-disable-line quotes
+        .find(`[aria-label="${ariaLabel} ${collectionCentreName}"]`, { timeout: 6000 }) // eslint-disable-line quotes
         .click();
     cy.get(`div[data-testid="${modalName}"]`) // eslint-disable-line quotes
         .should("be.visible");
@@ -143,5 +143,5 @@ export const addNewCollectionCentre = (newCollectionCentreName: string): void =>
 
     // Give a moment for the database subscription to refresh the data with proper timestamps
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(1000);
+    cy.wait(500);
 };
