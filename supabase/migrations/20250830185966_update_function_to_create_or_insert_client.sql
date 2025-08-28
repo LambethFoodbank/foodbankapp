@@ -1,6 +1,6 @@
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.insert_client_and_family(clientrecord jsonb, familymembers jsonb, clientdiets jsonb)
+CREATE OR REPLACE FUNCTION public.insert_client_and_family(clientrecord jsonb, familymembers jsonb, clientdiets jsonb, clientpreferreditems jsonb)
  RETURNS uuid
  LANGUAGE plpgsql
 AS $function$DECLARE
@@ -132,14 +132,13 @@ FOR member IN SELECT * FROM jsonb_array_elements(familyMembers)
                   );
 END LOOP;
 
--- FOR diet IN SELECT * FROM jsonb_array_elements(clientDiets)
---                               LOOP
---     INSERT INTO clients_diets (client_id, diet_id)
---             VALUES (inserted_client_id, (diet->>'diet_id')::uuid);
--- END LOOP;
 INSERT INTO clients_diets (client_id, diet_id)
 SELECT inserted_client_id, (diet->>'diet_id')::uuid
 FROM jsonb_array_elements(clientDiets) diet;
+
+INSERT INTO clients_preferred_items (client_id, item_id)
+SELECT inserted_client_id, (item->>'item_id')::uuid
+FROM jsonb_array_elements(clientPreferredItems) item;
 
 RETURN inserted_client_id;
 END;$function$

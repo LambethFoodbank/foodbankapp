@@ -17,6 +17,7 @@ import {
     createSetter,
     Setter,
     Diet,
+    Item,
 } from "@/components/Form/formFunctions";
 import {
     CenterComponent,
@@ -75,7 +76,7 @@ export interface ClientFields extends Fields {
     cookingFacilities: BooleanGroup | null;
     dietaryRequirements: BooleanGroup | null;
     diets: Diet[];
-    preferredItems: BooleanGroup;
+    preferredItems: Item[];
     hygieneProductsTampons: string | null;
     hygieneProductsPads: string | null;
     hygieneOtherItems: BooleanGroup;
@@ -146,7 +147,7 @@ const ClientForm: React.FC<Props> = ({
     const [submitErrorMessage, setSubmitErrorMessage] = useState("");
     const [submitDisabled, setSubmitDisabled] = useState(false);
     const [diets, setDiets] = useState<Diet[]>([]);
-    const [preferredItems, setPreferredItems] = useState<string[]>([]);
+    const [preferredItems, setPreferredItems] = useState<Item[]>([]);
     const [fetchDataError, setFetchDataError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -186,10 +187,7 @@ const ClientForm: React.FC<Props> = ({
         if (result.error) {
             setFetchDataError("Failed to fetch diets");
         } else {
-            const diets = result.data.map((diet) => {
-                return { ...diet, isChecked: false };
-            });
-            setDiets(diets);
+            setDiets(result.data);
         }
     }, []);
 

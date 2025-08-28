@@ -24,6 +24,8 @@ const AddClients: () => React.ReactElement = () => {
         listType: null,
         cookingFacilities: null,
         dietaryRequirements: null,
+        diets: [],
+        preferredItems: [],
         hygieneProductsTampons: null,
         hygieneProductsPads: null,
         hygieneOtherItems: {},

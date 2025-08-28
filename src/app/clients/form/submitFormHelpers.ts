@@ -1,5 +1,5 @@
 import { ListType } from "@/common/databaseListTypes";
-import { checkboxGroupToArray, Diet, Person } from "@/components/Form/formFunctions";
+import { checkboxGroupToArray, Diet, Item, Person } from "@/components/Form/formFunctions";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
@@ -10,6 +10,7 @@ export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
 export type ClientDatabaseUpdateRecord = UpdateSchema["clients"];
 export type ClientDietsInsertRecord = InsertSchema["clients_diets"];
+export type ClientsPreferredItemsInsertRecord = InsertSchema["clients_preferred_items"];
 
 const personToFamilyRecordWithoutFamilyId = (person: Person): FamilyDatabaseInsertRecord => {
     return {
@@ -32,6 +33,12 @@ export const getFamilyMembersForDatabase = (
 export const formatClientDiets = (dietsIds: Diet[]): ClientDietsInsertRecord[] => {
     return dietsIds.map((diet) => ({
         diet_id: diet.primaryKey,
+    }));
+};
+
+export const formatPreferredItems = (items: Item[]): ClientsPreferredItemsInsertRecord[] => {
+    return items.map((item) => ({
+        item_id: item.primaryKey,
     }));
 };
 
@@ -90,17 +97,20 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
     const clientDiets = formatClientDiets(fields.diets);
+    const clientPreferredItems = formatPreferredItems(fields.preferredItems);
 
     console.log("Payload for insert_client_and_family:", {
         clientrecord: clientRecord,
         familymembers: familyMembers,
         clientdiets: clientDiets,
+        clientpreferreditems: clientPreferredItems,
     });
 
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
         clientrecord: clientRecord,
         familymembers: familyMembers,
         clientdiets: clientDiets,
+        clientpreferreditems: clientPreferredItems,
     });
 
     const auditLog = {

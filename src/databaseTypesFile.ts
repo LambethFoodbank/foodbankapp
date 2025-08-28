@@ -1242,6 +1242,7 @@ export type Database = {
               clientrecord: Json
               familymembers: Json
               clientdiets: Json
+              clientpreferreditems: Json
             }
             Returns: string
           }

@@ -1,6 +1,6 @@
 import React from "react";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
-import { Diet } from "@/components/Form/formFunctions";
+import { Diet, onChangeSelectionByPrimaryKey } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 
@@ -13,13 +13,7 @@ const DietsCard: React.FC<DietsCardProps> = ({ fieldSetter, fields, diets }) => 
     const selectedKeys = selected.map((diet) => diet.primaryKey);
 
     const handleChange = (key: string, checked: boolean): void => {
-        const set = new Set(selectedKeys);
-        if (checked) {
-            set.add(key);
-        } else {
-            set.delete(key);
-        }
-        const newSelected = diets.filter((diet) => set.has(diet.primaryKey));
+        const newSelected = onChangeSelectionByPrimaryKey(selected, diets, key, checked);
         fieldSetter({ diets: newSelected });
     };
 

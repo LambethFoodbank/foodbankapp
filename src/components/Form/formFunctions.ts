@@ -49,7 +49,11 @@ export interface Person {
 export interface Diet {
     primaryKey: string;
     name: string;
-    isChecked?: boolean;
+}
+
+export interface Item {
+    primaryKey: string;
+    name: string;
 }
 
 export type Fields = Record<string, unknown>;
@@ -188,6 +192,23 @@ export const onChangeRadioGroup = <SpecificFields extends Fields>(
         });
     };
 };
+
+export function onChangeSelectionByPrimaryKey<T extends { primaryKey: string }>(
+    currentSelected: T[],
+    allItems: T[],
+    key: string,
+    checked: boolean
+): T[] {
+    let keys = currentSelected.map((item) => item.primaryKey);
+    if (checked) {
+        if (!keys.includes(key)) {
+            keys = [...keys, key];
+        }
+    } else {
+        keys = keys.filter((currentKey) => currentKey !== key);
+    }
+    return allItems.filter((item) => keys.includes(item.primaryKey));
+}
 
 export const valueOnChangeRadioGroup = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,

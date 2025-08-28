@@ -1,4 +1,4 @@
-import { Diet } from "@/components/Form/formFunctions";
+import { Diet, Item } from "@/components/Form/formFunctions";
 import { DbWikiRow, Schema } from "@/databaseUtils";
 import { Supabase } from "@/supabaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
@@ -291,7 +291,7 @@ export const fetchLists = async (supabase: Supabase): Promise<FetchListsReponse>
 
 export type FetchAlternativeItemsFromListReponse =
     | {
-          data: string[];
+          data: Item[];
           error: null;
       }
     | {
@@ -304,7 +304,7 @@ export const fetchAlternativeItemsFromList = async (
 ): Promise<FetchAlternativeItemsFromListReponse> => {
     const { data, error } = await supabase
         .from("lists")
-        .select("item_name")
+        .select("primary_key, item_name")
         .eq("item_type", "alternative_food");
 
     if (error) {
@@ -312,7 +312,10 @@ export const fetchAlternativeItemsFromList = async (
         return { data: null, error: { type: "listsFetchFailed", logId: logId } };
     }
 
-    const alternativeItems = data.map((item) => item.item_name);
+    const alternativeItems = data.map((item) => ({
+        primaryKey: item.primary_key,
+        name: item.item_name,
+    }));
 
     return { data: alternativeItems, error: null };
 };
