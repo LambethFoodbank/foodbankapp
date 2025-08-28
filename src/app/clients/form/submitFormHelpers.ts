@@ -83,12 +83,7 @@ export type addClientResult =
 export const submitAddClientForm = async (fields: ClientFields): Promise<addClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
-    const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
-        clientrecord: clientRecord,
-        familymembers: familyMembers,
-    });
-
-    const auditLog = {
+    const auditLogBase = {
         action: "add a client",
         content: {
             clientDetails: clientRecord,
@@ -96,14 +91,18 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         },
     } as const satisfies Partial<AuditLog>;
 
-    if (error) {
+    // Insert client and family
+    const { data: clientId, error: insertError } = await supabase.rpc("insert_client_and_family", {
+        clientrecord: clientRecord,
+        familymembers: familyMembers,
+    });
+
+    if (insertError) {
         const logId = await logErrorReturnLogId(
             "Error with inserting new client and their family",
-            {
-                error,
-            }
+            { error: insertError }
         );
-        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+        await sendAuditLog({ ...auditLogBase, wasSuccess: false, logId });
         return { clientId: null, error: { type: "failedToInsertClientAndFamily", logId } };
     }
 
@@ -111,57 +110,44 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         (key) => (fields.diets as Record<string, boolean>)[key]
     );
 
-    if (diets.length === 0) {
-        await sendAuditLog({
-            ...auditLog,
-            wasSuccess: true,
-            clientId: clientId,
-        });
-        return { clientId: clientId, error: null };
-    }
+    if (diets.length > 0) {
+        const { data: dietsId, error: dietsIdError } = await fetchDietsIdsForNames(diets, supabase);
 
-    console.log(diets);
-    const { data: dietsId, error: dietsIdError } = await fetchDietsIdsForNames(diets, supabase);
-
-    if (dietsIdError) {
-        const logId = await logErrorReturnLogId(
-            `Error fetching diet ids for new client. Client id ${clientId}`,
-            {
-                error,
+        if (dietsIdError) {
+            // Rollback: delete the client if diet insert fails
+            if (clientId) {
+                await supabase.from("clients").delete().eq("client_id", clientId);
             }
-        );
-        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-        return { clientId: null, error: { type: "failedToInsertClientAndFamily", logId } };
-    }
+            const logId = await logErrorReturnLogId(
+                `Error fetching diet ids for new client. Client id ${clientId}`,
+                { error: dietsIdError }
+            );
+            await sendAuditLog({ ...auditLogBase, wasSuccess: false, logId });
+            return { clientId: null, error: { type: "failedToInsertClientAndFamily", logId } };
+        }
 
-    console.log(dietsId);
-
-    if (dietsId && dietsId.length > 0) {
-        const { error: insertDietsError } = await supabase.from("clients_diets").insert(
-            dietsId.map((dietId) => ({
-                client_id: clientId,
-                diet_id: dietId,
-            }))
-        );
-
+        const { error: insertDietsError } = await supabase
+            .from("clients_diets")
+            .insert(dietsId.map((dietId) => ({ client_id: clientId, diet_id: dietId })));
         if (insertDietsError) {
+            // Rollback: delete the client if diet insert fails
+            if (clientId) {
+                await supabase.from("clients").delete().eq("client_id", clientId);
+            }
             const logId = await logErrorReturnLogId(
                 `Error inserting diet ids for new client. Client id ${clientId}`,
-                {
-                    error: insertDietsError,
-                }
+                { error: insertDietsError }
             );
-            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
+            await sendAuditLog({ ...auditLogBase, wasSuccess: false, logId });
             return { clientId: null, error: { type: "failedToInsertClientAndFamily", logId } };
         }
     }
 
     await sendAuditLog({
-        ...auditLog,
+        ...auditLogBase,
         wasSuccess: true,
         clientId: clientId,
     });
-
     return { clientId: clientId, error: null };
 };
 
