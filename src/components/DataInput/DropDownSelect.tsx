@@ -33,6 +33,7 @@ interface UncontrolledProps<ValueType> {
     onChange?: (event: SelectChangeEvent<ValueType>) => void;
     selectLabelId: string;
     focusOnDropdown?: boolean;
+    disabled?: boolean;
 }
 
 const GenericSelect = <ValueType,>(props: GenericProps<ValueType>): React.ReactElement => {

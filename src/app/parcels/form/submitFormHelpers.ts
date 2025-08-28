@@ -39,24 +39,41 @@ export function switchErrorForCollectionDate(
     const collectionDateDayIndex =
         dayjs(fields.collectionDate).day() !== 0 ? dayjs(fields.collectionDate).day() - 1 : 6;
 
-    return fields.collectionDate == null
-        ? Errors.initial
-        : !availableDaysForCentre.length || availableDaysForCentre[collectionDateDayIndex].is_active
-          ? Errors.none
-          : Errors.invalidCollectionDate;
+    // Date field is required
+    if (!fields.collectionDate) {
+        return Errors.initial;
+    }
+
+    // The collection centre should be available on the selected day
+    if (
+        availableDaysForCentre.length === 0 ||
+        availableDaysForCentre[collectionDateDayIndex].is_active
+    ) {
+        return Errors.none;
+    }
+
+    return Errors.invalidCollectionDate;
 }
 
 export function switchErrorForCollectionSlot(
     fields: ParcelFields,
     collectionSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues
 ): Errors {
-    return fields.collectionSlot == "-" || !fields.collectionSlot
-        ? Errors.initial
-        : collectionSlotsLabelsAndValues.some(
-                (slotLabelAndValue) => slotLabelAndValue[1] === fields.collectionSlot
-            )
-          ? Errors.none
-          : Errors.invalidCollectionSlot;
+    // Slot field is required
+    if (!fields.collectionSlot || fields.collectionSlot === "-") {
+        return Errors.initial;
+    }
+
+    // The collection slot should be one of the available options for the centre
+    if (
+        collectionSlotsLabelsAndValues.some(
+            (slotLabelAndValue) => slotLabelAndValue[1] === fields.collectionSlot
+        )
+    ) {
+        return Errors.none;
+    }
+
+    return Errors.invalidCollectionSlot;
 }
 
 export const insertParcel: InsertParcel = async (parcelRecord) => {

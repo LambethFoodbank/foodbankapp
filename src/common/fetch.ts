@@ -254,15 +254,7 @@ export const getAvailableDaysForCollectionCentres = async (
         return { data: [], error: null };
     }
 
-    const availableDaysForAllCollectionCentres = data.map((availableDaysObject) => {
-        if (availableDaysObject.available_days == null) {
-            return null;
-        }
-
-        return availableDaysObject;
-    });
-
-    return { data: availableDaysForAllCollectionCentres, error: null };
+    return { data, error: null };
 };
 
 export type FetchClientError = { type: FetchClientErrorType; logId: string };
