@@ -19,17 +19,27 @@ import {
     ColumnDisplayFunctions,
     ColumnStyles,
     DefaultSortConfig,
+    EditableConfig,
     FilterConfig,
     PaginationConfig,
     SortConfig,
     TableHeaders,
 } from "@/components/Tables/Table";
 import { mapHeadersToMRTColumns } from "@/components/Tables/materialTable/materialTableMethods";
-import { Box } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { ClientSideSortMethod, ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { SortOrder } from "react-data-table-component";
 import styled, { useTheme } from "styled-components";
 import TableFiltersBar from "@/components/Tables/TableFiltersBar";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+const EditAndReorderArrowDiv = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    transform: translateX(-1.2rem);
+`;
 
 const RelativeContainerForTable = styled.div`
     position: relative;
@@ -56,7 +66,9 @@ interface MRTTableProps<
     checkboxConfig: CheckboxConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
     enableRowOrdering?: boolean;
+    manualPagination: boolean;
     paginationConfig: PaginationConfig;
+    manualSorting: boolean;
     sortConfig: SortConfig<
         Data,
         PaginationType extends PaginationTypeEnum.Client
@@ -69,6 +81,7 @@ interface MRTTableProps<
             ? DistributeClientFilter<Data, FilterState>
             : DistributeServerFilter<Data, FilterState, DbData>
     >;
+    rowActionsConfig: EditableConfig<Data>;
     columnStyleOptions?: ColumnStyles<Data>;
 }
 
@@ -91,6 +104,8 @@ const MaterialTable = <
     onRowClick,
     checkboxConfig,
     filterConfig,
+    rowActionsConfig,
+    columnStyleOptions,
 }: MRTTableProps<PaginationType, FilterState, Data, DbData>): React.ReactElement => {
     const theme = useTheme();
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
@@ -119,9 +134,16 @@ const MaterialTable = <
                 headerKeysAndLabels,
                 toggleableHeaders,
                 sortConfig.sortPossible ? sortConfig.sortableColumns : [],
-                columnDisplayFunctions
+                columnDisplayFunctions,
+                columnStyleOptions
             ),
-        [columnDisplayFunctions, headerKeysAndLabels, sortConfig, toggleableHeaders]
+        [
+            columnDisplayFunctions,
+            columnStyleOptions,
+            headerKeysAndLabels,
+            sortConfig,
+            toggleableHeaders,
+        ]
     );
 
     useEffect(() => {
@@ -171,32 +193,86 @@ const MaterialTable = <
         enableColumnActions: false,
         enableRowOrdering: enableRowOrdering,
         enableRowSelection: checkboxConfig.displayed,
+        enableSorting: sortConfig.sortPossible,
+        enablePagination: paginationConfig.enablePagination,
         muiPaginationProps: {
             rowsPerPageOptions: paginationConfig.enablePagination
                 ? paginationConfig.rowsPerPageOptions
                 : undefined,
         },
-        manualPagination: paginationConfig.enablePagination,
-        manualSorting: sortConfig.sortPossible,
         rowCount: paginationConfig.enablePagination ? paginationConfig.filteredCount : undefined,
         renderToolbarInternalActions: ({ table }) => (
             <Box>{toggleableHeaders.length > 0 && <MRT_ShowHideColumnsButton table={table} />}</Box>
         ),
+        enableRowActions: rowActionsConfig.editable,
+        positionActionsColumn: "first",
+        renderRowActions: ({ row }) =>
+            rowActionsConfig.editable && (
+                <EditAndReorderArrowDiv>
+                    {rowActionsConfig.onEdit && (
+                        <IconButton
+                            onClick={() => rowActionsConfig.onEdit?.(row.index)}
+                            aria-label="edit"
+                            data-testid={`button-edit-row-${row.index}`}
+                        >
+                            <EditIcon />
+                        </IconButton>
+                    )}
+                    {rowActionsConfig.onDelete &&
+                        (rowActionsConfig.isDeletable
+                            ? rowActionsConfig.isDeletable(row.original)
+                            : true) && (
+                            <IconButton
+                                onClick={() => {
+                                    if (rowActionsConfig.onDelete) {
+                                        rowActionsConfig.onDelete(row.index);
+                                    }
+                                }}
+                                aria-label="delete"
+                                data-testid={`button-delete-row-${row.index}`}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                        )}
+                </EditAndReorderArrowDiv>
+            ),
+        muiTableHeadCellProps: {
+            sx: {
+                backgroundColor: theme.main.background[2],
+                color: theme.main.foreground[2],
+                fontWeight: "bold",
+                borderColor: theme.main.border,
+                whiteSpace: "normal", // allow wrapping
+            },
+        },
+        muiTableBodyProps: {
+            sx: {
+                "& tr:nth-of-type(odd) > td": {
+                    backgroundColor: theme.main.background[1],
+                },
+            },
+        },
         muiTableBodyRowProps: ({ row }) => ({
             onClick: (event) => onRowClick?.(row, event),
             sx: {
                 cursor: "pointer",
-                "&:hover > td": {
+                "&.MuiTableRow-root:hover > td": {
                     backgroundColor: `${theme.primary.background[1]}`,
                 },
                 ...(checkboxConfig.displayed &&
                     checkboxConfig.isRowChecked(row.original) && {
-                        "& > td": {
-                            backgroundColor: `${theme.primary.background[1]}`,
+                        "&.MuiTableRow-root > td": {
+                            backgroundColor: `${theme.primary.background[1]} !important`,
                         },
                     }),
             },
         }),
+        muiTableBodyCellProps: {
+            sx: {
+                whiteSpace: "normal",
+                wordBreak: "break-word", // or overflowWrap: "anywhere"
+            },
+        },
         muiSelectCheckboxProps: ({ row }) => ({
             inputProps: { "aria-label": `Select row ${row.id}` },
             checked: checkboxConfig.displayed
@@ -234,6 +310,9 @@ const MaterialTable = <
                 header: "",
                 size: 0,
                 enableSorting: false,
+            },
+            "mrt-row-actions": {
+                header: "",
             },
         },
         onColumnVisibilityChange: setColumnVisibility,
@@ -279,17 +358,17 @@ const MaterialTable = <
 };
 
 // Client-side pagination (default MRT mode)
-export const ClientPaginatedMaterialTable = <
-    Data extends MRT_RowData,
-    DbData extends Record<string, unknown>,
-    FilterState,
->(
+export const ClientPaginatedMaterialTable = <Data extends MRT_RowData, FilterState>(
     props: Omit<
-        MRTTableProps<PaginationTypeEnum.Client, FilterState, Data, DbData>,
-        "manualPagination" | "manualSorting" | "manualFiltering"
+        MRTTableProps<PaginationTypeEnum.Client, FilterState, Data, Record<string, never>>,
+        "manualPagination" | "manualSorting"
     >
 ): React.ReactElement => (
-    <MaterialTable<PaginationTypeEnum.Client, FilterState, Data, DbData> {...props} />
+    <MaterialTable<PaginationTypeEnum.Client, FilterState, Data>
+        {...props}
+        manualPagination={false}
+        manualSorting={false}
+    />
 );
 
 // Server-side pagination/sorting/filtering
@@ -298,7 +377,14 @@ export const ServerPaginatedMaterialTable = <
     DbData extends Record<string, unknown>,
     FilterState,
 >(
-    props: MRTTableProps<PaginationTypeEnum.Server, FilterState, Data, DbData>
+    props: Omit<
+        MRTTableProps<PaginationTypeEnum.Server, FilterState, Data, DbData>,
+        "manualPagination" | "manualSorting"
+    >
 ): React.ReactElement => (
-    <MaterialTable<PaginationTypeEnum.Server, FilterState, Data, DbData> {...props} />
+    <MaterialTable<PaginationTypeEnum.Server, FilterState, Data, DbData>
+        {...props}
+        manualPagination={true}
+        manualSorting={true}
+    />
 );
