@@ -5,6 +5,7 @@ import GeneralActionModal, {
     Heading,
     maxParcelsToShow,
     ActionModalProps,
+    Paragraph,
 } from "./GeneralActionModal";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
@@ -18,12 +19,17 @@ import { displayNameForNullDriverName } from "@/common/format";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { saveParcelTableRowsStatus } from "../saveStatus";
+import RadioGroupInput from "@/components/DataInput/RadioGroupInput";
+import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
+import { fetchDriverNamesByCircuitPresence } from "@/app/drivers/driversTable/DriversActions";
 
 interface DriverOverviewInputProps {
     onDateTimeChange: (newDate: Dayjs | null) => void;
     onDriverNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setDateValid: () => void;
     setDateInvalid: () => void;
+    sendToCircuit: boolean;
+    onSendToCircuitChange?: (value: boolean) => void;
 }
 
 interface ContentProps {
@@ -37,22 +43,71 @@ interface ContentProps {
     onDriverNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setIsDateValid: (valid: boolean) => void;
     maxParcelsToShow: number;
+    sendToCircuit: boolean;
+    onSendToCircuitChange: (value: boolean) => void;
 }
 
+const getDriverSelectLabelsAndValues = async (
+    hasCircuitId: boolean
+): Promise<[string, string][]> => {
+    const names = await fetchDriverNamesByCircuitPresence(hasCircuitId);
+    return names.map((name) => [name, name]);
+};
+
 const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInputProps>(
-    (props, driverNameInputFocusRef) => {
+    (props) => {
         const dateTime = dayjs();
+        const [driverOptions, setDriverOptions] = useState<[string, string][]>([]);
+        const [selectedDriver, setSelectedDriver] = useState<string>("");
+
+        useEffect(() => {
+            let isActive = true;
+            (async () => {
+                try {
+                    const opts = await getDriverSelectLabelsAndValues(props.sendToCircuit);
+                    if (isActive) {
+                        setDriverOptions(opts);
+                        // reset selection if current value not in new options
+                        if (!opts.some(([_, v]) => v === selectedDriver)) {
+                            setSelectedDriver("");
+                        }
+                    }
+                } catch (e) {
+                    // silently ignore for now or consider surfacing an error prop
+                    if (isActive) {
+                        setDriverOptions([]);
+                        setSelectedDriver("");
+                    }
+                }
+            })();
+            return () => {
+                isActive = false;
+            };
+        }, [props.sendToCircuit]);
 
         return (
             <>
                 <Heading>Delivery Information</Heading>
-                <FreeFormTextInput
-                    onChange={props.onDriverNameChange}
-                    label="Driver's Name (required)"
-                    ref={driverNameInputFocusRef}
-                    fullWidth
-                    margin="normal"
+                <br />
+                <Paragraph>Send selected parcels to driver's Circuit App?</Paragraph>
+                <RadioGroupInput
+                    labelsAndValues={[
+                        ["Yes", "Yes"],
+                        ["No", "No"],
+                    ]}
+                    defaultValue={props.sendToCircuit ? "Yes" : "No"}
+                    onChange={(event) =>
+                        props.onSendToCircuitChange?.(event.target.value === "Yes")
+                    }
+                ></RadioGroupInput>
+                <ControlledSelect
+                    selectLabelId="driver-select-label"
+                    labelsAndValues={driverOptions}
+                    listTitle="Driver's Name (required)"
+                    value={selectedDriver}
+                    onChange={(event) => setSelectedDriver(event.target.value as string)}
                 />
+
                 <DateTimePicker
                     defaultValue={dateTime}
                     onChange={props.onDateTimeChange}
@@ -102,6 +157,8 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
     onPdfCreationCompleted,
     onPdfCreationFailed,
     isInputValid,
+    sendToCircuit,
+    onSendToCircuitChange,
 }) => {
     const driverNameInputFocusRef = useRef<HTMLInputElement>(null);
 
@@ -117,6 +174,8 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
                 setDateValid={() => setIsDateValid(true)}
                 setDateInvalid={() => setIsDateValid(false)}
                 ref={driverNameInputFocusRef}
+                sendToCircuit={sendToCircuit}
+                onSendToCircuitChange={onSendToCircuitChange}
             />
             <SelectedParcelsOverview
                 parcels={selectedParcels}
@@ -145,6 +204,7 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
     const [date, setDate] = useState(dayjs());
 
     const [isDateValid, setIsDateValid] = useState(true);
+    const [sendToCircuit, setSendToCircuit] = useState<boolean>(true);
 
     const isInputValid = isDateValid && driverName !== null;
 
@@ -231,6 +291,8 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
                     onPdfCreationCompleted={onPdfCreationCompleted}
                     onPdfCreationFailed={onPdfCreationFailed}
                     isInputValid={isInputValid}
+                    sendToCircuit={sendToCircuit}
+                    onSendToCircuitChange={setSendToCircuit}
                 />
             )}
         </GeneralActionModal>
