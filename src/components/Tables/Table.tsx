@@ -27,6 +27,7 @@ import {
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import { Database } from "@/databaseTypesFile";
 import ColumnTogglePopup from "./ColumnTogglePopup";
+import { MRT_Row, MRT_RowData } from "material-react-table";
 
 export type TableHeaders<Data> = readonly (readonly [keyof Data, string])[];
 
@@ -44,8 +45,8 @@ export type ColumnStyles<Data> = {
     [headerKey in keyof Data]?: ColumnStyleOptions;
 };
 
-export type OnRowClickFunction<Data> = (
-    row: Row<Data>,
+export type OnRowClickFunction<Data extends MRT_RowData> = (
+    row: MRT_Row<Data>,
     event: React.MouseEvent<Element, MouseEvent>
 ) => void;
 
@@ -54,7 +55,7 @@ export type ColumnStyleOptions = Omit<
     "name" | "selector" | "sortable" | "sortFunction" | "cell"
 >;
 
-type GenericSortMethod = (
+export type GenericSortMethod = (
     sortDirection: SortOrder,
     query: PostgrestFilterBuilder<Database["public"], Record<string, unknown>, unknown>
 ) => void;
@@ -141,7 +142,7 @@ export type FilterConfig<Filter> =
 export type EditableConfig<Data> =
     | {
           editable: true;
-          setDataPortion: (dataPortion: Data[]) => void;
+          setDataPortion?: (dataPortion: Data[]) => void;
           onEdit?: (data: number) => void;
           onDelete?: (data: number) => void;
           onSwapRows?: (row1: Data, row2: Data) => Promise<void>;
@@ -579,21 +580,25 @@ const TableStyling = styled.div<{
     $dividingLineStyleOptions: DividingLineStyleOptions;
 }>`
     // the component with the filter bars
+
     & > header {
         background-color: transparent;
         padding: 0;
     }
 
     // the entire table component including the header and the pagination bar
+
     & > div {
         border-radius: 1rem;
         background-color: transparent;
+
         :focus {
             border: 2px solid ${(props) => props.theme.main.foreground[0]};
             border-radius: 9px;
         }
 
         // the pagination bar
+
         > nav {
             background-color: transparent;
             color: ${(props) => props.theme.main.foreground[0]};
@@ -609,11 +614,13 @@ const TableStyling = styled.div<{
     }
 
     // the icons in the pagination bar
+
     & svg {
         fill: ${(props) => props.theme.main.lighterForeground[0]};
     }
 
     // formatting all direct children to adhere to the theme
+
     & > div {
         background-color: ${(props) => props.theme.main.background[0]};
         color: ${(props) => props.theme.main.foreground[0]};
@@ -621,6 +628,7 @@ const TableStyling = styled.div<{
     }
 
     // the filter bars
+
     & input[type="text"] {
         color: ${(props) => props.theme.main.lighterForeground[1]};
         background-color: ${(props) => props.theme.main.background[1]};
@@ -641,12 +649,14 @@ const TableStyling = styled.div<{
         padding: 0 0 0 1rem;
 
         // allowing text overflow so the titles don't get unnecessarily clipped due to react-data-table's layout
+
         & > * {
             overflow: visible;
         }
     }
 
     // the table itself
+
     & .rdt_TableCell,
     & .rdt_TableCol_Sortable,
     & .rdt_TableHeadRow,
@@ -682,6 +692,7 @@ const TableStyling = styled.div<{
 
     & .rdt_TableCell {
         // the div containing the text
+
         & > div {
             white-space: normal;
         }
