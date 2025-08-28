@@ -12,6 +12,7 @@ import {
     GridRowModesModel,
     GridRowsProp,
     GridToolbarContainer,
+    GridPaginationModel,
 } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
@@ -38,6 +39,7 @@ interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
     setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
     rows: DriversRow[];
+    setPaginationModel: React.Dispatch<React.SetStateAction<GridPaginationModel>>;
 }
 
 export interface DriversRow {
@@ -53,7 +55,7 @@ export interface DriverRowWithOriginalLastUpdated extends DriversRow {
 }
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
-    const { setRows, setRowModesModel, rows } = props;
+    const { setRows, setRowModesModel, rows, setPaginationModel } = props;
 
     const handleClick = (): void => {
         const id = rows.length + 1;
@@ -62,6 +64,7 @@ function EditToolbar(props: EditToolbarProps): React.JSX.Element {
             ...oldModel,
             [id]: { mode: GridRowModes.Edit, fieldToFocus: "name", editable: true },
         }));
+        setPaginationModel((prev) => ({ ...prev, page: 0 }));
     };
 
     return (
@@ -94,6 +97,10 @@ const DriversTable: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const originalTimestampsRef = React.useRef<Record<string, string>>({});
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        pageSize: 10,
+        page: 0,
+    });
 
     useEffect(() => {
         setErrorMessage(null);
@@ -196,6 +203,21 @@ const DriversTable: React.FC = () => {
 
         try {
             if (row.isNew) {
+                const sorted = [
+                    ...rows.filter((rowToBeCompared) => rowToBeCompared.id !== row.id),
+                    row,
+                ].sort((first, second) => {
+                    const newFirst = first.name ?? "";
+                    const newSecond = second.name ?? "";
+                    return newFirst.localeCompare(newSecond);
+                });
+                const targetIndex = sorted.findIndex(
+                    (rowToBeCompared) => rowToBeCompared.id === row.id
+                );
+                if (targetIndex >= 0 && paginationModel.pageSize > 0) {
+                    const targetPage = Math.floor(targetIndex / paginationModel.pageSize);
+                    setPaginationModel((prev) => ({ ...prev, page: targetPage }));
+                }
                 const { data: createdDrivers, error: insertDriversError } =
                     await insertNewDrivers(row);
                 const baseAuditLog = getBaseAuditLogForDriversAction("add a new driver", row);
@@ -385,13 +407,9 @@ const DriversTable: React.FC = () => {
                             sorting: {
                                 sortModel: [{ field: "name", sort: "asc" }],
                             },
-                            pagination: {
-                                paginationModel: {
-                                    pageSize: 10,
-                                    page: 0,
-                                },
-                            },
                         }}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={setPaginationModel}
                         sortingOrder={["asc", "desc"]}
                         columns={driversColumns}
                         editMode="row"
@@ -409,7 +427,7 @@ const DriversTable: React.FC = () => {
                             loadingOverlay: LinearProgress,
                         }}
                         slotProps={{
-                            toolbar: { setRows, setRowModesModel, rows },
+                            toolbar: { setRows, setRowModesModel, rows, setPaginationModel },
                         }}
                         loading={isLoading}
                         getRowClassName={(params) =>
