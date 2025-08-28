@@ -1,6 +1,6 @@
 import { FetchParcelError, fetchParcel } from "@/common/fetch";
 import { UpdateParcelError } from "../../form/submitFormHelpers";
-import { ParcelsTableRowWithOriginalLastUpdated } from "../../parcelsTable/types";
+import { ParcelsTableRow } from "../../parcelsTable/types";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
@@ -37,7 +37,7 @@ export const getUpdateErrorMessage = ({
 type UpdateField = "packingDate" | "packingSlot";
 
 export const packingDateorSlotCheckConcurrency = async (
-    parcel: ParcelsTableRowWithOriginalLastUpdated,
+    parcel: ParcelsTableRow,
     updateField: UpdateField
 ): Promise<boolean> => {
     const { data, error, count } = await supabase
@@ -96,7 +96,7 @@ export const packingDateorSlotCheckConcurrency = async (
 export const packingDateOrSlotUpdate = async (
     updateField: UpdateField,
     packingDateOrSlotData: string,
-    parcel: ParcelsTableRowWithOriginalLastUpdated
+    parcel: ParcelsTableRow
 ): Promise<{
     parcelId: string | null;
     error: FetchParcelError | UpdateParcelError | null;
@@ -105,7 +105,7 @@ export const packingDateOrSlotUpdate = async (
         packing_date?: string;
         packing_slot?: string;
     };
-    const lastUpdated = parcel.originalLastUpdated;
+    const lastUpdated = parcel.lastUpdated;
 
     const packingDateOrSlotDbUpdate = async (
         fieldToUpdate: FieldToUpdate

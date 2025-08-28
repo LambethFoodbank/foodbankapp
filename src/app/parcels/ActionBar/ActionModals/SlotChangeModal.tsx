@@ -115,13 +115,7 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
                 return false;
             }
 
-            const result = await packingDateorSlotCheckConcurrency(
-                {
-                    ...parcel,
-                    originalLastUpdated: parcel.lastUpdated,
-                },
-                "packingSlot"
-            );
+            const result = await packingDateorSlotCheckConcurrency(parcel, "packingSlot");
             return acc && result;
         }, Promise.resolve(true));
         if (!packingDateConcurrencyUpdateFlag) {
@@ -132,10 +126,7 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
 
         const packingSlotUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingSlot", slot, {
-                    ...parcel,
-                    originalLastUpdated: parcel.lastUpdated,
-                });
+                return packingDateOrSlotUpdate("packingSlot", slot, parcel);
             })
         );
 
