@@ -16,6 +16,7 @@ import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { Centerer, ContentDiv, OutsideDiv, SpaceBetween } from "@/components/Modal/ModalFormStyles";
 import { ModalAvailableDaysContainer, ModalAvailableDaysRow } from "@/app/admin/common/modalStyles";
+import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 
 interface Props {
     selectedCollectionCentreInfo: CollectionCentresTableRow | null;
@@ -27,18 +28,12 @@ interface Props {
 const formatCollectionCentreAvailableDaysDbData = (
     row: CollectionCentresTableRow
 ): FormattedAvailableDaysWithPrimaryKey => {
-    let formattedAvailableDays: FormattedAvailableDayType[];
-
-    if (row.availableDays === null || row.availableDays === undefined) {
-        formattedAvailableDays = [];
-    } else {
-        formattedAvailableDays = row.availableDays.map((availableDayObject) => {
-            return {
-                day: availableDayObject.day,
-                isActive: availableDayObject.is_active ?? false,
-            };
-        });
-    }
+    const formattedAvailableDays: FormattedAvailableDayType[] = row.availableDays
+        .filter((dayObj) => dayObj.day !== null)
+        .map((availableDayObject) => ({
+            day: availableDayObject.day as DaysOfWeekType,
+            isActive: availableDayObject.is_active ?? false,
+        }));
 
     return {
         primaryKey: row.id,
