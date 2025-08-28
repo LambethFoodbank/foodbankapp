@@ -251,6 +251,7 @@ const MaterialTable = <
             sx: {
                 backgroundColor: theme.main.background[2],
                 color: theme.main.foreground[2],
+                fontSize: "1rem",
                 fontWeight: "bold",
                 borderColor: theme.main.border,
                 whiteSpace: "normal",
