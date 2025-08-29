@@ -7,9 +7,27 @@ import { DbAuditLogRow } from "@/databaseUtils";
 export type AuditLogSortMethod = ServerSideSortMethod<DbAuditLogRow>;
 export type AuditLogSortState = SortState<AuditLogRow, AuditLogSortMethod>;
 
-export type AuditLogResponse =
+export type GetAuditLogDataResult = 
     | {
-          data: DbAuditLogRow[];
+        logs: DbAuditLogRow[];
+        error: null;
+      }
+    | {
+        logs: null;
+        error: {
+            type: GetDbAuditLogDataErrorType;
+            logId: string;
+        }
+    }
+
+export type GetDbAuditLogDataErrorType = "abortedFetch" | "failedToFetchAuditLogTable";
+
+export type GetAuditLogDataAndIdsResult =
+    | {
+          data: {
+            auditLogTableRows: AuditLogRow[];
+            allAuditLogIds: string[];
+          }
           error: null;
       }
     | {
@@ -27,8 +45,13 @@ export type AuditLogCountResponse =
           error: AuditLogCountError;
       };
 
+export type AuditLogErrorType =
+    | "abortedFetch"
+    | "failedAuditLogFetch"
+    | "failedToFetchAuditLogs";
+
 export interface AuditLogError {
-    type: "failedAuditLogFetch";
+    type: AuditLogErrorType;
     logId: string;
 }
 export interface AuditLogCountError {

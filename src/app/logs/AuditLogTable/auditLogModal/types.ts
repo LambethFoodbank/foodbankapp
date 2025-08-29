@@ -1,3 +1,5 @@
+import { DbAuditLogRow } from "@/databaseUtils";
+
 export type AuditLogModalRowResponse<Data> =
     | {
           data: Data;
@@ -7,3 +9,5 @@ export type AuditLogModalRowResponse<Data> =
           data: null;
           errorMessage: string;
       };
+export type ParcelsSortMethod = ServerSideSortMethod<DbAuditLogRow>;
+export type AuditLogSortState = SortState<AuditLogTableRow, AuditLogSortMethod>;

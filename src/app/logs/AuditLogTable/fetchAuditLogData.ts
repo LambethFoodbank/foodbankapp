@@ -1,59 +1,166 @@
-import { logErrorReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import { Supabase } from "@/supabaseUtils";
-import { AuditLogCountResponse, AuditLogResponse, AuditLogSortState } from "./types";
+import { DatabaseError} from "../../errorClasses";
+import { GetAuditLogDataAndIdsResult, AuditLogSortState, GetAuditLogDataResult, AuditLogErrorType, convertAuditLogPlusRowsToAuditLogRows, AuditLogRow } from "./types";
 import { DbQuery } from "@/components/Tables/Filters";
 import { DbAuditLogRow } from "@/databaseUtils";
+import { defaultAuditLogSort, defaultAuditLogSortConfig } from "./sortFunctions";
 
-export const fetchAuditLog = async (
+const getAuditLogQuery = (
     supabase: Supabase,
-    startIndex: number,
-    endIndex: number,
-    sortState: AuditLogSortState
-): Promise<AuditLogResponse> => {
-    let query = supabase
-        .from("audit_log_plus")
-        .select("*")
-        .range(startIndex, endIndex) as DbQuery<DbAuditLogRow>;
+    sortState: AuditLogSortState,
+    selectString = "*"
+): DbQuery<DbAuditLogRow> => {
+    let query = supabase.from("audit_log_plus").select(selectString) as DbQuery<DbAuditLogRow>;
 
     if (sortState.sortEnabled && sortState.column.sortMethod) {
         query = sortState.column.sortMethod(sortState.sortDirection, query);
-    } else {
-        query.order("created_at", { ascending: false });
+    } else{
+        query = defaultAuditLogSort(defaultAuditLogSortConfig.defaultSortDirection, query);
     }
 
-    const { data: auditLogs, error } = (await query) as {
+    query = query.order("log_id"); // maybe comment this
+
+    return query;
+}
+
+const fetchAuditLogDbRows = async (
+    supabase: Supabase,
+    sortState: AuditLogSortState,
+    abortSignal: AbortSignal,
+    startIndex: number,
+    endIndex: number
+): Promise<GetAuditLogDataResult> => {
+    let query = getAuditLogQuery(supabase, sortState);
+    query = query.range(startIndex, endIndex);
+    query = query.abortSignal(abortSignal);
+
+    const { data, error } = (await query) as {
         data: DbAuditLogRow[];
         error: Error | null;
     };
 
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: Audit Log", {
-            error: error,
-        });
-        return { data: null, error: { type: "failedAuditLogFetch", logId: logId } };
-    }
+    console.log(error);
 
-    return { data: auditLogs, error: null };
+    if (error) {
+        const logId = abortSignal.aborted
+            ? await logInfoReturnLogId("Aborted fetch: audit log table", {}, error)
+            : await logErrorReturnLogId("Error with fetch: audit log table", {}, error);
+        return {
+            logs: null,
+            error: {
+                type: abortSignal.aborted ? "abortedFetch" : "failedToFetchAuditLogTable",
+                logId,
+            },
+        };
+    }
+    return {
+        logs: data,
+        error: null,
+    };
 };
 
-export const fetchAuditLogCount = async (supabase: Supabase): Promise<AuditLogCountResponse> => {
-    const { count, error } = await supabase
-        .from("audit_log")
-        .select("*", { count: "exact", head: true });
+export const getAuditLogTableDataAndAllIds = async (
+    supabase: Supabase,
+    sortState: AuditLogSortState,
+    abortSignal: AbortSignal,
+    startIndex: number,
+    endIndex: number,
+): Promise<GetAuditLogDataAndIdsResult> => {
+    const { logs, error: getDbLogsError} = await fetchAuditLogDbRows(
+        supabase,
+        sortState,
+        abortSignal,
+        startIndex,
+        endIndex
+    );
+
+    if (getDbLogsError) {
+        let errorType: AuditLogErrorType;
+        switch (getDbLogsError.type) {
+            case "abortedFetch":
+                errorType = "abortedFetch";
+                break;
+            case "failedToFetchAuditLogTable":
+                errorType = "failedToFetchAuditLogs";
+                break;
+        }
+
+        return {
+            data: null,
+            error: {
+                type: errorType,
+                logId: getDbLogsError.logId,
+            },
+        };
+    }
+
+    const allAuditLogIds = await getAuditLogIds(supabase, sortState, abortSignal);
+
+    const auditLogTableRows = convertAuditLogPlusRowsToAuditLogRows(logs);
+
+    return {
+        data: {
+            auditLogTableRows: auditLogTableRows,
+            allAuditLogIds: allAuditLogIds,
+        },
+        error: null,
+    };
+};
+
+export const getAuditLogIds = async (
+    supabase: Supabase,
+    sortState: AuditLogSortState,
+    abortSignal: AbortSignal | null = null
+): Promise<string[]> => {
+    const query = getAuditLogQuery(supabase, sortState, "log_id");
+
+    if (abortSignal) {
+        query.abortSignal(abortSignal);
+    }
+
+    const { data, error } = (await query) as {
+        data: { log_id: string }[];
+        error: Error | null;
+    };
 
     if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: Audit Log Count", {
-            error: error,
-        });
-        return { count: null, error: { type: "failedAuditLogCountFetch", logId: logId } };
+        if (abortSignal && abortSignal.aborted) {
+            await logInfoReturnLogId("Aborted fetch: audit log IDs", {}, error);
+            return [];
+        } else {
+            const logId = await logErrorReturnLogId("Error with fetch", {}, error);
+            throw new DatabaseError("fetch", "audit logs", logId);
+        }
     }
 
-    if (count === null) {
-        const logId = await logErrorReturnLogId("Error with fetch: Audit Log Count", {
-            error: "nullCount",
-        });
-        return { count: null, error: { type: "nullCount", logId: logId } };
+    return data.map((log) => log.log_id);
+};
+
+export const getAuditLogByIds = async (
+    supabase: Supabase,
+    auditLogIds: string[]
+): Promise<AuditLogRow[]> => {
+    const query = supabase
+        .from("audit_log_plus")
+        .select("*")
+        .in("log_id", auditLogIds) as DbQuery<DbAuditLogRow>;
+
+    return runAuditLogQueryAndConvertToAuditLogRows(query);
+};
+
+const runAuditLogQueryAndConvertToAuditLogRows = async (
+    query: DbQuery<DbAuditLogRow>
+): Promise<AuditLogRow[]> => {
+    const { data, error } = (await query) as {
+        data: DbAuditLogRow[];
+        error: Error | null;
+    };
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: audit log table", {}, error);
+        throw new DatabaseError("fetch", "audit log table", logId);
     }
 
-    return { count: count, error: null };
+    const auditLogTableRows = convertAuditLogPlusRowsToAuditLogRows(data);
+    return auditLogTableRows;
 };

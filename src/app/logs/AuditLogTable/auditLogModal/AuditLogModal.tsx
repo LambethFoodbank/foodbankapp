@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Modal from "@/components/Modal/Modal";
-import styled, { useTheme } from "styled-components";
+import styled from "styled-components";
 import { AuditLogRow } from "../types";
 import { capitaliseWords, formatJson } from "@/common/format";
 import CollectionCentreAuditLogModalRow from "./auditLogModalRows/CollectionCentre";
@@ -15,6 +15,10 @@ import PackingSlotAuditLogModalRow from "./auditLogModalRows/PackingSlot";
 import StatusOrderAuditLogModalRow from "./auditLogModalRows/StatusOrder";
 import WebsiteDataAuditLogModalRow from "./auditLogModalRows/WebsiteData";
 import { AuditLogModalItem, Key, TextValueContainer } from "./AuditLogModalRow";
+import { getAuditLogByIds } from "../fetchAuditLogData";
+import { useTheme } from "styled-components";
+import supabase from "@/supabaseClient";
+import { generateReturnPathQueryParam } from "@/common/urlQueryParams";
 
 export const AuditLogModalContainer = styled.div`
     width: 800px;
@@ -25,14 +29,36 @@ export const AuditLogModalContainer = styled.div`
 `;
 
 interface AuditLogModalProps {
+    modalIsOpen: boolean;
     selectedAuditLogRow: AuditLogRow | null;
-    onClose: () => void;
+    closeAuditLogModal: () => void;
 }
 
-const AuditLogModal: React.FC<AuditLogModalProps> = ({ selectedAuditLogRow, onClose }) => {
+const AuditLogModal: React.FC<AuditLogModalProps> = ({ 
+    modalIsOpen,
+    selectedAuditLogRow,
+    closeAuditLogModal,
+}) => {
+    const refreshAuditLogDetailsRef = useRef<(() => void)| null>(null);
+
     const theme = useTheme();
 
+    // useEffect(() => {
+    //     setReturnPathQueryParamForLinks(generateReturnPathQueryParam(window.location));
+    // }, [modalIsOpen]);
+    
+    const refreshDetails = (): void => {
+        if (refreshAuditLogDetailsRef.current) {
+            refreshAuditLogDetailsRef.current();
+        }
+    };
+
+    const postSetStatusCallback = (): void => {
+        refreshDetails();
+    };
+
     return (
+        <>
         <Modal
             header={
                 <>
@@ -42,7 +68,7 @@ const AuditLogModal: React.FC<AuditLogModalProps> = ({ selectedAuditLogRow, onCl
                 </>
             }
             isOpen={selectedAuditLogRow !== null}
-            onClose={onClose}
+            onClose={closeAuditLogModal}
             headerId="auditLogModal"
         >
             {selectedAuditLogRow && (
@@ -91,7 +117,12 @@ const AuditLogModal: React.FC<AuditLogModalProps> = ({ selectedAuditLogRow, onCl
                 </AuditLogModalContainer>
             )}
         </Modal>
+        </>
     );
 };
 
 export default AuditLogModal;
+function setReturnPathQueryParamForLinks(arg0: string) {
+    throw new Error("Function not implemented.");
+}
+
