@@ -31,6 +31,9 @@ import { DistributeServerFilter } from "@/components/Tables/Filters";
 import { DbParcelRow } from "@/databaseUtils";
 import dayjs from "dayjs";
 import { PreTableControlsContainer } from "@/components/controlsStyling";
+import EmergencyBagsTable from "@/app/emergency-bags/emergencyBagsTable/EmergencyBagsTable";
+import { EmergencyBagsSortState } from "@/app/emergency-bags/emergencyBagsTable/types";
+import { getDbDate } from "@/common/format";
 
 type ParcelTableFilterState = string | DateRangeState | string[];
 
@@ -62,6 +65,8 @@ const ParcelsPage: React.FC = () => {
 
     const today = useMemo(() => dayjs().startOf("day"), []);
     const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
+
+    const [hasEBs, setHasEBs] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -167,6 +172,44 @@ const ParcelsPage: React.FC = () => {
         mergeParamsIntoURL(paramsRecord);
     };
 
+
+    useEffect(() => {
+        const checkEBs = async () => {
+            const dateFilter = currentlyAppliedFilters.find(filter => filter.key === "packingDate");
+
+            if (!dateFilter || !dateFilter.state || typeof dateFilter.state !== 'object') {
+                setHasEBs(false);
+                return;
+            }
+
+            const { from: fromDate, to: toDate } = dateFilter.state as DateRangeState;
+
+            if (!fromDate || !toDate) {
+                setHasEBs(false);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from("emergency_bags")
+                .select("id")
+                .gte("packing_date", getDbDate(fromDate))
+                .lte("packing_date", getDbDate(toDate))
+                .limit(1);
+
+            if (error) {
+                console.error("Error checking emergency bags:", error);
+                setHasEBs(false);
+                return;
+            }
+
+            setHasEBs(data && data.length > 0);
+        };
+
+        if (!areFiltersLoadingForFirstTime && urlParamsHaveBeenProcessed) {
+            void checkEBs();
+        }
+    }, [currentlyAppliedFilters, areFiltersLoadingForFirstTime, urlParamsHaveBeenProcessed]);
+
     return (
         <>
             <PreTableControlsContainer>
@@ -218,6 +261,28 @@ const ParcelsPage: React.FC = () => {
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
                     />
+                    {hasEBs && (
+                        <EmergencyBagsTable
+                            checkedEmergencyBagIds={[]}
+                            setCheckedEmergencyBagIds={function (ids: string[]): void {
+                                throw new Error("Function not implemented.");
+                            }}
+                            openEmergencyBagModal={function (emergencyBagId: string): void {
+                                throw new Error("Function not implemented.");
+                            }}
+                            sortState={{
+                                sortEnabled: false,
+                            }}
+                            setSortState={function (sortState: EmergencyBagsSortState): void {
+                                throw new Error("Function not implemented.");
+                            }}
+                            appliedFilters={[]}
+                            areFiltersLoadingForFirstTime={false}
+                            setErrorMessage={function (errorMessage: string | null): void {
+                                throw new Error("Function not implemented.");
+                            }}
+                        ></EmergencyBagsTable>)}
+                    }
                     <ParcelsModal
                         modalIsOpen={modalIsOpen}
                         selectedParcelId={selectedParcelId}
