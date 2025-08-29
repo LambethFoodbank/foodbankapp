@@ -121,15 +121,10 @@ const getShoppingListDataForSingleParcel = async (
         return { data: null, error: { type: "inactiveClient", logId: logId } };
     }
 
-    const clientDiets = [
-        ...(clientData.dietary_requirements ?? []),
-        ...(clientData.pet_food?.length ? ["Pet Food"] : []),
-    ];
-
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
         familyData.length,
         parcelInfoAndClientIdData.parcelInfo.listType,
-        clientDiets
+        clientData.dietary_requirements ?? []
     );
 
     if (itemsListError) {
