@@ -50,6 +50,8 @@ type OnRowClickFunction<Data extends MRT_RowData> = (
     event: React.MouseEvent<Element, MouseEvent>
 ) => void;
 
+type OnRowReorderFunction<Data extends MRT_RowData> = (row1: Data, row2: Data) => Promise<void>;
+
 interface MRTTableProps<
     PaginationType,
     FilterState,
@@ -66,6 +68,7 @@ interface MRTTableProps<
     checkboxConfig: CheckboxConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
     enableRowOrdering?: boolean;
+    onRowReorder?: OnRowReorderFunction<Data>;
     manualPagination: boolean;
     paginationConfig: PaginationConfig;
     manualSorting: boolean;
@@ -99,6 +102,7 @@ const MaterialTable = <
     toggleableHeaders = [],
     isLoading = false,
     enableRowOrdering = false,
+    onRowReorder,
     paginationConfig,
     sortConfig,
     onRowClick,
@@ -315,11 +319,12 @@ const MaterialTable = <
             onDragEnd: () => {
                 const { draggingRow, hoveredRow } = table.getState();
                 if (hoveredRow && draggingRow) {
-                    const updatedData = [...data];
+                    const draggingRowData = draggingRow.original;
+                    const hoveredRowData = hoveredRow.original;
 
-                    const movedRow = updatedData.splice(draggingRow.index, 1)[0];
-                    updatedData.splice((hoveredRow as MRT_Row<Data>).index, 0, movedRow);
-                    setData?.(updatedData);
+                    if (hoveredRowData) {
+                        onRowReorder?.(draggingRowData, hoveredRowData).then();
+                    }
                 }
             },
         }),
