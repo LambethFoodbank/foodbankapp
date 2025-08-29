@@ -373,6 +373,13 @@ export type Database = {
             foreignKeyName: "clients_preferred_items_item_id_fkey"
             columns: ["item_id"]
             isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
             referencedRelation: "lists"
             referencedColumns: ["primary_key"]
           },

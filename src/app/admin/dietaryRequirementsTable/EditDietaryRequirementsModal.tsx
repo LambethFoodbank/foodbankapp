@@ -1,5 +1,4 @@
 import FloatingToast from "@/components/FloatingToast";
-import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import {
     Box,
