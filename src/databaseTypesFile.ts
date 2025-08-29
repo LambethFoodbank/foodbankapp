@@ -17,6 +17,7 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
+          dietary_requirement: string | null
           event_id: string | null
           list_id: string | null
           log_id: string | null
@@ -36,6 +37,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -55,6 +57,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -102,6 +105,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "audit_log_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_list_id_fkey"
@@ -309,6 +319,74 @@ export type Database = {
             | null
         }
         Relationships: []
+      }
+      dietary_requirements: {
+        Row: {
+          dairy_free: Database["public"]["Enums"]["item_dietary_status"] | null
+          gluten_free: Database["public"]["Enums"]["item_dietary_status"] | null
+          halal: Database["public"]["Enums"]["item_dietary_status"] | null
+          id: string
+          meat: Database["public"]["Enums"]["item_dietary_status"] | null
+          pescatarian: Database["public"]["Enums"]["item_dietary_status"] | null
+          pet_food: Database["public"]["Enums"]["item_dietary_status"] | null
+          seafood_allergy:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          vegan: Database["public"]["Enums"]["item_dietary_status"] | null
+          vegetarian: Database["public"]["Enums"]["item_dietary_status"] | null
+        }
+        Insert: {
+          dairy_free?: Database["public"]["Enums"]["item_dietary_status"] | null
+          gluten_free?:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          halal?: Database["public"]["Enums"]["item_dietary_status"] | null
+          id?: string
+          meat?: Database["public"]["Enums"]["item_dietary_status"] | null
+          pescatarian?:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          pet_food?: Database["public"]["Enums"]["item_dietary_status"] | null
+          seafood_allergy?:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          vegan?: Database["public"]["Enums"]["item_dietary_status"] | null
+          vegetarian?: Database["public"]["Enums"]["item_dietary_status"] | null
+        }
+        Update: {
+          dairy_free?: Database["public"]["Enums"]["item_dietary_status"] | null
+          gluten_free?:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          halal?: Database["public"]["Enums"]["item_dietary_status"] | null
+          id?: string
+          meat?: Database["public"]["Enums"]["item_dietary_status"] | null
+          pescatarian?:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          pet_food?: Database["public"]["Enums"]["item_dietary_status"] | null
+          seafood_allergy?:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          vegan?: Database["public"]["Enums"]["item_dietary_status"] | null
+          vegetarian?: Database["public"]["Enums"]["item_dietary_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dietary_requirements_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dietary_requirements_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "lists"
+            referencedColumns: ["primary_key"]
+          },
+        ]
       }
       events: {
         Row: {
@@ -706,6 +784,7 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string | null
+          dietary_requirement: string | null
           event_id: string | null
           list_id: string | null
           log_id: string | null
@@ -752,6 +831,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "audit_log_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_list_id_fkey"
@@ -827,6 +913,24 @@ export type Database = {
           full_name: string | null
           is_active: boolean | null
           phone_number: string | null
+        }
+        Relationships: []
+      }
+      dietary_requirements_plus: {
+        Row: {
+          dairy_free: Database["public"]["Enums"]["item_dietary_status"] | null
+          gluten_free: Database["public"]["Enums"]["item_dietary_status"] | null
+          halal: Database["public"]["Enums"]["item_dietary_status"] | null
+          id: string | null
+          item_name: string | null
+          meat: Database["public"]["Enums"]["item_dietary_status"] | null
+          pescatarian: Database["public"]["Enums"]["item_dietary_status"] | null
+          pet_food: Database["public"]["Enums"]["item_dietary_status"] | null
+          seafood_allergy:
+            | Database["public"]["Enums"]["item_dietary_status"]
+            | null
+          vegan: Database["public"]["Enums"]["item_dietary_status"] | null
+          vegetarian: Database["public"]["Enums"]["item_dietary_status"] | null
         }
         Relationships: []
       }
@@ -974,6 +1078,7 @@ export type Database = {
     }
     Enums: {
       gender: "male" | "female" | "other"
+      item_dietary_status: "included" | "excluded" | "not_specified"
       list_type: "regular" | "hotel"
       role: "volunteer" | "admin" | "manager" | "staff"
     }

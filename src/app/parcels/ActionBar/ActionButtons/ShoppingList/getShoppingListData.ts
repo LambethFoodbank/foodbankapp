@@ -17,6 +17,8 @@ import { prepareClientSummary, prepareRequirementSummary } from "@/common/format
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
 import { prepareParcelInfo } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getParcelsData";
 import {
+    FetchDietaryRequirementsError,
+    FetchDietaryRequirementsErrorType,
     GetQuantityAndNotesError,
     GetQuantityAndNotesErrorType,
     prepareItemsListForHousehold,
@@ -78,6 +80,7 @@ export type ShoppingListPdfError =
     | FetchListsError
     | FetchListsCommentError
     | FetchParcelError
+    | FetchDietaryRequirementsError
     | GetQuantityAndNotesError
     | InactiveClientError;
 
@@ -86,6 +89,7 @@ export type ShoppingListPdfErrorType =
     | FetchListsErrorType
     | FetchListsCommentErrorType
     | FetchParcelErrorType
+    | FetchDietaryRequirementsErrorType
     | GetQuantityAndNotesErrorType
     | InactiveClientErrorType;
 
@@ -119,8 +123,10 @@ const getShoppingListDataForSingleParcel = async (
 
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
         familyData.length,
-        parcelInfoAndClientIdData.parcelInfo.listType
+        parcelInfoAndClientIdData.parcelInfo.listType,
+        clientData.dietary_requirements ?? []
     );
+
     if (itemsListError) {
         return { data: null, error: itemsListError };
     }

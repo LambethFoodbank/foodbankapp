@@ -3,6 +3,14 @@ import { styled } from "styled-components";
 import React from "react";
 
 const DataGridStyling = styled(DataGrid)`
+    &.dietary-table {
+        & .MuiDataGrid-cellContent {
+            padding: 0.5rem;
+            min-height: 56px;
+            align-content: center;
+        }
+    }
+
     & > div {
         border-radius: 1rem;
         border: 0px;
