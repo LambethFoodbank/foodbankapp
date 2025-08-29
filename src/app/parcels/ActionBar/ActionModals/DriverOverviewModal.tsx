@@ -6,9 +6,10 @@ import GeneralActionModal, {
     maxParcelsToShow,
     ActionModalProps,
     Paragraph,
+    WarningMessage,
+    WarningMessage2,
 } from "./GeneralActionModal";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
-import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import dayjs, { Dayjs } from "dayjs";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { getStatusErrorMessageWithLogId } from "../Statuses";
@@ -25,7 +26,7 @@ import { fetchDriverNamesByCircuitPresence } from "@/app/drivers/driversTable/Dr
 
 interface DriverOverviewInputProps {
     onDateTimeChange: (newDate: Dayjs | null) => void;
-    onDriverNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onDriverNameChange: (driverName: string) => void;
     setDateValid: () => void;
     setDateInvalid: () => void;
     sendToCircuit: boolean;
@@ -40,7 +41,7 @@ interface ContentProps {
     onPdfCreationFailed: (pdfError: DriverOverviewError) => void;
     isInputValid: boolean | null;
     onDateTimeChange: (newDate: Dayjs | null) => void;
-    onDriverNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onDriverNameChange: (driverName: string) => void;
     setIsDateValid: (valid: boolean) => void;
     maxParcelsToShow: number;
     sendToCircuit: boolean;
@@ -67,13 +68,11 @@ const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInp
                     const opts = await getDriverSelectLabelsAndValues(props.sendToCircuit);
                     if (isActive) {
                         setDriverOptions(opts);
-                        // reset selection if current value not in new options
                         if (!opts.some(([_, v]) => v === selectedDriver)) {
                             setSelectedDriver("");
                         }
                     }
                 } catch (e) {
-                    // silently ignore for now or consider surfacing an error prop
                     if (isActive) {
                         setDriverOptions([]);
                         setSelectedDriver("");
@@ -100,14 +99,18 @@ const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInp
                         props.onSendToCircuitChange?.(event.target.value === "Yes")
                     }
                 ></RadioGroupInput>
+                <br />
                 <ControlledSelect
                     selectLabelId="driver-select-label"
                     labelsAndValues={driverOptions}
                     listTitle="Driver's Name (required)"
                     value={selectedDriver}
-                    onChange={(event) => setSelectedDriver(event.target.value as string)}
+                    onChange={(event) => {
+                        const value = event.target.value as string;
+                        props.onDriverNameChange(value);
+                        setSelectedDriver(value);
+                    }}
                 />
-
                 <DateTimePicker
                     defaultValue={dateTime}
                     onChange={props.onDateTimeChange}
@@ -166,6 +169,10 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
         driverNameInputFocusRef.current?.focus();
     }, []);
 
+    const parcelListContainsCollectionsCentres = selectedParcels.some(
+        (parcel) => parcel.deliveryCollection.collectionCentreName !== "Delivery"
+    );
+
     return (
         <form>
             <DriverOverviewInput
@@ -181,6 +188,14 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
                 parcels={selectedParcels}
                 maxParcelsToShow={maxParcelsToShow}
             />
+            {sendToCircuit && parcelListContainsCollectionsCentres && (
+                <Centerer>
+                    <WarningMessage2>
+                        * The list has <strong>Collection</strong> parcels — they won't be included
+                        in the Driver’s route.
+                    </WarningMessage2>
+                </Centerer>
+            )}
             <Centerer>
                 <DriverOverviewPdfButton
                     parcels={selectedParcels}
@@ -208,8 +223,8 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
 
     const isInputValid = isDateValid && driverName !== null;
 
-    const onDriverNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const trimmedDriverName = event.target.value.trim();
+    const onDriverNameChange = (driverName: string): void => {
+        const trimmedDriverName = driverName.trim();
         setDriverName(trimmedDriverName.length !== 0 ? trimmedDriverName : null);
     };
 
