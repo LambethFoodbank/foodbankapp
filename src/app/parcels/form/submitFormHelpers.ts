@@ -24,16 +24,25 @@ type InsertParcel = (
     deliveryInstructions: string
 ) => Promise<InsertParcelReturnType>;
 
-export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructions) => {
-    const { data: parcelDataWithCount, error: insertParcelError } = await supabase.rpc(
-        "insert_parcel_with_delivery_instructions",
-        {
-            parcel_record: parcelRecord,
-            delivery_instructions: deliveryInstructions,
-        }
-    );
+export function switchErrorForCollectionCentre(
+    fields: ParcelFields,
+    collectionCentreIsActive: boolean,
+    deliveryPrimaryKey: string
+): Errors {
+    if (!collectionCentreIsActive) {
+        return Errors.invalidCollectionCentre;
+    }
+
+    if (fields.collectionCentre === deliveryPrimaryKey) {
+        return Errors.initial;
+    }
+
+    return Errors.none;
+}
+
 export function switchErrorForCollectionDate(
     fields: ParcelFields,
+    collectionCentreIsActive: boolean,
     availableDaysForCentre: DbAvailableDaysType
 ): Errors {
     const collectionDateDayIndex =
@@ -46,13 +55,14 @@ export function switchErrorForCollectionDate(
 
     // The collection centre should be available on the selected day
     if (
-        availableDaysForCentre.length === 0 ||
-        availableDaysForCentre[collectionDateDayIndex].is_active
+        (availableDaysForCentre.length > 0 &&
+            !availableDaysForCentre[collectionDateDayIndex].is_active) ||
+        !collectionCentreIsActive
     ) {
-        return Errors.none;
+        return Errors.invalidCollectionDate;
     }
 
-    return Errors.invalidCollectionDate;
+    return Errors.none;
 }
 
 export function switchErrorForCollectionSlot(
@@ -76,12 +86,14 @@ export function switchErrorForCollectionSlot(
     return Errors.invalidCollectionSlot;
 }
 
-export const insertParcel: InsertParcel = async (parcelRecord) => {
-    const { data, error } = await supabase
-        .from("parcels")
-        .insert(parcelRecord)
-        .select("primary_key")
-        .single();
+export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructions) => {
+    const { data: parcelDataWithCount, error: insertParcelError } = await supabase.rpc(
+        "insert_parcel_with_delivery_instructions",
+        {
+            parcel_record: parcelRecord,
+            delivery_instructions: deliveryInstructions,
+        }
+    );
 
     const auditLog = {
         action: "add a parcel",

@@ -30,6 +30,7 @@ import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard
 import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
 import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
 import {
+    switchErrorForCollectionCentre,
     switchErrorForCollectionDate,
     switchErrorForCollectionSlot,
     WriteParcelToDatabaseErrors,
@@ -212,6 +213,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [clientDetails, setClientDetails] = useState<ExpandedClientData | null>(null);
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
+    const [collectionCentreIsActive, setCollectionCentreIsActive] = useState<boolean>(true);
     const [collectionAvailableDays, setAvailableDays] = useState<
         DbCollectionCentreWithAvailableDaysType[]
     >([]);
@@ -230,6 +232,13 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 });
         }
     }, [clientDetails, clientIdForFetch]);
+
+    useEffect(() => {
+        const centreIsActive = collectionCentresLabelsAndValues.some(
+            (centre) => centre[1] === fields.collectionCentre
+        );
+        setCollectionCentreIsActive(centreIsActive);
+    }, [collectionCentresLabelsAndValues, fields.collectionCentre]);
 
     useEffect(() => {
         const getTimeSlots = async (): Promise<void> => {
@@ -299,12 +308,18 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     useEffect(() => {
         // If the Shipping Method changes, errors for collection date and slot should be reset
         if (fields.shippingMethod == "Collection") {
-            // The collection centre fields initially have 'Delivery' default values
             setFormErrors((prevErrors) => ({
                 ...prevErrors,
-                collectionCentre:
-                    fields.collectionCentre == deliveryPrimaryKey ? Errors.initial : Errors.none,
-                collectionDate: switchErrorForCollectionDate(fields, availableDaysForCentre),
+                collectionCentre: switchErrorForCollectionCentre(
+                    fields,
+                    collectionCentreIsActive,
+                    deliveryPrimaryKey
+                ),
+                collectionDate: switchErrorForCollectionDate(
+                    fields,
+                    collectionCentreIsActive,
+                    availableDaysForCentre
+                ),
                 collectionSlot: switchErrorForCollectionSlot(
                     fields,
                     collectionSlotsLabelsAndValues
@@ -434,6 +449,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                             fieldSetter={fieldSetter}
                             fields={fields}
                             deliveryPrimaryKey={deliveryPrimaryKey}
+                            collectionCentreIsActive={collectionCentreIsActive}
                             collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                             packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                             collectionTimeSlotsLabelsAndValues={collectionSlotsLabelsAndValues}

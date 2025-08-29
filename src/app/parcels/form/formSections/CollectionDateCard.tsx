@@ -10,6 +10,7 @@ import { Schema } from "@/databaseUtils";
 
 interface DateCardProps extends ParcelCardProps {
     deliveryPrimaryKey: Schema["collection_centres"]["primary_key"];
+    collectionCentreIsActive: boolean;
     availableDaysForSelectedCentre: DbAvailableDaysType;
 }
 
@@ -19,6 +20,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
     formErrors,
     fields,
     deliveryPrimaryKey,
+    collectionCentreIsActive,
     availableDaysForSelectedCentre,
 }) => {
     const isCentreClosedOnDay = (day: Dayjs): boolean => {
@@ -32,6 +34,7 @@ const CollectionDateCard: React.FC<DateCardProps> = ({
     };
 
     const isDisabledFormInput =
+        !collectionCentreIsActive ||
         !fields.collectionCentre ||
         fields.collectionCentre == deliveryPrimaryKey ||
         !availableDaysForSelectedCentre?.find((dayObject) => dayObject.is_active);

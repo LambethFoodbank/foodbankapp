@@ -9,6 +9,7 @@ import { Schema } from "@/databaseUtils";
 
 interface CollectionSlotsCardProps extends ParcelCardProps {
     deliveryPrimaryKey: Schema["collection_centres"]["primary_key"];
+    collectionCentreIsActive: boolean;
     collectionTimeSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues;
     availableDaysForSelectedCentre: DbAvailableDaysType;
 }
@@ -19,10 +20,12 @@ const CollectionSlotCard: React.FC<CollectionSlotsCardProps> = ({
     formErrors,
     fields,
     deliveryPrimaryKey,
+    collectionCentreIsActive,
     availableDaysForSelectedCentre,
     collectionTimeSlotsLabelsAndValues,
 }) => {
     const isDisabledFormInput =
+        !collectionCentreIsActive ||
         !fields.collectionCentre ||
         fields.collectionCentre == deliveryPrimaryKey ||
         !availableDaysForSelectedCentre?.find((dayObject) => dayObject.is_active);
