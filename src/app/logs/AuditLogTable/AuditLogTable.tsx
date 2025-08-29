@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import supabase from "@/supabaseClient";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { getAuditLogTableDataAndAllIds } from "./fetchAuditLogData";
 import { auditLogTableHeaderKeysAndLabels } from "./columns";
 import { getAuditLogErrorMessage, auditLogTableColumnDisplayFunctions } from "./format";
-import { defaultNumberOfAuditLogRowsPerPage, numberOfAuditLogRowsPerPageOption } from "./constants";
-import { AuditLogRow, AuditLogSortState } from "./types";
+import {
+    defaultNumberOfAuditLogRowsPerPage,
+    numberOfAuditLogRowsPerPageOption,
+} from "./constants";
+import { AuditLogRow, AuditLogSortState, convertAuditLogPlusRowsToAuditLogRows } from "./types";
 import { auditLogTableSortableColumns } from "./sortFunctions";
 import { DbAuditLogRow } from "@/databaseUtils";
 import TableSurface from "@/components/Tables/TableSurface";
@@ -86,8 +89,14 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
     }, [areFiltersLoadingForFirstTime, fetchAndDisplayAuditLog]);
 
     useEffect(() => {
-        void fetchAndDisplayAuditLog();
-    }, [fetchAndDisplayAuditLog]);
+        if (!areFiltersLoadingForFirstTime) {
+            void fetchAndDisplayAuditLog();
+        }
+    }, [areFiltersLoadingForFirstTime, fetchAndDisplayAuditLog]);
+
+    // useEffect(() => {
+    //     void fetchAndDisplayAuditLog();
+    // }, [fetchAndDisplayAuditLog]);
 
     useEffect(() => {
         const subscriptionChannel = supabase

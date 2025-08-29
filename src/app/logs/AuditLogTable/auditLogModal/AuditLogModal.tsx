@@ -67,6 +67,20 @@ const AuditLogModal: React.FC<AuditLogModalProps> = ({
         }
     }, [refreshCallback]);
 
+    // useEffect(() => {
+    //     setReturnPathQueryParamForLinks(generateReturnPathQueryParam(window.location));
+    // }, [modalIsOpen]);
+    
+    const refreshDetails = (): void => {
+        if (refreshAuditLogDetailsRef.current) {
+            refreshAuditLogDetailsRef.current();
+        }
+    };
+
+    const postSetStatusCallback = (): void => {
+        refreshDetails();
+    };
+
     return (
         <>
             <Modal
@@ -132,3 +146,7 @@ const AuditLogModal: React.FC<AuditLogModalProps> = ({
 };
 
 export default AuditLogModal;
+function setReturnPathQueryParamForLinks(arg0: string) {
+    throw new Error("Function not implemented.");
+}
+

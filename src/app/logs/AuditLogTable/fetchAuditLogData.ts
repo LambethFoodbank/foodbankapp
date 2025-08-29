@@ -165,10 +165,64 @@ const runAuditLogQueryAndConvertToAuditLogRows = async (
         error: Error | null;
     };
     if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: audit log table", {}, error);
-        throw new DatabaseError("fetch", "audit log table", logId);
+        const logId = abortSignal.aborted
+            ? await logInfoReturnLogId("Aborted fetch: audit log table", {}, error)
+            : await logErrorReturnLogId("Error with fetch: audit log table", {}, error);
+        return {
+            logs: null,
+            error: {
+                type: abortSignal.aborted ? "abortedFetch" : "failedToFetchAuditLogTable",
+                logId,
+            },
+        };
+    }
+    return {
+        logs: data,
+        error: null,
+    };
+};
+
+export const getAuditLogTableDataAndAllIds = async (
+    supabase: Supabase,
+    sortState: AuditLogSortState,
+    abortSignal: AbortSignal,
+    startIndex: number,
+    endIndex: number,
+): Promise<GetAuditLogDataAndIdsResult> => {
+    const { logs, error: getDbLogsError} = await fetchAuditLogDbRows(
+        supabase,
+        sortState,
+        abortSignal,
+        startIndex,
+        endIndex
+    );
+
+    if (getDbLogsError) {
+        let errorType: AuditLogErrorType;
+        switch (getDbLogsError.type) {
+            case "abortedFetch":
+                errorType = "abortedFetch";
+                break;
+            case "failedToFetchAuditLogTable":
+                errorType = "failedToFetchAuditLogs";
+                break;
+        }
+
+        return {
+            data: null,
+            error: {
+                type: errorType,
+                logId: getDbLogsError.logId,
+            },
+        };
     }
 
-    const auditLogTableRows = convertAuditLogPlusRowsToAuditLogRows(data);
-    return auditLogTableRows;
+    if (count === null) {
+        const logId = await logErrorReturnLogId("Error with fetch: Audit Log Count", {
+            error: "nullCount",
+        });
+        return { count: null, error: { type: "nullCount", logId: logId } };
+    }
+
+    return { count: count, error: null };
 };
