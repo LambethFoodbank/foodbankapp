@@ -388,6 +388,67 @@ export type Database = {
           },
         ]
       }
+      dietary_rules: {
+        Row: {
+          diet_id: string
+          item_id: string
+          primary_key: string
+          status: Database["public"]["Enums"]["item_dietary_status"]
+        }
+        Insert: {
+          diet_id?: string
+          item_id?: string
+          primary_key?: string
+          status: Database["public"]["Enums"]["item_dietary_status"]
+        }
+        Update: {
+          diet_id?: string
+          item_id?: string
+          primary_key?: string
+          status?: Database["public"]["Enums"]["item_dietary_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dietary_rules_diet_id_fkey"
+            columns: ["diet_id"]
+            isOneToOne: false
+            referencedRelation: "diets"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "dietary_rules_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dietary_rules_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
+      diets: {
+        Row: {
+          name: string
+          notes: string | null
+          primary_key: string
+        }
+        Insert: {
+          name: string
+          notes?: string | null
+          primary_key?: string
+        }
+        Update: {
+          name?: string
+          notes?: string | null
+          primary_key?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           event_data: string | null
@@ -939,6 +1000,40 @@ export type Database = {
           vegetarian: Database["public"]["Enums"]["item_dietary_status"] | null
         }
         Relationships: []
+      }
+      dietary_rules_plus: {
+        Row: {
+          diet_id: string | null
+          diet_name: string | null
+          item_id: string | null
+          item_name: string | null
+          item_type: Database["public"]["Enums"]["item_type"] | null
+          primary_key: string | null
+          status: Database["public"]["Enums"]["item_dietary_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dietary_rules_diet_id_fkey"
+            columns: ["diet_id"]
+            isOneToOne: false
+            referencedRelation: "diets"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "dietary_rules_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dietary_rules_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["primary_key"]
+          },
+        ]
       }
       family_count: {
         Row: {

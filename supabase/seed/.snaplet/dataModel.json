@@ -1699,6 +1699,193 @@
         }
       ]
     },
+    "dietary_rules": {
+      "id": "public.dietary_rules",
+      "schemaName": "public",
+      "tableName": "dietary_rules",
+      "fields": [
+        {
+          "id": "public.dietary_rules.primary_key",
+          "name": "primary_key",
+          "columnName": "primary_key",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_rules.diet_id",
+          "name": "diet_id",
+          "columnName": "diet_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_rules.item_id",
+          "name": "item_id",
+          "columnName": "item_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.dietary_rules.status",
+          "name": "status",
+          "columnName": "status",
+          "type": "item_dietary_status",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "diets",
+          "type": "diets",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "dietary_rulesTodiets",
+          "relationFromFields": [
+            "diet_id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "lists",
+          "type": "lists",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "dietary_rulesTolists",
+          "relationFromFields": [
+            "item_id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "dietary_rules_pkey",
+          "fields": [
+            "primary_key"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "diets": {
+      "id": "public.diets",
+      "schemaName": "public",
+      "tableName": "diets",
+      "fields": [
+        {
+          "id": "public.diets.primary_key",
+          "name": "primary_key",
+          "columnName": "primary_key",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.diets.name",
+          "name": "name",
+          "columnName": "name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.diets.notes",
+          "name": "notes",
+          "columnName": "notes",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "dietary_rules",
+          "type": "dietary_rules",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "dietary_rulesTodiets",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "diets_name_key",
+          "fields": [
+            "name"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "diets_pkey",
+          "fields": [
+            "primary_key"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "events": {
       "id": "public.events",
       "schemaName": "public",
@@ -3381,6 +3568,20 @@
           "isRequired": false,
           "kind": "object",
           "relationName": "dietary_requirementsTolists",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "dietary_rules",
+          "type": "dietary_rules",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "dietary_rulesTolists",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,

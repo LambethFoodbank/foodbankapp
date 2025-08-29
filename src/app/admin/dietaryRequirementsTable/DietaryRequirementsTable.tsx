@@ -1,12 +1,12 @@
 "use client";
 
+import {
+    DietTableRow,
+    fetchDietaryRequirementsForTable,
+} from "@/app/admin/dietaryRequirementsTable/DietaryRequirementsActions";
 import { GridColDef, GridRowModesModel } from "@mui/x-data-grid";
 import React, { useCallback, useEffect, useState } from "react";
 import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
-import {
-    DietaryRequirementsTableRow,
-    fetchDietaryRequirementsForTable,
-} from "@/app/admin/dietaryRequirementsTable/DietaryRequirementsActions";
 import Header from "@/app/admin/websiteDataTable/Header";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
@@ -15,7 +15,7 @@ import { Button } from "@mui/material";
 import { EditDietaryRequirementsModal } from "@/app/admin/dietaryRequirementsTable/EditDietaryRequirementsModal";
 
 const DietaryRequirementsTable: React.FC = () => {
-    const [rows, setRows] = useState<DietaryRequirementsTableRow[]>([]);
+    const [rows, setRows] = useState<DietTableRow[]>([]);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [openEditModal, setOpenEditModal] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -23,11 +23,15 @@ const DietaryRequirementsTable: React.FC = () => {
 
     const getDietaryRequirementsForTable = useCallback(async () => {
         setErrorMessage(null);
+        setIsLoading(true);
+
         const { data, error } = await fetchDietaryRequirementsForTable();
+
         if (error) {
             setErrorMessage("Error fetching data, please reload");
             return;
         }
+
         setRows(data);
         setIsLoading(false);
     }, []);
@@ -41,7 +45,12 @@ const DietaryRequirementsTable: React.FC = () => {
             .channel("dietary-requirements-table-changes")
             .on(
                 "postgres_changes",
-                { event: "*", schema: "public", table: "dietary_requirements" },
+                { event: "*", schema: "public", table: "diets" },
+                getDietaryRequirementsForTable
+            )
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "dietary_rules" },
                 getDietaryRequirementsForTable
             )
             .subscribe((status, error) => {
