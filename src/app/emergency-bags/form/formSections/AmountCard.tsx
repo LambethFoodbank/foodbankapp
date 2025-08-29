@@ -15,7 +15,8 @@ import {
 
 const numberOfEBRange = (value: string): boolean => {
     return (
-        parseInt(value) <= MAXIMUM_NUMBER_OF_EMERGENCY_BAGS && parseInt(value) >= MINIMUM_NUMBER_OF_EMERGENCY_BAGS
+        parseInt(value) <= MAXIMUM_NUMBER_OF_EMERGENCY_BAGS &&
+        parseInt(value) >= MINIMUM_NUMBER_OF_EMERGENCY_BAGS
     );
 };
 
