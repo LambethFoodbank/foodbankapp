@@ -1,5 +1,5 @@
 create or replace view
-    "public"."dietary_requirements_plus" with (security_invoker = true) as
+    "public"."dietary_requirements_plus" as
 select
     l.primary_key AS id,
     l.item_name,
