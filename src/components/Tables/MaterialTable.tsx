@@ -106,6 +106,8 @@ const MaterialTable = <
     filterConfig,
     rowActionsConfig,
     columnStyleOptions,
+    manualPagination,
+    manualSorting,
 }: MRTTableProps<PaginationType, FilterState, Data, DbData>): React.ReactElement => {
     const theme = useTheme();
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
@@ -191,6 +193,8 @@ const MaterialTable = <
         state: { isLoading, columnVisibility, pagination, sorting },
         enableColumnFilters: false,
         enableColumnActions: false,
+        manualPagination: manualPagination,
+        manualSorting: manualSorting,
         enableRowOrdering: enableRowOrdering,
         enableRowSelection: checkboxConfig.displayed,
         enableSorting: sortConfig.sortPossible,
