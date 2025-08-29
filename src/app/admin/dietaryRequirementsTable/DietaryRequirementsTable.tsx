@@ -6,13 +6,13 @@ import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
 import {
     DietaryRequirementsTableRow,
     fetchDietaryRequirementsForTable,
-} from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsActions";
+} from "@/app/admin/dietaryRequirementsTable/DietaryRequirementsActions";
 import Header from "@/app/admin/websiteDataTable/Header";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
 import supabase from "@/supabaseClient";
 import { Button } from "@mui/material";
-import { EditDietaryRequirementsModal } from "@/app/admin/dieteryRequirementsTable/EditDietaryRequirementsModal";
+import { EditDietaryRequirementsModal } from "@/app/admin/dietaryRequirementsTable/EditDietaryRequirementsModal";
 
 const DietaryRequirementsTable: React.FC = () => {
     const [rows, setRows] = useState<DietaryRequirementsTableRow[]>([]);

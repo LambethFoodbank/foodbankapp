@@ -1,4 +1,4 @@
-import { dietaryRequirementTypes } from "@/app/admin/dieteryRequirementsTable/DietaryRequirementsActions";
+import { dietaryRequirementTypes } from "@/app/admin/dietaryRequirementsTable/DietaryRequirementsActions";
 import { DatabaseEnums } from "@/databaseUtils";
 import FloatingToast from "@/components/FloatingToast";
 import { logErrorReturnLogId } from "@/logger/logger";
@@ -85,7 +85,8 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             .order("item_name");
 
         if (error) {
-            console.error("Error fetching dietary requirements data:", error);
+            setErrorMessage("Error fetching dietary requirements data");
+            onClose();
             return;
         }
 

@@ -1,4 +1,7 @@
-create or replace view "public"."dietary_requirements_plus" as  SELECT d.id,
+create or replace view
+    "public"."dietary_requirements_plus" as
+select
+    l.primary_key AS id,
     l.item_name,
     d.halal,
     d.vegetarian,
@@ -9,5 +12,6 @@ create or replace view "public"."dietary_requirements_plus" as  SELECT d.id,
     d.dairy_free,
     d.seafood_allergy,
     d.pet_food
-   FROM (dietary_requirements d
-     JOIN lists l ON ((d.id = l.primary_key)));
+from
+    lists l
+        left join dietary_requirements d on d.id = l.primary_key;
