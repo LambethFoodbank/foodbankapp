@@ -1,6 +1,7 @@
 describe("Delivery Areas on admins page", () => {
     beforeEach(() => {
         cy.login();
+        cy.intercept({ method: "GET", url: "**/rest/v1/delivery_areas*" }).as("getDeliveryAreas");
         cy.visit("/admin");
     });
 
@@ -37,7 +38,7 @@ describe("Delivery Areas on admins page", () => {
         fillOutNewDeliveryAreaAndSave(newDeliveryArea);
         cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
             .contains(".MuiDataGrid-cellContent", newDeliveryArea, { timeout: 5000 })
-            .should("exist");
+            .should("be.visible");
     });
 
     it("Prevents adding duplicate delivery area", () => {
@@ -47,17 +48,16 @@ describe("Delivery Areas on admins page", () => {
 
         startAddingNewDeliveryArea();
         fillOutNewDeliveryAreaAndSave(existingDeliveryArea);
-
         cy.get('[role="alert"]').should("contain", "already"); // eslint-disable-line quotes
     });
 
     it("Prevents adding empty delivery area", () => {
         toggleDeliveryAreaNameSection();
 
-        const exmptyDeliveryArea = " ";
+        const emptyDeliveryArea = " ";
 
         startAddingNewDeliveryArea();
-        fillOutNewDeliveryAreaAndSave(exmptyDeliveryArea);
+        fillOutNewDeliveryAreaAndSave(emptyDeliveryArea);
 
         cy.get('[role="alert"]').should("contain", "whitespaces"); // eslint-disable-line quotes
     });
@@ -89,7 +89,6 @@ describe("Delivery Areas on admins page", () => {
             .within(() => {
                 cy.get('[data-testid="DeleteIcon"]').click(); // eslint-disable-line quotes
             });
-
         cy.get('div[aria-label="Delivery Areas Table"]').should("not.contain", deletedDeliveryArea); // eslint-disable-line quotes
     });
 });
@@ -132,6 +131,7 @@ const fillOutNewDeliveryAreaAndSave = (newDeliveryAreaName: string): void => {
 };
 
 const startAddingNewDeliveryArea = (): void => {
+    cy.wait("@getDeliveryAreas");
     cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
         .find('[data-testid="AddIcon"]') // eslint-disable-line quotes
         .click();
