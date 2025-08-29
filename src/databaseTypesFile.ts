@@ -1041,6 +1041,16 @@ export type Database = {
         }
         Returns: string
       }
+      insert_parcel_with_delivery_instructions: {
+        Args: {
+          parcel_record: Json
+          delivery_instructions: string
+        }
+        Returns: {
+          parcel_primary_key: string
+          rows_inserted: number
+        }[]
+      }
       packing_slot_order_swap: {
         Args: {
           id1: string
@@ -1062,6 +1072,17 @@ export type Database = {
           familymembers: Json
         }
         Returns: Database["public"]["CompositeTypes"]["update_client_result"]
+      }
+      update_parcel_with_delivery_instructions: {
+        Args: {
+          parcel_record: Json
+          delivery_instructions: string
+          parcel_primary_key: string
+        }
+        Returns: {
+          returned_parcel_primary_key: string
+          rows_updated: number
+        }[]
       }
       user_is_admin: {
         Args: Record<PropertyKey, never>

@@ -1,7 +1,11 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import ParcelForm, { initialParcelFields, ParcelErrors, ParcelFields } from "../form/ParcelForm";
+import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
+import { updateParcel } from "@/app/parcels/form/submitFormHelpers";
+import { returnPathQueryParam } from "@/common/constants";
+import { LIST_TYPES_ARRAY, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
 import {
     CollectionCentresLabelsAndValues,
     fetchClient,
@@ -15,16 +19,12 @@ import {
     PackingSlotsLabelsAndValues,
     ParcelWithCollectionCentreAndPackingSlot,
 } from "@/common/fetch";
-import { LIST_TYPES_ARRAY, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
-import supabase from "@/supabaseClient";
-import { Errors } from "@/components/Form/formFunctions";
-import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
-import Title from "@/components/Title/Title";
-import { updateParcel } from "@/app/parcels/form/submitFormHelpers";
-import { formatDatetimeAsTime, capitaliseWords } from "@/common/format";
-import { useSearchParams } from "next/navigation";
+import { capitaliseWords, formatDatetimeAsTime } from "@/common/format";
 import { parseQueryParams } from "@/common/urlQueryParams";
-import { returnPathQueryParam } from "@/common/constants";
+import { Errors } from "@/components/Form/formFunctions";
+import Title from "@/components/Title/Title";
+import supabase from "@/supabaseClient";
+import ParcelForm, { initialParcelFields, ParcelErrors, ParcelFields } from "../form/ParcelForm";
 
 interface EditParcelFormProps {
     parcelId: string;
@@ -48,6 +48,8 @@ const prepareParcelDataForForm = (
         collectionSlot: formatDatetimeAsTime(parcelData.collection_datetime),
         collectionCentre: parcelData.collection_centre?.primary_key ?? null,
         lastUpdated: parcelData.last_updated,
+        deliveryInstructions:
+            parcelData.clientWithDeliveryInstructions?.delivery_instructions ?? null,
         notes: parcelData.notes,
         referralAgency: parcelData.referral_agency ?? "",
         referrerName: parcelData.referrer_name ?? "",
@@ -185,6 +187,7 @@ const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement =
         collectionDate: Errors.none,
         collectionSlot: Errors.none,
         collectionCentre: collectionCentreIsShown ? Errors.none : Errors.invalidCollectionCentre,
+        deliveryInstructions: Errors.none,
         referrerEmail: Errors.none,
         referrerPhone: Errors.none,
     };

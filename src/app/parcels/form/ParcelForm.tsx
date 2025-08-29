@@ -5,33 +5,6 @@ import InfoIcon from "@mui/icons-material/Info";
 import { Button, IconButton } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { useTheme } from "styled-components";
-import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
-import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
-import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
-import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
-import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
-import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
-import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
-import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
-import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
-import {
-    WriteParcelToDatabaseErrors,
-    WriteParcelToDatabaseFunction,
-} from "@/app/parcels/form/submitFormHelpers";
-import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
-import {
-    CollectionCentresLabelsAndValues,
-    CollectionTimeSlotsLabelsAndValues,
-    getActiveTimeSlotsForCollectionCentre,
-    PackingSlotsLabelsAndValues,
-} from "@/common/fetch";
-import { getDbDate } from "@/common/format";
 import {
     CardProps,
     checkErrorOnSubmit,
@@ -49,12 +22,42 @@ import {
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { Schema } from "@/databaseUtils";
+
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useTheme } from "styled-components";
+import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
+import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
+import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
+import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
+import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
+import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
+import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
+import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
+import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
+import {
+    WriteParcelToDatabaseErrors,
+    WriteParcelToDatabaseFunction,
+} from "@/app/parcels/form/submitFormHelpers";
+import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
+import {
+    CollectionCentresLabelsAndValues,
+    CollectionTimeSlotsLabelsAndValues,
+    getActiveTimeSlotsForCollectionCentre,
+    PackingSlotsLabelsAndValues,
+} from "@/common/fetch";
+import { getDbDate } from "@/common/format";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
+import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
-    listType?: ListType;
+    listType: ListType | null;
     voucherNumber: string | undefined;
     referralAgency: string | undefined;
     referrerName: string | undefined;
@@ -67,6 +70,7 @@ export interface ParcelFields extends Fields {
     collectionSlot: string | null;
     collectionCentre: string | null;
     lastUpdated: string | undefined;
+    deliveryInstructions: string | null;
     notes: string | null;
 }
 
@@ -79,15 +83,20 @@ export interface ParcelErrors extends FormErrors<ParcelFields> {
     collectionDate: Errors;
     collectionSlot: Errors;
     collectionCentre: Errors;
+    deliveryInstructions: Errors;
     referrerEmail: Errors;
     referrerPhone: Errors;
 }
 
+export type CommonFields = ParcelFields | ClientFields;
+export type CommonErrors = ParcelErrors | ClientErrors;
+
 export type ParcelCardProps = CardProps<ParcelFields, ParcelErrors>;
+export type CommonCardProps = CardProps<CommonFields, CommonErrors>;
 
 export const initialParcelFields: ParcelFields = {
     clientId: null,
-    listType: undefined,
+    listType: "regular",
     voucherNumber: "",
     referralAgency: "",
     referrerName: "",
@@ -100,6 +109,7 @@ export const initialParcelFields: ParcelFields = {
     collectionSlot: null,
     collectionCentre: null,
     lastUpdated: undefined,
+    deliveryInstructions: null,
     notes: null,
 };
 
@@ -112,6 +122,7 @@ export const initialParcelFormErrors: ParcelErrors = {
     collectionDate: Errors.initial,
     collectionSlot: Errors.initial,
     collectionCentre: Errors.initial,
+    deliveryInstructions: Errors.none,
     referralAgency: Errors.none,
     referrerName: Errors.none,
     referrerEmail: Errors.none,
@@ -148,6 +159,7 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
 
@@ -169,6 +181,8 @@ const databaseErrorMessageFromErrorType = (
             return `Failed to insert parcel. Log ID: ${logId}`;
         case "failedToUpdateParcel":
             return `Failed to update parcel. Log ID: ${logId}`;
+        case "failedToUpdateDeliveryInstructions":
+            return `Failed to update delivery instructions. Log ID: ${logId}`;
         case "concurrentUpdateConflict":
             return `Record has been edited recently - please refresh the page. LogID: ${logId}`;
     }
@@ -308,13 +322,14 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
 
         const parcelRecord = {
             client_id: clientId || fields.clientId || "",
-            list_type: fields.listType,
+            list_type: fields.listType ?? undefined,
             packing_date: packingDate,
             packing_slot: fields.packingSlot,
             voucher_number: fields.voucherNumber,
             collection_centre: isDelivery ? deliveryPrimaryKey : fields.collectionCentre,
             collection_datetime: collectionDateTime,
             last_updated: fields.lastUpdated,
+            delivery_instructions: fields.delivery_instructions,
             referral_agency: fields.referralAgency,
             referrer_name: fields.referrerName,
             referrer_email: fields.referrerEmail,
@@ -322,7 +337,10 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             notes: fields.notes,
         };
 
-        const { parcelId, error } = await writeParcelInfoToDatabase(parcelRecord);
+        const { parcelId, error } = await writeParcelInfoToDatabase(
+            parcelRecord,
+            fields.deliveryInstructions == null ? "" : fields.deliveryInstructions
+        );
 
         if (parcelId) {
             if (returnPath) {
