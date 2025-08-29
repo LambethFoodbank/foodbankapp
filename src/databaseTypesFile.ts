@@ -17,8 +17,8 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
-          dietary_requirement: string | null
           delivery_areas_id: string | null
+          dietary_requirement: string | null
           event_id: string | null
           list_id: string | null
           log_id: string | null
@@ -38,8 +38,8 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
-          dietary_requirement?: string | null
           delivery_areas_id?: string | null
+          dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -59,8 +59,8 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
-          dietary_requirement?: string | null
           delivery_areas_id?: string | null
+          dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
