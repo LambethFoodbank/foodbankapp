@@ -364,10 +364,10 @@
           "maxLength": null
         },
         {
-          "id": "public.audit_log.emergency_bag_id",
-          "name": "emergency_bag_id",
-          "columnName": "emergency_bag_id",
-          "type": "uuid",
+          "id": "public.audit_log.dietary_requirement",
+          "name": "dietary_requirement",
+          "columnName": "dietary_requirement",
+          "type": "text",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,
@@ -378,10 +378,10 @@
           "maxLength": null
         },
         {
-          "id": "public.audit_log.dietary_requirement",
-          "name": "dietary_requirement",
-          "columnName": "dietary_requirement",
-          "type": "text",
+          "id": "public.audit_log.emergency_bag_id",
+          "name": "emergency_bag_id",
+          "columnName": "emergency_bag_id",
+          "type": "uuid",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,
