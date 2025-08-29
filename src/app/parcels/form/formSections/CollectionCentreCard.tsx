@@ -14,6 +14,11 @@ interface CollectionCentreCardProps extends ParcelCardProps {
     collectionAvailableDays: DbCollectionCentreWithAvailableDaysType[];
 }
 
+type CollectionCentreWithAvailabilityString = {
+    primary_key: string;
+    availabilityString: string;
+} | null;
+
 const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     fieldSetter,
     errorSetter,
@@ -22,25 +27,39 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     collectionCentresLabelsAndValues,
     collectionAvailableDays,
 }) => {
-    const availableDaysNamesArray = collectionAvailableDays?.map((availableDaysObject) => {
-        if (!availableDaysObject) {
-            return "This centre is closed all week";
-        }
-        return availableDaysObject.available_days
-            ?.filter((collectionDayObject) => collectionDayObject.is_active)
-            ?.map((collectionDayObject) => collectionDayObject.day)
-            .join(", ");
-    });
+    const collectionCentresWithAvailabilityStrings: CollectionCentreWithAvailabilityString[] =
+        collectionAvailableDays?.map((availableDaysObject) => {
+            if (!availableDaysObject) {
+                return null;
+            }
+
+            const formattedAvailabilityString = availableDaysObject.available_days
+                ?.filter((collectionDayObject) => collectionDayObject.is_active)
+                ?.map((collectionDayObject) => collectionDayObject.day)
+                .join(", ");
+
+            return {
+                primary_key: availableDaysObject.primary_key,
+                availabilityString: formattedAvailabilityString,
+            };
+        });
 
     const collectionCentresLabelsAndValuesWithDays: CollectionCentresLabelsAndValues =
-        collectionCentresLabelsAndValues.map((centre, index) => {
+        collectionCentresLabelsAndValues.map((centre) => {
             const [label, value] = centre;
-            const daysString =
-                availableDaysNamesArray?.[index] == ""
-                    ? "This centre is closed all week"
-                    : availableDaysNamesArray[index];
+            const availabilityString =
+                collectionCentresWithAvailabilityStrings.find(
+                    (availabilityObject) => availabilityObject?.primary_key === value
+                )?.availabilityString ?? "";
 
-            return [label + " - " + daysString, value];
+            return [
+                label +
+                    " - " +
+                    (availabilityString !== ""
+                        ? availabilityString
+                        : "This centre is closed all week"),
+                value,
+            ];
         });
 
     return (
