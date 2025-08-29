@@ -3,6 +3,7 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import {
+    getDefaultTextValue,
     getErrorText,
     onChangeText,
     valueOnChangeDropdownList,
@@ -38,7 +39,7 @@ const TypeOfEmergencyBagCard: React.FC<EmergencyBagCardProps> = ({
                             margin="dense"
                             id="other-type-information"
                             label="Extra information"
-                            value={fields.otherInfo}
+                            defaultValue={getDefaultTextValue(fields, "otherInfo")}
                             onChange={onChangeText(fieldSetter, errorSetter, "otherInfo", {
                                 required: true,
                             })}
