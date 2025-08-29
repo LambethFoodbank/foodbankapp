@@ -28,6 +28,14 @@ interface Props {
 const formatCollectionCentreAvailableDaysDbData = (
     row: CollectionCentresTableRow
 ): FormattedAvailableDaysWithPrimaryKey => {
+    if (row.availableDays === undefined) {
+        return {
+            primaryKey: row.id,
+            availableDays: [],
+            lastUpdated: row.lastUpdated,
+        };
+    }
+
     const formattedAvailableDays: FormattedAvailableDayType[] = row.availableDays
         .filter((dayObj) => dayObj.day !== null)
         .map((availableDayObject) => ({
