@@ -419,6 +419,13 @@ export type Database = {
             foreignKeyName: "dietary_rules_item_id_fkey"
             columns: ["item_id"]
             isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dietary_rules_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
             referencedRelation: "lists"
             referencedColumns: ["primary_key"]
           },
@@ -1011,6 +1018,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "diets"
             referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "dietary_rules_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dietary_rules_item_id_fkey"
