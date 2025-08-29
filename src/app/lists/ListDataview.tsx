@@ -1,10 +1,6 @@
 "use client";
 
-import {
-    ClientPaginatedTable,
-    ColumnDisplayFunctions,
-    ColumnStyles,
-} from "@/components/Tables/Table";
+import { ColumnDisplayFunctions, ColumnStyles } from "@/components/Tables/Table";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import EditModal, { EditModalState } from "@/app/lists/EditModal";
@@ -126,6 +122,7 @@ const listsColumnStyleOptions: ColumnStyles<ListRow> = {
 
 const ListsDataView: React.FC<ListDataViewProps> = ({
     listOfIngredients,
+    setListOfIngredients,
     comment,
     errorMessage,
     setErrorMessage,
@@ -193,6 +190,69 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
         }
     };
 
+    const reorderRows = (row1: ListRow, row2: ListRow): void => {
+        const primaryKeys = listOfIngredients.map((ingredient) => ingredient.primaryKey);
+
+        const row1Index = primaryKeys.indexOf(row1.primaryKey);
+        const row2Index = primaryKeys.indexOf(row2.primaryKey);
+
+        const row1Item = listOfIngredients[row1Index];
+        const row1Order = row1Item.rowOrder;
+
+        const row2Item = listOfIngredients[row2Index];
+        row1Item.rowOrder = row2Item.rowOrder;
+        row2Item.rowOrder = row1Order;
+
+        const newListOfIngredients = [...listOfIngredients];
+        newListOfIngredients[row1Index] = row2Item;
+        newListOfIngredients[row2Index] = row1Item;
+
+        setListOfIngredients(newListOfIngredients);
+    };
+
+    const onSwapRows = async (row1: ListRow, row2: ListRow): Promise<void> => {
+        const { error } = await supabase.from("lists").upsert([
+            {
+                primary_key: row1.primaryKey,
+                row_order: row2.rowOrder,
+            },
+            {
+                primary_key: row2.primaryKey,
+                row_order: row1.rowOrder,
+            },
+        ]);
+
+        const auditLog = {
+            action: `move a list item ${row1.rowOrder <= row2.rowOrder ? "down" : "up"}`,
+            listId: row1.primaryKey,
+            content: {
+                itemName: row1.itemName,
+                oldRowOrder: row1.rowOrder,
+            },
+        } as const satisfies Partial<AuditLog>;
+
+        if (error) {
+            const logId = await logErrorReturnLogId("Error with upsert: List row item order", {
+                error: error,
+            });
+            setErrorMessage(`Failed to swap rows. Log ID: ${logId}`);
+            void sendAuditLog({
+                ...auditLog,
+                wasSuccess: false,
+                logId: logId,
+            });
+            return;
+        } else {
+            void sendAuditLog({
+                ...auditLog,
+                wasSuccess: true,
+                content: { ...auditLog.content, newRowOrder: row2.rowOrder },
+            });
+        }
+
+        reorderRows(row1, row2);
+    };
+
     useEffect(() => {
         setListData(
             listOfIngredients.filter((row) => {
@@ -256,6 +316,7 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
                         onDelete: onDeleteButtonClick,
                     }}
                     enableRowOrdering={true}
+                    onRowReorder={onSwapRows}
                 />
                 <EditModal
                     onClose={() => setModal(undefined)}
