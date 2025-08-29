@@ -97,9 +97,6 @@ export const saveTimeSlotsForCentre = (): void => {
         .find(".MuiDataGrid-row--editing")
         .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
-
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(500);
 };
 
 export const saveAvailableDaysForCentre = (collectionCentreName: string): void => {
@@ -113,9 +110,6 @@ export const saveAvailableDaysForCentre = (collectionCentreName: string): void =
         .find(".MuiDataGrid-row--editing")
         .find('[data-testid="SaveIcon"]') // eslint-disable-line quotes
         .click();
-
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(500);
 };
 
 export const addNewCollectionCentre = (newCollectionCentreName: string): void => {
