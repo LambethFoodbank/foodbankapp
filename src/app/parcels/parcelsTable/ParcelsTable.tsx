@@ -263,6 +263,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 }}
                 rowActionsConfig={{ editable: false }}
                 columnStyleOptions={parcelTableColumnStyleOptions}
+                rowBreakPointConfigs={parcelRowBreakPointConfig}
             />
         </TableSurface>
     );

@@ -52,14 +52,14 @@ export const searchForBreakPoints = (
         case "packingDate": {
             return [
                 {
-                    name: "packingSlot",
-                    breakPoints: searchForPackingSlotBreakPoints(parcelsTableRows),
-                    dividingLineStyle: "dateAndSlotSecondary",
-                },
-                {
                     name: "packingDate",
                     breakPoints: searchForPackingDateBreakPoints(parcelsTableRows),
                     dividingLineStyle: "dateAndSlotPrimary",
+                },
+                {
+                    name: "packingSlot",
+                    breakPoints: searchForPackingSlotBreakPoints(parcelsTableRows),
+                    dividingLineStyle: "dateAndSlotSecondary",
                 },
             ];
         }
