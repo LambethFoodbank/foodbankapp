@@ -1428,7 +1428,7 @@
           "name": "diet_id",
           "columnName": "diet_id",
           "type": "uuid",
-          "isRequired": false,
+          "isRequired": true,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -1458,7 +1458,7 @@
         {
           "name": "diets",
           "type": "diets",
-          "isRequired": false,
+          "isRequired": true,
           "kind": "object",
           "relationName": "clients_dietsTodiets",
           "relationFromFields": [
@@ -1522,7 +1522,7 @@
           "name": "item_id",
           "columnName": "item_id",
           "type": "uuid",
-          "isRequired": false,
+          "isRequired": true,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -1552,7 +1552,7 @@
         {
           "name": "lists",
           "type": "lists",
-          "isRequired": false,
+          "isRequired": true,
           "kind": "object",
           "relationName": "clients_preferred_itemsTolists",
           "relationFromFields": [
