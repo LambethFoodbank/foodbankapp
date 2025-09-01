@@ -51,6 +51,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
     const auditLogsTableFetchAbortController = useRef<AbortController | null>(null);
 
     const fetchAndDisplayAuditLog = useCallback(async (): Promise<void> => {
+        setIsLoading(true);
         if (auditLogsTableFetchAbortController.current) {
             auditLogsTableFetchAbortController.current.abort("stale request");
         }
@@ -63,9 +64,9 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
             const { data, error } = await getAuditLogTableDataAndAllIds(
                 supabase,
                 sortState,
-                auditLogsTableFetchAbortController.current.signal,
                 startPoint,
-                endPoint
+                endPoint,
+                auditLogsTableFetchAbortController.current.signal
             );
 
             if (error) {

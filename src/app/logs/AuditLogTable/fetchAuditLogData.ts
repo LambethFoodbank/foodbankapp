@@ -5,6 +5,7 @@ import { GetAuditLogDataAndIdsResult, AuditLogSortState, GetAuditLogDataResult, 
 import { DbQuery } from "@/components/Tables/Filters";
 import { DbAuditLogRow } from "@/databaseUtils";
 import { defaultAuditLogSort, defaultAuditLogSortConfig } from "./sortFunctions";
+import { PostgrestError } from "@supabase/supabase-js";
 
 const getAuditLogQuery = (
     supabase: Supabase,
@@ -15,11 +16,11 @@ const getAuditLogQuery = (
 
     if (sortState.sortEnabled && sortState.column.sortMethod) {
         query = sortState.column.sortMethod(sortState.sortDirection, query);
-    } else{
+    } else {
         query = defaultAuditLogSort(defaultAuditLogSortConfig.defaultSortDirection, query);
     }
 
-    query = query.order("log_id"); // maybe comment this
+    // query = query.order("log_id");
 
     return query;
 }
@@ -27,9 +28,9 @@ const getAuditLogQuery = (
 const fetchAuditLogDbRows = async (
     supabase: Supabase,
     sortState: AuditLogSortState,
-    abortSignal: AbortSignal,
     startIndex: number,
-    endIndex: number
+    endIndex: number,
+    abortSignal: AbortSignal
 ): Promise<GetAuditLogDataResult> => {
     let query = getAuditLogQuery(supabase, sortState);
     query = query.range(startIndex, endIndex);
@@ -37,15 +38,16 @@ const fetchAuditLogDbRows = async (
 
     const { data, error } = (await query) as {
         data: DbAuditLogRow[];
-        error: Error | null;
+        error: PostgrestError | null;
     };
 
     console.log(error);
+    console.log(abortSignal.aborted)
 
     if (error) {
         const logId = abortSignal.aborted
-            ? await logInfoReturnLogId("Aborted fetch: audit log table", {}, error)
-            : await logErrorReturnLogId("Error with fetch: audit log table", {}, error);
+            ? await logInfoReturnLogId("Aborted fetch: audit log table", {error: error} )
+            : await logErrorReturnLogId("Error with fetch: audit log table", {error: error} );
         return {
             logs: null,
             error: {
@@ -63,16 +65,16 @@ const fetchAuditLogDbRows = async (
 export const getAuditLogTableDataAndAllIds = async (
     supabase: Supabase,
     sortState: AuditLogSortState,
-    abortSignal: AbortSignal,
     startIndex: number,
     endIndex: number,
+    abortSignal: AbortSignal,
 ): Promise<GetAuditLogDataAndIdsResult> => {
     const { logs, error: getDbLogsError} = await fetchAuditLogDbRows(
         supabase,
         sortState,
-        abortSignal,
         startIndex,
-        endIndex
+        endIndex,
+        abortSignal
     );
 
     if (getDbLogsError) {
