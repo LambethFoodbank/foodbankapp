@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import supabase from "@/supabaseClient";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { getAuditLogTableDataAndAllIds } from "./fetchAuditLogData";
+import { getAuditLogsByIds, getAuditLogTableDataAndAllIds } from "./fetchAuditLogData";
 import { auditLogTableHeaderKeysAndLabels } from "./columns";
 import { getAuditLogErrorMessage, auditLogTableColumnDisplayFunctions } from "./format";
 import {
@@ -18,7 +18,7 @@ import FloatingToast from "@/components/FloatingToast";
 import TableSurface from "@/components/Tables/TableSurface";
 
 interface AuditLogTableProps { 
-    openAuditLogModal: (row: AuditLogRow) => void;
+    openAuditLogModal: (rowId: string) => void;
     sortState: AuditLogSortState;
     setSortState: (sortStte: AuditLogSortState) => void;
     appliedFilters: any[];
@@ -49,17 +49,22 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
     // const [selectedAuditLogRow, setSelectedAuditLogRow] = useState<AuditLogRow | null>(null);
 
     const auditLogsTableFetchAbortController = useRef<AbortController | null>(null);
+    const latestFetchRequestId = useRef<number>(0);
 
     const fetchAndDisplayAuditLog = useCallback(async (): Promise<void> => {
         setIsLoading(true);
+
+        latestFetchRequestId.current += 1;
+        const currentFetchRequestId = latestFetchRequestId.current;
+
         if (auditLogsTableFetchAbortController.current) {
             auditLogsTableFetchAbortController.current.abort("stale request");
         }
 
         auditLogsTableFetchAbortController.current = new AbortController();
+        setErrorMessage(null);
 
         if (auditLogsTableFetchAbortController.current) {
-            setErrorMessage(null);
             
             const { data, error } = await getAuditLogTableDataAndAllIds(
                 supabase,
@@ -68,21 +73,21 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                 endPoint,
                 auditLogsTableFetchAbortController.current.signal
             );
-
-            if (error) {
-                const newErrorMessage= getAuditLogErrorMessage(error);
-                if (newErrorMessage !== null) {
-                    setErrorMessage(`Log ID: ${error.logId}`);
+            if (currentFetchRequestId === latestFetchRequestId.current) {
+                if (error) {
+                    const newErrorMessage= getAuditLogErrorMessage(error);
+                    if (newErrorMessage !== null) {
+                        setErrorMessage(`Log ID: ${error.logId}`);
+                    }
+                } else {
+                    setAuditLogDataPortion(data.auditLogTableRows);
+                    setAllFilteredAuditLogIds(data.allAuditLogIds);
+                    
                 }
-            } else {
-                setAuditLogDataPortion(data.auditLogTableRows);
-                setAllFilteredAuditLogIds(data.allAuditLogIds);
-                
             }
-
-            auditLogsTableFetchAbortController.current = null;
-            setIsLoading(false);
         }
+        auditLogsTableFetchAbortController.current = null;
+        setIsLoading(false);
     }, [endPoint, sortState, startPoint, setErrorMessage]);
 
     useEffect(() => {
@@ -91,9 +96,9 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
         }
     }, [areFiltersLoadingForFirstTime, fetchAndDisplayAuditLog]);
 
-    // useEffect(() => {
-    //     void fetchAndDisplayAuditLog();
-    // }, [fetchAndDisplayAuditLog]);
+    useEffect(() => {
+        void fetchAndDisplayAuditLog();
+    }, [fetchAndDisplayAuditLog]);
 
     useEffect(() => {
         const subscriptionChannel = supabase
@@ -117,7 +122,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
     });
 
     const onAuditTableRowClick = (row: Row<AuditLogRow>): void => {
-        openAuditLogModal(row.data);
+        openAuditLogModal(row.data.auditLogId);
     };
 
     return (
@@ -133,7 +138,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                         "actorName",
                         "content",
                         "wasSuccess",
-                        "logId",
+                        "auditLogId",
                     ]}
                     columnDisplayFunctions={auditLogTableColumnDisplayFunctions}
                     onRowClick={onAuditTableRowClick}

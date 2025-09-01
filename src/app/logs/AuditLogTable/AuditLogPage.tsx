@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AuditLogTable from "./AuditLogTable";
 import AuditLogModal from "./auditLogModal/AuditLogModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { CircularProgress } from "@mui/material";
 import FloatingToast from "@/components/FloatingToast";
-import { AuditLogRow, AuditLogSortState } from "./types";
+import { AuditLogSortState } from "./types";
 import { mergeParamsIntoURL, parseQueryParams } from "@/common/urlQueryParams";
 import { logIdParam } from "./constants";
 import { useSearchParams } from "next/navigation";
@@ -25,9 +25,11 @@ const AuditLogPage: React.FC = () => {
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const [selectedLog, setSelectedLog] = useState<AuditLogRow | null>(null);
+    const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
 
     const currentlyAppliedFilters: any[] = [];
+
+    const refreshAuditLogDetailsRef = useRef<(() => void) | null>(null) //add all refresh fcts
 
     useEffect(() => {
         (async () => {
@@ -37,40 +39,42 @@ const AuditLogPage: React.FC = () => {
             setAreFiltersLoadingForFirstTime(true);
 
             const urlParams = parseQueryParams(searchParams.toString());
-
+            console.log(urlParams[logIdParam] as string);
+            
             setAreFiltersLoadingForFirstTime(false);
 
-            // if (urlParams[logIdParam]) {
-            //     openLogModal(urlParams[logIdParam] as string);
-            // }
+            if (urlParams[logIdParam]) {
+                // console.log("yes")
+                openLogModal(urlParams[logIdParam] as string);
+            }
             setUrlParamsHaveBeenProcessed(true);
-        })
+        })();
     }, [urlParamsHaveBeenProcessed, searchParams])
 
-    useEffect(() => {
-            if (!urlParamsHaveBeenProcessed) {
-                return;
-            }
+    // useEffect(() => {
+    //         if (!urlParamsHaveBeenProcessed) {
+    //             return;
+    //         }
     
-            // mergeParamsIntoURL(paramsRecord);
-        }, [currentlyAppliedFilters, searchParams, urlParamsHaveBeenProcessed]);
+    //         // mergeParamsIntoURL(paramsRecord);
+    //     }, [currentlyAppliedFilters, searchParams, urlParamsHaveBeenProcessed]);
 
-    const openLogModal = (row: AuditLogRow): void => {
-        setSelectedLog(row);
+    const openLogModal = (rowId: string): void => {
+        setSelectedLogId(rowId);
         setModalIsOpen(true);
     }
 
-    const openLogModalAndUpdateURL = (row: AuditLogRow): void => {
-        openLogModal(row);
+    const openLogModalAndUpdateURL = (rowId: string): void => {
+        openLogModal(rowId);
 
         const paramsRecord: Record<string, string> = {};
-        paramsRecord[logIdParam] = row.logId;
+        paramsRecord[logIdParam] = rowId;
         mergeParamsIntoURL(paramsRecord);
     }
 
     const closeLogModalAndUpdateURL = (): void => {
         setModalIsOpen(false);
-        setSelectedLog(null);
+        setSelectedLogId(null);
 
         const paramsRecord: Record<string, string | null> = {};
         paramsRecord[logIdParam] = null;
@@ -102,8 +106,11 @@ const AuditLogPage: React.FC = () => {
                     />
                     <AuditLogModal
                         modalIsOpen={modalIsOpen}
-                        selectedAuditLogRow={selectedLog}
+                        selectedAuditLogRowId={selectedLogId}
                         closeAuditLogModal={closeLogModalAndUpdateURL}
+                        refreshCallback={(refresh) => {
+                            refreshAuditLogDetailsRef.current = refresh;
+                        }}
                     />
                 </>
             )}

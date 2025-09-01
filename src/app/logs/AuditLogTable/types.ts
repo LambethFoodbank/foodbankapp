@@ -81,7 +81,12 @@ export interface AuditLogRow {
 export const convertAuditLogPlusRowsToAuditLogRows = (
     auditLogResponse: DbAuditLogRow[]
 ): AuditLogRow[] =>
-    auditLogResponse.map((auditLogPlusRow) => ({
+    auditLogResponse.map((convertSingleAuditLogPlusRowsToAuditLogRow));
+
+export const convertSingleAuditLogPlusRowsToAuditLogRow = (
+    auditLogPlusRow: DbAuditLogRow
+): AuditLogRow =>{
+    return {
         auditLogId: auditLogPlusRow.primary_key ?? "",
         action: auditLogPlusRow.action ?? "",
         actorName:
@@ -101,4 +106,5 @@ export const convertAuditLogPlusRowsToAuditLogRows = (
         statusOrder: auditLogPlusRow.status_order ?? "",
         wasSuccess: auditLogPlusRow.wasSuccess ?? null,
         websiteData: auditLogPlusRow.website_data ?? "",
-    }));
+    }
+};

@@ -1,7 +1,7 @@
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import { Supabase } from "@/supabaseUtils";
 import { DatabaseError} from "../../errorClasses";
-import { GetAuditLogDataAndIdsResult, AuditLogSortState, GetAuditLogDataResult, AuditLogErrorType, convertAuditLogPlusRowsToAuditLogRows, AuditLogRow } from "./types";
+import { GetAuditLogDataAndIdsResult, AuditLogSortState, GetAuditLogDataResult, AuditLogErrorType, convertAuditLogPlusRowsToAuditLogRows, AuditLogRow, convertSingleAuditLogPlusRowsToAuditLogRow } from "./types";
 import { DbQuery } from "@/components/Tables/Filters";
 import { DbAuditLogRow } from "@/databaseUtils";
 import { defaultAuditLogSort, defaultAuditLogSortConfig } from "./sortFunctions";
@@ -41,8 +41,8 @@ const fetchAuditLogDbRows = async (
         error: PostgrestError | null;
     };
 
-    console.log(error);
-    console.log(abortSignal.aborted)
+    // console.log(error);
+    // console.log(abortSignal.aborted)
 
     if (error) {
         const logId = abortSignal.aborted
@@ -115,7 +115,7 @@ export const getAuditLogIds = async (
     sortState: AuditLogSortState,
     abortSignal: AbortSignal | null = null
 ): Promise<string[]> => {
-    const query = getAuditLogQuery(supabase, sortState, "log_id");
+    const query = getAuditLogQuery(supabase, sortState, "primary_key");
 
     if (abortSignal) {
         query.abortSignal(abortSignal);
@@ -139,16 +139,29 @@ export const getAuditLogIds = async (
     return data.map((log) => log.log_id);
 };
 
-export const getAuditLogByIds = async (
+export const getAuditLogsByIds = async (
     supabase: Supabase,
     auditLogIds: string[]
 ): Promise<AuditLogRow[]> => {
     const query = supabase
         .from("audit_log_plus")
         .select("*")
-        .in("log_id", auditLogIds) as DbQuery<DbAuditLogRow>;
+        .in("primary_key", auditLogIds) as DbQuery<DbAuditLogRow>;
 
     return runAuditLogQueryAndConvertToAuditLogRows(query);
+};
+
+export const getSingleAuditLogById = async (
+    supabase: Supabase,
+    auditLogId: string
+): Promise<AuditLogRow> => {
+    const query = supabase
+        .from("audit_log_plus")
+        .select("*")
+        .eq("primary_key", auditLogId)
+        .single() as DbQuery<DbAuditLogRow>;
+
+    return runAuditLogQueryAndConvertToSingleAuditLogRow(query);
 };
 
 const runAuditLogQueryAndConvertToAuditLogRows = async (
@@ -165,4 +178,20 @@ const runAuditLogQueryAndConvertToAuditLogRows = async (
 
     const auditLogTableRows = convertAuditLogPlusRowsToAuditLogRows(data);
     return auditLogTableRows;
+};
+
+const runAuditLogQueryAndConvertToSingleAuditLogRow = async (
+    query: DbQuery<DbAuditLogRow>
+): Promise<AuditLogRow> => {
+    const { data, error } = (await query) as {
+        data: DbAuditLogRow;
+        error: Error | null;
+    };
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: audit log table", {}, error);
+        throw new DatabaseError("fetch", "audit log table", logId);
+    }
+
+    const auditLogTableRow = convertSingleAuditLogPlusRowsToAuditLogRow(data);
+    return auditLogTableRow;
 };
