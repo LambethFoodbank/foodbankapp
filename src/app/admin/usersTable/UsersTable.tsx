@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ServerPaginatedTable } from "@/components/Tables/Table";
 import ManageUserModal from "@/app/admin/manageUser/ManageUserModal";
 import DeleteUserDialog from "@/app/admin/deleteUser/DeleteUserDialog";
 import OptionButtonsDiv from "@/app/admin/common/OptionButtonsDiv";
@@ -23,6 +22,7 @@ import { userTableColumnDisplayFunctions } from "./format";
 import { Schema } from "@/databaseUtils";
 import FloatingToast from "@/components/FloatingToast";
 import { userTableColumnStyleOptions } from "./styles";
+import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 const UsersTable: React.FC = () => {
     const [userToDelete, setUserToDelete] = useState<UserRow | null>(null);
@@ -33,11 +33,11 @@ const UsersTable: React.FC = () => {
     const [sortState, setSortState] = useState<UsersSortState>({ sortEnabled: false });
     const [isLoading, setIsLoading] = useState(true);
     const [userCountPerPage, setUserCountPerPage] = useState(defaultNumberOfUsersPerPage);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-    const startIndex = (currentPage - 1) * userCountPerPage;
-    const endIndex = currentPage * userCountPerPage - 1;
+    const startIndex = currentPage * userCountPerPage;
+    const endIndex = startIndex + userCountPerPage - 1;
 
     const usersTableFetchAbortController = useRef<AbortController | null>(null);
 
@@ -140,8 +140,8 @@ const UsersTable: React.FC = () => {
                     variant="filled"
                 ></FloatingToast>
             )}
-            <ServerPaginatedTable<UserRow, Schema["profiles"], string | string[]>
-                dataPortion={users}
+            <ServerPaginatedMaterialTable<UserRow, Schema["profiles"], string | string[]>
+                data={users}
                 headerKeysAndLabels={usersTableHeaderKeysAndLabels}
                 columnDisplayFunctions={userTableColumnDisplayFunctions}
                 columnStyleOptions={userTableColumnStyleOptions}
@@ -161,7 +161,7 @@ const UsersTable: React.FC = () => {
                     sortableColumns: usersSortableColumns,
                     setSortState: setSortState,
                 }}
-                editableConfig={{
+                rowActionsConfig={{
                     editable: true,
                     onDelete: userOnDelete,
                     onEdit: userOnEdit,

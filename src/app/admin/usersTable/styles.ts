@@ -8,8 +8,8 @@ export const userTableColumnStyleOptions = {
         minWidth: "4rem",
     },
     email: {
-        grow: 3,
-        minWidth: "15rem",
+        grow: 1,
+        minWidth: "10rem",
     },
     userRole: {
         grow: 0.6,
