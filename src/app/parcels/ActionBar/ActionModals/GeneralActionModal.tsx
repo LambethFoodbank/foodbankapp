@@ -30,11 +30,10 @@ export const Paragraph = styled.p`
     margin: 0.3rem;
 `;
 
-export const WarningMessage2 = styled.p`
+export const DriverOverviewMessage = styled.p`
     font-size: 0.9rem;
     margin: 1rem;
     text-align: center;
-    //font-style: oblique;
 `;
 
 export const ModalInner = styled.div`

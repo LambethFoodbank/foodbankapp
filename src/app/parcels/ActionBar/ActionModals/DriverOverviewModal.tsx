@@ -6,8 +6,7 @@ import GeneralActionModal, {
     maxParcelsToShow,
     ActionModalProps,
     Paragraph,
-    WarningMessage,
-    WarningMessage2,
+    DriverOverviewMessage,
 } from "./GeneralActionModal";
 import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import dayjs, { Dayjs } from "dayjs";
@@ -18,18 +17,20 @@ import { DriverOverviewError } from "../ActionButtons/DriverOverview/getDriverOv
 import { sendAuditLog } from "@/server/auditLog";
 import { displayNameForNullDriverName } from "@/common/format";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import { Centerer } from "@/components/Modal/ModalFormStyles";
+import { ButtonCenterer, Centerer } from "@/components/Modal/ModalFormStyles";
 import { saveParcelTableRowsStatus } from "../saveStatus";
 import RadioGroupInput from "@/components/DataInput/RadioGroupInput";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { fetchDriverNamesByCircuitPresence } from "@/app/drivers/driversTable/DriversActions";
+import DriverCircuitButton from "@/app/parcels/ActionBar/ActionButtons/DriverOverview/DriverCircuitButton";
 
 interface DriverOverviewInputProps {
     onDateTimeChange: (newDate: Dayjs | null) => void;
-    onDriverNameChange: (driverName: string) => void;
+    onDriverNameChange: (value: string) => void;
     setDateValid: () => void;
     setDateInvalid: () => void;
     sendToCircuit: boolean;
+    buttonsDisabled: (value: boolean) => void;
     onSendToCircuitChange?: (value: boolean) => void;
 }
 
@@ -41,11 +42,15 @@ interface ContentProps {
     onPdfCreationFailed: (pdfError: DriverOverviewError) => void;
     isInputValid: boolean | null;
     onDateTimeChange: (newDate: Dayjs | null) => void;
-    onDriverNameChange: (driverName: string) => void;
+    onDriverNameChange: (value: string) => void;
     setIsDateValid: (valid: boolean) => void;
     maxParcelsToShow: number;
     sendToCircuit: boolean;
     onSendToCircuitChange: (value: boolean) => void;
+    routeSendCompleted: boolean;
+    onRouteSendCompleted: () => void;
+    buttonsDisabled: (value: boolean) => void;
+    displayActionMessage?: string | null;
 }
 
 const getDriverSelectLabelsAndValues = async (
@@ -56,7 +61,7 @@ const getDriverSelectLabelsAndValues = async (
 };
 
 const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInputProps>(
-    (props) => {
+    (props, _ref) => {
         const dateTime = dayjs();
         const [driverOptions, setDriverOptions] = useState<[string, string][]>([]);
         const [selectedDriver, setSelectedDriver] = useState<string>("");
@@ -65,17 +70,13 @@ const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInp
             let isActive = true;
             (async () => {
                 try {
-                    const opts = await getDriverSelectLabelsAndValues(props.sendToCircuit);
+                    const driversList = await getDriverSelectLabelsAndValues(props.sendToCircuit);
                     if (isActive) {
-                        setDriverOptions(opts);
-                        if (!opts.some(([_, v]) => v === selectedDriver)) {
-                            setSelectedDriver("");
-                        }
+                        setDriverOptions(driversList);
                     }
-                } catch (e) {
+                } catch (err) {
                     if (isActive) {
                         setDriverOptions([]);
-                        setSelectedDriver("");
                     }
                 }
             })();
@@ -84,31 +85,39 @@ const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInp
             };
         }, [props.sendToCircuit]);
 
+        useEffect(() => {
+            if (selectedDriver && !driverOptions.some(([_, value]) => value === selectedDriver)) {
+                setSelectedDriver("");
+            }
+        }, [driverOptions, selectedDriver]);
+
         return (
             <>
                 <Heading>Delivery Information</Heading>
                 <br />
-                <Paragraph>Send selected parcels to driver's Circuit App?</Paragraph>
+                <Paragraph>Send selected parcels to driver&#39;s Circuit App?</Paragraph>
                 <RadioGroupInput
                     labelsAndValues={[
                         ["Yes", "Yes"],
                         ["No", "No"],
                     ]}
-                    defaultValue={props.sendToCircuit ? "Yes" : "No"}
-                    onChange={(event) =>
-                        props.onSendToCircuitChange?.(event.target.value === "Yes")
-                    }
+                    defaultValue="Yes"
+                    onChange={(event) => {
+                        props.onSendToCircuitChange?.(event.target.value === "Yes");
+                        props.buttonsDisabled?.(true);
+                    }}
                 ></RadioGroupInput>
-                <br />
                 <ControlledSelect
                     selectLabelId="driver-select-label"
                     labelsAndValues={driverOptions}
                     listTitle="Driver's Name (required)"
                     value={selectedDriver}
+                    focusOnDropdown={true}
                     onChange={(event) => {
                         const value = event.target.value as string;
                         props.onDriverNameChange(value);
                         setSelectedDriver(value);
+                        props.buttonsDisabled?.(false);
                     }}
                 />
                 <DateTimePicker
@@ -162,6 +171,10 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
     isInputValid,
     sendToCircuit,
     onSendToCircuitChange,
+    routeSendCompleted,
+    onRouteSendCompleted,
+    displayActionMessage,
+    buttonsDisabled,
 }) => {
     const driverNameInputFocusRef = useRef<HTMLInputElement>(null);
 
@@ -172,7 +185,6 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
     const parcelListContainsCollectionsCentres = selectedParcels.some(
         (parcel) => parcel.deliveryCollection.collectionCentreName !== "Delivery"
     );
-
     return (
         <form>
             <DriverOverviewInput
@@ -183,6 +195,7 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
                 ref={driverNameInputFocusRef}
                 sendToCircuit={sendToCircuit}
                 onSendToCircuitChange={onSendToCircuitChange}
+                buttonsDisabled={buttonsDisabled}
             />
             <SelectedParcelsOverview
                 parcels={selectedParcels}
@@ -190,13 +203,13 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
             />
             {sendToCircuit && parcelListContainsCollectionsCentres && (
                 <Centerer>
-                    <WarningMessage2>
-                        * The list has <strong>Collection</strong> parcels — they won't be included
-                        in the Driver’s route.
-                    </WarningMessage2>
+                    <DriverOverviewMessage>
+                        * The list has <strong>Collection</strong> parcels — they won&#39;t be
+                        included in the Driver’s route.
+                    </DriverOverviewMessage>
                 </Centerer>
             )}
-            <Centerer>
+            <ButtonCenterer>
                 <DriverOverviewPdfButton
                     parcels={selectedParcels}
                     date={date}
@@ -205,7 +218,19 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
                     onPdfCreationFailed={onPdfCreationFailed}
                     disabled={!isInputValid}
                 />
-            </Centerer>
+                {sendToCircuit && (
+                    <DriverCircuitButton
+                        onRouteSendCompleted={onRouteSendCompleted}
+                        routeSendCompleted={routeSendCompleted}
+                        disabled={!isInputValid}
+                    />
+                )}
+            </ButtonCenterer>
+            {displayActionMessage && (
+                <Centerer>
+                    <DriverOverviewMessage>{displayActionMessage}</DriverOverviewMessage>
+                </Centerer>
+            )}
         </form>
     );
 };
@@ -220,12 +245,15 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
 
     const [isDateValid, setIsDateValid] = useState(true);
     const [sendToCircuit, setSendToCircuit] = useState<boolean>(true);
+    const [sendToCircuitCompleted, setSendToCircuitCompleted] = useState<boolean>(false);
+    const [downloadCompleted, setDownloadCompleted] = useState<boolean>(false);
+    const [actionMessage, setActionMessage] = useState<string | null>(null);
+    const [buttonsDisabled, setButtonsDisabled] = useState(false);
 
-    const isInputValid = isDateValid && driverName !== null;
+    const isInputValid = isDateValid && driverName !== null && !buttonsDisabled;
 
-    const onDriverNameChange = (driverName: string): void => {
-        const trimmedDriverName = driverName.trim();
-        setDriverName(trimmedDriverName.length !== 0 ? trimmedDriverName : null);
+    const onDriverNameChange = (value: string): void => {
+        setDriverName(value.length !== 0 ? value : null);
     };
 
     const onDateTimeChange = (newDate: Dayjs | null): void => {
@@ -242,7 +270,33 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
         setErrorMessage(null);
     };
 
+    const onRouteSendCompleted = async (): Promise<void> => {
+        if (downloadCompleted) {
+            setSuccessMessage("Driver Overview Created");
+            setActionCompleted(true);
+            props.postSuccessCallback();
+
+            // Auto-close the modal after 3 seconds
+            setTimeout(() => {
+                props.onClose();
+            }, 3000);
+        } else {
+            setActionMessage("Circuit route was successfully sent");
+        }
+        void sendAuditLog({
+            action: "generate a driver's route",
+            wasSuccess: true,
+            content: {
+                parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId),
+                date: date.toString(),
+                driverName: driverName,
+            },
+        });
+        setSendToCircuitCompleted(true);
+    };
+
     const onPdfCreationCompleted = async (): Promise<void> => {
+        const shouldActionBeCompleted = !sendToCircuit || sendToCircuitCompleted;
         const { error } = await saveParcelTableRowsStatus(
             props.selectedParcels,
             "Out for Delivery",
@@ -250,11 +304,21 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
             undefined,
             date
         );
-        if (error) {
+        if (error && shouldActionBeCompleted) {
             setErrorMessage(getStatusErrorMessageWithLogId(error));
         }
-        setSuccessMessage("Driver Overview Created");
-        setActionCompleted(true);
+        if (shouldActionBeCompleted) {
+            setSuccessMessage("Driver Overview Created");
+            setActionCompleted(true);
+            props.postSuccessCallback();
+
+            // Auto-close the modal after 3 seconds
+            setTimeout(() => {
+                props.onClose();
+            }, 3000);
+        } else {
+            setActionMessage("Driver PDF Download Completed");
+        }
         void sendAuditLog({
             action: "create driver overview pdf",
             wasSuccess: true,
@@ -264,17 +328,13 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
                 driverName: driverName,
             },
         });
-        props.postSuccessCallback();
-
-        // Auto-close the modal after 3 seconds
-        setTimeout(() => {
-            props.onClose();
-        }, 3000);
+        setDownloadCompleted(true);
     };
 
     const onPdfCreationFailed = (pdfError: DriverOverviewError): void => {
         setErrorMessage(getPdfErrorMessage(pdfError));
         setActionCompleted(true);
+
         void sendAuditLog({
             action: "create driver overview pdf",
             wasSuccess: false,
@@ -308,6 +368,10 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
                     isInputValid={isInputValid}
                     sendToCircuit={sendToCircuit}
                     onSendToCircuitChange={setSendToCircuit}
+                    routeSendCompleted={sendToCircuitCompleted}
+                    onRouteSendCompleted={onRouteSendCompleted}
+                    displayActionMessage={actionMessage}
+                    buttonsDisabled={setButtonsDisabled}
                 />
             )}
         </GeneralActionModal>

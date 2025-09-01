@@ -29,3 +29,9 @@ export const ButtonsDiv = styled.div`
 export const InputContainer = styled.div`
     max-width: 10rem;
 `;
+
+export const ButtonCenterer = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+`;
