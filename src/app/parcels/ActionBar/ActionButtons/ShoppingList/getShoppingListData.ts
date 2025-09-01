@@ -29,7 +29,6 @@ import {
     ShoppingListPdfData,
 } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/shoppingListPdfDataProps";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { fetch } from "next/dist/compiled/@edge-runtime/primitives";
 
 interface ClientDataAndFamilyData {
     clientData: Schema["clients"];
