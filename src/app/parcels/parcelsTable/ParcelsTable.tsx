@@ -8,6 +8,7 @@ import {
     numberOfParcelsPerPageOptions,
 } from "@/app/parcels/parcelsTable/constants";
 import {
+    parcelTableColumnGroups,
     parcelTableDefaultShownHeaders,
     parcelTableHeaderKeysAndLabels,
     parcelTableToggleableHeaders,
@@ -235,6 +236,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                 headerKeysAndLabels={parcelTableHeaderKeysAndLabels}
                 defaultShownHeaders={parcelTableDefaultShownHeaders}
                 toggleableHeaders={parcelTableToggleableHeaders}
+                toggleableColumnGroups={parcelTableColumnGroups}
                 columnDisplayFunctions={parcelTableColumnDisplayFunctions}
                 isLoading={isLoading}
                 paginationConfig={{
