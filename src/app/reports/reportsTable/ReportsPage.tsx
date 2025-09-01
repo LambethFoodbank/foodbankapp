@@ -1,7 +1,6 @@
 "use client";
 
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import { ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import supabase from "@/supabaseClient";
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -14,6 +13,7 @@ import reportsSortableColumns from "./sortableColumns";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { reportsTableColumnStyleOptions } from "@/app/reports/reportsTable/styles";
 import FloatingToast from "@/components/FloatingToast";
+import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 const ReportsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -24,9 +24,9 @@ const ReportsPage: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const reportTableFetchAbortController = useRef<AbortController | null>(null);
     const [perPage, setPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-    const startPoint = (currentPage - 1) * perPage;
-    const endPoint = currentPage * perPage - 1;
+    const [currentPage, setCurrentPage] = useState(0);
+    const startPoint = currentPage * perPage;
+    const endPoint = startPoint + perPage - 1;
 
     const fetchAndDisplayReportsData = useCallback(async () => {
         setIsLoading(true);
@@ -106,8 +106,8 @@ const ReportsPage: React.FC = () => {
                         ></FloatingToast>
                     )}
                     <TableSurface>
-                        <ServerPaginatedTable<ReportsTableRow, DbReportRow, never>
-                            dataPortion={reportsDataPortion}
+                        <ServerPaginatedMaterialTable<ReportsTableRow, DbReportRow, never>
+                            data={reportsDataPortion}
                             paginationConfig={{
                                 enablePagination: true,
                                 filteredCount: filteredReportCount,
@@ -126,9 +126,8 @@ const ReportsPage: React.FC = () => {
                                 additionalFiltersShown: false,
                             }}
                             checkboxConfig={{ displayed: false }}
-                            editableConfig={{ editable: false }}
+                            rowActionsConfig={{ editable: false }}
                             isLoading={isLoading}
-                            pointerOnHover={true}
                         />
                     </TableSurface>
                 </>

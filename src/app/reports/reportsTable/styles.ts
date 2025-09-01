@@ -1,5 +1,18 @@
 export const reportsTableColumnStyleOptions = {
-    weekCommencing: {
-        minWidth: "8rem",
-    },
+    weekCommencing: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize1: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize2: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize3: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize4: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize5: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize6: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize7: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize8: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize9: { minWidth: "1rem", maxWidth: "5rem" },
+    familySize10Plus: { minWidth: "1rem", maxWidth: "5rem" },
+    total: { minWidth: "1rem", maxWidth: "5rem" },
+    cat: { minWidth: "1rem", maxWidth: "5rem" },
+    dog: { minWidth: "1rem", maxWidth: "5rem" },
+    catAndDog: { minWidth: "1rem", maxWidth: "5rem" },
+    totalWithPets: { minWidth: "1rem", maxWidth: "5rem" },
 };
