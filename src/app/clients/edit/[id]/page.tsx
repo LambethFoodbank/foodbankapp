@@ -6,14 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { parseQueryParams } from "@/common/urlQueryParams";
 import { returnPathQueryParam } from "@/common/constants";
 import ClientForm, { ClientErrors } from "@/app/clients/form/ClientForm";
-import { Errors } from "@/components/Form/formFunctions";
+import { Errors, Item } from "@/components/Form/formFunctions";
 import autofill from "@/app/clients/edit/[id]/autofill";
-import {
-    fetchClient,
-    fetchFamily,
-    fetchClientDiets,
-    fetchClientPreferredItems,
-} from "@/common/fetch";
+import { fetchClient, fetchFamily, fetchClientDiets, fetchClientItems } from "@/common/fetch";
 import { Schema } from "@/databaseUtils";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 
@@ -29,9 +24,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);
     const [familyData, setFamilyData] = useState<Schema["families"][] | null>(null);
     const [dietsData, setDietsData] = useState<Schema["clients_diets"]["diet_id"][] | null>(null);
-    const [itemsData, setItemsData] = useState<
-        Schema["clients_preferred_items"]["item_id"][] | null
-    >(null);
+    const [itemsData, setItemsData] = useState<Item[] | null>(null);
     const [error, setError] = useState<string | null>();
     const [returnPath, setReturnPath] = useState<string | null>(null);
 
@@ -86,15 +79,17 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             }
             setDietsData(dietsData.map((diet) => diet.primaryKey));
 
-            const { data: itemsData, error: itemsError } = await fetchClientPreferredItems(
+            const { data: itemsData, error: itemsError } = await fetchClientItems(
                 params.id,
+                "all",
                 supabase
             );
+
             if (itemsError) {
                 setError(`Unable to fetch preferred items data. Log ID: ${itemsError.logId}`);
                 return;
             }
-            setItemsData(itemsData.map((item) => item.primaryKey));
+            setItemsData(itemsData);
         })();
     }, [params.id, searchParams]);
 

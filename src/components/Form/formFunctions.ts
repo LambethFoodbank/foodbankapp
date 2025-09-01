@@ -54,6 +54,8 @@ export interface Diet {
 export interface Item {
     primaryKey: string;
     name: string;
+    type?: string;
+    notes?: string | null;
 }
 
 export type Fields = Record<string, unknown>;

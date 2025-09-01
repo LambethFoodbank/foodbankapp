@@ -454,7 +454,7 @@ type FetchClientDietsResponse = {
     error: FetchClientDietaryError | null;
 };
 
-type FetchClientPreferredItemsResponse = {
+type FetchClientItemsResponse = {
     data: Item[];
     error: FetchClientDietaryError | null;
 };
@@ -496,14 +496,21 @@ export const fetchClientDiets = async (
     return { data: diets, error: null };
 };
 
-export const fetchClientPreferredItems = async (
+export const fetchClientItems = async (
     clientId: string,
+    itemType: string,
     supabase: Supabase
-): Promise<FetchClientPreferredItemsResponse> => {
-    const { data, error } = await supabase
+): Promise<FetchClientItemsResponse> => {
+    let query = supabase
         .from("clients_preferred_items")
-        .select("item_id")
+        .select("item_id, notes")
         .eq("client_id", clientId);
+
+    if (itemType !== "all") {
+        query = query.eq("item_type", itemType);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Client preferred items", error);
@@ -517,7 +524,7 @@ export const fetchClientPreferredItems = async (
     const itemIds = data.map((item) => item.item_id);
     const { data: itemsData, error: itemsError } = await supabase
         .from("lists")
-        .select("primary_key, item_name")
+        .select("primary_key, item_name, item_type")
         .in("primary_key", itemIds);
 
     if (itemsError) {
@@ -528,6 +535,9 @@ export const fetchClientPreferredItems = async (
     const items: Item[] = (itemsData ?? []).map((item) => ({
         primaryKey: item.primary_key,
         name: item.item_name,
+        type: item.item_type as string,
+        notes:
+            data.find((preferredItem) => preferredItem.item_id === item.primary_key)?.notes ?? null,
     }));
 
     return { data: items, error: null };
