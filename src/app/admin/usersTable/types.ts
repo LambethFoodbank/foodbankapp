@@ -1,5 +1,5 @@
 import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
-import { SortState } from "@/components/Tables/Table";
+import { SortState } from "@/components/Tables/materialTable/tableTypes";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { Schema, UserRole } from "@/databaseUtils";
 

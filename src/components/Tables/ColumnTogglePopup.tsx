@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import CheckboxGroupPopup from "../DataInput/CheckboxGroupPopup";
 import { ViewColumnOutlined } from "@mui/icons-material";
 import styled from "styled-components";

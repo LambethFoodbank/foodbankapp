@@ -6,7 +6,7 @@ import {
     GenericSortMethod,
     SortOptions,
     TableHeaders,
-} from "@/components/Tables/Table";
+} from "@/components/Tables/materialTable/tableTypes";
 
 import React from "react";
 

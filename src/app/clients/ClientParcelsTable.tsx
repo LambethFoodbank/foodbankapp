@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import TableSurface from "@/components/Tables/TableSurface";
 import { useRouter } from "next/navigation";
 import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";

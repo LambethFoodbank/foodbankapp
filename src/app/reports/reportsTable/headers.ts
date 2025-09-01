@@ -1,4 +1,4 @@
-import { TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import { ReportsTableRow } from "@/app/reports/reportsTable/types";
 
 const clientsHeaders: TableHeaders<ReportsTableRow> = [

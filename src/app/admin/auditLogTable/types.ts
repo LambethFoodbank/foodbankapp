@@ -1,6 +1,6 @@
 import { Json } from "@/databaseTypesFile";
 import { profileDisplayNameForDeletedUser } from "./format";
-import { SortState } from "@/components/Tables/Table";
+import { SortState } from "@/components/Tables/materialTable/tableTypes";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { DbAuditLogRow } from "@/databaseUtils";
 
@@ -31,6 +31,7 @@ export interface AuditLogError {
     type: "failedAuditLogFetch";
     logId: string;
 }
+
 export interface AuditLogCountError {
     type: "failedAuditLogCountFetch" | "nullCount";
     logId: string;

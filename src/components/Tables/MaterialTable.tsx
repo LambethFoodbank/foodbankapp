@@ -25,7 +25,7 @@ import {
     PaginationConfig,
     SortConfig,
     TableHeaders,
-} from "@/components/Tables/Table";
+} from "@/components/Tables/materialTable/tableTypes";
 import { mapHeadersToMRTColumns } from "@/components/Tables/materialTable/materialTableMethods";
 import { Box, IconButton } from "@mui/material";
 import { ClientSideSortMethod, ServerSideSortMethod } from "@/components/Tables/sortMethods";
@@ -35,6 +35,12 @@ import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { getDividingLineStyleOptions } from "@/app/parcels/parcelsTable/conditionalStyling";
+
+const defaultColumnStyleOptions = {
+    grow: 1,
+    minWidth: "2rem",
+    maxWidth: "20rem",
+};
 
 const EditAndReorderArrowDiv = styled.div`
     display: flex;
@@ -111,7 +117,7 @@ const MaterialTable = <
     checkboxConfig,
     filterConfig,
     rowActionsConfig,
-    columnStyleOptions,
+    columnStyleOptions = defaultColumnStyleOptions as ColumnStyles<Data>,
     manualPagination,
     manualSorting,
     rowBreakPointConfigs,
@@ -359,6 +365,10 @@ const MaterialTable = <
             },
             "mrt-row-actions": {
                 header: "",
+            },
+            "mrt-row-select": {
+                size: 2,
+                enableSorting: false,
             },
         },
         onColumnVisibilityChange: setColumnVisibility,
