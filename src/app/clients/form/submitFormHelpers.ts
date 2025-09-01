@@ -1,16 +1,14 @@
-import { ListType } from "@/common/databaseListTypes";
-import { checkboxGroupToArray, Diet, Item, Person } from "@/components/Form/formFunctions";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import supabase from "@/supabaseClient";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { ClientFields } from "./ClientForm";
+import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import { ListType } from "@/common/databaseListTypes";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
 export type ClientDatabaseUpdateRecord = UpdateSchema["clients"];
-export type ClientDietsInsertRecord = InsertSchema["clients_diets"];
-export type ClientsPreferredItemsInsertRecord = InsertSchema["clients_preferred_items"];
 
 const personToFamilyRecordWithoutFamilyId = (person: Person): FamilyDatabaseInsertRecord => {
     return {
@@ -30,17 +28,10 @@ export const getFamilyMembersForDatabase = (
     return peopleToInsert.map((person) => personToFamilyRecordWithoutFamilyId(person));
 };
 
-export const formatClientDiets = (dietsIds: Diet[]): ClientDietsInsertRecord[] => {
-    return dietsIds.map((diet) => ({
-        diet_id: diet.primaryKey,
-    }));
-};
-
-export const formatPreferredItems = (items: Item[]): ClientsPreferredItemsInsertRecord[] => {
-    return items.map((item) => ({
-        item_id: item.primaryKey,
-    }));
-};
+export const formatFromPrimaryKey =
+    <T extends { primaryKey: string }, K extends string>(key: K) =>
+    (items: T[]): { [P in K]: string }[] =>
+        items.map((item) => ({ [key]: item.primaryKey }) as { [P in K]: string });
 
 export const formatClientRecord = (
     fields: ClientFields
@@ -96,8 +87,8 @@ export type addClientResult =
 export const submitAddClientForm = async (fields: ClientFields): Promise<addClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
-    const clientDiets = formatClientDiets(fields.diets);
-    const clientPreferredItems = formatPreferredItems(fields.preferredItems);
+    const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);
+    const clientPreferredItems = formatFromPrimaryKey("item_id")(fields.preferredItems);
 
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
         clientrecord: clientRecord,
@@ -149,8 +140,8 @@ export const submitEditClientForm = async (
 ): Promise<editClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
-    const clientDiets = formatClientDiets(fields.diets);
-    const clientPreferredItems = formatPreferredItems(fields.preferredItems);
+    const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);
+    const clientPreferredItems = formatFromPrimaryKey("item_id")(fields.preferredItems);
 
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
         "update_client_and_family",

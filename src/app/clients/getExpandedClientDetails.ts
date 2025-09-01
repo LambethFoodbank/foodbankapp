@@ -161,8 +161,14 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.dietary_requirements,
             dietaryRequirementOptions
         ),
-        diets: formatBreakdownOfDietsFromClientDiets(client.diets ?? []),
-        preferredItems: formatBreakdownOfPreferredItemsFromClient(client.preferred_items ?? []),
+        diets: formatBreakdownFromArray(
+            client.diets ?? [],
+            (diet) => diet.diet?.name ?? diet.diet_id
+        ),
+        preferredItems: formatBreakdownFromArray(
+            client.preferred_items ?? [],
+            (item) => item.item?.item_name ?? item.item_id
+        ),
         hygieneProducts: formatHygieneProducts(
             client.hygiene_tampons,
             client.hygiene_pads,
@@ -297,24 +303,15 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
     return childDetails.join(", ");
 };
 
-export const formatBreakdownOfDietsFromClientDiets = (diets: ClientDietWithName[]): string => {
-    if (!diets || diets.length === 0) {
+export const formatBreakdownFromArray = <T>(
+    arr: T[] | null | undefined,
+    getName: (item: T) => string | number | null | undefined
+): string => {
+    if (!arr || arr.length === 0) {
         return "-";
     }
-    const dietNames = diets.map((currentDiet) =>
-        currentDiet.diet?.name ? currentDiet.diet.name : currentDiet.diet_id
-    );
-    return dietNames.join(", ");
-};
-
-export const formatBreakdownOfPreferredItemsFromClient = (items: ClientItemWithName[]): string => {
-    if (!items || items.length === 0) {
-        return "-";
-    }
-    const itemNames = items.map((currentItem) =>
-        currentItem.item?.item_name ? currentItem.item.item_name : currentItem.item_id
-    );
-    return itemNames.join(", ");
+    const names = arr.map((item) => getName(item)).filter(Boolean);
+    return names.join(", ");
 };
 
 export const formatRequirementsByCanonicalOrder = (

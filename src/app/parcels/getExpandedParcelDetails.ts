@@ -7,8 +7,7 @@ import {
     formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
-    formatBreakdownOfDietsFromClientDiets,
-    formatBreakdownOfPreferredItemsFromClient,
+    formatBreakdownFromArray,
     formatHouseholdFromFamilyDetails,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
@@ -204,9 +203,13 @@ const getExpandedParcelDetails = async (
                         client.dietary_requirements,
                         dietaryRequirementOptions
                     ),
-                    diets: formatBreakdownOfDietsFromClientDiets(client.diets),
-                    preferredItems: formatBreakdownOfPreferredItemsFromClient(
-                        client.preferred_items
+                    diets: formatBreakdownFromArray(
+                        client.diets ?? [],
+                        (diet) => diet.diet?.name ?? diet.diet_id
+                    ),
+                    preferredItems: formatBreakdownFromArray(
+                        client.preferred_items ?? [],
+                        (item) => item.item?.item_name ?? item.item_id
                     ),
                     hygieneProducts: formatHygieneProducts(
                         client.hygiene_tampons,
