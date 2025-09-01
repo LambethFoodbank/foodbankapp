@@ -25,6 +25,7 @@ import {
     PaginationConfig,
     SortConfig,
     TableHeaders,
+    ToggleableColumnGroup,
 } from "@/components/Tables/materialTable/tableTypes";
 import { mapHeadersToMRTColumns } from "@/components/Tables/materialTable/materialTableMethods";
 import { Box, IconButton } from "@mui/material";
@@ -35,6 +36,7 @@ import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { getDividingLineStyleOptions } from "@/app/parcels/parcelsTable/conditionalStyling";
+import ColumnTogglePopup from "@/components/Tables/ColumnTogglePopup";
 
 const defaultColumnStyleOptions = {
     grow: 1,
@@ -51,6 +53,13 @@ const EditAndReorderArrowDiv = styled.div`
 
 const RelativeContainerForTable = styled.div`
     position: relative;
+`;
+
+const ColumnSelectorContainer = styled.div`
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 900;
 `;
 
 type OnRowClickFunction<Data extends MRT_RowData> = (
@@ -73,6 +82,7 @@ interface MRTTableProps<
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>;
     defaultShownHeaders?: readonly (keyof Data)[];
     toggleableHeaders?: readonly (keyof Data | string)[];
+    toggleableColumnGroups?: ToggleableColumnGroup[];
     isLoading?: boolean;
     checkboxConfig: CheckboxConfig<Data>;
     onRowClick?: OnRowClickFunction<Data>;
@@ -110,6 +120,7 @@ const MaterialTable = <
     defaultShownHeaders = [],
     columnDisplayFunctions,
     toggleableHeaders = [],
+    toggleableColumnGroups = [],
     isLoading = false,
     enableRowOrdering = false,
     onRowReorder,
@@ -137,6 +148,7 @@ const MaterialTable = <
         () => headerKeysAndLabels.map(([key]) => key),
         [headerKeysAndLabels]
     );
+
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(() =>
         Object.fromEntries(
             headerKeys.map((key) => [
@@ -150,18 +162,11 @@ const MaterialTable = <
         () =>
             mapHeadersToMRTColumns(
                 headerKeysAndLabels,
-                toggleableHeaders,
                 sortConfig.sortPossible ? sortConfig.sortableColumns : [],
                 columnDisplayFunctions,
                 columnStyleOptions
             ),
-        [
-            columnDisplayFunctions,
-            columnStyleOptions,
-            headerKeysAndLabels,
-            sortConfig,
-            toggleableHeaders,
-        ]
+        [columnDisplayFunctions, columnStyleOptions, headerKeysAndLabels, sortConfig]
     );
 
     useEffect(() => {
@@ -221,9 +226,7 @@ const MaterialTable = <
                 : undefined,
         },
         rowCount: paginationConfig.enablePagination ? paginationConfig.filteredCount : undefined,
-        renderToolbarInternalActions: ({ table }) => (
-            <Box>{toggleableHeaders.length > 0 && <MRT_ShowHideColumnsButton table={table} />}</Box>
-        ),
+        renderToolbarInternalActions: () => <Box></Box>,
         enableRowActions: rowActionsConfig.editable,
         positionActionsColumn: "first",
         renderRowActions: ({ row }) =>
@@ -300,7 +303,6 @@ const MaterialTable = <
                 borderStyle = {
                     borderTop: `${style.thickness} solid ${style.colour}`,
                 };
-                console.log(rowBreakPointConfigs);
             }
 
             return {
@@ -409,6 +411,17 @@ const MaterialTable = <
                 />
             )}
             <RelativeContainerForTable>
+                {toggleableHeaders.length > 0 && (
+                    <ColumnSelectorContainer>
+                        <ColumnTogglePopup
+                            toggleableHeaders={toggleableHeaders}
+                            headers={headerKeysAndLabels}
+                            columnVisibility={columnVisibility}
+                            setColumnVisibility={setColumnVisibility}
+                            toggleableColumnGroups={toggleableColumnGroups}
+                        />
+                    </ColumnSelectorContainer>
+                )}
                 <MaterialReactTable table={table} />
             </RelativeContainerForTable>
         </div>
