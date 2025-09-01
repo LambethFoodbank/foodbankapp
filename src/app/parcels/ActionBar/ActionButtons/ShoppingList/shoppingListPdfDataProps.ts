@@ -172,6 +172,10 @@ export const prepareItemsListForHousehold = async (
     }
 
     for (const row of listData) {
+        if (!row.is_available) {
+            continue;
+        }
+
         if (row.list_type !== listType) {
             continue;
         }
