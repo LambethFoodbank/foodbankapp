@@ -1,7 +1,7 @@
 create table "public"."clients_diets" (
     "id" uuid not null default gen_random_uuid(),
     "client_id" uuid not null default gen_random_uuid(),
-    "diet_id" uuid default gen_random_uuid()
+    "diet_id" uuid not null default gen_random_uuid()
 );
 
 alter table "public"."clients_diets" enable row level security;

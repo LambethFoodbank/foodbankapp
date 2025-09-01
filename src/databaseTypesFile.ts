@@ -287,17 +287,17 @@ export type Database = {
       clients_diets: {
         Row: {
           client_id: string
-          diet_id: string | null
+          diet_id: string
           id: string
         }
         Insert: {
           client_id?: string
-          diet_id?: string | null
+          diet_id?: string
           id?: string
         }
         Update: {
           client_id?: string
-          diet_id?: string | null
+          diet_id?: string
           id?: string
         }
         Relationships: [
@@ -335,17 +335,17 @@ export type Database = {
         Row: {
           client_id: string
           id: string
-          item_id: string | null
+          item_id: string
         }
         Insert: {
           client_id?: string
           id?: string
-          item_id?: string | null
+          item_id?: string
         }
         Update: {
           client_id?: string
           id?: string
-          item_id?: string | null
+          item_id?: string
         }
         Relationships: [
           {
