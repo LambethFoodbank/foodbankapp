@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDisplayFunctions, ColumnStyles } from "@/components/Tables/Table";
+import { ColumnDisplayFunctions, ColumnStyles } from "@/components/Tables/materialTable/tableTypes";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import EditModal, { EditModalState } from "@/app/lists/EditModal";

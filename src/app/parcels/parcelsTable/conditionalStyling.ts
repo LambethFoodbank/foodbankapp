@@ -1,6 +1,6 @@
 import { DefaultTheme } from "styled-components";
 import { ParcelsTableRow } from "./types";
-import { BreakPointConfig } from "@/components/Tables/Table";
+import { BreakPointConfig } from "@/components/Tables/materialTable/tableTypes";
 
 export type DividingLineStyleOptions = {
     dateAndSlotPrimary: DividingLineStyle;

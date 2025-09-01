@@ -1,4 +1,4 @@
-import { BreakPointConfig } from "@/components/Tables/Table";
+import { BreakPointConfig } from "@/components/Tables/materialTable/tableTypes";
 import TableSurface from "@/components/Tables/TableSurface";
 import { ParcelsFilter, ParcelsSortState, ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { DbParcelRow } from "@/databaseUtils";

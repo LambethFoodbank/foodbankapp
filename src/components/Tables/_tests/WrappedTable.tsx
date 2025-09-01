@@ -11,7 +11,7 @@ import {
     SortOptions,
     SortState,
     TableHeaders,
-} from "../Table";
+} from "../materialTable/tableTypes";
 import { ClientSideSortMethod } from "../sortMethods";
 import { SortOrder } from "react-data-table-component";
 import { ClientSideFilter } from "../Filters";

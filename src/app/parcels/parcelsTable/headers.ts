@@ -1,4 +1,4 @@
-import { TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import { ParcelsTableRow } from "./types";
 
 export const parcelTableHeaderKeysAndLabels: TableHeaders<ParcelsTableRow> = [
