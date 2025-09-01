@@ -4,7 +4,6 @@ import {
     MRT_PaginationState,
     MRT_Row,
     MRT_RowData,
-    MRT_ShowHideColumnsButton,
     MRT_SortingState,
     useMaterialReactTable,
 } from "material-react-table";

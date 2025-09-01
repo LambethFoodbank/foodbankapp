@@ -7,7 +7,6 @@ import {
     fakeSmallerData,
     fakeMidData,
     fakeDataHeaders,
-    MRT_RowData,
     fullNameTextFilterTest,
     typeButtonFilterTest,
 } from "./testHelpers";
@@ -15,6 +14,7 @@ import { expect, it } from "@jest/globals";
 import WrappedTableForTest from "./WrappedTable";
 import userEvent from "@testing-library/user-event";
 import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
+import { MRT_RowData } from "material-react-table";
 
 describe("Generic Table component", () => {
     describe("Table without features", () => {
