@@ -15,6 +15,7 @@ import {
 } from "@/components/Tables/Filters";
 import React, { useEffect, useMemo, useState } from "react";
 import {
+    BreakPointConfig,
     CheckboxConfig,
     ColumnDisplayFunctions,
     ColumnStyles,
@@ -33,6 +34,7 @@ import styled, { useTheme } from "styled-components";
 import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { getDividingLineStyleOptions } from "@/app/parcels/parcelsTable/conditionalStyling";
 
 const EditAndReorderArrowDiv = styled.div`
     display: flex;
@@ -86,6 +88,7 @@ interface MRTTableProps<
     >;
     rowActionsConfig: EditableConfig<Data>;
     columnStyleOptions?: ColumnStyles<Data>;
+    rowBreakPointConfigs?: BreakPointConfig[];
 }
 
 const MaterialTable = <
@@ -95,7 +98,6 @@ const MaterialTable = <
     DbData extends Record<string, unknown> = Record<string, never>,
 >({
     data,
-    setData,
     headerKeysAndLabels,
     defaultShownHeaders = [],
     columnDisplayFunctions,
@@ -112,8 +114,10 @@ const MaterialTable = <
     columnStyleOptions,
     manualPagination,
     manualSorting,
+    rowBreakPointConfigs,
 }: MRTTableProps<PaginationType, FilterState, Data, DbData>): React.ReactElement => {
     const theme = useTheme();
+    const dividingLineStyleOptions = getDividingLineStyleOptions(theme);
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
     const [pagination, setPagination] = useState<MRT_PaginationState>({
         pageIndex: 0,
@@ -253,6 +257,7 @@ const MaterialTable = <
             sx: {
                 tableLayout: "fixed",
                 width: "100%",
+                borderCollapse: "collapse",
             },
         },
         muiTableHeadCellProps: {
@@ -274,21 +279,39 @@ const MaterialTable = <
                 },
             },
         },
-        muiTableBodyRowProps: ({ row }) => ({
-            onClick: (event) => onRowClick?.(row, event),
-            sx: {
-                cursor: "pointer",
-                "&.MuiTableRow-root:hover > td": {
-                    backgroundColor: `${theme.primary.background[1]}`,
+        muiTableBodyRowProps: ({ row }) => {
+            const rowIndex = row.index;
+
+            const dividingConfig = rowBreakPointConfigs?.find((config) =>
+                config.breakPoints.includes(rowIndex)
+            );
+
+            let borderStyle = {};
+            if (dividingConfig) {
+                const style = dividingLineStyleOptions[dividingConfig.dividingLineStyle];
+                borderStyle = {
+                    borderTop: `${style.thickness} solid ${style.colour}`,
+                };
+                console.log(rowBreakPointConfigs);
+            }
+
+            return {
+                onClick: (event) => onRowClick?.(row, event),
+                sx: {
+                    cursor: "pointer",
+                    "&.MuiTableRow-root:hover > td": {
+                        backgroundColor: `${theme.primary.background[1]}`,
+                    },
+                    ...(checkboxConfig.displayed &&
+                        checkboxConfig.isRowChecked(row.original) && {
+                            "&.MuiTableRow-root > td": {
+                                backgroundColor: `${theme.primary.background[1]} !important`,
+                            },
+                        }),
+                    ...borderStyle,
                 },
-                ...(checkboxConfig.displayed &&
-                    checkboxConfig.isRowChecked(row.original) && {
-                        "&.MuiTableRow-root > td": {
-                            backgroundColor: `${theme.primary.background[1]} !important`,
-                        },
-                    }),
-            },
-        }),
+            };
+        },
         muiTableBodyCellProps: {
             sx: {
                 whiteSpace: "normal",
