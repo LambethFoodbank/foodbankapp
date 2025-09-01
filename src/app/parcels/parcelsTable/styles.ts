@@ -37,6 +37,26 @@ export const parcelTableColumnStyleOptions = {
         minWidth: "6rem",
         grow: 0.5,
     },
+    referralAgency: {
+        maxWidth: "10rem",
+        minWidth: "6rem",
+        grow: 0.6,
+    },
+    referrerName: {
+        maxWidth: "10rem",
+        minWidth: "6rem",
+        grow: 0.6,
+    },
+    referrerEmail: {
+        maxWidth: "10rem",
+        minWidth: "6rem",
+        grow: 0.6,
+    },
+    referrerPhone: {
+        maxWidth: "10rem",
+        minWidth: "6rem",
+        grow: 0.6,
+    },
     deliveryCollection: {
         grow: 0.6,
         maxWidth: "6rem",
