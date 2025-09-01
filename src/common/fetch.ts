@@ -445,21 +445,25 @@ interface WikiRowsQueryFailureType {
 
 export type WikiRowsQueryType = WikiRowsQuerySuccessType | WikiRowsQueryFailureType;
 
-interface ClientDietsFetchError {
-    type: "dietsFetchFailed";
-    logId: string;
-}
+export type FetchClientDietaryErrorType = "dietsFetchFailed" | "preferredItemsFetchFailed";
 
-interface ClientPreferredItemsFetchError {
-    type: "preferredItemsFetchFailed";
-    logId: string;
-}
+export type FetchClientDietaryError = { type: FetchClientDietaryErrorType; logId: string };
+
+type FetchClientDietsResponse = {
+    data: Diet[];
+    error: FetchClientDietaryError | null;
+};
+
+type FetchClientPreferredItemsResponse = {
+    data: Item[];
+    error: FetchClientDietaryError | null;
+};
 
 export const fetchClientDiets = async (
     clientId: string,
     supabase: Supabase
-): Promise<{ data: Schema["clients_diets"]["diet_id"][]; error: ClientDietsFetchError | null }> => {
-    const { data, error } = await supabase
+): Promise<FetchClientDietsResponse> => {
+    const { data: clientDietRows, error } = await supabase
         .from("clients_diets")
         .select("diet_id")
         .eq("client_id", clientId);
@@ -469,16 +473,33 @@ export const fetchClientDiets = async (
         return { data: [], error: { type: "dietsFetchFailed", logId } };
     }
 
-    return { data: data.map((diet) => diet.diet_id), error: null };
+    if (!clientDietRows || clientDietRows.length === 0) {
+        return { data: [], error: null };
+    }
+
+    const dietIds = clientDietRows.map((diet) => diet.diet_id);
+    const { data: dietsData, error: dietsError } = await supabase
+        .from("diets")
+        .select("primary_key, name")
+        .in("primary_key", dietIds);
+
+    if (dietsError) {
+        const logId = await logErrorReturnLogId("Error with fetch: Diets data", dietsError);
+        return { data: [], error: { type: "dietsFetchFailed", logId } };
+    }
+
+    const diets: Diet[] = (dietsData ?? []).map((diet) => ({
+        primaryKey: diet.primary_key,
+        name: diet.name,
+    }));
+
+    return { data: diets, error: null };
 };
 
 export const fetchClientPreferredItems = async (
     clientId: string,
     supabase: Supabase
-): Promise<{
-    data: Schema["clients_preferred_items"]["item_id"][];
-    error: ClientPreferredItemsFetchError | null;
-}> => {
+): Promise<FetchClientPreferredItemsResponse> => {
     const { data, error } = await supabase
         .from("clients_preferred_items")
         .select("item_id")
@@ -489,5 +510,25 @@ export const fetchClientPreferredItems = async (
         return { data: [], error: { type: "preferredItemsFetchFailed", logId } };
     }
 
-    return { data: data.map((item) => item.item_id), error: null };
+    if (!data || data.length === 0) {
+        return { data: [], error: null };
+    }
+
+    const itemIds = data.map((item) => item.item_id);
+    const { data: itemsData, error: itemsError } = await supabase
+        .from("lists")
+        .select("primary_key, item_name")
+        .in("primary_key", itemIds);
+
+    if (itemsError) {
+        const logId = await logErrorReturnLogId("Error with fetch: Items data", itemsError);
+        return { data: [], error: { type: "preferredItemsFetchFailed", logId } };
+    }
+
+    const items: Item[] = (itemsData ?? []).map((item) => ({
+        primaryKey: item.primary_key,
+        name: item.item_name,
+    }));
+
+    return { data: items, error: null };
 };

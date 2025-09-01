@@ -84,7 +84,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                 setError(`Unable to fetch diets data. Log ID: ${dietsError.logId}`);
                 return;
             }
-            setDietsData(dietsData);
+            setDietsData(dietsData.map((diet) => diet.primaryKey));
 
             const { data: itemsData, error: itemsError } = await fetchClientPreferredItems(
                 params.id,
@@ -94,7 +94,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                 setError(`Unable to fetch preferred items data. Log ID: ${itemsError.logId}`);
                 return;
             }
-            setItemsData(itemsData);
+            setItemsData(itemsData.map((item) => item.primaryKey));
         })();
     }, [params.id, searchParams]);
 
