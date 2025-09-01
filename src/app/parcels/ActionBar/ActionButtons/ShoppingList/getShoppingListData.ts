@@ -1,3 +1,4 @@
+import { Diet, Item } from "@/components/Form/formFunctions";
 import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import {
@@ -14,6 +15,7 @@ import {
     fetchFamily,
     fetchClientDiets,
     FetchClientDietaryErrorType,
+    fetchClientPreferredItems,
 } from "@/common/fetch";
 import { prepareClientSummary, prepareRequirementSummary } from "@/common/formatClientsData";
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
@@ -27,12 +29,13 @@ import {
     ShoppingListPdfData,
 } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/shoppingListPdfDataProps";
 import { logErrorReturnLogId } from "@/logger/logger";
+import { fetch } from "next/dist/compiled/@edge-runtime/primitives";
 
 interface ClientDataAndFamilyData {
     clientData: Schema["clients"];
     familyData: Schema["families"][];
-    clientDietsData: string[];
-    clientPreferredItemsData: string[];
+    clientDietsData: Diet[];
+    clientPreferredItemsData: Item[];
 }
 
 type FetchShoppingListResponse =
@@ -74,10 +77,8 @@ const getClientAndFamilyData = async (clientID: string): Promise<FetchShoppingLi
         return { data: null, error: dietsError };
     }
 
-    const { data: clientPreferredItemsData, error: preferredItemsError } = await fetchClientDiets(
-        clientID,
-        supabase
-    );
+    const { data: clientPreferredItemsData, error: preferredItemsError } =
+        await fetchClientPreferredItems(clientID, supabase);
     if (preferredItemsError) {
         return { data: null, error: preferredItemsError };
     }
@@ -143,6 +144,8 @@ const getShoppingListDataForSingleParcel = async (
 
     const familyData = clientAndFamilyData.familyData;
     const clientData = clientAndFamilyData.clientData;
+    const clientDietsData = clientAndFamilyData.clientDietsData;
+    const clientPreferredItemsData = clientAndFamilyData.clientPreferredItemsData;
 
     if (!clientData.is_active) {
         const logId = await logErrorReturnLogId("Generating shopping list pdf for inactive client");
@@ -152,7 +155,7 @@ const getShoppingListDataForSingleParcel = async (
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
         familyData.length,
         parcelInfoAndClientIdData.parcelInfo.listType,
-        clientAndFamilyData.clientDietsData
+        clientDietsData.map((diet) => diet.primaryKey)
     );
 
     if (itemsListError) {
@@ -161,7 +164,11 @@ const getShoppingListDataForSingleParcel = async (
 
     const clientSummary = prepareClientSummary(clientData);
     const householdSummary = prepareHouseholdSummary(familyData);
-    const requirementSummary = prepareRequirementSummary(clientData);
+    const requirementSummary = prepareRequirementSummary(
+        clientData,
+        clientDietsData.map((diet) => diet.name),
+        clientPreferredItemsData.map((item) => item.name)
+    );
 
     const { data: endNotes, error: listsCommentError } = await fetchListsComment(supabase);
     if (listsCommentError) {

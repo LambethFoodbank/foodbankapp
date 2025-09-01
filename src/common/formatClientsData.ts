@@ -6,7 +6,6 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
@@ -23,7 +22,8 @@ export interface RequirementSummary {
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
-    dietaryRequirements: string;
+    diets: string;
+    preferredItems: string;
     otherItems: string;
     cookingFacilities: string;
 }
@@ -58,7 +58,11 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
     };
 };
 
-export const prepareRequirementSummary = (clientData: Schema["clients"]): RequirementSummary => {
+export const prepareRequirementSummary = (
+    clientData: Schema["clients"],
+    clientDiets: string[],
+    clientPreferredItems: string[]
+): RequirementSummary => {
     return {
         hygieneProducts: formatHygieneProducts(
             clientData.hygiene_tampons,
@@ -72,10 +76,8 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
             clientData.baby_other_items
         ),
         petFood: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),
-        dietaryRequirements: formatRequirementsByCanonicalOrder(
-            clientData.dietary_requirements,
-            dietaryRequirementOptions
-        ),
+        diets: clientDiets.join(", ") || "None",
+        preferredItems: clientPreferredItems.join(", ") || "None",
         otherItems: formatRequirementsByCanonicalOrder(
             clientData.other_items,
             otherRequirementOptions
