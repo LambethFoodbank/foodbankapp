@@ -1,39 +1,21 @@
-import { Button } from "@mui/material";
-import ActionAndStatusBar from "../ActionBar/ActionAndStatusBar";
-import { ParcelsTableRow } from "./types";
+import { EmergencyBagsTableRow } from "./types";
 import { ActionsContainer } from "@/components/controlsStyling";
 
 interface PreTableControlsProps {
-    isPackingManagerView: boolean;
-    setIsPackingManagerView: (isPackingManagerView: boolean) => void;
-    selectedParcelMessage: string | null;
-    getCheckedParcelsData: () => Promise<ParcelsTableRow[]>;
-    postCheckedParcelActivity: () => void;
+    selectedEmergencyBagMessage: string | null;
+    getCheckedEmergencyBagsData: () => Promise<EmergencyBagsTableRow[]>;
+    postCheckedEmergencyBagActivity: () => void;
 }
 
 const PreTableControls: React.FC<PreTableControlsProps> = (props) => {
     return (
         <>
-            <Button
-                variant={props.isPackingManagerView ? "outlined" : "contained"}
-                onClick={() => props.setIsPackingManagerView(false)}
-                data-testid="all-parcels-button"
-            >
-                All parcels
-            </Button>
-            <Button
-                variant={props.isPackingManagerView ? "contained" : "outlined"}
-                onClick={() => props.setIsPackingManagerView(true)}
-                data-testid="packing-manager-view-button"
-            >
-                Packing manager view
-            </Button>
-            {props.selectedParcelMessage && <span>{props.selectedParcelMessage}</span>}
+            {props.selectedEmergencyBagMessage && <span>{props.selectedEmergencyBagMessage}</span>}
             <ActionsContainer>
-                <ActionAndStatusBar
-                    fetchSelectedParcels={props.getCheckedParcelsData}
-                    postCheckedParcelActivity={props.postCheckedParcelActivity}
-                />
+                {/*<ActionAndStatusBar*/}
+                {/*    fetchSelectedParcels={props.getCheckedEmergencyBagsData}*/}
+                {/*    postCheckedParcelActivity={props.postCheckedEmergencyBagActivity}*/}
+                {/*/>*/}
             </ActionsContainer>
         </>
     );

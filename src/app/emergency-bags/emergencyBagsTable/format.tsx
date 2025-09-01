@@ -1,75 +1,30 @@
 import React from "react";
-import {
-    displayNameForDeletedClient,
-    formatDateTime,
-    formatDatetimeAsDate,
-    displayPostcodeForHomelessClient,
-} from "@/common/format";
-import {
-    FetchClientIdAndIsActiveError,
-    GetParcelDataAndCountErrorType,
-    ParcelsTableRow,
-} from "./types";
-import CongestionChargeAppliesIcon from "@/components/Icons/CongestionChargeAppliesIcon";
-import DeliveryIcon from "@/components/Icons/DeliveryIcon";
-import FlaggedForAttentionIcon from "@/components/Icons/FlaggedForAttentionIcon";
-import PhoneIcon from "@/components/Icons/PhoneIcon";
+import { formatDateTime, formatDatetimeAsDate } from "@/common/format";
+import { EmergencyBagsTableRow, GetEmergencyBagDataAndCountErrorType } from "./types";
 import CollectionIcon from "@/components/Icons/CollectionIcon";
 import { useTheme } from "styled-components";
-import HotelIcon from "@/components/Icons/HotelIcon";
-
-const RowToIconsColumn = ({
-    flaggedForAttention,
-    requiresFollowUpPhoneCall,
-}: ParcelsTableRow["iconsColumn"]): React.ReactElement => {
-    const theme = useTheme();
-    return (
-        <>
-            {flaggedForAttention && <FlaggedForAttentionIcon />}
-            {requiresFollowUpPhoneCall && <PhoneIcon color={theme.main.largeForeground[0]} />}
-        </>
-    );
-};
 
 const RowToDeliveryCollectionColumn = (
-    collectionData: ParcelsTableRow["deliveryCollection"]
+    collectionData: EmergencyBagsTableRow["deliveryCollection"]
 ): React.ReactElement => {
     const theme = useTheme();
-    const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies, listType } =
-        collectionData;
+    const { collectionCentreName, collectionCentreAcronym } = collectionData;
     const icons: React.ReactNode[] = [];
 
-    if (listType === "hotel") {
-        icons.push(
-            <>
-                <HotelIcon color={theme.main.largeForeground[0]} />
-            </>
-        );
-    }
-
-    if (collectionCentreName === "Delivery") {
-        icons.push(
-            <>
-                <DeliveryIcon color={theme.main.largeForeground[0]} />
-                {congestionChargeApplies && <CongestionChargeAppliesIcon />}
-            </>
-        );
-    } else {
-        icons.push(
-            <>
-                <CollectionIcon
-                    color={theme.main.largeForeground[0]}
-                    collectionPoint={collectionCentreName}
-                />
-                {collectionCentreAcronym}
-            </>
-        );
-    }
+    icons.push(
+        <>
+            <CollectionIcon
+                color={theme.main.largeForeground[0]}
+                collectionPoint={collectionCentreName}
+            />
+            {collectionCentreAcronym}
+        </>
+    );
 
     return <>{icons}</>;
 };
 
-const rowToLastStatusColumn = (data: ParcelsTableRow["lastStatus"] | null): string => {
+const rowToLastStatusColumn = (data: EmergencyBagsTableRow["lastStatus"] | null): string => {
     if (!data) {
         return "";
     }
@@ -79,52 +34,33 @@ const rowToLastStatusColumn = (data: ParcelsTableRow["lastStatus"] | null): stri
     );
 };
 
-const formatNullPostcode = (postcodeData: ParcelsTableRow["addressPostcode"]): string => {
-    return postcodeData ?? displayPostcodeForHomelessClient;
-};
-
-export const parcelTableColumnDisplayFunctions = {
-    iconsColumn: RowToIconsColumn,
+export const emergencyBagTableColumnDisplayFunctions = {
     deliveryCollection: RowToDeliveryCollectionColumn,
     packingDate: formatDatetimeAsDate,
     lastStatus: rowToLastStatusColumn,
-    addressPostcode: formatNullPostcode,
     createdAt: formatDateTime,
 };
 
 export const getEmergencyBagDataErrorMessage = (
-    errorType: GetParcelDataAndCountErrorType
+    errorType: GetEmergencyBagDataAndCountErrorType
 ): string | null => {
     switch (errorType) {
         case "unknownError":
             return "Unknown error has occurred. Please reload.";
-        case "failedToFetchParcels":
-            return "Failed to fetch parcels. Please reload.";
-        case "failedToRetrieveCongestionChargeDetails":
-            return "Failed to retrieve Congestion Charge details. Please reload.";
+        case "failedToFetchEmergencyBags":
+            return "Failed to fetch emergency bags. Please reload.";
         case "abortedFetch":
             return null;
     }
 };
 
-export const getClientIdAndIsActiveErrorMessage = (
-    error: FetchClientIdAndIsActiveError
+export const getSelectedEmergencyBagCountMessage = (
+    numberOfSelectedEmergencyBags: number
 ): string | null => {
-    switch (error.type) {
-        case "failedClientIdAndIsActiveFetch":
-            return `Failed to fetch client ID and is active for the selected parcel. Please reload. Log ID: ${error.logId}`;
-        case "noMatchingClient":
-            return `No matching client for the selected parcel. Please reload. Log ID: ${error.logId}`;
-    }
-};
-
-export const getSelectedParcelCountMessage = (numberOfSelectedParcels: number): string | null => {
-    if (numberOfSelectedParcels === 0) {
+    if (numberOfSelectedEmergencyBags === 0) {
         return null;
     }
-    return numberOfSelectedParcels === 1
-        ? "1 parcel selected"
-        : `${numberOfSelectedParcels} parcels selected`;
+    return numberOfSelectedEmergencyBags === 1
+        ? "1 emergency bag selected"
+        : `${numberOfSelectedEmergencyBags} emergency bags selected`;
 };
-
-export const parcelsPageDeletedClientDisplayName = `(${displayNameForDeletedClient})`;

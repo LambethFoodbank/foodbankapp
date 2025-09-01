@@ -38,15 +38,6 @@ const emergencyBagsSortableColumns: SortOptions<EmergencyBagsTableRow, Emergency
                     .order("emergency_bag_id"),
         },
         {
-            key: "lastStatus",
-            sortMethod: (sortDirection, query) =>
-                query
-                    .order("last_status_workflow_order", { ascending: sortDirection === "asc" })
-                    .order("packing_date")
-                    .order("collection_centre_name")
-                    .order("emergency_bag_id"),
-        },
-        {
             key: "createdAt",
             sortMethod: (sortDirection, query) =>
                 query

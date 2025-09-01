@@ -2,7 +2,6 @@ import { TableHeaders } from "@/components/Tables/Table";
 import { EmergencyBagsTableRow } from "./types";
 
 export const emergencyBagTableHeaderKeysAndLabels: TableHeaders<EmergencyBagsTableRow> = [
-    ["iconsColumn", ""],
     ["type", "Type"],
     ["amount", "Amount"],
     ["deliveryCollection", "Hub"],
@@ -12,7 +11,6 @@ export const emergencyBagTableHeaderKeysAndLabels: TableHeaders<EmergencyBagsTab
 ];
 
 export const emergencyBagTableDefaultShownHeaders: (keyof EmergencyBagsTableRow)[] = [
-    "iconsColumn",
     "type",
     "amount",
     "deliveryCollection",

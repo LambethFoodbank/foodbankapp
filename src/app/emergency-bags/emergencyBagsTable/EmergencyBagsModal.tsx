@@ -6,7 +6,6 @@ import ExpandedParcelDetails from "../ExpandedEmergencyBagDetails";
 import ExpandedEmergencyBagDetailsFallback from "../ExpandedEmergencyBagDetailsFallback";
 import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
-import Statuses from "../ActionBar/Statuses";
 import Modal from "@/components/Modal/Modal";
 import { Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
 import LinkButton from "@/components/Buttons/LinkButton";
@@ -16,6 +15,7 @@ import { useTheme } from "styled-components";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import { Button } from "@mui/material";
 import { ArrowDropDown } from "@mui/icons-material";
+import Statuses from "@/app/parcels/ActionBar/Statuses";
 
 interface ParcelsModalProps {
     modalIsOpen: boolean;

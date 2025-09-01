@@ -1,4 +1,4 @@
-import { BreakPointConfig, Row, ServerPaginatedTable } from "@/components/Tables/Table";
+import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import {
@@ -6,11 +6,10 @@ import {
     numberOfParcelsPerPageOptions,
 } from "@/app/parcels/parcelsTable/constants";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { EmergencyBagsFilter, EmergencyBagsSortState, EmergencyBagsTableRow } from "./types";
 import { getEmergencyBagsTableDataAndAllIds } from "./fetchEmergencyBagTableData";
-import { getEmergencyBagDataErrorMessage } from "./format";
+import { emergencyBagTableColumnDisplayFunctions, getEmergencyBagDataErrorMessage } from "./format";
 import { DbEmergencyBagRow } from "@/databaseUtils";
 import {
     emergencyBagTableDefaultShownHeaders,
@@ -21,6 +20,7 @@ import emergencyBagsSortableColumns, {
     defaultEmergencyBagsSortConfig,
 } from "@/app/emergency-bags/emergencyBagsTable/sortableColumns";
 import supabase from "@/supabaseClient";
+import { parcelTableColumnStyleOptions } from "@/app/parcels/parcelsTable/styles";
 
 interface EmergencyBagsTableProps {
     checkedEmergencyBagIds: string[];
@@ -53,10 +53,6 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
     >([]);
     const [filteredEmergencyBagCount, setFilteredEmergencyBagCount] = useState<number>(0);
     const [allFilteredEmergencyBagIds, setAllFilteredEmergencyBagIds] = useState<string[]>([]);
-
-    const [emergencyBagRowBreakPointConfig, setEmergencyBagRowBreakPointConfig] = useState<
-        BreakPointConfig[]
-    >([]);
 
     const [isAllCheckBoxSelected, setAllCheckBoxSelected] = useState(false);
     const fetchEmergencyBagsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -99,19 +95,19 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
                 setFilteredEmergencyBagCount(data.allEmergencyBagIds.length);
                 setAllFilteredEmergencyBagIds(data.allEmergencyBagIds);
 
-                if (sortState.sortEnabled && sortState.column.headerKey) {
-                    setEmergencyBagRowBreakPointConfig(
-                        searchForBreakPoints(sortState.column.headerKey, data.emergencyBagTableRows)
-                    );
-                } else {
-                    // The user hasn't request a specific sort, so breakpoints are as per default sorting
-                    setEmergencyBagRowBreakPointConfig(
-                        searchForBreakPoints(
-                            defaultEmergencyBagsSortConfig.defaultColumnHeaderKey as keyof EmergencyBagsTableRow,
-                            data.emergencyBagTableRows
-                        )
-                    );
-                }
+                // if (sortState.sortEnabled && sortState.column.headerKey) {
+                //     setEmergencyBagRowBreakPointConfig(
+                //         searchForBreakPoints(sortState.column.headerKey, data.emergencyBagTableRows)
+                //     );
+                // } else {
+                //     // The user hasn't request a specific sort, so breakpoints are as per default sorting
+                //     setEmergencyBagRowBreakPointConfig(
+                //         searchForBreakPoints(
+                //             defaultEmergencyBagsSortConfig.defaultColumnHeaderKey as keyof EmergencyBagsTableRow,
+                //             data.emergencyBagTableRows
+                //         )
+                //     );
+                // }
             }
 
             emergencyBagsTableFetchAbortController.current = null;
@@ -224,8 +220,6 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
         openEmergencyBagModal(row.data.emergencyBagId);
     };
 
-    let emergencyBagTableColumnDisplayFunctions;
-    let emergencyBagTableColumnStyleOptions;
     return (
         <TableSurface>
             <ServerPaginatedTable<
@@ -245,7 +239,7 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
                 }}
                 headerKeysAndLabels={emergencyBagTableHeaderKeysAndLabels}
                 columnDisplayFunctions={emergencyBagTableColumnDisplayFunctions}
-                columnStyleOptions={emergencyBagTableColumnStyleOptions}
+                columnStyleOptions={parcelTableColumnStyleOptions}
                 onRowClick={onEmergencyBagTableRowClick}
                 sortConfig={{
                     sortPossible: true,
@@ -253,7 +247,6 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
                     setSortState: setSortState,
                 }}
                 defaultSortConfig={defaultEmergencyBagsSortConfig}
-                rowBreakPointConfigs={emergencyBagRowBreakPointConfig}
                 filterConfig={{
                     primaryFiltersShown: false,
                     additionalFiltersShown: false,

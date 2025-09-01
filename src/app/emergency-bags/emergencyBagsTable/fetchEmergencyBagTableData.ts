@@ -1,46 +1,33 @@
 import { Supabase } from "@/supabaseUtils";
-import { DatabaseError, EdgeFunctionError } from "../../errorClasses";
+import { DatabaseError } from "../../errorClasses";
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
-import { DbParcelRow } from "@/databaseUtils";
+import { DbEmergencyBagRow } from "@/databaseUtils";
 import {
-    ParcelsFilters,
-    ParcelsSortState,
-    GetDbParcelDataResult,
-    GetParcelDataAndIdsResult,
-    GetParcelDataAndCountErrorType,
-    ParcelsTableRow,
-    ParcelStatusesReturnType,
-    FetchClientIdResult,
-    ParcelPostcodeResult,
-    ParcelsFiltersAllStates,
+    EmergencyBagsFilters,
+    EmergencyBagsSortState,
+    EmergencyBagsFiltersAllStates,
+    GetDbEmergencyBagDataResult,
+    GetEmergencyBagDataAndCountErrorType,
+    EmergencyBagsTableRow,
+    GetEmergencyBagDataAndIdsResult,
+    EmergencyBagStatusesReturnType,
 } from "./types";
-import { checkForCongestionCharge, CongestionChargeReturnType } from "@/common/congestionCharges";
 import convertEmergencyBagDBtoEBRow from "./convertEmergencyBagDBtoEBRow";
-import { StatusType } from "@/app/parcels/ActionBar/saveStatus";
-import { defaultParcelsSort, defaultParcelsSortConfig } from "./sortableColumns";
+import { defaultEmergencyBagsSort, defaultEmergencyBagsSortConfig } from "./sortableColumns";
 import { DbQuery } from "@/components/Tables/Filters";
 
-const getCongestionChargeDetailsForParcelsTable = async (
-    processingData: DbParcelRow[]
-): Promise<CongestionChargeReturnType> => {
-    const postcodes = [];
-    for (const parcel of processingData) {
-        postcodes.push(parcel.client_address_postcode);
-    }
-
-    return await checkForCongestionCharge(postcodes);
-};
-
-const getParcelsQuery = (
+const getEmergencyBagsQuery = (
     supabase: Supabase,
-    filters: ParcelsFilters,
-    sortState: ParcelsSortState,
+    filters: EmergencyBagsFilters,
+    sortState: EmergencyBagsSortState,
     selectString = "*"
-): DbQuery<DbParcelRow> => {
-    let query = supabase.from("parcels_plus").select(selectString) as DbQuery<DbParcelRow>;
+): DbQuery<DbEmergencyBagRow> => {
+    let query = supabase
+        .from("emergency_bags_plus")
+        .select(selectString) as DbQuery<DbEmergencyBagRow>;
 
-    filters.forEach((filter: ParcelsFiltersAllStates) => {
+    filters.forEach((filter: EmergencyBagsFiltersAllStates) => {
         // We know that filter.method and filter.state are compatible, but it doesn't work with filter defined
         // through interfaces. Ideally we would rewrite filters to be classes so it's all consistent.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,60 +37,63 @@ const getParcelsQuery = (
     if (sortState.sortEnabled && sortState.column.sortMethod) {
         query = sortState.column.sortMethod(sortState.sortDirection, query);
     } else {
-        query = defaultParcelsSort(defaultParcelsSortConfig.defaultSortDirection, query);
+        query = defaultEmergencyBagsSort(
+            defaultEmergencyBagsSortConfig.defaultSortDirection,
+            query
+        );
     }
 
-    query = query.order("parcel_id");
+    query = query.order("emergency_bag_id");
 
     return query;
 };
 
-const fetchParcelsDbRows = async (
+const fetchEmergencyBagsDbRows = async (
     supabase: Supabase,
-    filters: ParcelsFilters,
-    sortState: ParcelsSortState,
+    filters: EmergencyBagsFilters,
+    sortState: EmergencyBagsSortState,
     abortSignal: AbortSignal,
     startIndex: number,
     endIndex: number
-): Promise<GetDbParcelDataResult> => {
-    let query = getParcelsQuery(supabase, filters, sortState);
+): Promise<GetDbEmergencyBagDataResult> => {
+    let query = getEmergencyBagsQuery(supabase, filters, sortState);
     query = query.range(startIndex, endIndex);
     query = query.abortSignal(abortSignal);
 
     const { data, error } = (await query) as {
-        data: DbParcelRow[];
+        data: DbEmergencyBagRow[];
         error: Error | null;
     };
 
     if (error) {
         const logId = abortSignal.aborted
-            ? await logInfoReturnLogId("Aborted fetch: parcel table", {}, error)
-            : await logErrorReturnLogId("Error with fetch: parcel table", {}, error);
+            ? await logInfoReturnLogId("Aborted fetch: emergency bag table", {}, error)
+            : await logErrorReturnLogId("Error with fetch: emergency bag table", {}, error);
 
         return {
-            parcels: null,
+            emergencyBags: null,
             error: {
-                type: abortSignal.aborted ? "abortedFetch" : "failedToFetchParcelTable",
+                type: abortSignal.aborted ? "abortedFetch" : "failedToFetchEmergencyBagTable",
                 logId,
             },
         };
     }
 
     return {
-        parcels: data,
+        emergencyBags: data,
         error: null,
     };
 };
 
 export const getEmergencyBagsTableDataAndAllIds = async (
     supabase: Supabase,
-    filters: ParcelsFilters,
-    sortState: ParcelsSortState,
+    filters: EmergencyBagsFilters,
+    sortState: EmergencyBagsSortState,
     abortSignal: AbortSignal,
     startIndex: number,
     endIndex: number
-): Promise<GetParcelDataAndIdsResult> => {
-    const { parcels, error: getDbParcelsError } = await fetchParcelsDbRows(
+): Promise<GetEmergencyBagDataAndIdsResult> => {
+    const { emergencyBags, error: getDbEmergencyBagsError } = await fetchEmergencyBagsDbRows(
         supabase,
         filters,
         sortState,
@@ -112,14 +102,14 @@ export const getEmergencyBagsTableDataAndAllIds = async (
         endIndex
     );
 
-    if (getDbParcelsError) {
-        let errorType: GetParcelDataAndCountErrorType;
-        switch (getDbParcelsError.type) {
+    if (getDbEmergencyBagsError) {
+        let errorType: GetEmergencyBagDataAndCountErrorType;
+        switch (getDbEmergencyBagsError.type) {
             case "abortedFetch":
                 errorType = "abortedFetch";
                 break;
-            case "failedToFetchParcelTable":
-                errorType = "failedToFetchParcels";
+            case "failedToFetchEmergencyBagTable":
+                errorType = "failedToFetchEmergencyBags";
                 break;
         }
 
@@ -127,143 +117,116 @@ export const getEmergencyBagsTableDataAndAllIds = async (
             data: null,
             error: {
                 type: errorType,
-                logId: getDbParcelsError.logId,
+                logId: getDbEmergencyBagsError.logId,
             },
         };
     }
 
-    const { data: congestionChargeData, error: congestionChargeError } =
-        await getCongestionChargeDetailsForParcelsTable(parcels);
+    const { emergencyBagTableRows, error } = await convertEmergencyBagDBtoEBRow(emergencyBags);
 
-    if (congestionChargeError) {
+    if (error) {
         return {
             data: null,
-            error: congestionChargeError,
+            error: {
+                type: "failedToFetchEmergencyBags",
+                logId: error.logId,
+            },
         };
     }
 
-    const { parcelTableRows, error } = await convertEmergencyBagDBtoEBRow(
-        parcels,
-        congestionChargeData
-    );
-
-    if (error) {
-        switch (error.type) {
-            case "invalidInputLengths":
-                return {
-                    data: null,
-                    error: {
-                        type: "unknownError",
-                        logId: error.logId,
-                    },
-                };
-        }
-    }
-
-    const allParcelIds = await getParcelIds(supabase, filters, sortState, abortSignal);
+    const allEmergencyBagIds = await getEmergencyBagIds(supabase, filters, sortState, abortSignal);
 
     return {
         data: {
-            parcelTableRows,
-            allParcelIds,
+            emergencyBagTableRows,
+            allEmergencyBagIds,
         },
         error: null,
     };
 };
 
-export const getParcelIds = async (
+export const getEmergencyBagIds = async (
     supabase: Supabase,
-    filters: ParcelsFilters,
-    sortState: ParcelsSortState,
+    filters: EmergencyBagsFilters,
+    sortState: EmergencyBagsSortState,
     abortSignal: AbortSignal | null = null
 ): Promise<string[]> => {
-    const query = getParcelsQuery(supabase, filters, sortState, "parcel_id");
+    const query = getEmergencyBagsQuery(supabase, filters, sortState, "emergency_bag_id");
 
     if (abortSignal) {
         query.abortSignal(abortSignal);
     }
 
     const { data, error } = (await query) as {
-        data: { parcel_id: string }[];
+        data: { emergency_bag_id: string }[];
         error: Error | null;
     };
 
     if (error) {
         if (abortSignal && abortSignal.aborted) {
-            await logInfoReturnLogId("Aborted fetch: parcel IDs", {}, error);
+            await logInfoReturnLogId("Aborted fetch: emergency bag IDs", {}, error);
             return [];
         } else {
             const logId = await logErrorReturnLogId("Error with fetch", {}, error);
-            throw new DatabaseError("fetch", "parcels", logId);
+            throw new DatabaseError("fetch", "emergency bags", logId);
         }
     }
 
-    return data.map((parcel) => parcel.parcel_id);
+    return data.map((emergencyBag) => emergencyBag.emergency_bag_id);
 };
 
-export const getParcelsByIds = async (
+export const getEmergencyBagsByIds = async (
     supabase: Supabase,
-    parcelIds: string[]
-): Promise<ParcelsTableRow[]> => {
+    emergencyBagIds: string[]
+): Promise<EmergencyBagsTableRow[]> => {
     const query = supabase
-        .from("parcels_plus")
+        .from("emergency_bags_plus")
         .select("*")
-        .in("parcel_id", parcelIds) as DbQuery<DbParcelRow>;
+        .in("emergency_bags_id", emergencyBagIds) as DbQuery<DbEmergencyBagRow>;
 
-    return runParcelsQueryAndConvertToParcelTableRows(query);
+    return runEmergencyBagsQueryAndConvertToEmergencyBagTableRows(query);
 };
 
-export const getParcelsByIdsWithFiltersAndSorting = async (
+export const getEmergencyBagsByIdsWithFiltersAndSorting = async (
     supabase: Supabase,
-    filters: ParcelsFilters,
-    sortState: ParcelsSortState,
-    parcelIds: string[]
-): Promise<ParcelsTableRow[]> => {
-    const query = getParcelsQuery(supabase, filters, sortState);
-    if (parcelIds) {
-        query.in("parcel_id", parcelIds);
+    filters: EmergencyBagsFilters,
+    sortState: EmergencyBagsSortState,
+    emergencyBagIds: string[]
+): Promise<EmergencyBagsTableRow[]> => {
+    const query = getEmergencyBagsQuery(supabase, filters, sortState);
+    if (emergencyBagIds) {
+        query.in("emergency_bag_id", emergencyBagIds);
     }
 
-    return runParcelsQueryAndConvertToParcelTableRows(query);
+    return runEmergencyBagsQueryAndConvertToEmergencyBagTableRows(query);
 };
 
-const runParcelsQueryAndConvertToParcelTableRows = async (
-    query: DbQuery<DbParcelRow>
-): Promise<ParcelsTableRow[]> => {
+const runEmergencyBagsQueryAndConvertToEmergencyBagTableRows = async (
+    query: DbQuery<DbEmergencyBagRow>
+): Promise<EmergencyBagsTableRow[]> => {
     const { data, error } = (await query) as {
-        data: DbParcelRow[];
+        data: DbEmergencyBagRow[];
         error: Error | null;
     };
     if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: parcel table", {}, error);
-        throw new DatabaseError("fetch", "parcel table", logId);
+        const logId = await logErrorReturnLogId("Error with fetch: emergency bag table", {}, error);
+        throw new DatabaseError("fetch", "emergency bag table", logId);
     }
 
-    const { data: congestionChargeDetails, error: congestionChargeError } =
-        await getCongestionChargeDetailsForParcelsTable(data);
+    const { emergencyBagTableRows, error: processEmergencyBagDataError } =
+        await convertEmergencyBagDBtoEBRow(data);
 
-    if (congestionChargeError) {
-        const logId = await logErrorReturnLogId(
-            "Error retrieving congestion charge details",
-            congestionChargeError
-        );
-        throw new EdgeFunctionError("congestion charge check", logId);
+    if (processEmergencyBagDataError) {
+        throw new Error("Failed to process emergency bags.", {
+            cause: processEmergencyBagDataError,
+        });
     }
 
-    const { parcelTableRows, error: processParcelDataError } = await convertEmergencyBagDBtoEBRow(
-        data,
-        congestionChargeDetails
-    );
-
-    if (processParcelDataError) {
-        throw new Error("Failed to process parcels.", { cause: processParcelDataError });
-    }
-
-    return parcelTableRows;
+    return emergencyBagTableRows;
 };
 
-export const fetchParcelStatuses = async (): Promise<ParcelStatusesReturnType> => {
-    const { data: parcelStatusesListData, error: statusOrderError } = await supabase
+export const fetchEmergencyBagStatuses = async (): Promise<EmergencyBagStatusesReturnType> => {
+    const { data: emergencyBagStatusesListData, error: statusOrderError } = await supabase
         .from("status_order")
         .select("event_name")
         .order("workflow_order");
@@ -275,55 +238,9 @@ export const fetchParcelStatuses = async (): Promise<ParcelStatusesReturnType> =
         return { data: null, error: { type: "failedToFetchStatuses", logId } };
     }
 
-    const parcelStatusesList = parcelStatusesListData.map((status) => {
+    const emergencyBagStatusesList = emergencyBagStatusesListData.map((status) => {
         return status.event_name;
     });
 
-    return { data: parcelStatusesList, error: null };
-};
-
-export const getClientIdAndIsActive = async (parcelId: string): Promise<FetchClientIdResult> => {
-    const { data, error } = await supabase
-        .from("parcels")
-        .select("client_id, client:clients(is_active)")
-        .eq("primary_key", parcelId)
-        .single();
-
-    if (error) {
-        const message = `Failed to fetch client ID and is active for a parcel with ID ${parcelId}`;
-        const logId = await logErrorReturnLogId(message, { error });
-        return { data: null, error: { type: "failedClientIdAndIsActiveFetch", logId } };
-    }
-
-    if (data.client === null) {
-        const message = `Failed to find matching client for a parcel with ID ${parcelId}`;
-        const logId = await logErrorReturnLogId(message, { error });
-        return { data: null, error: { type: "noMatchingClient", logId } };
-    }
-
-    return {
-        data: { clientId: data.client_id, isClientActive: data?.client?.is_active },
-        error: null,
-    };
-};
-
-export const getParcelPostcodesByEvent = async (
-    targetEventName: StatusType,
-    parcelIds: string[]
-): Promise<ParcelPostcodeResult> => {
-    const { data, error } = await supabase
-        .from("parcels_plus")
-        .select("client_address_postcode, events!inner(new_parcel_status)")
-        .in("parcel_id", parcelIds)
-        .eq("events.new_parcel_status", targetEventName);
-
-    if (error) {
-        const logId = await logErrorReturnLogId("Failed to fetch parcels with events", error);
-        return { postcodes: null, error: { type: "failedToFetchParcelTable", logId: logId } };
-    }
-
-    const postcodes = data.map((parcel) => parcel.client_address_postcode);
-    const uniquePostcodes = Array.from(new Set(postcodes));
-
-    return { postcodes: uniquePostcodes, error: null };
+    return { data: emergencyBagStatusesList, error: null };
 };

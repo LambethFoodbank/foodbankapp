@@ -3,17 +3,14 @@ import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Fi
 import { SortState } from "@/components/Tables/Table";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { DbEmergencyBagRow, EmergencyBagStatus, Schema } from "@/databaseUtils";
-import { ListType } from "@/common/databaseListTypes";
 
 export interface EmergencyBagsTableRow {
-    emergencyBagId: Schema["parcels"]["primary_key"];
+    emergencyBagId: Schema["emergency_bags"]["id"];
     type: string;
     amount: number;
     deliveryCollection: {
         collectionCentreName: string;
         collectionCentreAcronym: string;
-        congestionChargeApplies: boolean;
-        listType: ListType | null;
     };
     lastStatus: {
         name: string;
@@ -22,10 +19,6 @@ export interface EmergencyBagsTableRow {
         workflowOrder: number;
     } | null;
     allStatuses: string[] | null;
-    iconsColumn: {
-        flaggedForAttention: boolean;
-        requiresFollowUpPhoneCall: boolean;
-    };
     packingDate: Date | null;
     createdAt: Date | null;
 }
@@ -49,8 +42,7 @@ export type GetEmergencyBagDataAndIdsResult =
 export type GetEmergencyBagDataAndCountErrorType =
     | "unknownError"
     | "failedToFetchEmergencyBags"
-    | "abortedFetch"
-    | "failedToRetrieveCongestionChargeDetails";
+    | "abortedFetch";
 
 export interface CollectionCentresOptions {
     key: string;
@@ -85,11 +77,6 @@ export type EmergencyBagsFiltersAllStates =
 export type EmergencyBagsFilters = EmergencyBagsFiltersAllStates[];
 export type EmergencyBagsSortMethod = ServerSideSortMethod<DbEmergencyBagRow>;
 export type EmergencyBagsSortState = SortState<EmergencyBagsTableRow, EmergencyBagsSortMethod>;
-
-export type CongestionChargeDetails = {
-    postcode: string;
-    congestionCharge: boolean;
-};
 
 export type GetDbEmergencyBagDataResult =
     | {

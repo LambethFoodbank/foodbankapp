@@ -32,7 +32,10 @@ import { DbParcelRow } from "@/databaseUtils";
 import dayjs from "dayjs";
 import { PreTableControlsContainer } from "@/components/controlsStyling";
 import EmergencyBagsTable from "@/app/emergency-bags/emergencyBagsTable/EmergencyBagsTable";
-import { EmergencyBagsSortState } from "@/app/emergency-bags/emergencyBagsTable/types";
+import {
+    EmergencyBagsSortState,
+    EmergencyBagsFiltersAllStates,
+} from "@/app/emergency-bags/emergencyBagsTable/types";
 import { getDbDate } from "@/common/format";
 
 type ParcelTableFilterState = string | DateRangeState | string[];
@@ -60,6 +63,15 @@ const ParcelsPage: React.FC = () => {
     const [urlParamsHaveBeenProcessed, setUrlParamsHaveBeenProcessed] = useState<boolean>(false);
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const [checkedEmergencyBagIds, setCheckedEmergencyBagIds] = useState<string[]>([]);
+    const [emergencyBagsSortState, setEmergencyBagsSortState] = useState<EmergencyBagsSortState>({
+        sortEnabled: false,
+    });
+    const [emergencyBagsError, setEmergencyBagsError] = useState<string | null>(null);
+    const [emergencyBagsFilters, setEmergencyBagsFilters] = useState<
+        EmergencyBagsFiltersAllStates[]
+    >([]);
 
     const selectedParcelMessage = getSelectedParcelCountMessage(checkedParcelIds.length);
 
@@ -114,6 +126,11 @@ const ParcelsPage: React.FC = () => {
             ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
             : [...primaryFilters, ...additionalFilters];
     }, [isPackingManagerView, packingManagerViewPrimaryFilters, primaryFilters, additionalFilters]);
+
+    // Create emergency bags filters based on current applied filters
+    const emergencyBagsAppliedFilters = useMemo(() => {
+        return emergencyBagsFilters;
+    }, [emergencyBagsFilters]);
 
     useEffect(() => {
         if (!urlParamsHaveBeenProcessed) {
@@ -172,12 +189,13 @@ const ParcelsPage: React.FC = () => {
         mergeParamsIntoURL(paramsRecord);
     };
 
-
     useEffect(() => {
-        const checkEBs = async () => {
-            const dateFilter = currentlyAppliedFilters.find(filter => filter.key === "packingDate");
+        const checkEBs = async (): Promise<void> => {
+            const dateFilter = currentlyAppliedFilters.find(
+                (filter) => filter.key === "packingDate"
+            );
 
-            if (!dateFilter || !dateFilter.state || typeof dateFilter.state !== 'object') {
+            if (!dateFilter || !dateFilter.state || typeof dateFilter.state !== "object") {
                 setHasEBs(false);
                 return;
             }
@@ -263,26 +281,16 @@ const ParcelsPage: React.FC = () => {
                     />
                     {hasEBs && (
                         <EmergencyBagsTable
-                            checkedEmergencyBagIds={[]}
-                            setCheckedEmergencyBagIds={function (ids: string[]): void {
-                                throw new Error("Function not implemented.");
-                            }}
-                            openEmergencyBagModal={function (emergencyBagId: string): void {
-                                throw new Error("Function not implemented.");
-                            }}
-                            sortState={{
-                                sortEnabled: false,
-                            }}
-                            setSortState={function (sortState: EmergencyBagsSortState): void {
-                                throw new Error("Function not implemented.");
-                            }}
-                            appliedFilters={[]}
+                            checkedEmergencyBagIds={checkedEmergencyBagIds}
+                            setCheckedEmergencyBagIds={setCheckedEmergencyBagIds}
+                            openEmergencyBagModal={openParcelModalAndUpdateURL}
+                            sortState={emergencyBagsSortState}
+                            setSortState={setEmergencyBagsSortState}
+                            appliedFilters={emergencyBagsAppliedFilters}
                             areFiltersLoadingForFirstTime={false}
-                            setErrorMessage={function (errorMessage: string | null): void {
-                                throw new Error("Function not implemented.");
-                            }}
-                        ></EmergencyBagsTable>)}
-                    }
+                            setErrorMessage={setEmergencyBagsError}
+                        />
+                    )}
                     <ParcelsModal
                         modalIsOpen={modalIsOpen}
                         selectedParcelId={selectedParcelId}
