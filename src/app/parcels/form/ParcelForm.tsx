@@ -308,6 +308,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     useEffect(() => {
         // If the Shipping Method changes, errors for collection date and slot should be reset
         if (fields.shippingMethod == "Collection") {
+            console.log(availableDaysForCentre);
             setFormErrors((prevErrors) => ({
                 ...prevErrors,
                 collectionCentre: switchErrorForCollectionCentre(
@@ -322,7 +323,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 ),
                 collectionSlot: switchErrorForCollectionSlot(
                     fields,
-                    collectionSlotsLabelsAndValues
+                    collectionSlotsLabelsAndValues,
+                    availableDaysForCentre
                 ),
             }));
         }

@@ -67,7 +67,8 @@ export function switchErrorForCollectionDate(
 
 export function switchErrorForCollectionSlot(
     fields: ParcelFields,
-    collectionSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues
+    collectionSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues,
+    availableDaysForCentre: DbAvailableDaysType
 ): Errors {
     // Slot field is required
     if (!fields.collectionSlot || fields.collectionSlot === "-") {
@@ -76,14 +77,15 @@ export function switchErrorForCollectionSlot(
 
     // The collection slot should be one of the available options for the centre
     if (
-        collectionSlotsLabelsAndValues.some(
+        !collectionSlotsLabelsAndValues.some(
             (slotLabelAndValue) => slotLabelAndValue[1] === fields.collectionSlot
-        )
+        ) ||
+        !availableDaysForCentre.some((day) => day.is_active)
     ) {
-        return Errors.none;
+        return Errors.invalidCollectionSlot;
     }
 
-    return Errors.invalidCollectionSlot;
+    return Errors.none;
 }
 
 export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructions) => {
