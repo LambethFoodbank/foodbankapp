@@ -91,6 +91,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
             .from("lists")
             .select("primary_key, item_name, item_type, list_type")
             .in("item_type", ["alternative_food", "regular_food"])
+            .order("list_type")
             .order("item_name");
         setItems(
             (itemsData ?? []).map((item) => ({
