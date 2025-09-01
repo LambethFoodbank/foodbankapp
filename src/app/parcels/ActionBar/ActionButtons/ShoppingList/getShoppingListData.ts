@@ -12,6 +12,8 @@ import {
     fetchClient,
     fetchListsComment,
     fetchFamily,
+    fetchClientDiets,
+    FetchClientDietaryErrorType,
 } from "@/common/fetch";
 import { prepareClientSummary, prepareRequirementSummary } from "@/common/formatClientsData";
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
@@ -29,6 +31,8 @@ import { logErrorReturnLogId } from "@/logger/logger";
 interface ClientDataAndFamilyData {
     clientData: Schema["clients"];
     familyData: Schema["families"][];
+    clientDietsData: string[];
+    clientPreferredItemsData: string[];
 }
 
 type FetchShoppingListResponse =
@@ -41,7 +45,10 @@ type FetchShoppingListResponse =
           error: FetchShoppingListError;
       };
 
-type FetchShoppingListErrorType = FetchClientErrorType | FetchFamilyErrorType;
+type FetchShoppingListErrorType =
+    | FetchClientErrorType
+    | FetchFamilyErrorType
+    | FetchClientDietaryErrorType;
 
 interface FetchShoppingListError {
     type: FetchShoppingListErrorType;
@@ -62,7 +69,28 @@ const getClientAndFamilyData = async (clientID: string): Promise<FetchShoppingLi
         return { data: null, error: familyError };
     }
 
-    return { data: { clientData: clientData, familyData: familyData }, error: null };
+    const { data: clientDietsData, error: dietsError } = await fetchClientDiets(clientID, supabase);
+    if (dietsError) {
+        return { data: null, error: dietsError };
+    }
+
+    const { data: clientPreferredItemsData, error: preferredItemsError } = await fetchClientDiets(
+        clientID,
+        supabase
+    );
+    if (preferredItemsError) {
+        return { data: null, error: preferredItemsError };
+    }
+
+    return {
+        data: {
+            clientData: clientData,
+            familyData: familyData,
+            clientDietsData: clientDietsData,
+            clientPreferredItemsData: clientPreferredItemsData,
+        },
+        error: null,
+    };
 };
 
 type FetchShoppingListForPdfResponse =
@@ -121,15 +149,10 @@ const getShoppingListDataForSingleParcel = async (
         return { data: null, error: { type: "inactiveClient", logId: logId } };
     }
 
-    const clientDiets = [
-        ...(clientData.dietary_requirements ?? []),
-        ...(clientData.pet_food?.length ? ["Pet Food"] : []),
-    ];
-
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
         familyData.length,
         parcelInfoAndClientIdData.parcelInfo.listType,
-        clientDiets
+        clientAndFamilyData.clientDietsData
     );
 
     if (itemsListError) {
