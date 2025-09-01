@@ -53,6 +53,12 @@ const getPdfErrorMessage = (error: ShoppingListPdfError): string => {
         case "failedToFetchDietaryRequirements":
             errorMessage = "Failed to fetch dietary requirement(s) data.";
             break;
+        case "dietsFetchFailed":
+            errorMessage = "Failed to fetch client's diet(s) data.";
+            break;
+        case "preferredItemsFetchFailed":
+            errorMessage = "Failed to fetch client's preferred item(s) data.";
+            break;
     }
     return `${errorMessage} LogId: ${error.logId}`;
 };
