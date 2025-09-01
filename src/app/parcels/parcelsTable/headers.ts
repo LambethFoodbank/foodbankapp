@@ -1,4 +1,4 @@
-import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
+import { TableHeaders, ToggleableColumnGroup } from "@/components/Tables/materialTable/tableTypes";
 import { ParcelsTableRow } from "./types";
 
 export const parcelTableHeaderKeysAndLabels: TableHeaders<ParcelsTableRow> = [
@@ -31,17 +31,32 @@ export const parcelTableDefaultShownHeaders: (keyof ParcelsTableRow)[] = [
     "lastStatus",
 ];
 
-export const parcelTableToggleableHeaders: (keyof ParcelsTableRow | "Referral Details")[] = [
+export const parcelTableToggleableHeaders: (keyof ParcelsTableRow)[] = [
     "fullName",
     "familyCategory",
     "addressPostcode",
     "phoneNumber",
     "email",
     "voucherNumber",
-    "Referral Details",
     "deliveryCollection",
     "packingDate",
     "packingSlot",
     "lastStatus",
     "createdAt",
+];
+
+export const parcelTableColumnGroups: ToggleableColumnGroup[] = [
+    {
+        commonLabel: "Referral Details",
+        commonKey: "referralDetails",
+        columnNames: ["referralAgency", "referrerName", "referrerEmail", "referrerPhone"],
+    },
+];
+
+export const parcelColumnGroups: ToggleableColumnGroup[] = [
+    {
+        commonLabel: "Referral Details",
+        commonKey: "referralDetails",
+        columnNames: ["referralAgency", "referrerName", "referrerEmail", "referrerPhone"],
+    },
 ];
