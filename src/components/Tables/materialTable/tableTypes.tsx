@@ -134,3 +134,9 @@ export type BreakPointConfig = {
     breakPoints: number[];
     dividingLineStyle: keyof DividingLineStyleOptions;
 };
+
+export type ToggleableColumnGroup = {
+    commonKey: string;
+    commonLabel: string;
+    columnNames: string[];
+};
