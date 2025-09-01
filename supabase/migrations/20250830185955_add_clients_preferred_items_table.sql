@@ -1,7 +1,8 @@
 create table "public"."clients_preferred_items" (
     "id" uuid not null default gen_random_uuid(),
     "client_id" uuid not null default gen_random_uuid(),
-    "item_id" uuid not null default gen_random_uuid()
+    "item_id" uuid not null default gen_random_uuid(),
+    "notes" text
 );
 
 

@@ -336,16 +336,19 @@ export type Database = {
           client_id: string
           id: string
           item_id: string
+          notes: string | null
         }
         Insert: {
           client_id?: string
           id?: string
           item_id?: string
+          notes?: string | null
         }
         Update: {
           client_id?: string
           id?: string
           item_id?: string
+          notes?: string | null
         }
         Relationships: [
           {
