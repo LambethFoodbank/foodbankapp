@@ -45,12 +45,11 @@ const renderMRTCell = <Data extends object, K extends keyof Data>(
 
 export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends GenericSortMethod>(
     headers: TableHeaders<Data>,
-    toggleableHeaders: readonly (keyof Data | string)[],
     sortableColumns: SortOptions<Data, SortMethod>[],
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>,
     columnStyleOptions?: ColumnStyles<Data>
 ): MRT_ColumnDef<Data>[] => {
-    const baseColumns: MRT_ColumnDef<Data>[] = headers.map(([key, label]) => {
+    return headers.map(([key, label]) => {
         return {
             accessorKey: key as string,
             header: label,
@@ -60,13 +59,8 @@ export const mapHeadersToMRTColumns = <Data extends object, SortMethod extends G
 
                 return renderMRTCell(value, key, renderer);
             },
-            ...(toggleableHeaders.length > 0 && {
-                visibleInShowHideMenu: toggleableHeaders.includes(key),
-            }),
             enableSorting: !!sortableColumns.find((column) => column.key === key),
             ...(columnStyleOptions?.[key] && mapColumnStyle(columnStyleOptions?.[key])),
         };
     });
-
-    return baseColumns;
 };
