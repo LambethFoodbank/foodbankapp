@@ -80,7 +80,7 @@ export interface ParcelFields extends Fields {
     attentionFlag: boolean | null;
     signpostingCall: boolean | null;
     signpostingCallReasons: BooleanGroup | null;
-    extraInformation: string;
+    extraInformation: string | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -360,7 +360,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 fields.signpostingCall && fields.signpostingCallReasons !== null
                     ? checkboxGroupToArray(fields.signpostingCallReasons)
                     : [],
-            extra_information: fields.extraInformation,
+            extra_information: fields.extraInformation ?? "",
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(

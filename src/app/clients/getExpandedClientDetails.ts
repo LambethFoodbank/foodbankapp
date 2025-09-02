@@ -61,7 +61,6 @@ const getRawClientDetails = async (clientId: string) => {
             baby_other_items,
             pet_food,
             other_items,
-            extra_information,
             last_updated,
             notes,
             is_active,
@@ -105,7 +104,6 @@ export interface ExpandedClientData {
     babyProducts: string;
     petFood: string;
     otherRequirements: string;
-    extraInformation: string;
     lastUpdated: string;
     notes: string | null;
     isActive: boolean;
@@ -147,7 +145,6 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.other_items,
             otherRequirementOptions
         ),
-        extraInformation: formatExtraInformation(client.extra_information),
         lastUpdated: client.last_updated,
         notes: client.notes,
         isActive: client.is_active,
@@ -316,6 +313,7 @@ export const formatBabyProducts = (
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";
+
 export interface IsClientActiveError {
     type: IsClientActiveErrorType;
     logId: string;
