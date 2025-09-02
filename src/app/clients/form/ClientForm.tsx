@@ -1,9 +1,10 @@
 "use client";
 
 import FloatingToast from "@/components/FloatingToast";
+import { Schema } from "@/databaseUtils";
 import React, { useCallback, useEffect, useState } from "react";
 import supabase from "@/supabaseClient";
-import { fetchAlternativeItemsFromList, fetchDiets } from "@/common/fetch";
+import { fetchDiets, fetchLists } from "@/common/fetch";
 import { useRouter } from "next/navigation";
 import { returnPathQueryParam } from "@/common/constants";
 import { stringifyQueryParams } from "@/common/urlQueryParams";
@@ -135,6 +136,16 @@ const formSections = [
     ClientNotesCard,
 ];
 
+const mapListSchemaToItems = (list: Schema["lists"][]): Item[] => {
+    return list.map((item) => {
+        return {
+            primaryKey: item.primary_key,
+            name: item.item_name,
+            type: item.item_type as string,
+        };
+    });
+};
+
 const ClientForm: React.FC<Props> = ({
     initialFields,
     initialFormErrors,
@@ -148,7 +159,7 @@ const ClientForm: React.FC<Props> = ({
     const [submitErrorMessage, setSubmitErrorMessage] = useState("");
     const [submitDisabled, setSubmitDisabled] = useState(false);
     const [diets, setDiets] = useState<Diet[]>([]);
-    const [preferredItems, setPreferredItems] = useState<Item[]>([]);
+    const [items, setItems] = useState<Item[]>([]);
     const [fetchDataError, setFetchDataError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -197,11 +208,11 @@ const ClientForm: React.FC<Props> = ({
     }, [getDiets]);
 
     const getPreferredItems = useCallback(async (): Promise<void> => {
-        const result = await fetchAlternativeItemsFromList(supabase);
+        const result = await fetchLists(supabase);
         if (result.error) {
             setFetchDataError("Failed to fetch preferred items");
         } else {
-            setPreferredItems(result.data);
+            setItems(mapListSchemaToItems(result.data));
         }
     }, []);
 
@@ -291,7 +302,7 @@ const ClientForm: React.FC<Props> = ({
                                 fieldSetter={fieldSetter}
                                 fields={fields}
                                 diets={diets}
-                                items={preferredItems}
+                                items={items}
                             />
                         );
                     })}

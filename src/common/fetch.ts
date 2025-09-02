@@ -289,37 +289,6 @@ export const fetchLists = async (supabase: Supabase): Promise<FetchListsReponse>
     return { data: data, error: null };
 };
 
-export type FetchAlternativeItemsFromListReponse =
-    | {
-          data: Item[];
-          error: null;
-      }
-    | {
-          data: null;
-          error: FetchListsError;
-      };
-
-export const fetchAlternativeItemsFromList = async (
-    supabase: Supabase
-): Promise<FetchAlternativeItemsFromListReponse> => {
-    const { data, error } = await supabase
-        .from("lists")
-        .select("primary_key, item_name")
-        .eq("item_type", "alternative_food");
-
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: Lists data", error);
-        return { data: null, error: { type: "listsFetchFailed", logId: logId } };
-    }
-
-    const alternativeItems = data.map((item) => ({
-        primaryKey: item.primary_key,
-        name: item.item_name,
-    }));
-
-    return { data: alternativeItems, error: null };
-};
-
 type FetchListsCommentResponse =
     | {
           data: string;
