@@ -176,6 +176,7 @@ interface Props<Data, DbData extends Record<string, unknown>, PaginationType, Fi
     rowBreakPointConfigs?: BreakPointConfig[];
     defaultShownHeaders?: readonly (keyof Data)[];
     toggleableHeaders?: readonly (keyof Data | string)[];
+    showToggleableHeadersInTableContainer?: boolean;
     columnDisplayFunctions?: ColumnDisplayFunctions<Data>;
     columnStyleOptions?: ColumnStyles<Data>;
     editableConfig: EditableConfig<Data>;
@@ -231,6 +232,7 @@ const Table = <
     isLoading = false,
     defaultShownHeaders,
     toggleableHeaders = [],
+    showToggleableHeadersInTableContainer = true,
     onRowClick,
     columnDisplayFunctions = {},
     columnStyleOptions = {},
@@ -474,11 +476,21 @@ const Table = <
                             ? filterConfig.setAdditionalFilters
                             : undefined
                     }
+                    columnTogglePopup={
+                        toggleableHeaders.length > 0 ? (
+                            <ColumnTogglePopup
+                                toggleableHeaders={toggleableHeaders}
+                                shownHeaderKeys={shownHeaderKeys}
+                                setShownHeaderKeys={setShownHeaderKeys}
+                                headers={headerKeysAndLabels}
+                            />
+                        ) : undefined
+                    }
                 />
             )}
 
             <RelativeContainerForTable>
-                {toggleableHeaders.length > 0 && (
+                {showToggleableHeadersInTableContainer && (
                     <ColumnSelectorContainer>
                         <ColumnTogglePopup
                             toggleableHeaders={toggleableHeaders}
@@ -488,7 +500,6 @@ const Table = <
                         />
                     </ColumnSelectorContainer>
                 )}
-
                 <TableStyling
                     $rowBreakPointConfigs={rowBreakPointConfigs ?? []}
                     $dividingLineStyleOptions={getDividingLineStyleOptions(theme)}
@@ -656,6 +667,7 @@ const TableStyling = styled.div<{
         font-size: 1rem;
         background-color: transparent;
         color: ${(props) => props.theme.main.foreground[2]};
+        justify-content: start;
     }
 
     & .rdt_Table {

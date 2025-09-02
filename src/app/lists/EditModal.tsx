@@ -1,11 +1,19 @@
 "use client";
 
 import Modal from "@/components/Modal/Modal";
+import { FormHelperText } from "@mui/material";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { SnackBarDiv } from "@/app/lists/ListDataview";
 import { ListType } from "@/common/databaseListTypes";
+import { ItemType, itemTypeLabels } from "@/common/databaseItemTypes";
 import TextInput from "@/components/DataInput/FreeFormTextInput";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
 import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
 import Snackbar from "@mui/material/Snackbar/Snackbar";
@@ -69,12 +77,31 @@ const listQuantityNoteAndLabels: [keyof Schema["lists"], keyof Schema["lists"], 
 
 const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
     const [toSubmit, setToSubmit] = useState<Partial<Schema["lists"]> | null>(data ?? null);
-
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [descriptionError, setDescriptionError] = useState<boolean>(
+        () => !data?.item_name || data.item_name.trim() === ""
+    );
+    const [itemTypeError, setItemTypeError] = useState<boolean>(() => !data?.item_type);
 
-    const setKey = (event: React.ChangeEvent<HTMLInputElement>, key: string): void => {
+    const setKey = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        key: string
+    ): void => {
         const newValue = event.target.value;
-        setToSubmit({ ...toSubmit, [key]: newValue });
+        setToSubmit((prev) => ({ ...prev, [key]: newValue }));
+        if (key === "item_name") {
+            setDescriptionError(newValue.trim() === "");
+        }
+    };
+
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setToSubmit((prev) => ({ ...prev, is_available: event.target.checked }));
+    };
+
+    const handleItemTypeChange = (event: SelectChangeEvent<ItemType>): void => {
+        const value = event.target.value as ItemType;
+        setToSubmit((prev) => ({ ...prev, item_type: value }));
+        setItemTypeError(value === null);
     };
 
     const addListItem = async (listItem: Partial<Schema["lists"]>): Promise<AddListReturn> => {
@@ -167,7 +194,12 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
 
     const Footer = (
         <>
-            <Button variant="contained" color="primary" onClick={() => onSubmit(currentList)}>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => onSubmit(currentList)}
+                disabled={descriptionError || itemTypeError}
+            >
                 Submit
             </Button>
             <Snackbar
@@ -200,7 +232,42 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                     defaultValue={toSubmit?.item_name ?? ""}
                     onChange={(event) => setKey(event, "item_name")}
                     label="Item Description"
+                    error={descriptionError}
+                    helperText={descriptionError ? "This is a required field" : undefined}
                 />
+
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={toSubmit?.is_available ?? true}
+                            onChange={handleCheckboxChange}
+                            name="is_available"
+                            color="primary"
+                        />
+                    }
+                    label="Item is available"
+                />
+
+                <h3>Item Type</h3>
+                <FormControl fullWidth error={itemTypeError}>
+                    <InputLabel id="item-type-select-label">Item Type</InputLabel>
+                    <Select
+                        labelId="item-type-select-label"
+                        id="item-type-select"
+                        value={toSubmit?.item_type ?? ""}
+                        label="Item Type"
+                        onChange={handleItemTypeChange}
+                    >
+                        {Object.entries(itemTypeLabels).map(([value, label]) => (
+                            <MenuItem key={value} value={value}>
+                                {label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {itemTypeError && (
+                        <FormHelperText error>This is a required field</FormHelperText>
+                    )}
+                </FormControl>
                 {listQuantityNoteAndLabels.map(([quantityKey, noteKey, label]) => {
                     return (
                         <DisplayContents key={quantityKey}>

@@ -17,6 +17,7 @@ export interface TableFiltersBarProps<Data, Filter extends FilterBase<Data, Stat
     setAdditionalFilters?: (filters: Filter[]) => void;
     primaryFilters?: Filter[];
     additionalFilters?: Filter[];
+    columnTogglePopup?: React.ReactElement;
 }
 
 const StyledButton = styled(Button)`
@@ -183,6 +184,7 @@ function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
                                 Clear
                             </StyledButton>
                         )}
+                        {props.columnTogglePopup}
                     </>
                 </FiltersSingleRowContainer>
             </FiltersAndIconContainer>

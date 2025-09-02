@@ -1,5 +1,6 @@
 "use client";
 
+import { itemTypeLabels, ItemType } from "@/common/databaseItemTypes";
 import {
     ClientPaginatedTable,
     ColumnDisplayFunctions,
@@ -19,17 +20,21 @@ import TableSurface from "@/components/Tables/TableSurface";
 import CommentBox from "@/app/lists/CommentBox";
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import { ClientSideFilter } from "@/components/Tables/Filters";
+import { DistributeClientFilter } from "@/components/Tables/Filters";
 import { ListType } from "@/common/databaseListTypes";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
+import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export type ListFilter = ClientSideFilter<ListRow, string>;
+export type ListFilter = DistributeClientFilter<ListRow, string | string[]>;
 
 export interface ListRow {
     primaryKey: string;
     rowOrder: number;
     itemName: string;
     listType: ListType;
+    is_available: boolean;
+    item_type: ItemType;
     "1": QuantityAndNotes;
     "2": QuantityAndNotes;
     "3": QuantityAndNotes;
@@ -59,6 +64,8 @@ interface ListDataViewProps {
 
 export const listsHeaderKeysAndLabels = [
     ["itemName", "Description"],
+    ["is_available", "Availability"],
+    ["item_type", "Item Type"],
     ["1", "Single"],
     ["2", "Family of 2"],
     ["3", "Family of 3"],
@@ -96,15 +103,25 @@ export const listRowToListDB = (listRow: ListRow): Schema["lists"] => ({
     primary_key: listRow.primaryKey,
     row_order: listRow.rowOrder,
     list_type: listRow.listType,
+    item_type: listRow.item_type,
+    is_available: listRow.is_available,
 });
 
 const displayQuantityAndNotes = (data: QuantityAndNotes): React.ReactElement => {
     return <TooltipCell cellValue={data.quantity} tooltipValue={data.notes ?? ""} />;
 };
 
+const displayBoolean = (value: boolean): React.ReactElement => {
+    const icon = value ? faCheck : faXmark;
+    const color = value ? "green" : "red";
+    return <FontAwesomeIcon icon={icon} style={{ color }} />;
+};
+
 const listDataViewColumnDisplayFunctions = {
+    is_available: (value: boolean) => displayBoolean(value),
+    item_type: (value: ItemType) => itemTypeLabels[value] ?? value,
     ...Object.fromEntries(
-        listsHeaderKeysAndLabels.slice(1).map(([key]) => [key, displayQuantityAndNotes])
+        listsHeaderKeysAndLabels.slice(3).map(([key]) => [key, displayQuantityAndNotes])
     ),
 } satisfies ColumnDisplayFunctions<ListRow>;
 
@@ -116,7 +133,7 @@ const listsColumnStyleOptions: ColumnStyles<ListRow> = {
         listsHeaderKeysAndLabels.slice(1).map(([key]) => [
             key,
             {
-                minWidth: "10rem",
+                minWidth: "6rem",
                 center: true,
             },
         ])
@@ -262,10 +279,20 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
         }
     };
 
+    const isArrayStateFilter = (
+        filter: ListFilter
+    ): filter is DistributeClientFilter<ListRow, string[]> => Array.isArray(filter.state);
+
     useEffect(() => {
         setListData(
             listOfIngredients.filter((row) => {
                 return primaryFilters.every((filter) => {
+                    // without this if we have the following error:
+                    // Argument of type string | string[] is not assignable to parameter of type string & string[]
+                    if (isArrayStateFilter(filter)) {
+                        return filter.method(row, filter.state, filter.rowKey);
+                    }
+                    // Here state is string
                     return filter.method(row, filter.state, filter.rowKey);
                 });
             })
@@ -303,9 +330,10 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
 
             <TableSurface>
                 <CommentBox originalComment={comment} />
-                <ClientPaginatedTable<ListRow, string>
+                <ClientPaginatedTable<ListRow, string | string[]>
                     headerKeysAndLabels={listsHeaderKeysAndLabels}
                     toggleableHeaders={toggleableHeaders}
+                    showToggleableHeadersInTableContainer={false}
                     dataPortion={listData}
                     columnDisplayFunctions={listDataViewColumnDisplayFunctions}
                     columnStyleOptions={listsColumnStyleOptions}

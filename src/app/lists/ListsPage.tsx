@@ -19,6 +19,9 @@ import { ErrorSecondaryText } from "../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { clientSideButtonGroupFilter, filterRowbyButton } from "@/components/Tables/ButtonFilter";
 import { buildClientSideTextFilter, filterRowByText } from "@/components/Tables/TextFilter";
+import { clientSideDropdownFilter } from "@/components/Tables/DropdownFilter";
+import { clientSideChecklistFilter } from "@/components/Tables/ChecklistFilter";
+import { itemTypeLabels } from "@/common/databaseItemTypes";
 
 interface FetchedListsData {
     listsData: Schema["lists"][];
@@ -68,6 +71,8 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
                 listType: row.list_type,
                 rowOrder: row.row_order,
                 itemName: row.item_name,
+                item_type: row.item_type,
+                is_available: row.is_available,
                 ...Object.fromEntries(
                     listsHeaderKeysAndLabels
                         .filter(([key]) => /^\d+$/.test(key))
@@ -81,6 +86,25 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
                 ),
             }) as ListRow // this cast is needed here as the type system can't infer what Object.fromEntries will return
     );
+};
+
+const filterRowByAvailability = <Data,>(row: Data, state: string, rowKey?: keyof Data): boolean => {
+    if (state === "all" || !rowKey) {
+        return true;
+    }
+    const desired = state === "true";
+    return row[rowKey] === desired;
+};
+
+const filterRowByItemTypes = <Data,>(row: Data, state: string[], rowKey?: keyof Data): boolean => {
+    if (!rowKey || state.length === 0) {
+        return true;
+    }
+    const value = row[rowKey] as string | undefined;
+    if (value === undefined || value === null) {
+        return false;
+    }
+    return state.includes(String(value));
 };
 
 const filters: ListFilter[] = [
@@ -98,6 +122,29 @@ const filters: ListFilter[] = [
         initialActiveFilter: "regular",
         method: filterRowbyButton,
         shouldPersistOnClear: true,
+    }),
+    clientSideDropdownFilter({
+        key: "availability",
+        rowKey: "is_available",
+        label: "Availability",
+        itemLabelsAndKeys: [
+            ["All", "all"],
+            ["Available", "true"],
+            ["Not available", "false"],
+        ],
+        initialSelected: "all",
+        method: filterRowByAvailability,
+    }),
+    clientSideChecklistFilter({
+        key: "itemType",
+        rowKey: "item_type",
+        filterLabel: "Item Type",
+        itemLabelsAndKeys: Object.entries(itemTypeLabels).map(([key, label]): [string, string] => [
+            label,
+            key,
+        ]),
+        initialCheckedKeys: [],
+        method: filterRowByItemTypes,
     }),
 ];
 
