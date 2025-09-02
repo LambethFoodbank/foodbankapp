@@ -1,4 +1,4 @@
-import { FetchParcelError, ParcelWithCollectionCentreAndPackingSlot, fetchParcel } from "@/common/fetch";
+import { FetchParcelError, fetchParcel } from "@/common/fetch";
 import { UpdateParcelError } from "../../form/submitFormHelpers";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
@@ -8,7 +8,14 @@ import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 type UpdateField = "packingDate" | "packingSlot";
 
-const buildAuditLog = (action: string, updateField: UpdateField, parcel: ParcelsTableRow, count?: number, oldValue = "-", newValue = "-") => {
+const buildAuditLog = (
+    action: string,
+    updateField: UpdateField,
+    parcel: ParcelsTableRow,
+    count = 1,
+    oldValue = "-",
+    newValue = "-"
+): AuditLog => {
     return {
         action: action,
         content: {
@@ -19,7 +26,8 @@ const buildAuditLog = (action: string, updateField: UpdateField, parcel: Parcels
         },
         clientId: parcel.clientId,
         parcelId: parcel.parcelId,
-    } as const satisfies Partial<AuditLog>;
+        wasSuccess: false,
+    };
 };
 
 export const getUpdateErrorMessage = ({
@@ -55,14 +63,13 @@ export const hasConcurrencyConflict = async (
     updateField: UpdateField,
     action: string
 ): Promise<boolean> => {
-
     const auditLog = buildAuditLog(action, updateField, parcel);
     const { error, count } = await supabase
         .from("parcels")
-        .select("*", { count: "exact", head: true})
+        .select("*", { count: "exact", head: true })
         .eq("primary_key", parcel.parcelId)
         .eq("last_updated", parcel.lastUpdated);
-    
+
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetching parcel data", error);
         await sendAuditLog({
@@ -124,7 +131,14 @@ export const packingDateOrSlotUpdate = async (
 
     const { data: parcelData, error: fetchError } = await fetchParcel(parcel.parcelId, supabase);
 
-    const auditLog = buildAuditLog(action, updateField, parcel, updateResponse.count ?? 1, oldValue, parcelData?.packing_slot?.name);
+    const auditLog = buildAuditLog(
+        action,
+        updateField,
+        parcel,
+        updateResponse.count ?? 1,
+        oldValue,
+        parcelData?.packing_slot?.name
+    );
 
     if (fetchError) {
         const logId = await logErrorReturnLogId("Error with fetching parcel data", fetchError);
@@ -163,23 +177,21 @@ export const packingDateOrSlotUpdate = async (
         collection_datetime: parcelData.collection_datetime,
         last_updated: parcelData.last_updated,
     };
-
-    // const auditLog = {
-    //     action: action,
-    //     content: {
-    //         before: { [updateField]: oldValue },
-    //         after: { [updateField]: packingDateOrSlotData },
-    //         parcelDetails: parcelRecord, count: updateResponse.count },
-    //     clientId: parcel.clientId,
-    //     parcelId: parcel.parcelId,
-    // } as const satisfies Partial<AuditLog>;
+    let content = auditLog.content;
+    content = { ...{ content }, parcelDetails: parcelRecord };
 
     if (updateResponse.error) {
         const logId = await logErrorReturnLogId(
             "Error with update: parcel data",
             updateResponse.error
         );
-        await sendAuditLog({ ...auditLog, content: { ...auditLog.content, parcelDetails: parcelRecord}, wasSuccess: false, logId });
+
+        await sendAuditLog({
+            ...auditLog,
+            content: content,
+            wasSuccess: false,
+            logId,
+        });
         return {
             parcelId: null,
             error: { type: "failedToUpdateParcel", logId } as UpdateParcelError,
@@ -188,14 +200,23 @@ export const packingDateOrSlotUpdate = async (
 
     if (updateResponse.count === 0) {
         const logId = await logWarningReturnLogId("Concurrent editing of parcel");
-        await sendAuditLog({ ...auditLog, content: { ...auditLog.content, parcelDetails: parcelRecord}, wasSuccess: false, logId });
+        await sendAuditLog({
+            ...auditLog,
+            content: content,
+            wasSuccess: false,
+            logId,
+        });
         return {
             parcelId: null,
             error: { type: "concurrentUpdateConflict", logId } as UpdateParcelError,
         };
     }
 
-    sendAuditLog({ ...auditLog, content: { ...auditLog.content, parcelDetails: parcelRecord}, wasSuccess: true });
+    sendAuditLog({
+        ...auditLog,
+        content: content,
+        wasSuccess: true,
+    });
 
     return { parcelId: parcel.parcelId, error: null };
 };

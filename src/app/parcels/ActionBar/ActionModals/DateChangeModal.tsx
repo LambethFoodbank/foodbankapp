@@ -90,12 +90,12 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
         }
         const newPackingDate = getDbDate(dayjs(date));
 
-        const checks = props.selectedParcels.map(parcel =>
+        const checks = props.selectedParcels.map((parcel) =>
             hasConcurrencyConflict(parcel, "packingDate", "Change Packing Date")
         );
         const results = await Promise.all(checks);
         const packingDateConcurrencyUpdateFlag = results.every(Boolean);
-        
+
         if (!packingDateConcurrencyUpdateFlag) {
             setErrorMessage("Record has been edited recently - please refresh the page.");
             setActionCompleted(true);
@@ -104,7 +104,12 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
 
         const packingDateUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingDate", "Change Packing Date", newPackingDate, parcel);
+                return packingDateOrSlotUpdate(
+                    "packingDate",
+                    "Change Packing Date",
+                    newPackingDate,
+                    parcel
+                );
             })
         );
 
