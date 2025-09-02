@@ -6,7 +6,7 @@ select
     parcels.packing_date,
     parcels.created_at,
     packing_slots.name as packing_slot_name,
-    packing_slots."order" as packing_slot_order,
+    packing_slots.order as packing_slot_order,
     parcels.voucher_number,
     collection_centres.name as collection_centre_name,
     collection_centres.acronym as collection_centre_acronym,

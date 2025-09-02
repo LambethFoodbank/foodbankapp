@@ -12,7 +12,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { getDbDate } from "@/common/format";
 import {
     getUpdateErrorMessage,
-    packingDateorSlotCheckConcurrency,
+    hasConcurrencyConflict,
     packingDateOrSlotUpdate,
 } from "./CommonDateAndSlot";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
@@ -90,17 +90,12 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
         }
         const newPackingDate = getDbDate(dayjs(date));
 
-        const packingDateConcurrencyUpdateFlag = await props.selectedParcels.reduce<
-            Promise<boolean>
-        >(async (accPromise, parcel) => {
-            const acc = await accPromise;
-            if (!acc) {
-                return false;
-            }
-
-            const result = await packingDateorSlotCheckConcurrency(parcel, "packingDate");
-            return acc && result;
-        }, Promise.resolve(true));
+        const checks = props.selectedParcels.map(parcel =>
+            hasConcurrencyConflict(parcel, "packingDate", "Change Packing Date")
+        );
+        const results = await Promise.all(checks);
+        const packingDateConcurrencyUpdateFlag = results.every(Boolean);
+        
         if (!packingDateConcurrencyUpdateFlag) {
             setErrorMessage("Record has been edited recently - please refresh the page.");
             setActionCompleted(true);
@@ -109,7 +104,7 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
 
         const packingDateUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingDate", newPackingDate, parcel);
+                return packingDateOrSlotUpdate("packingDate", "Change Packing Date", newPackingDate, parcel);
             })
         );
 

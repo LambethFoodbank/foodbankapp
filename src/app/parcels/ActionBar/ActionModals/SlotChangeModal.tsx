@@ -12,7 +12,7 @@ import { PackingSlotsLabelsAndValues, fetchPackingSlotsInfo } from "@/common/fet
 import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
 import {
     getUpdateErrorMessage,
-    packingDateorSlotCheckConcurrency,
+    hasConcurrencyConflict,
     packingDateOrSlotUpdate,
 } from "./CommonDateAndSlot";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
@@ -107,18 +107,13 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
             return;
         }
 
-        const packingDateConcurrencyUpdateFlag = await props.selectedParcels.reduce<
-            Promise<boolean>
-        >(async (accPromise, parcel) => {
-            const acc = await accPromise;
-            if (!acc) {
-                return false;
-            }
+        const checks = props.selectedParcels.map(parcel =>
+            hasConcurrencyConflict(parcel, "packingSlot", "Change Packing Slot")
+        );
+        const results = await Promise.all(checks);
+        const packingSlotConcurrencyUpdateFlag = results.every(Boolean);
 
-            const result = await packingDateorSlotCheckConcurrency(parcel, "packingSlot");
-            return acc && result;
-        }, Promise.resolve(true));
-        if (!packingDateConcurrencyUpdateFlag) {
+        if (!packingSlotConcurrencyUpdateFlag) {
             setErrorMessage("Record has been edited recently - please refresh the page.");
             setActionCompleted(true);
             return;
@@ -126,7 +121,7 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
 
         const packingSlotUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingSlot", slot, parcel);
+                return packingDateOrSlotUpdate("packingSlot", "Change Packing Slot", slot, parcel);
             })
         );
 
