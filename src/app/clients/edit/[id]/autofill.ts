@@ -53,12 +53,6 @@ const autofill = (
         otherItems: arrayToBooleanGroup(clientData.other_items ?? []),
         deliveryInstructions: clientData.delivery_instructions ?? "",
         extraInformation: clientData.extra_information ?? "",
-        attentionFlag: clientData.flagged_for_attention ?? false,
-        signpostingCall: clientData.signposting_call_required ?? false,
-        signpostingCallReasons:
-            clientData.signposting_call_reasons !== null
-                ? arrayToBooleanGroup(clientData.signposting_call_reasons)
-                : null,
         lastUpdated: clientData.last_updated,
         notes: clientData.notes,
     };
