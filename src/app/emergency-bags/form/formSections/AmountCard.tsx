@@ -14,9 +14,9 @@ import {
 } from "@/app/clients/form/bounds";
 
 const numberOfEBRange = (value: string): boolean => {
+    const intValue = parseInt(value);
     return (
-        parseInt(value) <= MAXIMUM_NUMBER_OF_EMERGENCY_BAGS &&
-        parseInt(value) >= MINIMUM_NUMBER_OF_EMERGENCY_BAGS
+        intValue <= MAXIMUM_NUMBER_OF_EMERGENCY_BAGS && intValue >= MINIMUM_NUMBER_OF_EMERGENCY_BAGS
     );
 };
 

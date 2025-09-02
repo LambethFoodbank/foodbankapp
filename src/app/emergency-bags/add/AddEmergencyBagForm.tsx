@@ -10,7 +10,7 @@ import EmergencyBagForm, {
 } from "@/app/emergency-bags/form/EmergencyBagForm";
 import { insertEmergencyBag } from "@/app/emergency-bags/form/submitFormHelpers";
 
-const AddEmergencyBag: () => React.ReactElement = () => {
+const AddEmergencyBagForm: () => React.ReactElement = () => {
     const searchParams = useSearchParams();
     const [returnPath, setReturnPath] = useState<string | null>(null);
 
@@ -33,4 +33,4 @@ const AddEmergencyBag: () => React.ReactElement = () => {
     );
 };
 
-export default AddEmergencyBag;
+export default AddEmergencyBagForm;

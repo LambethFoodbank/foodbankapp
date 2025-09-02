@@ -12,14 +12,14 @@ export type EmergencyBagDatabaseInsertRecord = InsertSchema["emergency_bags"];
 type EmergencyBagDatabaseUpdateRecord = UpdateSchema["emergency_bags"];
 
 type InsertEmergencyBagErrorType = "failedToInsertEmergencyBag";
-export type InsertEmergencyBagReturnType = {
+export type InsertEmergencyBagResult = {
     error: { type: InsertEmergencyBagErrorType; logId: string } | null;
     emergencyBagId: string | null;
 };
 
 type InsertEmergencyBag = (
     emergencyBagRecord: EmergencyBagDatabaseInsertRecord
-) => Promise<InsertEmergencyBagReturnType>;
+) => Promise<InsertEmergencyBagResult>;
 
 export const insertEmergencyBag: InsertEmergencyBag = async (emergencyBagRecord) => {
     const { data, error } = await supabase

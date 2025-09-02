@@ -19,7 +19,7 @@ import {
 import Button from "@mui/material/Button";
 import Title from "@/components/Title/Title";
 import TypeOfEmergencyBagCard from "@/app/emergency-bags/form/formSections/TypeOfEmergencyBagCard";
-import { getActiveCollectionCentres } from "@/common/fetch";
+import { CollectionCentresLabelsAndValues, getActiveCollectionCentres } from "@/common/fetch";
 import supabase from "@/supabaseClient";
 import HubCard from "@/app/emergency-bags/form/formSections/HubCard";
 import PackingDateEmergencyBagCard from "@/app/emergency-bags/form/formSections/PackingDateEmergencyBagCard";
@@ -92,6 +92,17 @@ const databaseErrorMessageFromErrorType = (
     }
 };
 
+const fetchCollectionCentres = async (): Promise<CollectionCentresLabelsAndValues> => {
+    const { data: hubData, error: hubError } = await getActiveCollectionCentres(supabase);
+
+    if (hubError) {
+        console.error("Failed to fetch collection centres", hubError);
+        return [];
+    }
+
+    return hubData?.collectionCentresLabelsAndValues ?? [];
+};
+
 const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
     initialFields,
     initialFormErrors,
@@ -111,20 +122,7 @@ const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
     const errorSetter = createSetter(setFormErrors, formErrors);
 
     useEffect(() => {
-        const fetchCollectionCentres = async (): Promise<void> => {
-            const { data: hubData, error: hubError } = await getActiveCollectionCentres(supabase);
-
-            if (hubError) {
-                console.error("Failed to fetch collection centres", hubError);
-                return;
-            }
-
-            if (hubData) {
-                setHubLabelsAndValues(hubData.collectionCentresLabelsAndValues);
-            }
-        };
-
-        void fetchCollectionCentres();
+        void fetchCollectionCentres().then(setHubLabelsAndValues);
     }, [fields.packingDate]);
 
     const submitForm = async (): Promise<void> => {
@@ -151,7 +149,7 @@ const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
             type: fields.type === "Other" ? fields.otherInfo : fields.type,
             packing_date: packingDate,
             amount: fields.amount,
-            lastUpdated: fields.last_updated,
+            last_updated: fields.lastUpdated,
         };
 
         const { emergencyBagId, error } = await writeEmergencyBagInfoToDatabase(emergencyBagRecord);

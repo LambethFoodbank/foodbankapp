@@ -66,6 +66,3 @@ as permissive
 for all
 to authenticated
 using (true);
-
-
-
