@@ -54,6 +54,7 @@ import { getDbDate } from "@/common/format";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
+import AttentionFlagCard from "@/app/parcels/form/formSections/AttentionFlagCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -72,6 +73,7 @@ export interface ParcelFields extends Fields {
     lastUpdated: string | undefined;
     deliveryInstructions: string | null;
     notes: string | null;
+    attentionFlag: boolean | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -111,6 +113,7 @@ export const initialParcelFields: ParcelFields = {
     lastUpdated: undefined,
     deliveryInstructions: null,
     notes: null,
+    attentionFlag: null,
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -150,6 +153,7 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
+    AttentionFlagCard,
     ParcelNotesCard,
 ];
 
@@ -159,6 +163,7 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    AttentionFlagCard,
     DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
@@ -335,6 +340,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             referrer_email: fields.referrerEmail,
             referrer_phone: fields.referrerPhone,
             notes: fields.notes,
+            flagged_for_attention: fields.attentionFlag,
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(
