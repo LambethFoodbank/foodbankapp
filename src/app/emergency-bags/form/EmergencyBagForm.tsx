@@ -30,6 +30,7 @@ import {
     WriteEmergencyBagToDatabaseErrors,
     WriteEmergencyBagToDatabaseFunction,
 } from "@/app/emergency-bags/form/submitFormHelpers";
+import { logErrorReturnLogId } from "@/logger/logger";
 
 interface EmergencyBagProps {
     initialFields: EmergencyBagFields;
@@ -62,7 +63,7 @@ export const initialEmergencyBagFields: EmergencyBagFields = {
     hub: "",
     packingDate: "",
     amount: 0,
-    lastUpdated: "",
+    lastUpdated: new Date().toISOString(),
     otherInfo: "",
 };
 
@@ -75,6 +76,16 @@ export const initialEmergencyBagFormErrors: EmergencyBagErrors = {
 };
 
 export type EmergencyBagCardProps = CardProps<EmergencyBagFields, EmergencyBagErrors>;
+
+type FetchCollectionCentresResponse =
+    | { data: CollectionCentresLabelsAndValues; error: null }
+    | { data: null; error: FetchCollectionCentresError };
+
+type FetchCollectionCentresErrorType = "failedToFetchCollectionCentres" | "noCollectionCentres";
+interface FetchCollectionCentresError extends Record<string, string> {
+    type: FetchCollectionCentresErrorType;
+    logId: string;
+}
 
 const formSections = [HubCard, PackingDateEmergencyBagCard, TypeOfEmergencyBagCard, AmountCard];
 
@@ -92,15 +103,22 @@ const databaseErrorMessageFromErrorType = (
     }
 };
 
-const fetchCollectionCentres = async (): Promise<CollectionCentresLabelsAndValues> => {
+const fetchCollectionCentres = async (): Promise<FetchCollectionCentresResponse> => {
     const { data: hubData, error: hubError } = await getActiveCollectionCentres(supabase);
 
     if (hubError) {
-        console.error("Failed to fetch collection centres", hubError);
-        return [];
+        const logId = await logErrorReturnLogId("Failed to fetch: Collection Centres", {
+            hubError,
+        });
+        return { data: null, error: { type: "failedToFetchCollectionCentres", logId } };
     }
 
-    return hubData?.collectionCentresLabelsAndValues ?? [];
+    if (!hubData?.collectionCentresLabelsAndValues?.length) {
+        const logId = await logErrorReturnLogId("No data for Collection Centres");
+        return { data: null, error: { type: "noCollectionCentres", logId } };
+    }
+
+    return { data: hubData.collectionCentresLabelsAndValues, error: null };
 };
 
 const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
@@ -122,7 +140,15 @@ const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
     const errorSetter = createSetter(setFormErrors, formErrors);
 
     useEffect(() => {
-        void fetchCollectionCentres().then(setHubLabelsAndValues);
+        (async () => {
+            const { data, error } = await fetchCollectionCentres();
+            if (error) {
+                setSubmitErrorMessage(`Failed to load collection centres. Log ID: ${error.logId}`);
+                setHubLabelsAndValues([]);
+                return;
+            }
+            setHubLabelsAndValues(data);
+        })();
     }, [fields.packingDate]);
 
     const submitForm = async (): Promise<void> => {
