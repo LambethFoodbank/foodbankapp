@@ -19,7 +19,7 @@ import {
     PackingSlotsLabelsAndValues,
     ParcelWithCollectionCentreAndPackingSlot,
 } from "@/common/fetch";
-import { capitaliseWords, formatDatetimeAsTime } from "@/common/format";
+import { arrayToBooleanGroup, capitaliseWords, formatDatetimeAsTime } from "@/common/format";
 import { parseQueryParams } from "@/common/urlQueryParams";
 import { Errors } from "@/components/Form/formFunctions";
 import Title from "@/components/Title/Title";
@@ -56,6 +56,12 @@ const prepareParcelDataForForm = (
         referrerName: parcelData.referrer_name ?? "",
         referrerEmail: parcelData.referrer_email ?? "",
         referrerPhone: parcelData.referrer_phone ?? "",
+        signpostingCall: parcelData.signposting_call_required ?? false,
+        signpostingCallReasons:
+            parcelData.signposting_call_reasons !== null
+                ? arrayToBooleanGroup(parcelData.signposting_call_reasons)
+                : null,
+        extraInformation: parcelData.extra_information ?? "",
     };
 };
 
