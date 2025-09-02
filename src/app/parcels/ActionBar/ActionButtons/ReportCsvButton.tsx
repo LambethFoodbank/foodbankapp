@@ -20,7 +20,7 @@ import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButt
 import CsvButton, {
     formatNumberAsStringForCsv,
 } from "@/components/FileGenerationButtons/CsvButton";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { signpostingCallOptions } from "@/app/parcels/form/formSections/SignpostingCallCard";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 
 export type FetchReportResult =
@@ -100,13 +100,13 @@ export interface rawParcel {
     } | null;
     list_type: "regular" | "hotel";
     flagged_for_attention: boolean | null;
+    signposting_call_required: boolean | null;
+    signposting_call_reasons: string[] | null;
     client: {
         full_name: string | null;
         is_active: boolean;
-        signposting_call_required: boolean | null;
         phone_number: string | null;
         email: string | null;
-        signposting_call_reasons: string[] | null;
         delivery_instructions: string | null;
         extra_information: string | null;
         notes: string | null;
@@ -152,13 +152,13 @@ export const getRawParcelListQuery = `
         ),
         list_type,
         flagged_for_attention,
+        signposting_call_required,
+        signposting_call_reasons,
         client:clients(
             full_name,
             is_active,
-            signposting_call_required,
             phone_number,
             email,
-            signposting_call_reasons,
             delivery_instructions,
             extra_information,
             notes,
@@ -201,14 +201,14 @@ export const convertRawParcelListToReportResult = (
                     voucherNumber: rawParcel.voucher_number ?? "",
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
-                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
+                    signpostingCallRequired: rawParcel.signposting_call_required ?? false,
                     flaggedForAttention: rawParcel.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
                     email: rawParcel.client?.email ?? "",
                     signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? null,
+                        rawParcel.signposting_call_reasons ?? null,
                         signpostingCallOptions
                     ),
                     address: rawParcel.client

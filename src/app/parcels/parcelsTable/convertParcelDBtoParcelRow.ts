@@ -70,12 +70,8 @@ const convertParcelDbtoParcelRow = async (
                 referrerPhone: parcel.referrer_phone,
                 packingDate: parcel.packing_date ? new Date(parcel.packing_date) : null,
                 iconsColumn: {
-                    flaggedForAttention: parcel.client_is_active
-                        ? parcel.flagged_for_attention ?? false
-                        : false,
-                    requiresFollowUpPhoneCall: parcel.client_is_active
-                        ? parcel.signposting_call_required ?? false
-                        : false,
+                    flaggedForAttention: parcel.flagged_for_attention ?? false,
+                    requiresFollowUpPhoneCall: parcel.signposting_call_required ?? false,
                 },
                 createdAt: parcel.created_at ? new Date(parcel.created_at) : null,
                 clientIsActive: parcel.client_is_active ?? false,
