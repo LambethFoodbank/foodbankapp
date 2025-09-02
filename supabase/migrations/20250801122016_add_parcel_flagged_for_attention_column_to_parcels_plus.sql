@@ -14,7 +14,6 @@ select
     clients.primary_key as client_id,
     clients.full_name as client_full_name,
     clients.address_postcode as client_address_postcode,
-    clients.flagged_for_attention as client_flagged_for_attention,
     clients.signposting_call_required as client_signposting_call_required,
     clients.phone_number as client_phone_number,
     clients.is_active as client_is_active,
