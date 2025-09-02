@@ -34,7 +34,7 @@ const AddClients: () => React.ReactElement = () => {
         babyNappies: null,
         babyOtherItems: {},
         petFood: {},
-        otherItems: {},
+        otherItems: [],
         deliveryInstructions: "",
         extraInformation: "",
         attentionFlag: false,

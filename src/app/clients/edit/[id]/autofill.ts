@@ -24,6 +24,7 @@ const autofill = (
     const noPostcode = clientData.address_postcode === null;
 
     const preferredItems = itemsData.filter((item) => item.type === "alternative_food");
+    const otherItems = itemsData.filter((item) => item.type === "others");
 
     return {
         fullName: clientData.full_name ?? "",
@@ -57,7 +58,7 @@ const autofill = (
         babyNappies: clientData.baby_nappies,
         babyOtherItems: arrayToBooleanGroup(clientData.baby_other_items ?? []),
         petFood: arrayToBooleanGroup(clientData.pet_food ?? []),
-        otherItems: arrayToBooleanGroup(clientData.other_items ?? []),
+        otherItems: otherItems,
         deliveryInstructions: clientData.delivery_instructions ?? "",
         extraInformation: clientData.extra_information ?? "",
         attentionFlag: clientData.flagged_for_attention ?? false,

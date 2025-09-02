@@ -1,25 +1,14 @@
+import { ItemsCardProps } from "@/app/clients/form/formSections/PreferredItemsCard";
+import SelectionGenericCard from "@/app/clients/form/formSections/SelectionGenericCard";
 import React from "react";
-import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
-import { checkboxGroupToArray, onChangeCheckboxInGroup } from "@/components/Form/formFunctions";
-import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
 
-export const otherRequirementOptions: string[] = ["Hot Water Bottle", "Blanket"];
-
-export const otherItemsLabelsAndKeys: [string, string][] = otherRequirementOptions.map(
-    (optionName) => [optionName, optionName]
+const PreferredItemsCard: React.FC<ItemsCardProps> = (props) => (
+    <SelectionGenericCard
+        {...props}
+        title="Other Items"
+        fieldName="otherItems"
+        items={props.items.filter((item) => item.type === "others")}
+    />
 );
 
-const OtherItemsCard: React.FC<ClientCardProps> = ({ fieldSetter, fields }) => {
-    return (
-        <GenericFormCard title="Other Items" required={false}>
-            <CheckboxGroupInput
-                labelsAndKeys={otherItemsLabelsAndKeys}
-                onChange={onChangeCheckboxInGroup(fieldSetter, fields.otherItems, "otherItems")}
-                checkedKeys={checkboxGroupToArray(fields.otherItems)}
-            />
-        </GenericFormCard>
-    );
-};
-
-export default OtherItemsCard;
+export default PreferredItemsCard;

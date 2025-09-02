@@ -62,7 +62,6 @@ export const formatClientRecord = (
         baby_nappies: fields.babyNappies,
         baby_other_items: checkboxGroupToArray(fields.babyOtherItems),
         pet_food: checkboxGroupToArray(fields.petFood),
-        other_items: checkboxGroupToArray(fields.otherItems),
         delivery_instructions: fields.deliveryInstructions,
         extra_information: fields.extraInformation,
         signposting_call_required: fields.signpostingCall,
@@ -88,13 +87,16 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
     const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);
-    const clientPreferredItems = formatFromPrimaryKey("item_id")(fields.preferredItems);
+    const clientSelectedItems = formatFromPrimaryKey("item_id")([
+        ...fields.preferredItems,
+        ...fields.otherItems,
+    ]);
 
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
         clientrecord: clientRecord,
         familymembers: familyMembers,
         clientdiets: clientDiets,
-        clientpreferreditems: clientPreferredItems,
+        clientpreferreditems: clientSelectedItems,
     });
 
     const auditLog = {
@@ -103,7 +105,7 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
             clientDetails: clientRecord,
             familyMembers: familyMembers,
             clientDiets: clientDiets,
-            clientPreferredItems: clientPreferredItems,
+            clientPreferredItems: clientSelectedItems,
         },
     } as const satisfies Partial<AuditLog>;
 
@@ -141,7 +143,10 @@ export const submitEditClientForm = async (
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
     const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);
-    const clientPreferredItems = formatFromPrimaryKey("item_id")(fields.preferredItems);
+    const clientSelectedItems = formatFromPrimaryKey("item_id")([
+        ...fields.preferredItems,
+        ...fields.otherItems,
+    ]);
 
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
         "update_client_and_family",
@@ -150,7 +155,7 @@ export const submitEditClientForm = async (
             familymembers: familyMembers,
             clientid: primaryKey,
             clientdiets: clientDiets,
-            clientpreferreditems: clientPreferredItems,
+            clientpreferreditems: clientSelectedItems,
         }
     );
 
@@ -160,7 +165,7 @@ export const submitEditClientForm = async (
             clientDetails: clientRecord,
             familyMembers: familyMembers,
             clientDiets: clientDiets,
-            clientPreferredItems: clientPreferredItems,
+            clientPreferredItems: clientSelectedItems,
         },
         clientId: primaryKey,
     } as const satisfies Partial<AuditLog>;

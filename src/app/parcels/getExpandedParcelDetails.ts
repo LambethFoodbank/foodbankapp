@@ -23,7 +23,6 @@ import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 
@@ -230,9 +229,14 @@ const getExpandedParcelDetails = async (
                         client.baby_other_items
                     ),
                     petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
-                    otherRequirements: formatRequirementsByCanonicalOrder(
-                        client.other_items,
-                        otherRequirementOptions
+                    otherRequirements: formatBreakdownFromArray(
+                        getClientPreferredItemsByType(
+                            client.preferred_items,
+                            (item) => item.item?.item_name ?? item.item_id,
+                            (item) => item.item?.item_type ?? null,
+                            "others"
+                        ),
+                        (item) => item
                     ),
                     extraInformation: client.extra_information ?? "",
                     signpostingCall: formatSignpostingCall(
