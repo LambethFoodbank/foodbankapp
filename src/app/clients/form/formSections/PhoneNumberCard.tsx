@@ -4,8 +4,7 @@ import {
     errorExists,
     getErrorText,
     getDefaultTextValue,
-    onChangeText,
-    onChangeAdditionalFields,
+    onChangePhoneNumbers,
     FormErrors,
     Setter,
 } from "@/components/Form/formFunctions";
@@ -44,20 +43,6 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
     }, [fields.additionalPhoneNumbers?.length]); //eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        const indexToRemove = fields.additionalPhoneNumbers?.indexOf("");
-        if (indexToRemove != -1 && indexToRemove !== undefined) {
-            const timer = setTimeout(() => {
-                phoneNumbers.splice(indexToRemove, 1);
-                const updatedAdditionalPhones = [...(fields.additionalPhoneNumbers || [])];
-                updatedAdditionalPhones.splice(indexToRemove, 1);
-                fieldSetter({ additionalPhoneNumbers: updatedAdditionalPhones });
-            }, 3000);
-
-            return () => clearTimeout(timer);
-        }
-    }, [fields.additionalPhoneNumbers]); //eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(() => {
         if (errorMessage) {
             const timer = setTimeout(() => {
                 setErrorMessage(null);
@@ -71,8 +56,8 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         const newId = phoneNumbers.length - 1;
         if (newId > 0) {
             if (
-                fields?.additionalPhoneNumbers &&
-                fields?.additionalPhoneNumbers[newId - 1] !== undefined &&
+                fields.additionalPhoneNumbers &&
+                fields.additionalPhoneNumbers[newId - 1] !== undefined &&
                 fields.additionalPhoneNumbers[newId - 1].length > 1
             ) {
                 setPhoneNumbers([...phoneNumbers, { id: newId }]);
@@ -82,7 +67,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                 );
             }
         } else {
-            if (fields.phoneNumber && fields.phoneNumber?.length > 0) {
+            if (fields.phoneNumber && fields.phoneNumber.length > 0) {
                 setPhoneNumbers([...phoneNumbers, { id: newId }]);
             } else {
                 setErrorMessage(
@@ -114,9 +99,8 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                     // eslint-disable-next-line react/no-array-index-key
                     <GappedDiv key={index}>
                         {index === 1 && (
-                            <Divider aria-hidden="true" orientation="horizontal" flexItem />
-                        )}
-                        {index === 1 && <FormText>Additional Phone Numbers</FormText>}
+                                <Divider aria-hidden="true" orientation="horizontal" flexItem />
+                            ) && <FormText>Additional Phone Numbers</FormText>}
                         {index === 0 && (
                             <FreeFormTextInput
                                 id="client-phone-number"
@@ -124,17 +108,17 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                 defaultValue={getDefaultTextValue(fields, "phoneNumber")}
                                 error={errorExists(formErrors.phoneNumber)}
                                 helperText={getErrorText(formErrors.phoneNumber)}
-                                onChange={onChangeText(
+                                onChange={onChangePhoneNumbers(
                                     fieldSetter,
+                                    fields.phoneNumber,
+                                    fields.additionalPhoneNumbers,
                                     errorSetter as Setter<FormErrors<ClientFields>>,
                                     "phoneNumber",
                                     {
                                         required: phoneNumberIsRequired,
                                         regex: phoneNumberRegex,
                                         formattingFunction: formatPhoneNumber,
-                                    },
-                                    fields.additionalPhoneNumbers,
-                                    fields.phoneNumber
+                                    }
                                 )}
                             />
                         )}
@@ -154,18 +138,18 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                     helperText={getErrorText(
                                         formErrors.additionalPhoneNumbers?.[index - 1]
                                     )}
-                                    onChange={onChangeAdditionalFields(
+                                    onChange={onChangePhoneNumbers(
                                         fieldSetter,
-                                        fields.additionalPhoneNumbers,
                                         fields.phoneNumber,
+                                        fields.additionalPhoneNumbers,
                                         errorSetter as Setter<FormErrors<ClientFields>>,
                                         "additionalPhoneNumbers",
-                                        index - 1,
                                         {
                                             required: phoneNumberIsRequired,
                                             regex: phoneNumberRegex,
                                             formattingFunction: formatPhoneNumber,
-                                        }
+                                        },
+                                        index - 1
                                     )}
                                 />
                                 <Button

@@ -143,7 +143,7 @@ const transformRowToDriverOverviewTableData = (
             ? formatAdditionalPhoneNumbers(
                   client.phone_number,
                   client.additional_phone_numbers,
-                  true
+                  "DriverOverview"
               )
             : "-",
         packingDate: formatDateStringAsDate(parcel.packing_date) ?? null,

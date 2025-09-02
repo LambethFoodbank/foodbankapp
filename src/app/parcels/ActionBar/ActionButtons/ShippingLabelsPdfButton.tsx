@@ -138,8 +138,7 @@ const getRequiredData = async (
                 ? formatAdditionalPhoneNumbers(
                       client.phone_number,
                       client.additional_phone_numbers,
-                      true,
-                      true
+                      "ShippingLabels"
                   )
                 : "-",
             address_1: clientIsActive ? client.address_1 ?? "" : "", //Seeded deleted clients have is_active set to false, but their personal info fields are non-null

@@ -62,9 +62,7 @@ export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
         if (substring === "-") {
-            const phoneColumnQueryInactiveClient = `or(${clientIsActiveColumnLabel}.is.false, ${phoneColumnLabel}.ilike.%${substring}%)`;
-            const additionalPhoneColumnQueryInactiveClient = `or(${clientIsActiveColumnLabel}.is.false, ${additionalPhoneColumnLabel}.ilike.%${substring}%)`;
-            return `or(${phoneColumnQueryInactiveClient}, ${additionalPhoneColumnQueryInactiveClient})`;
+            return `or(${clientIsActiveColumnLabel}.is.false, ${phoneColumnLabel}.ilike.%${substring}%)`;
         }
         const phoneColumnQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
         const additionalPhoneQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${additionalPhoneColumnLabel}.ilike.%${substring}%)`;

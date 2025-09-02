@@ -85,7 +85,11 @@ END,
         additional_phone_numbers =
            CASE
                 WHEN jsonb_typeof(clientRecord->'additional_phone_numbers') = 'array'
-                    THEN ARRAY(SELECT * FROM jsonb_array_elements_text(clientRecord->'additional_phone_numbers'))
+                    THEN ARRAY(
+                        SELECT e
+                        FROM jsonb_array_elements_text(clientRecord->'additional_phone_numbers') AS e
+                        WHERE btrim(e) <> '' AND lower(e) <> 'null'
+                    )
                 ELSE NULL
 END
 WHERE

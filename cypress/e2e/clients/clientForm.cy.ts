@@ -40,7 +40,7 @@ describe("Add client form", () => {
         assertPostcodeContentNotDisplayed();
     });
 
-    it("Try to add a client with the same additional phone number", () => {
+    it("Tries to add a client with the same additional phone number and fails", () => {
         fillName(fullName);
         fillPhoneNumber(phoneNumber);
         fillAdditionalPhoneNumbers(badAdditionalPhoneNumbers, true);
@@ -82,7 +82,7 @@ function fillAdditionalPhoneNumbers(values: string[], test?: boolean): void {
     if (test) {
         cy.contains(
             "This phone number already exists, please add a different phone number."
-        ).should("exist");
+        ).should("be.visible");
         cy.get('[id="remove-additional-phone-number-1"]').click(); // eslint-disable-line quotes
     }
 }

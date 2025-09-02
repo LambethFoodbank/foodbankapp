@@ -57,7 +57,11 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
 
     return {
         name: full_name ?? "",
-        contact: formatAdditionalPhoneNumbers(phone_number, additional_phone_numbers, true),
+        contact: formatAdditionalPhoneNumbers(
+            phone_number,
+            additional_phone_numbers,
+            "ShoppingList"
+        ),
         email: email ?? "",
         address: address_postcode ? formattedAddress : displayPostcodeForHomelessClient,
     };

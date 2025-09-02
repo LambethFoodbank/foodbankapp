@@ -210,7 +210,7 @@ export const convertRawParcelListToReportResult = (
                               formatAdditionalPhoneNumbers(
                                   rawParcel.client.phone_number,
                                   rawParcel.client.additional_phone_numbers,
-                                  true
+                                  "Report"
                               )
                           )
                         : "",

@@ -169,27 +169,23 @@ export const getParcelOverviewString = (
 export const formatAdditionalPhoneNumbers = (
     primaryPhoneNumber: string | null,
     additionalPhoneNumbers: string[] | null,
-    inDocument?: boolean,
-    inShippingLabels?: boolean
+    documentName?: string
 ): string => {
     if (primaryPhoneNumber === null || primaryPhoneNumber.length === 0) {
-        if (inDocument) {
+        if (documentName !== null) {
             return "";
-        } else {
-            return "None";
         }
+        return "None";
     }
 
     if (additionalPhoneNumbers) {
         const allPhoneNumbers: string[] = [primaryPhoneNumber, ...additionalPhoneNumbers];
-        if (inShippingLabels) {
-            const firstThreeNumbers = allPhoneNumbers.slice(0, 3);
-            return firstThreeNumbers.join(", ");
+        if (documentName === "ShippingLabels") {
+            return allPhoneNumbers.slice(0, 3).join(", ");
         }
         return allPhoneNumbers.join(", ");
-    } else {
-        return primaryPhoneNumber;
     }
+    return primaryPhoneNumber;
 };
 
 export const formatTimeStringToHoursAndMinutes = (timeString: string): string => {
