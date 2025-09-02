@@ -299,7 +299,7 @@ export type Database = {
         }
         Insert: {
           acronym?: string
-          available_days: Database["public"]["CompositeTypes"]["collection_availability_day"][]
+          available_days?: Database["public"]["CompositeTypes"]["collection_availability_day"][]
           is_delivery?: boolean
           is_shown?: boolean
           last_updated?: string
