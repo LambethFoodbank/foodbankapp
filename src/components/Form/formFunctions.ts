@@ -425,7 +425,6 @@ export const checkErrorOnSubmit = <
                 if (hasError) {
                     errorExists = true;
                 }
-                // Update initial states to required for any remaining initial states
                 const updatedErrors = error.map((err) =>
                     err === Errors.initial ? Errors.required : err
                 );
@@ -435,9 +434,7 @@ export const checkErrorOnSubmit = <
                         [errorKey]: updatedErrors,
                     };
                 }
-            }
-            // Handle regular error fields
-            else if (error !== Errors.none) {
+            } else if (error !== Errors.none) {
                 errorExists = true;
                 if (error === Errors.initial) {
                     amendedErrorTypes = {
