@@ -11,6 +11,7 @@ import {
     formatHouseholdFromFamilyDetails,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
+    getClientPreferredItemsByType,
 } from "@/app/clients/getExpandedClientDetails";
 import { capitaliseWords, formatDateTime, formatDatetimeAsDate } from "@/common/format";
 import {
@@ -95,7 +96,8 @@ const getExpandedParcelDetails = async (
             preferred_items:clients_preferred_items(
                 item_id,
                 item:lists(
-                    item_name
+                    item_name,
+                    item_type
                 )
             ),
             
@@ -208,8 +210,13 @@ const getExpandedParcelDetails = async (
                         (diet) => diet.diet?.name ?? diet.diet_id
                     ),
                     preferredItems: formatBreakdownFromArray(
-                        client.preferred_items ?? [],
-                        (item) => item.item?.item_name ?? item.item_id
+                        getClientPreferredItemsByType(
+                            client.preferred_items,
+                            (item) => item.item?.item_name ?? item.item_id,
+                            (item) => item.item?.item_type ?? null,
+                            "alternative_food"
+                        ),
+                        (item) => item
                     ),
                     hygieneProducts: formatHygieneProducts(
                         client.hygiene_tampons,
