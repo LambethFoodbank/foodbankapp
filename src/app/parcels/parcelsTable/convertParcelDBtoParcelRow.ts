@@ -71,7 +71,7 @@ const convertParcelDbtoParcelRow = async (
                 packingDate: parcel.packing_date ? new Date(parcel.packing_date) : null,
                 iconsColumn: {
                     flaggedForAttention: parcel.client_is_active
-                        ? parcel.client_flagged_for_attention ?? false
+                        ? parcel.flagged_for_attention ?? false
                         : false,
                     requiresFollowUpPhoneCall: parcel.client_is_active
                         ? parcel.client_signposting_call_required ?? false
