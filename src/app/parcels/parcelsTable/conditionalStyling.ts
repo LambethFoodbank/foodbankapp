@@ -1,6 +1,7 @@
 import { DefaultTheme } from "styled-components";
 import { ParcelsTableRow } from "./types";
 import { BreakPointConfig } from "@/components/Tables/Table";
+import { EmergencyBagsTableRow } from "@/app/emergency-bags/emergencyBagsTable/types";
 
 export type DividingLineStyleOptions = {
     dateAndSlotPrimary: DividingLineStyle;

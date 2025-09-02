@@ -134,7 +134,6 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
         }, 500);
     };
 
-    //TODO: subscribe to emergency bag changes
     useEffect(() => {
         const subscriptionChannel = supabase
             .channel("emergency-bags-table-changes")

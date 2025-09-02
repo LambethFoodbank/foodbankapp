@@ -28,17 +28,26 @@ import { CircularProgress } from "@mui/material";
 import FloatingToast from "@/components/FloatingToast";
 import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import { DistributeServerFilter } from "@/components/Tables/Filters";
-import { DbParcelRow } from "@/databaseUtils";
+import { DbEmergencyBagRow, DbParcelRow } from "@/databaseUtils";
 import dayjs from "dayjs";
 import { PreTableControlsContainer } from "@/components/controlsStyling";
 import EmergencyBagsTable from "@/app/emergency-bags/emergencyBagsTable/EmergencyBagsTable";
 import {
     EmergencyBagsSortState,
-    EmergencyBagsFiltersAllStates,
+    EmergencyBagsTableRow,
+    EmergencyBagsFilters,
+    EmergencyBagsFilter,
 } from "@/app/emergency-bags/emergencyBagsTable/types";
 import { getDbDate } from "@/common/format";
+import {
+    buildEmergencyBagFilters,
+    buildQueryParamsFromEmergencyBagFilters,
+    updateEmergencyBagFiltersFromQueryParams,
+} from "@/app/emergency-bags/emergencyBagsTable/filters";
 
 type ParcelTableFilterState = string | DateRangeState | string[];
+type EmergencyBagTableFilterState = string | DateRangeState | string[];
+type EmergencyBagsFiltersAllStates = EmergencyBagsFilter<EmergencyBagTableFilterState>;
 
 const ParcelsPage: React.FC = () => {
     const searchParams = useSearchParams();
@@ -54,12 +63,23 @@ const ParcelsPage: React.FC = () => {
     const [primaryFilters, setPrimaryFilters] = useState<ParcelsFilters>([]);
     const [additionalFilters, setAdditionalFilters] = useState<ParcelsFilters>([]);
 
+    const [primaryFiltersEmergencyBags, setPrimaryFiltersEmergencyBags] =
+        useState<EmergencyBagsFilters>([]);
+    const [additionalFiltersEmergencyBags, setAdditionalFiltersEmergencyBags] =
+        useState<EmergencyBagsFilters>([]);
+
     const [isPackingManagerView, setIsPackingManagerView] = useState<boolean>(false);
     const [packingManagerViewPrimaryFilters, setPackingManagerViewPrimaryFilters] =
         useState<ParcelsFilters>([]);
 
     const [areFiltersLoadingForFirstTime, setAreFiltersLoadingForFirstTime] =
         useState<boolean>(true);
+
+    const [
+        areEmergencyBagFiltersLoadingForFirstTime,
+        setAreEmergencyBagFiltersLoadingForFirstTime,
+    ] = useState<boolean>(true);
+
     const [urlParamsHaveBeenProcessed, setUrlParamsHaveBeenProcessed] = useState<boolean>(false);
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -107,6 +127,17 @@ const ParcelsPage: React.FC = () => {
                     ?.state === pageViewTypePackingManager
             );
 
+            let emergencyBagFiltersObject = await buildEmergencyBagFilters(today);
+            emergencyBagFiltersObject = updateEmergencyBagFiltersFromQueryParams(
+                urlParams,
+                emergencyBagFiltersObject.primaryFilters,
+                emergencyBagFiltersObject.additionalFilters
+            );
+
+            setPrimaryFiltersEmergencyBags(emergencyBagFiltersObject.primaryFilters);
+            setAdditionalFiltersEmergencyBags(emergencyBagFiltersObject.additionalFilters);
+            setAreEmergencyBagFiltersLoadingForFirstTime(false);
+
             if (urlParams[parcelIdParam]) {
                 openParcelModal(urlParams[parcelIdParam] as string);
             }
@@ -128,9 +159,37 @@ const ParcelsPage: React.FC = () => {
     }, [isPackingManagerView, packingManagerViewPrimaryFilters, primaryFilters, additionalFilters]);
 
     // Create emergency bags filters based on current applied filters
-    const emergencyBagsAppliedFilters = useMemo(() => {
-        return emergencyBagsFilters;
-    }, [emergencyBagsFilters]);
+    const currentlyAppliedEmergencyBagFilters = useMemo(() => {
+        return [...primaryFiltersEmergencyBags, ...additionalFiltersEmergencyBags];
+    }, [primaryFiltersEmergencyBags, additionalFiltersEmergencyBags]);
+
+    useEffect(() => {
+        if (!urlParamsHaveBeenProcessed || areEmergencyBagFiltersLoadingForFirstTime) {
+            return;
+        }
+
+        const parcelDateFilter = currentlyAppliedFilters.find(
+            (filter) => filter.key === "packingDate"
+        );
+
+        if (parcelDateFilter && parcelDateFilter.state) {
+            setPrimaryFiltersEmergencyBags((prevFilters) =>
+                prevFilters.map((filter) => {
+                    if (filter.key === "packingDate") {
+                        return {
+                            ...filter,
+                            state: parcelDateFilter.state as DateRangeState,
+                        } as EmergencyBagsFilter<DateRangeState>;
+                    }
+                    return filter;
+                })
+            );
+        }
+    }, [
+        currentlyAppliedFilters,
+        urlParamsHaveBeenProcessed,
+        areEmergencyBagFiltersLoadingForFirstTime,
+    ]);
 
     useEffect(() => {
         if (!urlParamsHaveBeenProcessed) {
@@ -138,8 +197,23 @@ const ParcelsPage: React.FC = () => {
         }
 
         const paramsRecord = buildQueryParamsFromFilters(currentlyAppliedFilters);
-        mergeParamsIntoURL(paramsRecord);
-    }, [isPackingManagerView, currentlyAppliedFilters, searchParams, urlParamsHaveBeenProcessed]);
+        const emergencyBagParamsRecord = buildQueryParamsFromEmergencyBagFilters(
+            currentlyAppliedEmergencyBagFilters
+        );
+
+        const mergedParams = { ...paramsRecord };
+        Object.entries(emergencyBagParamsRecord).forEach(([key, value]) => {
+            mergedParams[`eb_${key}`] = value;
+        });
+
+        mergeParamsIntoURL(mergedParams);
+    }, [
+        isPackingManagerView,
+        currentlyAppliedFilters,
+        searchParams,
+        urlParamsHaveBeenProcessed,
+        currentlyAppliedEmergencyBagFilters,
+    ]);
 
     const getCheckedParcelsData = async (): Promise<ParcelsTableRow[]> => {
         if (checkedParcelIds.length === 0) {
@@ -279,17 +353,38 @@ const ParcelsPage: React.FC = () => {
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
                     />
+
                     {hasEBs && (
-                        <EmergencyBagsTable
-                            checkedEmergencyBagIds={checkedEmergencyBagIds}
-                            setCheckedEmergencyBagIds={setCheckedEmergencyBagIds}
-                            openEmergencyBagModal={openParcelModalAndUpdateURL}
-                            sortState={emergencyBagsSortState}
-                            setSortState={setEmergencyBagsSortState}
-                            appliedFilters={emergencyBagsAppliedFilters}
-                            areFiltersLoadingForFirstTime={false}
-                            setErrorMessage={setEmergencyBagsError}
-                        />
+                        <>
+                            <PreTableControlsContainer>
+                                <TableFiltersBar<
+                                    EmergencyBagsTableRow,
+                                    DistributeServerFilter<
+                                        EmergencyBagsTableRow,
+                                        EmergencyBagTableFilterState,
+                                        DbEmergencyBagRow
+                                    >,
+                                    EmergencyBagTableFilterState
+                                >
+                                    primaryFilters={primaryFiltersEmergencyBags}
+                                    setPrimaryFilters={setPrimaryFiltersEmergencyBags}
+                                    additionalFilters={additionalFiltersEmergencyBags}
+                                    setAdditionalFilters={setAdditionalFiltersEmergencyBags}
+                                />
+                            </PreTableControlsContainer>
+                            <EmergencyBagsTable
+                                checkedEmergencyBagIds={checkedEmergencyBagIds}
+                                setCheckedEmergencyBagIds={setCheckedEmergencyBagIds}
+                                openEmergencyBagModal={openParcelModalAndUpdateURL}
+                                sortState={emergencyBagsSortState}
+                                setSortState={setEmergencyBagsSortState}
+                                appliedFilters={currentlyAppliedEmergencyBagFilters}
+                                areFiltersLoadingForFirstTime={
+                                    areEmergencyBagFiltersLoadingForFirstTime
+                                }
+                                setErrorMessage={setEmergencyBagsError}
+                            />
+                        </>
                     )}
                     <ParcelsModal
                         modalIsOpen={modalIsOpen}
