@@ -6,6 +6,12 @@ import { DatabaseError } from "@/app/errorClasses";
 import { Json } from "@/databaseTypesFile";
 import { getSupabaseServerComponentClient } from "@/supabaseServer";
 import { getCurrentProfile } from "./getCurrentProfile";
+import { CollectionCentresTableRow } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
+import supabase from "@/supabaseClient";
+import { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import { diff } from "json-diff-ts";
+import { Supabase } from "@/supabaseUtils";
+
 
 type AuditLogInsertRecord = InsertSchema["audit_log"];
 export interface AuditLog {
@@ -64,4 +70,68 @@ export async function sendAuditLog(auditLogProps: AuditLog): Promise<void> {
         const logId = await logErrorReturnLogId("failed to add audit log", error);
         throw new DatabaseError("insert", "audit log", logId);
     }
+}
+
+export type FetchResult = 
+    | {
+          data: CollectionCentresTableRow;
+          error: null;
+      }
+    | {
+        data: null;
+        error: {
+            type: PostgrestError;
+            logId: string;
+        };
+    };
+
+export interface beforeAndAfter {
+    before: {};
+    after: {};
+};
+
+export const fetchCollectionCentreWithId = async (
+    id: string
+): Promise<CollectionCentresTableRow | null> => {
+    const supabase = getSupabaseServerComponentClient();
+    const { data: latestRow, error } = await supabase
+            .from("collection_centres")
+            .select("*")
+            .eq("primary_key", id)
+            .single();
+
+        if (error || !latestRow) {
+            return null;
+        }
+
+        const mappedRow: CollectionCentresTableRow = {
+            id: latestRow.primary_key,
+            name: latestRow.name,
+            acronym: latestRow.acronym,
+            isDelivery: latestRow.is_delivery,
+            isShown: latestRow.is_shown,
+            lastUpdated: latestRow.last_updated,
+            timeSlots: latestRow.time_slots,
+            isNew: false,
+        };
+    return mappedRow;
+};
+
+export const getBeforeAndAfter = (oldCollectionCentre: {}, newCollectionCentre: {}): {before: {}, after: {}} => {
+    let comparison = diff(oldCollectionCentre, newCollectionCentre, { keysToSkip:['lastUpdated']});
+
+    const before = comparison.reduce((acc, curr) => {
+        acc[curr.key] = curr.value;
+        return acc;
+    }, {} as Record<string, any>);
+
+    const after = comparison.reduce((acc, curr) => {
+        acc[curr.key] = curr.oldValue;
+        return acc;
+    }, {} as Record<string, any>);
+
+    return {
+        before: before,
+        after: after,
+    };
 }
