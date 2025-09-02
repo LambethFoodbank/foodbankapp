@@ -62,6 +62,8 @@ const CollectionCentresTable: React.FC = () => {
     const [selectedRowForTimeSlotEdit, setSelectedRowForTimeSlotEdit] =
         useState<CollectionCentresTableRow | null>(null);
     const originalTimestampsRef = React.useRef<Record<string, string>>({});
+    const [blockedSaveRows, setBlockedSaveRows] = useState<Set<GridRowId>>(new Set());
+    const [rowErrors, setRowErrors] = useState<{ [id: string]: string }>({});
 
     const getCollectionCentresForTable = useCallback(async () => {
         setErrorMessage(null);
@@ -222,11 +224,28 @@ const CollectionCentresTable: React.FC = () => {
                         message =
                             "Record has been edited recently - please refresh the page." +
                             `Log ID: ${updateCollectionCentreError.logId}`;
+                        setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
                     }
+
+                    setRowErrors((prev) => ({ ...prev, [newRow.id]: message }));
                     setErrorMessage(message);
                     throw new Error(message);
                 }
             }
+
+            // Clear any previous errors for this row
+            setRowErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[newRow.id];
+                return newErrors;
+            });
+
+            setBlockedSaveRows((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(newRow.id);
+                return newSet;
+            });
+
             return newRow;
         } finally {
             setIsLoading(false);
@@ -259,6 +278,18 @@ const CollectionCentresTable: React.FC = () => {
     };
 
     const handleCancelClick = (id: GridRowId) => async () => {
+        setRowErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[id];
+            return newErrors;
+        });
+
+        setBlockedSaveRows((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(id);
+            return newSet;
+        });
+
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -340,6 +371,8 @@ const CollectionCentresTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             getActions: ({ id }) => {
                 const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+                const isBlocked = blockedSaveRows.has(id);
+                const rowError = rowErrors[id];
 
                 if (isInEditMode) {
                     return [
@@ -349,7 +382,13 @@ const CollectionCentresTable: React.FC = () => {
                             sx={{
                                 color: "primary.main",
                             }}
-                            onClick={handleSaveClick(id)}
+                            onClick={() => {
+                                if (isBlocked && rowErrors) {
+                                    setErrorMessage(rowError);
+                                } else {
+                                    handleSaveClick(id)();
+                                }
+                            }}
                             key="Save"
                         />,
                         <GridActionsCellItem
