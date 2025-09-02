@@ -28,6 +28,11 @@ export const getFamilyMembersForDatabase = (
     return peopleToInsert.map((person) => personToFamilyRecordWithoutFamilyId(person));
 };
 
+export const formatFromPrimaryKey =
+    <T extends { primaryKey: string }, K extends string>(key: K) =>
+    (items: T[]): { [P in K]: string }[] =>
+        items.map((item) => ({ [key]: item.primaryKey }) as { [P in K]: string });
+
 export const formatClientRecord = (
     fields: ClientFields
 ): ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord => {
@@ -82,9 +87,14 @@ export type addClientResult =
 export const submitAddClientForm = async (fields: ClientFields): Promise<addClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
+    const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);
+    const clientPreferredItems = formatFromPrimaryKey("item_id")(fields.preferredItems);
+
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
         clientrecord: clientRecord,
         familymembers: familyMembers,
+        clientdiets: clientDiets,
+        clientpreferreditems: clientPreferredItems,
     });
 
     const auditLog = {
@@ -92,6 +102,8 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         content: {
             clientDetails: clientRecord,
             familyMembers: familyMembers,
+            clientDiets: clientDiets,
+            clientPreferredItems: clientPreferredItems,
         },
     } as const satisfies Partial<AuditLog>;
 
@@ -111,7 +123,6 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         wasSuccess: true,
         clientId: clientId,
     });
-
     return { clientId: clientId, error: null };
 };
 
@@ -129,12 +140,17 @@ export const submitEditClientForm = async (
 ): Promise<editClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
+    const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);
+    const clientPreferredItems = formatFromPrimaryKey("item_id")(fields.preferredItems);
+
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
         "update_client_and_family",
         {
             clientrecord: clientRecord,
             familymembers: familyMembers,
             clientid: primaryKey,
+            clientdiets: clientDiets,
+            clientpreferreditems: clientPreferredItems,
         }
     );
 
@@ -143,6 +159,8 @@ export const submitEditClientForm = async (
         content: {
             clientDetails: clientRecord,
             familyMembers: familyMembers,
+            clientDiets: clientDiets,
+            clientPreferredItems: clientPreferredItems,
         },
         clientId: primaryKey,
     } as const satisfies Partial<AuditLog>;

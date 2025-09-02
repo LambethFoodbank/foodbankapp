@@ -53,6 +53,22 @@ const getRawClientDetails = async (clientId: string) => {
 
             cooking_facilities,
             dietary_requirements,
+            
+            diets:clients_diets(
+                diet_id,
+                diet:diets(
+                    name
+                )
+            ),
+            
+            preferred_items:clients_preferred_items(
+                item_id,
+                item:lists(
+                    item_name,
+                    item_type
+                )
+            ),
+            
             hygiene_tampons,
             hygiene_pads,
             hygiene_other_items,
@@ -93,6 +109,14 @@ export const familyCountToFamilyCategory = (count: number): string => {
     return "Family of 10+";
 };
 
+export interface ClientDietWithName extends Pick<Schema["clients_diets"], "diet_id"> {
+    diet: { name: string | null } | null;
+}
+
+export interface ClientItemWithName extends Pick<Schema["clients_preferred_items"], "item_id"> {
+    item: { item_name: string | null } | null;
+}
+
 export interface ExpandedClientData {
     fullName: string;
     address: string;
@@ -104,6 +128,8 @@ export interface ExpandedClientData {
     children: string;
     cookingFacilities: string;
     dietaryRequirements: string;
+    diets: string;
+    preferredItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
@@ -135,6 +161,19 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         dietaryRequirements: formatRequirementsByCanonicalOrder(
             client.dietary_requirements,
             dietaryRequirementOptions
+        ),
+        diets: formatBreakdownFromArray(
+            client.diets ?? [],
+            (diet) => diet.diet?.name ?? diet.diet_id
+        ),
+        preferredItems: formatBreakdownFromArray(
+            getClientPreferredItemsByType(
+                client.preferred_items,
+                (item) => item.item?.item_name ?? item.item_id,
+                (item) => item.item?.item_type ?? null,
+                "alternative_food"
+            ),
+            (item) => item
         ),
         hygieneProducts: formatHygieneProducts(
             client.hygiene_tampons,
@@ -270,6 +309,17 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
     return childDetails.join(", ");
 };
 
+export const formatBreakdownFromArray = <T>(
+    arr: T[] | null | undefined,
+    getName: (item: T) => string | number | null | undefined
+): string => {
+    if (!arr || arr.length === 0) {
+        return "-";
+    }
+    const names = arr.map((item) => getName(item)).filter(Boolean);
+    return names.join(", ");
+};
+
 export const formatRequirementsByCanonicalOrder = (
     requirementsArray: string[] | null,
     canonicalOrder: string[]
@@ -330,6 +380,22 @@ export const formatBabyProducts = (
     }
 
     return items.length > 0 ? items.join(", ") : "None";
+};
+
+export const getClientPreferredItemsByType = <T>(
+    preferredItems: T[] | null | undefined,
+    getName: (item: T) => string | number | null | undefined,
+    getType: (item: T) => string | null | undefined,
+    itemType: string
+): string[] => {
+    if (!preferredItems || preferredItems.length === 0) {
+        return [];
+    }
+
+    return preferredItems
+        .filter((item) => getType(item) === itemType)
+        .map((item) => getName(item))
+        .filter((name): name is string => typeof name === "string" && name.trim() !== "");
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";

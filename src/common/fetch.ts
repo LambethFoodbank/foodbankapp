@@ -1,3 +1,4 @@
+import { Diet, Item } from "@/components/Form/formFunctions";
 import { DbWikiRow, Schema } from "@/databaseUtils";
 import { Supabase } from "@/supabaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
@@ -321,6 +322,33 @@ export const fetchListsComment = async (supabase: Supabase): Promise<FetchListsC
     return { data: data.value, error: null };
 };
 
+export type FetchDietsResponse =
+    | { data: Diet[]; error: null }
+    | { data: null; error: FetchDietsError };
+
+export type FetchDietsErrorType = "failedToFetchDiets";
+export interface FetchDietsError extends Record<string, string> {
+    type: FetchDietsErrorType;
+    logId: string;
+}
+
+export const fetchDiets = async (supabase: Supabase): Promise<FetchDietsResponse> => {
+    const { data, error } = await supabase.from("diets").select("primary_key, name");
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Diets data", { error });
+        return { data: null, error: { type: "failedToFetchDiets", logId: logId } };
+    }
+
+    if (!data) {
+        return { data: [], error: null };
+    }
+
+    const diets = data.map((diet) => ({ primaryKey: diet.primary_key, name: diet.name }));
+
+    return { data: diets, error: null };
+};
+
 export type PackingSlotsLabelsAndValues = [string, Schema["packing_slots"]["primary_key"]][];
 type PackingSlotsResponse =
     | {
@@ -385,3 +413,101 @@ interface WikiRowsQueryFailureType {
 }
 
 export type WikiRowsQueryType = WikiRowsQuerySuccessType | WikiRowsQueryFailureType;
+
+export type FetchClientDietaryErrorType = "dietsFetchFailed" | "preferredItemsFetchFailed";
+
+export type FetchClientDietaryError = { type: FetchClientDietaryErrorType; logId: string };
+
+type FetchClientDietsResponse = {
+    data: Diet[];
+    error: FetchClientDietaryError | null;
+};
+
+type FetchClientItemsResponse = {
+    data: Item[];
+    error: FetchClientDietaryError | null;
+};
+
+export const fetchClientDiets = async (
+    clientId: string,
+    supabase: Supabase
+): Promise<FetchClientDietsResponse> => {
+    const { data: clientDietRows, error } = await supabase
+        .from("clients_diets")
+        .select("diet_id")
+        .eq("client_id", clientId);
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Client diets", error);
+        return { data: [], error: { type: "dietsFetchFailed", logId } };
+    }
+
+    if (!clientDietRows || clientDietRows.length === 0) {
+        return { data: [], error: null };
+    }
+
+    const dietIds = clientDietRows.map((diet) => diet.diet_id);
+    const { data: dietsData, error: dietsError } = await supabase
+        .from("diets")
+        .select("primary_key, name")
+        .in("primary_key", dietIds);
+
+    if (dietsError) {
+        const logId = await logErrorReturnLogId("Error with fetch: Diets data", dietsError);
+        return { data: [], error: { type: "dietsFetchFailed", logId } };
+    }
+
+    const diets: Diet[] = (dietsData ?? []).map((diet) => ({
+        primaryKey: diet.primary_key,
+        name: diet.name,
+    }));
+
+    return { data: diets, error: null };
+};
+
+export const fetchClientItems = async (
+    clientId: string,
+    itemType: string,
+    supabase: Supabase
+): Promise<FetchClientItemsResponse> => {
+    let query = supabase
+        .from("clients_preferred_items")
+        .select("item_id, notes")
+        .eq("client_id", clientId);
+
+    if (itemType !== "all") {
+        query = query.eq("item_type", itemType);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+        const logId = await logErrorReturnLogId("Error with fetch: Client preferred items", error);
+        return { data: [], error: { type: "preferredItemsFetchFailed", logId } };
+    }
+
+    if (!data || data.length === 0) {
+        return { data: [], error: null };
+    }
+
+    const itemIds = data.map((item) => item.item_id);
+    const { data: itemsData, error: itemsError } = await supabase
+        .from("lists")
+        .select("primary_key, item_name, item_type")
+        .in("primary_key", itemIds);
+
+    if (itemsError) {
+        const logId = await logErrorReturnLogId("Error with fetch: Items data", itemsError);
+        return { data: [], error: { type: "preferredItemsFetchFailed", logId } };
+    }
+
+    const items: Item[] = (itemsData ?? []).map((item) => ({
+        primaryKey: item.primary_key,
+        name: item.item_name,
+        type: item.item_type as string,
+        notes:
+            data.find((preferredItem) => preferredItem.item_id === item.primary_key)?.notes ?? null,
+    }));
+
+    return { data: items, error: null };
+};

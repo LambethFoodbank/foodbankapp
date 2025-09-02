@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import FloatingToast from "@/components/FloatingToast";
+import { Schema } from "@/databaseUtils";
+import React, { useCallback, useEffect, useState } from "react";
+import supabase from "@/supabaseClient";
+import { fetchDiets, fetchLists } from "@/common/fetch";
 import { useRouter } from "next/navigation";
 import { returnPathQueryParam } from "@/common/constants";
 import { stringifyQueryParams } from "@/common/urlQueryParams";
@@ -14,6 +18,8 @@ import {
     Person,
     createSetter,
     Setter,
+    Diet,
+    Item,
 } from "@/components/Form/formFunctions";
 import {
     CenterComponent,
@@ -27,6 +33,8 @@ import AddressCard from "@/app/clients/form/formSections/AddressCard";
 import NumberAdultsCard from "@/app/clients/form/formSections/NumberAdultsCard";
 import NumberChildrenCard from "@/app/clients/form/formSections/NumberChildrenCard";
 import DietaryRequirementCard from "@/app/clients/form/formSections/DietaryRequirementCard";
+import DietsCard from "@/app/clients/form/formSections/DietsCard";
+import PreferredItemsCard from "@/app/clients/form/formSections/PreferredItemsCard";
 import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
 import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
@@ -69,6 +77,8 @@ export interface ClientFields extends Fields {
     listType: ListType | null;
     cookingFacilities: BooleanGroup | null;
     dietaryRequirements: BooleanGroup | null;
+    diets: Diet[];
+    preferredItems: Item[];
     hygieneProductsTampons: string | null;
     hygieneProductsPads: string | null;
     hygieneOtherItems: BooleanGroup;
@@ -113,6 +123,8 @@ const formSections = [
     ListTypeCard,
     CookingFacilitiesCard,
     DietaryRequirementCard,
+    DietsCard,
+    PreferredItemsCard,
     HygieneProductsCard,
     BabyProductsCard,
     PetFoodCard,
@@ -123,6 +135,16 @@ const formSections = [
     ExtraInformationCard,
     ClientNotesCard,
 ];
+
+const mapListSchemaToItems = (list: Schema["lists"][]): Item[] => {
+    return list.map((item) => {
+        return {
+            primaryKey: item.primary_key,
+            name: item.item_name,
+            type: item.item_type as string,
+        };
+    });
+};
 
 const ClientForm: React.FC<Props> = ({
     initialFields,
@@ -136,6 +158,9 @@ const ClientForm: React.FC<Props> = ({
     const [submitError, setSubmitError] = useState(Errors.none);
     const [submitErrorMessage, setSubmitErrorMessage] = useState("");
     const [submitDisabled, setSubmitDisabled] = useState(false);
+    const [diets, setDiets] = useState<Diet[]>([]);
+    const [items, setItems] = useState<Item[]>([]);
+    const [fetchDataError, setFetchDataError] = useState<string | null>(null);
 
     useEffect(() => {
         if (fields.numberOfChildren <= fields.children.length) {
@@ -168,6 +193,32 @@ const ClientForm: React.FC<Props> = ({
             });
         fieldSetter({ adults: [...fields.adults, ...extraAdults] });
     }, [fields.numberOfAdults]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const getDiets = useCallback(async (): Promise<void> => {
+        const result = await fetchDiets(supabase);
+        if (result.error) {
+            setFetchDataError("Failed to fetch diets");
+        } else {
+            setDiets(result.data);
+        }
+    }, []);
+
+    useEffect(() => {
+        void getDiets();
+    }, [getDiets]);
+
+    const getPreferredItems = useCallback(async (): Promise<void> => {
+        const result = await fetchLists(supabase);
+        if (result.error) {
+            setFetchDataError("Failed to fetch preferred items");
+        } else {
+            setItems(mapListSchemaToItems(result.data));
+        }
+    }, []);
+
+    useEffect(() => {
+        void getPreferredItems();
+    }, [getPreferredItems]);
 
     const fieldSetter = createSetter(setFields, fields);
     const errorSetter = createSetter(setFormErrors, formErrors);
@@ -234,32 +285,39 @@ const ClientForm: React.FC<Props> = ({
     };
 
     return (
-        <CenterComponent>
-            <StyledForm>
-                <Title>Client Form</Title>
-                <FormText>
-                    Please provide or update the client&apos;s personal details, household
-                    composition, dietary restrictions and other needs.
-                </FormText>
-                {formSections.map((Card, index) => {
-                    return (
-                        <Card
-                            key={index} // eslint-disable-line react/no-array-index-key
-                            formErrors={formErrors}
-                            errorSetter={errorSetter}
-                            fieldSetter={fieldSetter}
-                            fields={fields}
-                        />
-                    );
-                })}
-                <CenterComponent>
-                    <Button variant="contained" onClick={submitForm} disabled={submitDisabled}>
-                        Submit
-                    </Button>
-                </CenterComponent>
-                <FormErrorText>{submitErrorMessage || submitError}</FormErrorText>
-            </StyledForm>
-        </CenterComponent>
+        <>
+            <CenterComponent>
+                <StyledForm>
+                    <Title>Client Form</Title>
+                    <FormText>
+                        Please provide or update the client&apos;s personal details, household
+                        composition, dietary restrictions and other needs.
+                    </FormText>
+                    {formSections.map((Card, index) => {
+                        return (
+                            <Card
+                                key={index} // eslint-disable-line react/no-array-index-key
+                                formErrors={formErrors}
+                                errorSetter={errorSetter}
+                                fieldSetter={fieldSetter}
+                                fields={fields}
+                                diets={diets}
+                                items={items}
+                            />
+                        );
+                    })}
+                    <CenterComponent>
+                        <Button variant="contained" onClick={submitForm} disabled={submitDisabled}>
+                            Submit
+                        </Button>
+                    </CenterComponent>
+                    <FormErrorText>{submitErrorMessage || submitError}</FormErrorText>
+                </StyledForm>
+            </CenterComponent>
+            {fetchDataError && (
+                <FloatingToast message={fetchDataError} severity="error" variant="filled" />
+            )}
+        </>
     );
 };
 

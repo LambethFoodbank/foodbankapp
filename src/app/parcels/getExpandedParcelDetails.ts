@@ -7,9 +7,11 @@ import {
     formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
+    formatBreakdownFromArray,
     formatHouseholdFromFamilyDetails,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
+    getClientPreferredItemsByType,
 } from "@/app/clients/getExpandedClientDetails";
 import { capitaliseWords, formatDateTime, formatDatetimeAsDate } from "@/common/format";
 import {
@@ -83,6 +85,22 @@ const getExpandedParcelDetails = async (
             is_active,
             cooking_facilities,
             dietary_requirements,
+            
+            diets:clients_diets(
+                diet_id,
+                diet:diets(
+                    name
+                )
+            ),
+            
+            preferred_items:clients_preferred_items(
+                item_id,
+                item:lists(
+                    item_name,
+                    item_type
+                )
+            ),
+            
             hygiene_tampons,
             hygiene_pads,
             hygiene_other_items,
@@ -187,6 +205,19 @@ const getExpandedParcelDetails = async (
                         client.dietary_requirements,
                         dietaryRequirementOptions
                     ),
+                    diets: formatBreakdownFromArray(
+                        client.diets ?? [],
+                        (diet) => diet.diet?.name ?? diet.diet_id
+                    ),
+                    preferredItems: formatBreakdownFromArray(
+                        getClientPreferredItemsByType(
+                            client.preferred_items,
+                            (item) => item.item?.item_name ?? item.item_id,
+                            (item) => item.item?.item_type ?? null,
+                            "alternative_food"
+                        ),
+                        (item) => item
+                    ),
                     hygieneProducts: formatHygieneProducts(
                         client.hygiene_tampons,
                         client.hygiene_pads,
@@ -277,6 +308,8 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     children: string;
     cookingFacilities: string;
     dietaryRequirements: string;
+    diets: string;
+    preferredItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;

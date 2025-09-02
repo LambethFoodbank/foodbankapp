@@ -46,6 +46,18 @@ export interface Person {
     primaryKey?: string;
 }
 
+export interface Diet {
+    primaryKey: string;
+    name: string;
+}
+
+export interface Item {
+    primaryKey: string;
+    name: string;
+    type?: string;
+    notes?: string | null;
+}
+
 export type Fields = Record<string, unknown>;
 
 export type FormErrors<SpecificFields extends Fields> = {
@@ -182,6 +194,23 @@ export const onChangeRadioGroup = <SpecificFields extends Fields>(
         });
     };
 };
+
+export function onChangeSelectionByPrimaryKey<T extends { primaryKey: string }>(
+    currentSelected: T[],
+    allItems: T[],
+    key: string,
+    checked: boolean
+): T[] {
+    let keys = currentSelected.map((item) => item.primaryKey);
+    if (checked) {
+        if (!keys.includes(key)) {
+            keys = [...keys, key];
+        }
+    } else {
+        keys = keys.filter((currentKey) => currentKey !== key);
+    }
+    return allItems.filter((item) => keys.includes(item.primaryKey));
+}
 
 export const valueOnChangeRadioGroup = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,

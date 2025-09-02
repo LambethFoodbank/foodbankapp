@@ -284,6 +284,110 @@ export type Database = {
         }
         Relationships: []
       }
+      clients_diets: {
+        Row: {
+          client_id: string
+          diet_id: string
+          id: string
+        }
+        Insert: {
+          client_id?: string
+          diet_id?: string
+          id?: string
+        }
+        Update: {
+          client_id?: string
+          diet_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_diets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "clients_diets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_diets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_diets_diet_id_fkey"
+            columns: ["diet_id"]
+            isOneToOne: false
+            referencedRelation: "diets"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
+      clients_preferred_items: {
+        Row: {
+          client_id: string
+          id: string
+          item_id: string
+          notes: string | null
+        }
+        Insert: {
+          client_id?: string
+          id?: string
+          item_id?: string
+          notes?: string | null
+        }
+        Update: {
+          client_id?: string
+          id?: string
+          item_id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_preferred_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["primary_key"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "parcels_plus"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements_plus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_preferred_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
       collection_centres: {
         Row: {
           acronym: string
@@ -1135,13 +1239,23 @@ export type Database = {
         }
         Returns: undefined
       }
-      insert_client_and_family: {
-        Args: {
-          clientrecord: Json
-          familymembers: Json
-        }
-        Returns: string
-      }
+      insert_client_and_family:
+        | {
+            Args: {
+              clientrecord: Json
+              familymembers: Json
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              clientrecord: Json
+              familymembers: Json
+              clientdiets: Json
+              clientpreferreditems: Json
+            }
+            Returns: string
+          }
       packing_slot_order_swap: {
         Args: {
           id1: string
@@ -1156,14 +1270,25 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_client_and_family: {
-        Args: {
-          clientrecord: Json
-          clientid: string
-          familymembers: Json
-        }
-        Returns: Database["public"]["CompositeTypes"]["update_client_result"]
-      }
+      update_client_and_family:
+        | {
+            Args: {
+              clientrecord: Json
+              clientid: string
+              familymembers: Json
+            }
+            Returns: Database["public"]["CompositeTypes"]["update_client_result"]
+          }
+        | {
+            Args: {
+              clientrecord: Json
+              clientid: string
+              familymembers: Json
+              clientdiets: Json
+              clientpreferreditems: Json
+            }
+            Returns: Database["public"]["CompositeTypes"]["update_client_result"]
+          }
       user_is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
