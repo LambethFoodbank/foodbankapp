@@ -61,31 +61,31 @@ type FetchCollectionCentresResult =
 export const initialCollectionAvailableDays: DbAvailableDaysType = [
     {
         day: "Monday",
-        is_active: false,
+        is_active: true,
     },
     {
         day: "Tuesday",
-        is_active: false,
+        is_active: true,
     },
     {
         day: "Wednesday",
-        is_active: false,
+        is_active: true,
     },
     {
         day: "Thursday",
-        is_active: false,
+        is_active: true,
     },
     {
         day: "Friday",
-        is_active: false,
+        is_active: true,
     },
     {
         day: "Saturday",
-        is_active: false,
+        is_active: true,
     },
     {
         day: "Sunday",
-        is_active: false,
+        is_active: true,
     },
 ];
 
