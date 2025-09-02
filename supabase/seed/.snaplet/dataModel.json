@@ -1807,7 +1807,7 @@
           "id": "public.emergency_bags.amount",
           "name": "amount",
           "columnName": "amount",
-          "type": "numeric",
+          "type": "int8",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
