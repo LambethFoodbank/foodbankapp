@@ -1,4 +1,7 @@
+import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
+import { SortState } from "@/components/Tables/Table";
 import { DbAuditLogRow } from "@/databaseUtils";
+import { AuditLogRow, AuditLogSortMethod } from "../types";
 
 export type AuditLogModalRowResponse<Data> =
     | {
@@ -10,4 +13,4 @@ export type AuditLogModalRowResponse<Data> =
           errorMessage: string;
       };
 export type ParcelsSortMethod = ServerSideSortMethod<DbAuditLogRow>;
-export type AuditLogSortState = SortState<AuditLogTableRow, AuditLogSortMethod>;
+export type AuditLogSortState = SortState<AuditLogRow, AuditLogSortMethod>;

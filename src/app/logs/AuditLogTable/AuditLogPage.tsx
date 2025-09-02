@@ -15,11 +15,11 @@ const AuditLogPage: React.FC = () => {
     const searchParams = useSearchParams();
 
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
-    
+
     const [sortState, setSortState] = useState<AuditLogSortState>({ sortEnabled: false });
-    
+
     const [areFiltersLoadingForFirstTime, setAreFiltersLoadingForFirstTime] =
-            useState<boolean>(false);
+        useState<boolean>(false);
 
     const [urlParamsHaveBeenProcessed, setUrlParamsHaveBeenProcessed] = useState<boolean>(false);
 
@@ -29,40 +29,30 @@ const AuditLogPage: React.FC = () => {
 
     const currentlyAppliedFilters: any[] = [];
 
-    const refreshAuditLogDetailsRef = useRef<(() => void) | null>(null) //add all refresh fcts
+    const refreshAuditLogDetailsRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
         (async () => {
-            if(urlParamsHaveBeenProcessed) {
+            if (urlParamsHaveBeenProcessed) {
                 return;
             }
             setAreFiltersLoadingForFirstTime(true);
 
             const urlParams = parseQueryParams(searchParams.toString());
-            console.log(urlParams[logIdParam] as string);
-            
+
             setAreFiltersLoadingForFirstTime(false);
 
             if (urlParams[logIdParam]) {
-                // console.log("yes")
                 openLogModal(urlParams[logIdParam] as string);
             }
             setUrlParamsHaveBeenProcessed(true);
         })();
-    }, [urlParamsHaveBeenProcessed, searchParams])
-
-    // useEffect(() => {
-    //         if (!urlParamsHaveBeenProcessed) {
-    //             return;
-    //         }
-    
-    //         // mergeParamsIntoURL(paramsRecord);
-    //     }, [currentlyAppliedFilters, searchParams, urlParamsHaveBeenProcessed]);
+    }, [urlParamsHaveBeenProcessed, searchParams]);
 
     const openLogModal = (rowId: string): void => {
         setSelectedLogId(rowId);
         setModalIsOpen(true);
-    }
+    };
 
     const openLogModalAndUpdateURL = (rowId: string): void => {
         openLogModal(rowId);
@@ -70,7 +60,7 @@ const AuditLogPage: React.FC = () => {
         const paramsRecord: Record<string, string> = {};
         paramsRecord[logIdParam] = rowId;
         mergeParamsIntoURL(paramsRecord);
-    }
+    };
 
     const closeLogModalAndUpdateURL = (): void => {
         setModalIsOpen(false);
@@ -79,7 +69,7 @@ const AuditLogPage: React.FC = () => {
         const paramsRecord: Record<string, string | null> = {};
         paramsRecord[logIdParam] = null;
         mergeParamsIntoURL(paramsRecord);
-    }
+    };
 
     return (
         <>
@@ -96,7 +86,7 @@ const AuditLogPage: React.FC = () => {
                             variant="filled"
                         ></FloatingToast>
                     )}
-                    <AuditLogTable 
+                    <AuditLogTable
                         openAuditLogModal={openLogModalAndUpdateURL}
                         sortState={sortState}
                         setSortState={setSortState}

@@ -9,7 +9,7 @@ import OrganisationRoleDependentView from "@/app/info/OrganisationRoleDependentV
 import AddWikiItemButton from "@/app/info/AddWikiItemButton";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import { TextValueContainer } from "@/app/admin/auditLogTable/auditLogModal/AuditLogModalRow";
+import { TextValueContainer } from "@/app/logs/AuditLogTable/auditLogModal/AuditLogModalRow";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { reorderTwoItemsInWikiTable } from "@/app/info/supabaseHelpers";
 

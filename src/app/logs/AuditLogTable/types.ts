@@ -7,27 +7,27 @@ import { DbAuditLogRow } from "@/databaseUtils";
 export type AuditLogSortMethod = ServerSideSortMethod<DbAuditLogRow>;
 export type AuditLogSortState = SortState<AuditLogRow, AuditLogSortMethod>;
 
-export type GetAuditLogDataResult = 
+export type GetAuditLogDataResult =
     | {
-        logs: DbAuditLogRow[];
-        error: null;
+          logs: DbAuditLogRow[];
+          error: null;
       }
     | {
-        logs: null;
-        error: {
-            type: GetDbAuditLogDataErrorType;
-            logId: string;
-        }
-    }
+          logs: null;
+          error: {
+              type: GetDbAuditLogDataErrorType;
+              logId: string;
+          };
+      };
 
 export type GetDbAuditLogDataErrorType = "abortedFetch" | "failedToFetchAuditLogTable";
 
 export type GetAuditLogDataAndIdsResult =
     | {
           data: {
-            auditLogTableRows: AuditLogRow[];
-            allAuditLogIds: string[];
-          }
+              auditLogTableRows: AuditLogRow[];
+              allAuditLogIds: string[];
+          };
           error: null;
       }
     | {
@@ -45,10 +45,7 @@ export type AuditLogCountResponse =
           error: AuditLogCountError;
       };
 
-export type AuditLogErrorType =
-    | "abortedFetch"
-    | "failedAuditLogFetch"
-    | "failedToFetchAuditLogs";
+export type AuditLogErrorType = "abortedFetch" | "failedAuditLogFetch" | "failedToFetchAuditLogs";
 
 export interface AuditLogError {
     type: AuditLogErrorType;
@@ -80,12 +77,11 @@ export interface AuditLogRow {
 
 export const convertAuditLogPlusRowsToAuditLogRows = (
     auditLogResponse: DbAuditLogRow[]
-): AuditLogRow[] =>
-    auditLogResponse.map((convertSingleAuditLogPlusRowsToAuditLogRow));
+): AuditLogRow[] => auditLogResponse.map(convertSingleAuditLogPlusRowsToAuditLogRow);
 
 export const convertSingleAuditLogPlusRowsToAuditLogRow = (
     auditLogPlusRow: DbAuditLogRow
-): AuditLogRow =>{
+): AuditLogRow => {
     return {
         auditLogId: auditLogPlusRow.primary_key ?? "",
         action: auditLogPlusRow.action ?? "",
@@ -106,5 +102,5 @@ export const convertSingleAuditLogPlusRowsToAuditLogRow = (
         statusOrder: auditLogPlusRow.status_order ?? "",
         wasSuccess: auditLogPlusRow.wasSuccess ?? null,
         websiteData: auditLogPlusRow.website_data ?? "",
-    }
+    };
 };

@@ -1,7 +1,15 @@
 import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import { Supabase } from "@/supabaseUtils";
-import { DatabaseError} from "../../errorClasses";
-import { GetAuditLogDataAndIdsResult, AuditLogSortState, GetAuditLogDataResult, AuditLogErrorType, convertAuditLogPlusRowsToAuditLogRows, AuditLogRow, convertSingleAuditLogPlusRowsToAuditLogRow } from "./types";
+import { DatabaseError } from "../../errorClasses";
+import {
+    GetAuditLogDataAndIdsResult,
+    AuditLogSortState,
+    GetAuditLogDataResult,
+    AuditLogErrorType,
+    convertAuditLogPlusRowsToAuditLogRows,
+    AuditLogRow,
+    convertSingleAuditLogPlusRowsToAuditLogRow,
+} from "./types";
 import { DbQuery } from "@/components/Tables/Filters";
 import { DbAuditLogRow } from "@/databaseUtils";
 import { defaultAuditLogSort, defaultAuditLogSortConfig } from "./sortFunctions";
@@ -10,9 +18,12 @@ import { PostgrestError } from "@supabase/supabase-js";
 const getAuditLogQuery = (
     supabase: Supabase,
     sortState: AuditLogSortState,
+    filters: any[],
     selectString = "*"
 ): DbQuery<DbAuditLogRow> => {
     let query = supabase.from("audit_log_plus").select(selectString) as DbQuery<DbAuditLogRow>;
+
+    // here is where the filters would be applied to the query
 
     if (sortState.sortEnabled && sortState.column.sortMethod) {
         query = sortState.column.sortMethod(sortState.sortDirection, query);
@@ -23,16 +34,17 @@ const getAuditLogQuery = (
     query = query.order("created_at", { ascending: false });
 
     return query;
-}
+};
 
 const fetchAuditLogDbRows = async (
     supabase: Supabase,
     sortState: AuditLogSortState,
     startIndex: number,
     endIndex: number,
+    filters: any[],
     abortSignal: AbortSignal
 ): Promise<GetAuditLogDataResult> => {
-    let query = getAuditLogQuery(supabase, sortState);
+    let query = getAuditLogQuery(supabase, sortState, filters);
     query = query.range(startIndex, endIndex);
     query = query.abortSignal(abortSignal);
 
@@ -41,13 +53,10 @@ const fetchAuditLogDbRows = async (
         error: PostgrestError | null;
     };
 
-    // console.log(error);
-    // console.log(abortSignal.aborted)
-
     if (error) {
         const logId = abortSignal.aborted
-            ? await logInfoReturnLogId("Aborted fetch: audit log table", {error: error} )
-            : await logErrorReturnLogId("Error with fetch: audit log table", {error: error} );
+            ? await logInfoReturnLogId("Aborted fetch: audit log table", { error: error })
+            : await logErrorReturnLogId("Error with fetch: audit log table", { error: error });
         return {
             logs: null,
             error: {
@@ -67,13 +76,15 @@ export const getAuditLogTableDataAndAllIds = async (
     sortState: AuditLogSortState,
     startIndex: number,
     endIndex: number,
-    abortSignal: AbortSignal,
+    filters: any[],
+    abortSignal: AbortSignal
 ): Promise<GetAuditLogDataAndIdsResult> => {
-    const { logs, error: getDbLogsError} = await fetchAuditLogDbRows(
+    const { logs, error: getDbLogsError } = await fetchAuditLogDbRows(
         supabase,
         sortState,
         startIndex,
         endIndex,
+        filters,
         abortSignal
     );
 
@@ -97,7 +108,7 @@ export const getAuditLogTableDataAndAllIds = async (
         };
     }
 
-    const allAuditLogIds = await getAuditLogIds(supabase, sortState, abortSignal);
+    const allAuditLogIds = await getAuditLogIds(supabase, sortState, filters, abortSignal);
 
     const auditLogTableRows = convertAuditLogPlusRowsToAuditLogRows(logs);
 
@@ -113,9 +124,10 @@ export const getAuditLogTableDataAndAllIds = async (
 export const getAuditLogIds = async (
     supabase: Supabase,
     sortState: AuditLogSortState,
+    filters: any[],
     abortSignal: AbortSignal | null = null
 ): Promise<string[]> => {
-    const query = getAuditLogQuery(supabase, sortState, "primary_key");
+    const query = getAuditLogQuery(supabase, sortState, filters, "primary_key");
 
     if (abortSignal) {
         query.abortSignal(abortSignal);

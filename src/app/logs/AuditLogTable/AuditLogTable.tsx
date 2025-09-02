@@ -4,20 +4,16 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import supabase from "@/supabaseClient";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { getAuditLogsByIds, getAuditLogTableDataAndAllIds } from "./fetchAuditLogData";
+import { getAuditLogTableDataAndAllIds } from "./fetchAuditLogData";
 import { auditLogTableHeaderKeysAndLabels } from "./columns";
 import { getAuditLogErrorMessage, auditLogTableColumnDisplayFunctions } from "./format";
-import {
-    defaultNumberOfAuditLogRowsPerPage,
-    numberOfAuditLogRowsPerPageOption,
-} from "./constants";
-import { AuditLogRow, AuditLogSortState, convertAuditLogPlusRowsToAuditLogRows } from "./types";
+import { defaultNumberOfAuditLogRowsPerPage, numberOfAuditLogRowsPerPageOption } from "./constants";
+import { AuditLogRow, AuditLogSortState } from "./types";
 import { auditLogTableSortableColumns } from "./sortFunctions";
 import { DbAuditLogRow } from "@/databaseUtils";
-import FloatingToast from "@/components/FloatingToast";
 import TableSurface from "@/components/Tables/TableSurface";
 
-interface AuditLogTableProps { 
+interface AuditLogTableProps {
     openAuditLogModal: (rowId: string) => void;
     sortState: AuditLogSortState;
     setSortState: (sortStte: AuditLogSortState) => void;
@@ -38,15 +34,12 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
     const [auditLogDataPortion, setAuditLogDataPortion] = useState<AuditLogRow[]>([]);
     const [auditLogCount, setAuditLogCount] = useState<number>(0);
 
-    const [allFilteredAuditLogIds, setAllFilteredAuditLogIds] = useState<string[]>([]);
-
     const [auditLogCountPerPage, setAuditLogCountPerPage] = useState(
         defaultNumberOfAuditLogRowsPerPage
     );
     const [currentPage, setCurrentPage] = useState(1);
     const startPoint = (currentPage - 1) * auditLogCountPerPage;
     const endPoint = currentPage * auditLogCountPerPage - 1;
-    // const [selectedAuditLogRow, setSelectedAuditLogRow] = useState<AuditLogRow | null>(null);
 
     const auditLogsTableFetchAbortController = useRef<AbortController | null>(null);
     const latestFetchRequestId = useRef<number>(0);
@@ -65,30 +58,29 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
         setErrorMessage(null);
 
         if (auditLogsTableFetchAbortController.current) {
-            
             const { data, error } = await getAuditLogTableDataAndAllIds(
                 supabase,
                 sortState,
                 startPoint,
                 endPoint,
+                appliedFilters,
                 auditLogsTableFetchAbortController.current.signal
             );
             if (currentFetchRequestId === latestFetchRequestId.current) {
                 if (error) {
-                    const newErrorMessage= getAuditLogErrorMessage(error);
+                    const newErrorMessage = getAuditLogErrorMessage(error);
                     if (newErrorMessage !== null) {
                         setErrorMessage(`Log ID: ${error.logId}`);
                     }
                 } else {
                     setAuditLogDataPortion(data.auditLogTableRows);
-                    setAllFilteredAuditLogIds(data.allAuditLogIds);
-                    
+                    setAuditLogCount(data.allAuditLogIds.length);
                 }
             }
         }
         auditLogsTableFetchAbortController.current = null;
         setIsLoading(false);
-    }, [endPoint, sortState, startPoint, setErrorMessage]);
+    }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
 
     useEffect(() => {
         if (!areFiltersLoadingForFirstTime) {

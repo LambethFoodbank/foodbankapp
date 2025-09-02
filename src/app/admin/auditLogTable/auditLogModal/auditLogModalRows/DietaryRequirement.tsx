@@ -1,7 +1,11 @@
 "use client";
 
 import React from "react";
-import { AuditLogModalItem, Key, TextValueContainer } from "../AuditLogModalRow";
+import {
+    AuditLogModalItem,
+    Key,
+    TextValueContainer,
+} from "@/app/logs/AuditLogTable/auditLogModal/AuditLogModalRow";
 
 const DietaryRequirementAuditLogModalRow: React.FC<{ dietaryRequirement: string }> = ({
     dietaryRequirement,
