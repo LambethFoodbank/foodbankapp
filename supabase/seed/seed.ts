@@ -43,7 +43,6 @@ import {
     possibleReferralAgency,
     defaultParcelNotes,
 } from "./parcelsSeed";
-import type { Enums } from "@/databaseTypesFile";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
@@ -182,35 +181,6 @@ const main = async (): Promise<never> => {
                     created_at: parcelCreationDateTime,
                 };
             }),
-        { connect: true }
-    );
-
-    await seed.dietary_requirements(
-        listsSeedRequired.map(() => {
-            const dietaryRequirement: {
-                halal: Enums<"item_dietary_status">;
-                vegetarian: Enums<"item_dietary_status">;
-                vegan: Enums<"item_dietary_status">;
-                meat: Enums<"item_dietary_status">;
-                gluten_free: Enums<"item_dietary_status">;
-                pescatarian: Enums<"item_dietary_status">;
-                dairy_free: Enums<"item_dietary_status">;
-                seafood_allergy: Enums<"item_dietary_status">;
-                pet_food: Enums<"item_dietary_status">;
-            } = {
-                halal: "not_specified",
-                vegetarian: "not_specified",
-                vegan: "not_specified",
-                meat: "not_specified",
-                gluten_free: "not_specified",
-                pescatarian: "not_specified",
-                dairy_free: "not_specified",
-                seafood_allergy: "not_specified",
-                pet_food: "not_specified",
-            };
-
-            return dietaryRequirement;
-        }),
         { connect: true }
     );
 
