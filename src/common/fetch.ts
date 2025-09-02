@@ -48,6 +48,7 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     flagged_for_attention: boolean | null;
     signposting_call_required: boolean | null;
     signposting_call_reasons: string[] | null;
+    extra_information: string | null;
 }
 
 export type FetchParcelResponse =

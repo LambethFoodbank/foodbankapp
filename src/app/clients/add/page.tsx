@@ -34,7 +34,6 @@ const AddClients: () => React.ReactElement = () => {
         petFood: {},
         otherItems: {},
         deliveryInstructions: "",
-        extraInformation: "",
         notes: "",
         lastUpdated: undefined,
     };

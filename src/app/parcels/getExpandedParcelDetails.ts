@@ -62,6 +62,7 @@ const getExpandedParcelDetails = async (
         list_type,
         signposting_call_required,
         signposting_call_reasons,
+        extra_information,
         notes,
         packing_slot: packing_slots (
             name
@@ -94,7 +95,6 @@ const getExpandedParcelDetails = async (
             baby_other_items,
             pet_food,
             other_items,
-            extra_information,
             notes,
 
             family:families(
@@ -203,7 +203,7 @@ const getExpandedParcelDetails = async (
                         client.other_items,
                         otherRequirementOptions
                     ),
-                    extraInformation: client.extra_information ?? "",
+                    extraInformation: formatExtraInformation(rawParcelDetails.extra_information),
                     signpostingCall: formatSignpostingCall(
                         rawParcelDetails.signposting_call_required,
                         rawParcelDetails.signposting_call_reasons
@@ -230,6 +230,7 @@ const getExpandedParcelDetails = async (
                 ),
                 listType: rawParcelDetails.list_type,
                 clientNotes: client.notes,
+                extraInformation: formatExtraInformation(rawParcelDetails.extra_information),
                 signpostingCall: formatSignpostingCall(
                     rawParcelDetails.signposting_call_required,
                     rawParcelDetails.signposting_call_reasons
@@ -262,6 +263,7 @@ interface ParcelDataIndependentOfClient extends Data {
     referralDetails: string;
     signpostingCall: string;
     parcelNotes: string | null;
+    extraInformation: string | null;
 }
 
 interface ParcelDataForInactiveClient extends ParcelDataIndependentOfClient {
@@ -286,7 +288,6 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     babyProducts: string;
     petFood: string;
     otherRequirements: string;
-    extraInformation: string;
     clientNotes: string;
 }
 
@@ -303,6 +304,10 @@ export const formatDatetimeAsTime = (datetime: string | null): string => {
     }
 
     return new Date(datetime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+};
+
+export const formatExtraInformation = (extraInformation: string | null): string => {
+    return extraInformation ? extraInformation.replace(/[\r\n]+/g, "\n") : "";
 };
 
 const formatPackingDateAndSlot = (

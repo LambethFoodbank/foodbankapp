@@ -181,6 +181,7 @@ const main = async (): Promise<never> => {
                             [0, possibleSignpostingCallReasons.length],
                             possibleSignpostingCallReasons
                         ),
+                    extra_information: () => copycat.oneOf(ctx.seed, defaultExtraInformation),
                     referral_agency: () => agency,
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
                     referrer_email: () => (agency ? copycat.email(ctx.seed) : ""),

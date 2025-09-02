@@ -4844,6 +4844,20 @@
           "maxLength": null
         },
         {
+          "id": "public.parcels.extra_information",
+          "name": "extra_information",
+          "columnName": "extra_information",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "clients",
           "type": "clients",
           "isRequired": true,

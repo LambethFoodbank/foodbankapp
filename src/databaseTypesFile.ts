@@ -594,6 +594,7 @@ export type Database = {
           collection_centre: string | null
           collection_datetime: string | null
           created_at: string
+          extra_information: string | null
           flagged_for_attention: boolean | null
           last_updated: string
           list_type: Database["public"]["Enums"]["list_type"]
@@ -614,6 +615,7 @@ export type Database = {
           collection_centre?: string | null
           collection_datetime?: string | null
           created_at?: string
+          extra_information?: string | null
           flagged_for_attention?: boolean | null
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
@@ -634,6 +636,7 @@ export type Database = {
           collection_centre?: string | null
           collection_datetime?: string | null
           created_at?: string
+          extra_information?: string | null
           flagged_for_attention?: boolean | null
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]

@@ -102,13 +102,13 @@ export interface rawParcel {
     flagged_for_attention: boolean | null;
     signposting_call_required: boolean | null;
     signposting_call_reasons: string[] | null;
+    extra_information: string | null;
     client: {
         full_name: string | null;
         is_active: boolean;
         phone_number: string | null;
         email: string | null;
         delivery_instructions: string | null;
-        extra_information: string | null;
         notes: string | null;
         address_1: string | null;
         address_2: string | null;
@@ -154,13 +154,13 @@ export const getRawParcelListQuery = `
         flagged_for_attention,
         signposting_call_required,
         signposting_call_reasons,
+        extra_information,
         client:clients(
             full_name,
             is_active,
             phone_number,
             email,
             delivery_instructions,
-            extra_information,
             notes,
             address_1,
             address_2,
@@ -223,7 +223,7 @@ export const convertRawParcelListToReportResult = (
                         : `${rawParcel.collection_centre?.name} (inactive)`,
                     deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
                     deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
-                    extraInformation: rawParcel.client?.extra_information ?? "",
+                    extraInformation: rawParcel.extra_information ?? "",
                     parcelNotes: rawParcel?.notes ?? "",
                     clientNotes: rawParcel.client?.notes ?? "",
                     cookingFacilities: formatRequirementsByCanonicalOrder(

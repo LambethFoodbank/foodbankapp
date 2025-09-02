@@ -19,13 +19,12 @@ import {
     PackingSlotsLabelsAndValues,
     ParcelWithCollectionCentreAndPackingSlot,
 } from "@/common/fetch";
-import { capitaliseWords, formatDatetimeAsTime } from "@/common/format";
+import { arrayToBooleanGroup, capitaliseWords, formatDatetimeAsTime } from "@/common/format";
 import { parseQueryParams } from "@/common/urlQueryParams";
 import { Errors } from "@/components/Form/formFunctions";
 import Title from "@/components/Title/Title";
 import supabase from "@/supabaseClient";
 import ParcelForm, { initialParcelFields, ParcelErrors, ParcelFields } from "../form/ParcelForm";
-import { arrayToBooleanGroup } from "@/app/clients/edit/[id]/autofill";
 
 interface EditParcelFormProps {
     parcelId: string;
@@ -62,6 +61,7 @@ const prepareParcelDataForForm = (
             parcelData.signposting_call_reasons !== null
                 ? arrayToBooleanGroup(parcelData.signposting_call_reasons)
                 : null,
+        extraInformation: parcelData.extra_information ?? "",
     };
 };
 
