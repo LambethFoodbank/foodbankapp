@@ -46,7 +46,7 @@ export const fetchWebsiteData = async (): Promise<FetchWebsiteDataErrorReturn> =
 
 export const updateDbWebsiteData = async (
     newRow: WebsiteDataRow,
-    oldTimestamp: string | undefined
+    originalTimestamp: string | undefined
 ): Promise<UpdateWebsiteDataErrorReturn> => {
     const processedData: DbWebsiteData = {
         name: newRow.dbName,
@@ -62,7 +62,7 @@ export const updateDbWebsiteData = async (
         .from("website_data")
         .update({ value: processedData.value }, { count: "exact" })
         .eq("name", processedData.name)
-        .eq("last_updated", oldTimestamp)
+        .eq("last_updated", originalTimestamp)
         .select();
 
     const auditLog = {
@@ -77,7 +77,7 @@ export const updateDbWebsiteData = async (
         return { error: { type: "failedToUpdateWebsiteData", logId } };
     }
 
-    if (count == 0 || !processedData || processedData.value.length === 0) {
+    if (count === 0) {
         const logId = await logErrorReturnLogId("Concurrent editing of website data");
         void sendAuditLog({ ...auditLog, wasSuccess: false, logId });
         return { error: { type: "concurrentEditWebsiteData", logId } };

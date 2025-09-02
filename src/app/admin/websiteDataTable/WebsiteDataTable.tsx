@@ -136,7 +136,6 @@ const WebsiteDataTable: React.FC = () => {
                         "Record has been edited recently - please refresh the page. " +
                         `Log ID: ${error.logId}`;
                     setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
-                    await refreshRow(newRow.id);
                 }
 
                 setRowErrors((prev) => ({ ...prev, [newRow.id]: message }));
@@ -206,11 +205,8 @@ const WebsiteDataTable: React.FC = () => {
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
         }));
 
-        const refreshedRow = await refreshRow(id.toString());
-        if (!refreshedRow) {
-            const logId = await logErrorReturnLogId("Failed to refresh row data on cancel");
-            setErrorMessage(`Failed to refresh data. Please try again. Log ID: ${logId}`);
-        }
+        await refreshRow(id.toString());
+        setErrorMessage(null);
     };
 
     const handleValueChange = (value: string, id: GridRowId, field: string): void => {
