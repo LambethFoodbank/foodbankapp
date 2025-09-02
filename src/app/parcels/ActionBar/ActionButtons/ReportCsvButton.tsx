@@ -4,7 +4,6 @@ import { Dayjs } from "dayjs";
 import React from "react";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import {
     formatAddressFromClientDetails,
@@ -249,10 +248,7 @@ export const convertRawParcelListToReportResult = (
                         rawParcel.client?.pet_food ?? null,
                         petFoodOptions
                     ),
-                    otherItems: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.other_items ?? null,
-                        otherRequirementOptions
-                    ),
+                    otherItems: "-", // TODO VFB-521
                     household: rawParcel.client
                         ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
                         : "",

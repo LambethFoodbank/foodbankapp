@@ -7,7 +7,6 @@ import {
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 
@@ -76,10 +75,7 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
             clientData.dietary_requirements,
             dietaryRequirementOptions
         ),
-        otherItems: formatRequirementsByCanonicalOrder(
-            clientData.other_items,
-            otherRequirementOptions
-        ),
+        otherItems: "-", //TODO: VFB-460
         cookingFacilities: formatRequirementsByCanonicalOrder(
             clientData.cooking_facilities,
             cookingFacilitiesOptions
