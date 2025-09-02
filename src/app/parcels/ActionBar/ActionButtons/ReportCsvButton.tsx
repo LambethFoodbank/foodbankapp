@@ -15,7 +15,7 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { formatDatetimeAsDate } from "@/common/format";
+import { displayNameForDeletedClient, formatDatetimeAsDate } from "@/common/format";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import CsvButton, {
     formatNumberAsStringForCsv,
@@ -188,89 +188,115 @@ export const getRawParcelListQuery = `
         )
     `;
 
+// After moving columns from clients to parcels, we need to ensure that the report rows are created correctly
+const createReportRow = (
+    rawParcel: rawParcel,
+    idAndStatusList: idAndStatus[],
+    isActive: boolean
+): ReportRow => {
+    const baseRow = {
+        clientIsActive: isActive,
+        voucherNumber: rawParcel.voucher_number ?? "",
+        packingDate: formatDatetimeAsDate(rawParcel.packing_date),
+        referralAgency: rawParcel.referral_agency ?? "",
+        referrerName: rawParcel.referrer_name ?? "",
+        referrerPhone: rawParcel.referrer_phone ?? "",
+        referrerEmail: rawParcel.referrer_email ?? "",
+        parcelStatus:
+            idAndStatusList.find((idAndStatus) => idAndStatus.parcel_id === rawParcel.primary_key)
+                ?.last_status_event_name ?? "(none)",
+        deliveryOrCollection: rawParcel.collection_centre?.is_shown
+            ? rawParcel.collection_centre?.name
+            : `${rawParcel.collection_centre?.name} (inactive)`,
+        deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
+        parcelNotes: rawParcel.notes ?? "",
+        parcelListType: rawParcel.list_type,
+        recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
+    };
+
+    if (isActive && rawParcel.client) {
+        return {
+            ...baseRow,
+            fullName: rawParcel.client.full_name ?? "(error)",
+            signpostingCallRequired: rawParcel.client.signposting_call_required ?? false,
+            flaggedForAttention: rawParcel.client.flagged_for_attention ?? false,
+            phoneNumber: formatNumberAsStringForCsv(rawParcel.client.phone_number),
+            email: rawParcel.client.email ?? "",
+            signpostingCallReasons: formatRequirementsByCanonicalOrder(
+                rawParcel.client.signposting_call_reasons ?? null,
+                signpostingCallOptions
+            ),
+            address: formatAddressFromClientDetails(rawParcel.client),
+            deliveryInstructions: rawParcel.client.delivery_instructions ?? "",
+            extraInformation: rawParcel.client.extra_information ?? "",
+            clientNotes: rawParcel.client.notes ?? "",
+            cookingFacilities: formatRequirementsByCanonicalOrder(
+                rawParcel.client.cooking_facilities ?? null,
+                cookingFacilitiesOptions
+            ),
+            dietaryRequirements: formatRequirementsByCanonicalOrder(
+                rawParcel.client.dietary_requirements ?? null,
+                dietaryRequirementOptions
+            ),
+            hygieneProducts: formatHygieneProducts(
+                rawParcel.client.hygiene_tampons ?? null,
+                rawParcel.client.hygiene_pads ?? null,
+                rawParcel.client.hygiene_other_items ?? []
+            ),
+            babyProducts: formatBabyProducts(
+                rawParcel.client.baby_food ?? null,
+                rawParcel.client.baby_formula ?? null,
+                rawParcel.client.baby_nappies ?? null,
+                rawParcel.client.baby_other_items ?? []
+            ),
+            petFood: formatRequirementsByCanonicalOrder(
+                rawParcel.client.pet_food ?? null,
+                petFoodOptions
+            ),
+            otherItems: formatRequirementsByCanonicalOrder(
+                rawParcel.client.other_items ?? null,
+                otherRequirementOptions
+            ),
+            household: formatHouseholdFromFamilyDetails(rawParcel.client.family),
+            adults: formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family),
+            children: formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family),
+        };
+    } else {
+        return {
+            ...baseRow,
+            fullName: displayNameForDeletedClient,
+            signpostingCallRequired: false,
+            flaggedForAttention: false,
+            phoneNumber: "",
+            email: "",
+            signpostingCallReasons: "",
+            address: "",
+            deliveryInstructions: "",
+            extraInformation: "",
+            clientNotes: "",
+            cookingFacilities: "",
+            dietaryRequirements: "",
+            hygieneProducts: "",
+            babyProducts: "",
+            petFood: "",
+            otherItems: "",
+            household: "",
+            adults: "",
+            children: "",
+        };
+    }
+};
+
 export const convertRawParcelListToReportResult = (
     rawParcelList: rawParcel[],
     idAndStatusList: idAndStatus[]
 ): FetchReportResult => {
     return {
         error: null,
-        data: rawParcelList
-            .filter((rawParcel) => !!rawParcel.client)
-            .map((rawParcel): ReportRow => {
-                return {
-                    voucherNumber: rawParcel.voucher_number ?? "",
-                    packingDate: formatDatetimeAsDate(rawParcel.packing_date),
-                    fullName: rawParcel.client?.full_name ?? "(error)",
-                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
-                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
-                    phoneNumber: rawParcel.client
-                        ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
-                        : "",
-                    email: rawParcel.client?.email ?? "",
-                    signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? null,
-                        signpostingCallOptions
-                    ),
-                    address: rawParcel.client
-                        ? formatAddressFromClientDetails(rawParcel.client)
-                        : "",
-                    parcelStatus:
-                        idAndStatusList.find(
-                            (idAndStatus) => idAndStatus.parcel_id === rawParcel.primary_key
-                        )?.last_status_event_name ?? "(none)",
-                    deliveryOrCollection: rawParcel.collection_centre?.is_shown
-                        ? rawParcel.collection_centre?.name
-                        : `${rawParcel.collection_centre?.name} (inactive)`,
-                    deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
-                    deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
-                    extraInformation: rawParcel.client?.extra_information ?? "",
-                    parcelNotes: rawParcel?.notes ?? "",
-                    clientNotes: rawParcel.client?.notes ?? "",
-                    cookingFacilities: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.cooking_facilities ?? null,
-                        cookingFacilitiesOptions
-                    ),
-                    dietaryRequirements: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.dietary_requirements ?? null,
-                        dietaryRequirementOptions
-                    ),
-                    hygieneProducts: formatHygieneProducts(
-                        rawParcel.client?.hygiene_tampons ?? null,
-                        rawParcel.client?.hygiene_pads ?? null,
-                        rawParcel.client?.hygiene_other_items ?? []
-                    ),
-                    babyProducts: formatBabyProducts(
-                        rawParcel.client?.baby_food ?? null,
-                        rawParcel.client?.baby_formula ?? null,
-                        rawParcel.client?.baby_nappies ?? null,
-                        rawParcel.client?.baby_other_items ?? []
-                    ),
-                    petFood: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.pet_food ?? null,
-                        petFoodOptions
-                    ),
-                    otherItems: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.other_items ?? null,
-                        otherRequirementOptions
-                    ),
-                    household: rawParcel.client
-                        ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    adults: rawParcel.client
-                        ? formatBreakdownOfAdultsFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    children: rawParcel.client
-                        ? formatBreakdownOfChildrenFromFamilyDetails(rawParcel.client.family)
-                        : "",
-                    parcelListType: rawParcel.list_type,
-                    clientIsActive: rawParcel.client?.is_active ?? false,
-                    recordCreatedOn: formatDatetimeAsDate(rawParcel.created_at),
-                    referralAgency: rawParcel?.referral_agency ?? "",
-                    referrerName: rawParcel?.referrer_name ?? "",
-                    referrerPhone: rawParcel?.referrer_phone ?? "",
-                    referrerEmail: rawParcel?.referrer_email ?? "",
-                };
-            }),
+        data: rawParcelList.map((rawParcel): ReportRow => {
+            const isActive = !!rawParcel.client?.is_active;
+            return createReportRow(rawParcel, idAndStatusList, isActive);
+        }),
     };
 };
 

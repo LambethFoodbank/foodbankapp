@@ -1,5 +1,7 @@
 "use client";
 
+import { getDeletedClientParcelsCount } from "@/app/parcels/ActionBar/ActionModals/getNumberOfDeletedClientParcels";
+import DeletedClientParcelsDownloadWarning from "@/app/parcels/ActionBar/DeletedClientParcelsDownloadWarning";
 import React, { useEffect, useRef, useState } from "react";
 import GeneralActionModal, {
     Heading,
@@ -37,6 +39,7 @@ interface ContentProps {
     onDriverNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     setIsDateValid: (valid: boolean) => void;
     maxParcelsToShow: number;
+    deletedClientParcelsCount: number;
 }
 
 const DriverOverviewInput = React.forwardRef<HTMLInputElement, DriverOverviewInputProps>(
@@ -87,6 +90,9 @@ const getPdfErrorMessage = (error: DriverOverviewError): string => {
         case "noCollectionCentre":
             errorMessage = "Failed to find a collection centre for one or more of the parcels.";
             break;
+        case "noActiveParcels":
+            errorMessage = "All selected parcels belong to deleted clients.";
+            break;
     }
     return `${errorMessage} LogId: ${error.logId}`;
 };
@@ -99,6 +105,7 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
     maxParcelsToShow,
     dateTime: date,
     driverName,
+    deletedClientParcelsCount,
     onPdfCreationCompleted,
     onPdfCreationFailed,
     isInputValid,
@@ -122,6 +129,11 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
                 parcels={selectedParcels}
                 maxParcelsToShow={maxParcelsToShow}
             />
+            {deletedClientParcelsCount > 0 && (
+                <DeletedClientParcelsDownloadWarning
+                    deletedClientParcelsCount={deletedClientParcelsCount}
+                />
+            )}
             <Centerer>
                 <DriverOverviewPdfButton
                     parcels={selectedParcels}
@@ -145,8 +157,10 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
     const [date, setDate] = useState(dayjs());
 
     const [isDateValid, setIsDateValid] = useState(true);
+    const [deletedClientParcelsCount, setDeletedClientParcelsCount] = useState<number>(0);
 
     const isInputValid = isDateValid && driverName !== null;
+    const parcelIds = props.selectedParcels.map((parcel) => parcel.parcelId);
 
     const onDriverNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const trimmedDriverName = event.target.value.trim();
@@ -212,6 +226,10 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
         });
     };
 
+    useEffect(() => {
+        void getDeletedClientParcelsCount(parcelIds, setDeletedClientParcelsCount, setErrorMessage);
+    }, [parcelIds]);
+
     return (
         <GeneralActionModal
             {...props}
@@ -228,6 +246,7 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
                     maxParcelsToShow={maxParcelsToShow}
                     dateTime={date}
                     driverName={driverName}
+                    deletedClientParcelsCount={deletedClientParcelsCount}
                     onPdfCreationCompleted={onPdfCreationCompleted}
                     onPdfCreationFailed={onPdfCreationFailed}
                     isInputValid={isInputValid}

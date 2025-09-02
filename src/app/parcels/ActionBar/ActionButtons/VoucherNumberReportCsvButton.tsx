@@ -26,7 +26,6 @@ const getMissingVoucherNumberParcelIdsAndStatus = async (
         .lte("packing_date", getDbDate(toDate))
         // eslint-disable-next-line quotes
         .or('voucher_number.not.ilike.E%, voucher_number.ilike."", voucher_number.is.null')
-        .eq("client_is_active", true)
         .not("parcel_id", "is", null);
 
     if (idFetchError) {

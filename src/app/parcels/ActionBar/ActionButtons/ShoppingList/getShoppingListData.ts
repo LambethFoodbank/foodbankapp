@@ -73,6 +73,10 @@ type FetchShoppingListForPdfResponse =
     | {
           data: null;
           error: ShoppingListPdfError;
+      }
+    | {
+          data: null;
+          error: null;
       };
 
 export type ShoppingListPdfError =
@@ -117,8 +121,7 @@ const getShoppingListDataForSingleParcel = async (
     const clientData = clientAndFamilyData.clientData;
 
     if (!clientData.is_active) {
-        const logId = await logErrorReturnLogId("Generating shopping list pdf for inactive client");
-        return { data: null, error: { type: "inactiveClient", logId: logId } };
+        return { data: null, error: null };
     }
 
     const clientDiets = [
@@ -179,6 +182,16 @@ const getShoppingListData = async (parcelIds: string[]): Promise<ShoppingListPdf
             error: lists.filter((list) => list.error)[0].error as ShoppingListPdfError,
         };
     }
+
+    const numberOfDeletedClientParcels = lists.filter(
+        (list) => list.data === null && list.error === null
+    ).length;
+
+    if (numberOfDeletedClientParcels === parcelIds.length) {
+        const logId = await logErrorReturnLogId("All parcels belong to deleted clients");
+        return { data: null, error: { type: "inactiveClient", logId: logId } };
+    }
+
     return {
         data: lists
             .filter(
