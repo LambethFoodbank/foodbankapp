@@ -20,7 +20,7 @@ const getAuditLogQuery = (
         query = defaultAuditLogSort(defaultAuditLogSortConfig.defaultSortDirection, query);
     }
 
-    // query = query.order("log_id");
+    query = query.order("created_at", { ascending: false });
 
     return query;
 }
