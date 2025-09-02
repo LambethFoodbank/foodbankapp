@@ -99,11 +99,11 @@ export interface rawParcel {
         is_shown: boolean;
     } | null;
     list_type: "regular" | "hotel";
+    flagged_for_attention: boolean | null;
     client: {
         full_name: string | null;
         is_active: boolean;
         signposting_call_required: boolean | null;
-        flagged_for_attention: boolean | null;
         phone_number: string | null;
         email: string | null;
         signposting_call_reasons: string[] | null;
@@ -151,11 +151,11 @@ export const getRawParcelListQuery = `
             is_shown
         ),
         list_type,
+        flagged_for_attention,
         client:clients(
             full_name,
             is_active,
             signposting_call_required,
-            flagged_for_attention,
             phone_number,
             email,
             signposting_call_reasons,
@@ -202,7 +202,7 @@ export const convertRawParcelListToReportResult = (
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
                     signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
-                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
+                    flaggedForAttention: rawParcel.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
                         ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
                         : "",
