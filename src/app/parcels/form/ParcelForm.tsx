@@ -354,8 +354,8 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             referrer_email: fields.referrerEmail,
             referrer_phone: fields.referrerPhone,
             notes: fields.notes,
-            flagged_for_attention: fields.attentionFlag,
-            signposting_call_required: fields.signpostingCall,
+            flagged_for_attention: fields.attentionFlag ?? false,
+            signposting_call_required: fields.signpostingCall ?? false,
             signposting_call_reasons:
                 fields.signpostingCall && fields.signpostingCallReasons !== null
                     ? checkboxGroupToArray(fields.signpostingCallReasons)
