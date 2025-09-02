@@ -15,7 +15,7 @@ import {
     fetchFamily,
     fetchClientDiets,
     FetchClientDietaryErrorType,
-    fetchClientPreferredItems,
+    fetchClientItems,
 } from "@/common/fetch";
 import { prepareClientSummary, prepareRequirementSummary } from "@/common/formatClientsData";
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
@@ -76,8 +76,11 @@ const getClientAndFamilyData = async (clientID: string): Promise<FetchShoppingLi
         return { data: null, error: dietsError };
     }
 
-    const { data: clientPreferredItemsData, error: preferredItemsError } =
-        await fetchClientPreferredItems(clientID, supabase);
+    const { data: clientPreferredItemsData, error: preferredItemsError } = await fetchClientItems(
+        clientID,
+        "all",
+        supabase
+    );
     if (preferredItemsError) {
         return { data: null, error: preferredItemsError };
     }
@@ -165,8 +168,8 @@ const getShoppingListDataForSingleParcel = async (
     const householdSummary = prepareHouseholdSummary(familyData);
     const requirementSummary = prepareRequirementSummary(
         clientData,
-        clientDietsData.map((diet) => diet.name),
-        clientPreferredItemsData.map((item) => item.name)
+        clientDietsData,
+        clientPreferredItemsData
     );
 
     const { data: endNotes, error: listsCommentError } = await fetchListsComment(supabase);

@@ -2,13 +2,16 @@ import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
     formatBabyProducts,
+    formatBreakdownFromArray,
     formatExtraInformation,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
+    getClientPreferredItemsByType,
 } from "@/app/clients/getExpandedClientDetails";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
+import { Diet, Item } from "@/components/Form/formFunctions";
 
 export interface ClientSummary {
     name: string;
@@ -60,8 +63,8 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
 
 export const prepareRequirementSummary = (
     clientData: Schema["clients"],
-    clientDiets: string[],
-    clientPreferredItems: string[]
+    clientDiets: Diet[],
+    clientPreferredItems: Item[]
 ): RequirementSummary => {
     return {
         hygieneProducts: formatHygieneProducts(
@@ -76,8 +79,16 @@ export const prepareRequirementSummary = (
             clientData.baby_other_items
         ),
         petFood: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),
-        diets: clientDiets.join(", ") || "None",
-        preferredItems: clientPreferredItems.join(", ") || "None",
+        diets: clientDiets.map((diet) => diet.name).join(", ") || "None",
+        preferredItems: formatBreakdownFromArray(
+            getClientPreferredItemsByType(
+                clientPreferredItems,
+                (item) => item.name,
+                (item) => item.type ?? null,
+                "alternative_food"
+            ),
+            (item) => item
+        ),
         otherItems: formatRequirementsByCanonicalOrder(
             clientData.other_items,
             otherRequirementOptions
