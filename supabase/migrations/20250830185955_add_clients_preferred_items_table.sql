@@ -12,11 +12,11 @@ CREATE UNIQUE INDEX clients_preferred_items_pkey ON public.clients_preferred_ite
 
 alter table "public"."clients_preferred_items" add constraint "clients_preferred_items_pkey" PRIMARY KEY using index "clients_preferred_items_pkey";
 
-alter table "public"."clients_preferred_items" add constraint "clients_preferred_items_client_id_fkey" FOREIGN KEY (client_id) REFERENCES clients(primary_key) not valid;
+alter table "public"."clients_preferred_items" add constraint "clients_preferred_items_client_id_fkey" FOREIGN KEY (client_id) REFERENCES clients(primary_key) ON DELETE CASCADE not valid;
 
 alter table "public"."clients_preferred_items" validate constraint "clients_preferred_items_client_id_fkey";
 
-alter table "public"."clients_preferred_items" add constraint "clients_preferred_items_item_id_fkey" FOREIGN KEY (item_id) REFERENCES lists(primary_key) not valid;
+alter table "public"."clients_preferred_items" add constraint "clients_preferred_items_item_id_fkey" FOREIGN KEY (item_id) REFERENCES lists(primary_key) ON DELETE CASCADE not valid;
 
 alter table "public"."clients_preferred_items" validate constraint "clients_preferred_items_item_id_fkey";
 
