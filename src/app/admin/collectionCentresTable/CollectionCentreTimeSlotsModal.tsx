@@ -28,8 +28,8 @@ import {
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 import {
     ColumnContainer,
-    ModalTimeSlotRow,
-    ModalTimeSlotsContainer,
+    ModalRow,
+    ModalContainer,
     RowContainer,
 } from "@/app/admin/common/modalStyles";
 
@@ -255,12 +255,12 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                         <Heading>{props.selectedCollectionCentreInfo?.name}</Heading>
                     </Centerer>
                     <Centerer>
-                        <ModalTimeSlotsContainer aria-label="List of defined time slots">
+                        <ModalContainer aria-label="List of defined time slots">
                             <FormGroup>
                                 {timeSlotModalData &&
                                     timeSlotModalData.timeSlots.map((timeSlot) => {
                                         return (
-                                            <ModalTimeSlotRow key={timeSlot.time}>
+                                            <ModalRow key={timeSlot.time}>
                                                 <SpaceBetween>
                                                     <CheckboxInput
                                                         label={timeSlot.time}
@@ -284,11 +284,11 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                                                         />
                                                     </StyledIconButton>
                                                 </SpaceBetween>
-                                            </ModalTimeSlotRow>
+                                            </ModalRow>
                                         );
                                     })}
                             </FormGroup>
-                        </ModalTimeSlotsContainer>
+                        </ModalContainer>
                     </Centerer>
                 </ContentDiv>
             </OutsideDiv>

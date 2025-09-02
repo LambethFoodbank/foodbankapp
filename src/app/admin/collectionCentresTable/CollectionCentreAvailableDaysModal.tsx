@@ -15,7 +15,7 @@ import CheckboxInput from "@/components/DataInput/CheckboxInput";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { Centerer, ContentDiv, OutsideDiv, SpaceBetween } from "@/components/Modal/ModalFormStyles";
-import { ModalAvailableDaysContainer, ModalAvailableDaysRow } from "@/app/admin/common/modalStyles";
+import { ModalContainer, ModalRow } from "@/app/admin/common/modalStyles";
 import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 
 interface Props {
@@ -131,34 +131,31 @@ const CollectionCentreAvailableDaysModal: React.FC<Props> = (props) => {
                         <Heading>{props.selectedCollectionCentreInfo?.name}</Heading>
                     </Centerer>
                     <Centerer>
-                        <ModalAvailableDaysContainer aria-label="List of defined available days">
+                        <ModalContainer aria-label="List of defined available days">
                             <FormGroup>
                                 {availableDaysModalData &&
-                                    availableDaysModalData.availableDays.map((availableDay) => {
-                                        return (
-                                            <>
-                                                {availableDay.day != null && (
-                                                    <ModalAvailableDaysRow key={availableDay.day}>
-                                                        <SpaceBetween>
-                                                            <CheckboxInput
-                                                                label={availableDay.day}
-                                                                checked={availableDay.isActive}
-                                                                onChange={() =>
-                                                                    !!availableDay.day &&
-                                                                    toggleAvailableDaysInModalData(
-                                                                        availableDay.day
-                                                                    )
-                                                                }
-                                                                ariaLabel="Available Day"
-                                                            />
-                                                        </SpaceBetween>
-                                                    </ModalAvailableDaysRow>
-                                                )}
-                                            </>
-                                        );
-                                    })}
+                                    availableDaysModalData.availableDays.map((availableDay) => (
+                                        <>
+                                            {availableDay.day != null && (
+                                                <ModalRow key={availableDay.day}>
+                                                    <SpaceBetween>
+                                                        <CheckboxInput
+                                                            label={availableDay.day}
+                                                            checked={availableDay.isActive}
+                                                            onChange={() =>
+                                                                toggleAvailableDaysInModalData(
+                                                                    availableDay.day
+                                                                )
+                                                            }
+                                                            ariaLabel="Available Day"
+                                                        />
+                                                    </SpaceBetween>
+                                                </ModalRow>
+                                            )}
+                                        </>
+                                    ))}
                             </FormGroup>
-                        </ModalAvailableDaysContainer>
+                        </ModalContainer>
                     </Centerer>
                 </ContentDiv>
             </OutsideDiv>
