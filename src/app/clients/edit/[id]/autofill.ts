@@ -1,14 +1,8 @@
 import { Schema } from "@/databaseUtils";
 import { ClientFields } from "@/app/clients/form/ClientForm";
-import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
 import { getFormattedPeople } from "@/common/formatFamiliesData";
-
-export const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
-    const reverted: BooleanGroup = {};
-    data.forEach((value) => (reverted[value] = true));
-    return reverted;
-};
+import { arrayToBooleanGroup } from "@/common/format";
 
 const autofill = (
     clientData: Schema["clients"],
