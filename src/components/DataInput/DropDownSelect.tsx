@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { MenuItem, InputLabel, Select, FormControl, SelectChangeEvent } from "@mui/material";
+import {
+    MenuItem,
+    InputLabel,
+    Select,
+    FormControl,
+    SelectChangeEvent,
+    SxProps,
+    Theme,
+} from "@mui/material";
 
 interface GenericProps<ValueType> {
     labelsAndValues: [string, string][];
@@ -13,6 +21,7 @@ interface GenericProps<ValueType> {
     focusOnDropdown?: boolean;
     error?: boolean;
     disabled?: boolean;
+    sx?: SxProps<Theme>;
 }
 
 interface ControlledProps<ValueType> {
@@ -24,6 +33,7 @@ interface ControlledProps<ValueType> {
     focusOnDropdown?: boolean;
     error?: boolean;
     disabled?: boolean;
+    sx?: SxProps<Theme>;
 }
 
 interface UncontrolledProps<ValueType> {
@@ -43,7 +53,7 @@ const GenericSelect = <ValueType,>(props: GenericProps<ValueType>): React.ReactE
     }, [props.focusOnDropdown]);
 
     return (
-        <FormControl fullWidth>
+        <FormControl fullWidth sx={props.sx}>
             <InputLabel id={props.selectLabelId}>{props.listTitle}</InputLabel>
             <Select
                 defaultValue={props.defaultValue ?? ("" as ValueType)}
@@ -79,6 +89,7 @@ export const ControlledSelect = <ValueType,>(
             onChange={props.onChange}
             error={props.error}
             disabled={props.disabled}
+            sx={props.sx}
         />
     );
 };
