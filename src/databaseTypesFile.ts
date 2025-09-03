@@ -1043,6 +1043,7 @@ export type Database = {
           referrer_name: string | null
           referrer_phone: string | null
           signposting_call_required: boolean | null
+          sorted_client_address_postcode: string | null
           voucher_number: string | null
         }
         Relationships: [
