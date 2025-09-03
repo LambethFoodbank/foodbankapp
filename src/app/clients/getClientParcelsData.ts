@@ -3,8 +3,6 @@ import { DatabaseError } from "@/app/errorClasses";
 import { Data } from "@/components/DataViewer/DataViewer";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { formatDatetimeAsDate } from "@/common/format";
-import { signpostingCallOptions } from "@/app/parcels/form/formSections/SignpostingCallCard";
-import { formatRequirementsByCanonicalOrder } from "@/app/clients/getExpandedClientDetails";
 
 export type RawClientParcelsDetails = Awaited<ReturnType<typeof getRawClientParcelsDetails>>;
 
@@ -15,8 +13,6 @@ export interface ParcelsDetail {
     collection_centre?: { name: string } | null;
     packing_date: string | null;
     voucher_number?: string | null;
-    signposting_call_required: boolean | null;
-    signposting_call_reasons: string[] | null;
 }
 
 export const getClientParcelsDetails = async (
@@ -37,9 +33,7 @@ const getRawClientParcelsDetails = async (clientId: string): Promise<ParcelsDeta
             name
          ),
         packing_date,
-        voucher_number,
-        signposting_call_required,
-        signposting_call_reasons
+        voucher_number
     `
         )
         .eq("client_id", clientId)
@@ -58,8 +52,6 @@ export interface ExpandedClientParcelDetails extends Data {
     voucherNumber: string;
     packingDate: string;
     collectionCentre: string;
-    signpostingCallRequired: boolean;
-    signpostingCallReasons: string;
 }
 
 export const rawDataToClientParcelsDetails = (
@@ -70,13 +62,5 @@ export const rawDataToClientParcelsDetails = (
         voucherNumber: parcel.voucher_number ?? "-",
         packingDate: formatDatetimeAsDate(parcel.packing_date),
         collectionCentre: parcel.collection_centre?.name ?? "-",
-        signpostingCallRequired: parcel.signposting_call_required ?? false,
-        signpostingCallReasons:
-            parcel.signposting_call_required === true
-                ? formatRequirementsByCanonicalOrder(
-                      parcel.signposting_call_reasons,
-                      signpostingCallOptions
-                  )
-                : "",
     };
 };
