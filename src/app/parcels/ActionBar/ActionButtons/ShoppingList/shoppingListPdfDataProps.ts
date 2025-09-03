@@ -1,5 +1,4 @@
 import { ParcelInfo } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getParcelsData";
-import { toSnakeCase } from "@/common/format";
 import { ClientSummary, RequirementSummary } from "@/common/formatClientsData";
 import { HouseholdSummary } from "@/common/formatFamiliesData";
 import { fetchLists, FetchListsErrorType } from "@/common/fetch";
@@ -7,7 +6,6 @@ import { ListType } from "@/common/databaseListTypes";
 import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { Tables } from "@/databaseTypesFile";
 
 export interface Item {
     description: string;
@@ -77,6 +75,12 @@ type GetQuantityAndNotesResult =
     | { data: Pick<Item, "quantity" | "notes">; error: null }
     | { data: null; error: GetQuantityAndNotesError };
 
+type DietaryRulesPlusRow = {
+    diet_id: string;
+    item_name: string;
+    status: "included" | "excluded" | "not_specified";
+};
+
 const getQuantityAndNotes = async (
     row: Schema["lists"],
     size: number
@@ -104,10 +108,12 @@ const getItemsByDietaryRequirements = async (
     dietaryRequirements?: string[]
 ): Promise<ItemIncludedPartition> => {
     if (!dietaryRequirements || !dietaryRequirements.length) {
-        return { includedItems: [], excludedItems: [] };
+        return { includedItems: [], excludedItems: [], error: undefined };
     }
 
-    const { data, error } = await supabase.from("dietary_requirements_plus").select();
+    const { data, error } = await supabase
+        .from("dietary_rules_plus")
+        .select("item_name, diet_id, status");
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to fetch dietary requirements", {
@@ -121,32 +127,35 @@ const getItemsByDietaryRequirements = async (
         };
     }
 
-    return (data ?? []).reduce<ItemIncludedPartition>(
-        (acc, row) => {
-            if (!row.item_name) {
-                return acc;
-            }
+    return (data ?? [])
+        .filter(
+            (row): row is DietaryRulesPlusRow =>
+                row.item_name !== null && row.diet_id !== null && row.status !== null
+        )
+        .reduce<ItemIncludedPartition>(
+            (acc, row) => {
+                const { item_name, diet_id, status } = row;
 
-            dietaryRequirements.forEach((requirement) => {
-                const value = row[requirement as keyof Tables<"dietary_requirements_plus">];
-                if (row.item_name) {
-                    if (value === "excluded") {
-                        acc.excludedItems.push(row.item_name);
-                    } else if (value === "included") {
-                        acc.includedItems.push(row.item_name);
-                    }
+                if (!dietaryRequirements.includes(diet_id)) {
+                    return acc;
                 }
-            });
-            return acc;
-        },
-        { includedItems: [], excludedItems: [] }
-    );
+
+                if (status === "excluded") {
+                    acc.excludedItems.push(item_name);
+                } else if (status === "included") {
+                    acc.includedItems.push(item_name);
+                }
+
+                return acc;
+            },
+            { includedItems: [], excludedItems: [], error: undefined }
+        );
 };
 
 export const prepareItemsListForHousehold = async (
     householdSize: number,
     listType: ListType,
-    dietaryRequirements: string[]
+    dietsIds: string[]
 ): Promise<PrepareItemsListResult> => {
     const { data: listData, error } = await fetchLists(supabase);
     if (error) {
@@ -154,27 +163,27 @@ export const prepareItemsListForHousehold = async (
     }
     const itemsList: Item[] = [];
 
-    const mappedDietaryRequirements = dietaryRequirements.length
-        ? dietaryRequirements.map((dietary) => toSnakeCase(dietary))
-        : null;
-
-    const itemsByRequirement = mappedDietaryRequirements
-        ? await getItemsByDietaryRequirements(mappedDietaryRequirements)
+    const itemsByRequirement = dietsIds
+        ? await getItemsByDietaryRequirements(dietsIds)
         : { includedItems: [], excludedItems: [] };
 
     if (itemsByRequirement.error) {
         return { data: null, error: itemsByRequirement.error };
     }
 
-    const itemsIncludedPetFood = await getItemsByDietaryRequirements(["pet_food"]);
-    if (itemsIncludedPetFood.error) {
-        return { data: null, error: itemsIncludedPetFood.error };
-    }
-
     for (const row of listData) {
+        if (!row.is_available) {
+            continue;
+        }
+
         if (row.list_type !== listType) {
             continue;
         }
+
+        if (row.item_type !== "regular_food" && row.item_type !== "alternative_food") {
+            continue;
+        }
+
         const { data: listItemData, error: listItemError } = await getQuantityAndNotes(
             row,
             householdSize
@@ -186,16 +195,14 @@ export const prepareItemsListForHousehold = async (
         if (!["", "0"].includes(listItemData.quantity.trim())) {
             const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
             const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
-            const isPetFood = itemsIncludedPetFood.includedItems.includes(row.item_name);
+            const isAlternativeFood = row.item_type === "alternative_food";
 
             const currentItem = { description: row.item_name, ...listItemData };
 
             // Add item if:
-            // 1. It's not excluded AND not pet food, OR
-            // 2. It's explicitly included by dietary requirements
-            //
-            // in the future, we will change the logic to include only regular_food items by default
-            const shouldAddItem = (!isExcluded && !isPetFood) || isIncluded;
+            // 1. It's not excluded has type "regular_food"
+            // 2. It's explicitly included
+            const shouldAddItem = (!isExcluded && !isAlternativeFood) || isIncluded;
 
             if (shouldAddItem) {
                 itemsList.push(currentItem);

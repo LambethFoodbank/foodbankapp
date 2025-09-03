@@ -10,6 +10,8 @@ import {
     Select,
     Typography,
 } from "@mui/material";
+import { faHotel } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import Alert from "@mui/material/Alert";
@@ -36,6 +38,7 @@ type Item = {
     id: string;
     item_name: string | null;
     item_type: string | null;
+    list_type: string | null;
 };
 
 function checkArraysAreEqual(
@@ -86,14 +89,16 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         const { data: itemsData } = await supabase
             .from("lists")
-            .select("primary_key, item_name, item_type")
+            .select("primary_key, item_name, item_type, list_type")
             .in("item_type", ["alternative_food", "regular_food"])
+            .order("list_type")
             .order("item_name");
         setItems(
             (itemsData ?? []).map((item) => ({
                 id: item.primary_key,
                 item_name: item.item_name,
                 item_type: item.item_type,
+                list_type: item.list_type,
             }))
         );
 
@@ -335,7 +340,20 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                                                 onChange={() => handleToggle(item.id, "included")}
                                             />
                                         }
-                                        label={item.item_name ?? "Unnamed Item"}
+                                        label={
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 0.5,
+                                                }}
+                                            >
+                                                {item.item_name ?? "Unnamed Item"}
+                                                {item.list_type === "hotel" && (
+                                                    <FontAwesomeIcon icon={faHotel} size="sm" />
+                                                )}
+                                            </Box>
+                                        }
                                     />
                                 </Grid>
                             ))}
@@ -358,7 +376,20 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                                                 onChange={() => handleToggle(item.id, "excluded")}
                                             />
                                         }
-                                        label={item.item_name ?? "Unnamed Item"}
+                                        label={
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 0.5,
+                                                }}
+                                            >
+                                                {item.item_name ?? "Unnamed Item"}
+                                                {item.list_type === "hotel" && (
+                                                    <FontAwesomeIcon icon={faHotel} size="sm" />
+                                                )}
+                                            </Box>
+                                        }
                                     />
                                 </Grid>
                             ))}

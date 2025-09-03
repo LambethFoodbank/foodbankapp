@@ -1,3 +1,4 @@
+import { Diet, Item } from "@/components/Form/formFunctions";
 import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import {
@@ -12,6 +13,9 @@ import {
     fetchClient,
     fetchListsComment,
     fetchFamily,
+    fetchClientDiets,
+    FetchClientDietaryErrorType,
+    fetchClientItems,
 } from "@/common/fetch";
 import { prepareClientSummary, prepareRequirementSummary } from "@/common/formatClientsData";
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
@@ -29,6 +33,8 @@ import { logErrorReturnLogId } from "@/logger/logger";
 interface ClientDataAndFamilyData {
     clientData: Schema["clients"];
     familyData: Schema["families"][];
+    clientDietsData: Diet[];
+    clientPreferredItemsData: Item[];
 }
 
 type FetchShoppingListResponse =
@@ -41,7 +47,10 @@ type FetchShoppingListResponse =
           error: FetchShoppingListError;
       };
 
-type FetchShoppingListErrorType = FetchClientErrorType | FetchFamilyErrorType;
+type FetchShoppingListErrorType =
+    | FetchClientErrorType
+    | FetchFamilyErrorType
+    | FetchClientDietaryErrorType;
 
 interface FetchShoppingListError {
     type: FetchShoppingListErrorType;
@@ -49,20 +58,37 @@ interface FetchShoppingListError {
 }
 
 const getClientAndFamilyData = async (clientID: string): Promise<FetchShoppingListResponse> => {
-    const { data: clientData, error: clientError } = await fetchClient(clientID, supabase);
-    if (clientError) {
-        return { data: null, error: clientError };
+    const [clientResult, dietsResult, itemsResult] = await Promise.all([
+        fetchClient(clientID, supabase),
+        fetchClientDiets(clientID, supabase),
+        fetchClientItems(clientID, "all", supabase),
+    ]);
+
+    if (clientResult.error) {
+        return { data: null, error: clientResult.error };
+    }
+
+    if (dietsResult.error) {
+        return { data: null, error: dietsResult.error };
     }
 
     const { data: familyData, error: familyError } = await fetchFamily(
-        clientData.family_id,
+        clientResult.data.family_id,
         supabase
     );
     if (familyError) {
         return { data: null, error: familyError };
     }
 
-    return { data: { clientData: clientData, familyData: familyData }, error: null };
+    return {
+        data: {
+            clientData: clientResult.data,
+            familyData: familyData,
+            clientDietsData: dietsResult.data,
+            clientPreferredItemsData: itemsResult.data,
+        },
+        error: null,
+    };
 };
 
 type FetchShoppingListForPdfResponse =
@@ -115,21 +141,18 @@ const getShoppingListDataForSingleParcel = async (
 
     const familyData = clientAndFamilyData.familyData;
     const clientData = clientAndFamilyData.clientData;
+    const clientDietsData = clientAndFamilyData.clientDietsData;
+    const clientPreferredItemsData = clientAndFamilyData.clientPreferredItemsData;
 
     if (!clientData.is_active) {
         const logId = await logErrorReturnLogId("Generating shopping list pdf for inactive client");
         return { data: null, error: { type: "inactiveClient", logId: logId } };
     }
 
-    const clientDiets = [
-        ...(clientData.dietary_requirements ?? []),
-        ...(clientData.pet_food?.length ? ["Pet Food"] : []),
-    ];
-
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
         familyData.length,
         parcelInfoAndClientIdData.parcelInfo.listType,
-        clientDiets
+        clientDietsData.map((diet) => diet.primaryKey)
     );
 
     if (itemsListError) {
@@ -138,7 +161,11 @@ const getShoppingListDataForSingleParcel = async (
 
     const clientSummary = prepareClientSummary(clientData);
     const householdSummary = prepareHouseholdSummary(familyData);
-    const requirementSummary = prepareRequirementSummary(clientData);
+    const requirementSummary = prepareRequirementSummary(
+        clientData,
+        clientDietsData,
+        clientPreferredItemsData
+    );
 
     const { data: endNotes, error: listsCommentError } = await fetchListsComment(supabase);
     if (listsCommentError) {

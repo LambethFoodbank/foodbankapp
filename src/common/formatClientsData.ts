@@ -2,14 +2,16 @@ import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
     formatBabyProducts,
+    formatBreakdownFromArray,
     formatExtraInformation,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
+    getClientPreferredItemsByType,
 } from "@/app/clients/getExpandedClientDetails";
-import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
+import { Diet, Item } from "@/components/Form/formFunctions";
 
 export interface ClientSummary {
     name: string;
@@ -23,7 +25,8 @@ export interface RequirementSummary {
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
-    dietaryRequirements: string;
+    diets: string;
+    preferredItems: string;
     otherItems: string;
     cookingFacilities: string;
 }
@@ -58,7 +61,11 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
     };
 };
 
-export const prepareRequirementSummary = (clientData: Schema["clients"]): RequirementSummary => {
+export const prepareRequirementSummary = (
+    clientData: Schema["clients"],
+    clientDiets: Diet[],
+    clientPreferredItems: Item[]
+): RequirementSummary => {
     return {
         hygieneProducts: formatHygieneProducts(
             clientData.hygiene_tampons,
@@ -72,9 +79,15 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
             clientData.baby_other_items
         ),
         petFood: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),
-        dietaryRequirements: formatRequirementsByCanonicalOrder(
-            clientData.dietary_requirements,
-            dietaryRequirementOptions
+        diets: clientDiets.map((diet) => diet.name).join(", ") || "None",
+        preferredItems: formatBreakdownFromArray(
+            getClientPreferredItemsByType(
+                clientPreferredItems,
+                (item) => item.name,
+                (item) => item.type ?? null,
+                "alternative_food"
+            ),
+            (item) => item
         ),
         otherItems: formatRequirementsByCanonicalOrder(
             clientData.other_items,
