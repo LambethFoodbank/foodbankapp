@@ -1,17 +1,23 @@
 import React from "react";
 import {
     CollectionCentresLabelsAndValues,
+    DbAvailableDaysType,
     DbCollectionCentreWithAvailableDaysType,
 } from "@/common/fetch";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
+import { Errors, getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
 import { ErrorText } from "@/components/Form/formStyling";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ParcelCardProps } from "../ParcelForm";
+import { StyledAlert } from "../../ActionBar/DuplicateDownloadWarning";
+import { switchErrorForCollectionCentre } from "@/app/parcels/form/submitFormHelpers";
 
 interface CollectionCentreCardProps extends ParcelCardProps {
     collectionCentresLabelsAndValues: CollectionCentresLabelsAndValues;
     collectionAvailableDays: DbCollectionCentreWithAvailableDaysType[];
+    availableDaysForSelectedCentre: DbAvailableDaysType;
+    deliveryPrimaryKey: string;
+    collectionCentreIsActive: boolean;
 }
 
 type CollectionCentreWithAvailabilityString = {
@@ -24,8 +30,11 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     errorSetter,
     formErrors,
     fields,
+    deliveryPrimaryKey,
+    collectionCentreIsActive,
     collectionCentresLabelsAndValues,
     collectionAvailableDays,
+    availableDaysForSelectedCentre,
 }) => {
     const collectionCentresWithAvailabilityStrings: CollectionCentreWithAvailabilityString[] =
         collectionAvailableDays?.map((availableDaysObject) => {
@@ -62,6 +71,15 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
             ];
         });
 
+    const isUnavailableCentre = (): boolean => {
+        return (
+            switchErrorForCollectionCentre(fields, collectionCentreIsActive, deliveryPrimaryKey) ===
+                Errors.none &&
+            availableDaysForSelectedCentre &&
+            !availableDaysForSelectedCentre.some((day) => day.is_active)
+        );
+    };
+
     return (
         <GenericFormCard
             title="Collection Centre"
@@ -79,7 +97,13 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
                         errorSetter,
                         "collectionCentre"
                     )}
+                    sx={isUnavailableCentre() ? { paddingBottom: "1rem" } : undefined}
                 />
+                {isUnavailableCentre() && (
+                    <StyledAlert severity="warning">
+                        The selected collection centre is unavailable.
+                    </StyledAlert>
+                )}
                 <ErrorText>{getErrorText(formErrors.collectionCentre)}</ErrorText>
             </>
         </GenericFormCard>
