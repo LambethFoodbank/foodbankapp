@@ -41,6 +41,9 @@ import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
 import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
 import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
 import {
+    switchErrorForCollectionCentre,
+    switchErrorForCollectionDate,
+    switchErrorForCollectionSlot,
     WriteParcelToDatabaseErrors,
     WriteParcelToDatabaseFunction,
 } from "@/app/parcels/form/submitFormHelpers";
@@ -50,6 +53,9 @@ import {
     CollectionTimeSlotsLabelsAndValues,
     getActiveTimeSlotsForCollectionCentre,
     PackingSlotsLabelsAndValues,
+    DbAvailableDaysType,
+    DbCollectionCentreWithAvailableDaysType,
+    getAvailableDaysForCollectionCentres,
 } from "@/common/fetch";
 import { getDbDate } from "@/common/format";
 import supabase from "@/supabaseClient";
@@ -227,6 +233,11 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [clientDetails, setClientDetails] = useState<ExpandedClientData | null>(null);
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
+    const [collectionCentreIsActive, setCollectionCentreIsActive] = useState<boolean>(true);
+    const [collectionAvailableDays, setAvailableDays] = useState<
+        DbCollectionCentreWithAvailableDaysType[]
+    >([]);
+    const [availableDaysForCentre, setAvailableDaysForCentre] = useState<DbAvailableDaysType>([]);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 
@@ -241,6 +252,13 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 });
         }
     }, [clientDetails, clientIdForFetch]);
+
+    useEffect(() => {
+        const centreIsActive = collectionCentresLabelsAndValues.some(
+            (centre) => centre[1] === fields.collectionCentre
+        );
+        setCollectionCentreIsActive(centreIsActive);
+    }, [collectionCentresLabelsAndValues, fields.collectionCentre]);
 
     useEffect(() => {
         const getTimeSlots = async (): Promise<void> => {
@@ -269,24 +287,72 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     }, [fields.collectionCentre, initialFormErrors]);
 
     useEffect(() => {
+        const getAvailableDaysForCentre = async (
+            collectionCentre: string | null
+        ): Promise<void> => {
+            if (fields.collectionCentre) {
+                const availableDays = collectionAvailableDays.find(
+                    (centre) => centre?.primary_key == collectionCentre
+                )?.available_days;
+
+                if (availableDays) {
+                    setAvailableDaysForCentre(availableDays);
+                }
+            }
+        };
+
+        void getAvailableDaysForCentre(fields.collectionCentre);
+    }, [collectionAvailableDays, fields.collectionCentre]);
+
+    useEffect(() => {
+        const getAvailableDays = async (): Promise<void> => {
+            const { data, error } = await getAvailableDaysForCollectionCentres(supabase);
+
+            if (error) {
+                const errorMessages = {
+                    collectionAvailableDaysFetchFailed:
+                        "Failed to fetch collection centre available days",
+                };
+
+                const errorMessage = errorMessages[error.type] || "An unexpected error occurred";
+                setSubmitErrorMessage(`${errorMessage}. Log ID: ${error.logId}`);
+                return;
+            }
+
+            setAvailableDays(data);
+        };
+
+        void getAvailableDays();
+    }, []);
+
+    useEffect(() => {
         // If the Shipping Method changes, errors for collection date and slot should be reset
         if (fields.shippingMethod == "Collection") {
-            // The collection centre fields initially have 'Delivery' default values
             setFormErrors((prevErrors) => ({
                 ...prevErrors,
-                collectionCentre:
-                    fields.collectionCentre == null || fields.collectionCentre == deliveryPrimaryKey
-                        ? Errors.initial
-                        : Errors.none,
-                collectionDate: fields.collectionDate == null ? Errors.initial : Errors.none,
-                collectionSlot:
-                    fields.collectionSlot == null || fields.collectionSlot == "-"
-                        ? Errors.initial
-                        : Errors.none,
+                collectionCentre: switchErrorForCollectionCentre(
+                    fields,
+                    collectionCentreIsActive,
+                    deliveryPrimaryKey
+                ),
+                collectionDate: switchErrorForCollectionDate(
+                    fields,
+                    collectionCentreIsActive,
+                    availableDaysForCentre
+                ),
+                collectionSlot: switchErrorForCollectionSlot(
+                    fields,
+                    collectionSlotsLabelsAndValues,
+                    availableDaysForCentre
+                ),
             }));
         }
     }, [
+        availableDaysForCentre,
+        collectionCentreIsActive,
+        collectionSlotsLabelsAndValues,
         deliveryPrimaryKey,
+        fields,
         fields.collectionCentre,
         fields.collectionDate,
         fields.collectionSlot,
@@ -411,9 +477,13 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                             errorSetter={errorSetter}
                             fieldSetter={fieldSetter}
                             fields={fields}
+                            deliveryPrimaryKey={deliveryPrimaryKey}
+                            collectionCentreIsActive={collectionCentreIsActive}
                             collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                             packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                             collectionTimeSlotsLabelsAndValues={collectionSlotsLabelsAndValues}
+                            collectionAvailableDays={collectionAvailableDays}
+                            availableDaysForSelectedCentre={availableDaysForCentre}
                             listTypeLabelsAndValues={listTypeLabelsAndValues}
                         />
                     );
