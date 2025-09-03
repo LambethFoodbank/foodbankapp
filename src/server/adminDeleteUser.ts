@@ -57,6 +57,8 @@ export async function adminDeleteUser(userId: string): Promise<DeleteUserResult>
     const auditLog = {
         action: "delete a user",
         content: {
+            before: {},
+            after: {},
             userId: userId,
             role: userProfile.role,
         },

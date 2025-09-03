@@ -5,6 +5,7 @@ import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { ClientFields } from "./ClientForm";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
+import { fetchClientAndFamily, getBeforeAndAfterClientAndFamily } from "@/app/logs/fetchForAuditLog";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
@@ -124,6 +125,15 @@ export const submitEditClientForm = async (
 ): Promise<editClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
+
+    const { data: oldRow, error: fetchOldRowError} = await fetchClientAndFamily(primaryKey);
+
+    if (fetchOldRowError) {
+        const logId = fetchOldRowError.logId;
+        await sendAuditLog({ content: { actionType: 'Edit' }, action: 'edit a client', wasSuccess: false, logId });
+        return { clientId: null, error: { type: "failedToUpdateClientAndFamily", logId } };
+    }
+
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
         "update_client_and_family",
         {
@@ -133,11 +143,13 @@ export const submitEditClientForm = async (
         }
     );
 
+    const beforeAndAfter = getBeforeAndAfterClientAndFamily(oldRow.client, oldRow.family, clientRecord, familyMembers);
+
     const auditLog = {
         action: "edit a client",
         content: {
-            clientDetails: clientRecord,
-            familyMembers: familyMembers,
+            ...beforeAndAfter,
+            actionType: 'Update'
         },
         clientId: primaryKey,
     } as const satisfies Partial<AuditLog>;

@@ -31,22 +31,23 @@ import Header from "@/app/admin/websiteDataTable/Header";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { AuditLog, fetchCollectionCentreWithId, getBeforeAndAfter, sendAuditLog } from "@/server/auditLog";
+import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
-import CollectionCentreAvailableDaysModal from "./CollectionCentreAvailableDaysModal";
+import { fetchCollectionCentreWithId, getBeforeAndAfterCollectionCentre } from "@/app/logs/fetchForAuditLog";
 
 function getBaseAuditLogForCollectionCentreAction(
     action: string,
     newCollectionCentreRow: CollectionCentresTableRow,
-    oldCollectionCentreRow: CollectionCentresTableRow
+    oldCollectionCentreRow: CollectionCentresTableRow,
+    actionType: string,
 ): Pick<AuditLog, "action" | "content" | "collectionCentreId"> {
-    const beforeAndAfter = getBeforeAndAfter(oldCollectionCentreRow, newCollectionCentreRow);
-    console.log(beforeAndAfter);
+    const beforeAndAfter = getBeforeAndAfterCollectionCentre(oldCollectionCentreRow, newCollectionCentreRow);
     return {
         action,
         content: {
             ...beforeAndAfter,
+            actionType,
         },
         collectionCentreId: newCollectionCentreRow.id,
     };
@@ -117,6 +118,7 @@ const CollectionCentresTable: React.FC = () => {
             "add a new collection centre",
             newRow,
             {} as CollectionCentresTableRow,
+            "Create"
         );
 
         if (insertCollectionCentreError) {
@@ -134,10 +136,6 @@ const CollectionCentresTable: React.FC = () => {
             await sendAuditLog({
                 ...baseAuditLog,
                 collectionCentreId: createdCollectionCentre.collectionCentreId,
-                content: {
-                    before: '-',
-                    after: { ...createdCollectionCentre }
-                },
                 wasSuccess: true,
             });
             setIsLoading(false);
@@ -152,26 +150,23 @@ const CollectionCentresTable: React.FC = () => {
             ...newRow,
             originalLastUpdated: originalTimestampsRef.current[newRow.id],
         };
-        const oldRow = await fetchCollectionCentreWithId(newRow.id);
+        const {data: oldRow, error: fetchOldRowError }= await fetchCollectionCentreWithId(newRow.id);
 
-        if (oldRow === null) {
-             const logId = await logErrorReturnLogId("Failed to update the collection centre.", {
-                message: "Failed to update the collection centre"
-            });
+        if (fetchOldRowError) {
             setErrorMessage(
-                `Failed to update the collection centre. Log ID: ${logId}`
+                `Failed to fetch collection centre. Log ID: ${fetchOldRowError.logId}`
             );
             await sendAuditLog({
                 action: "update a collection centre",
                 content: {},
                 wasSuccess: false,
-                logId,
+                logId: fetchOldRowError.logId,
             });
             setIsLoading(false);
             return {
                 error: {
                     type: "UpdateCollectionCentreFailed",
-                    logId,
+                    logId: fetchOldRowError.logId,
                 }
             };
         }
@@ -181,7 +176,8 @@ const CollectionCentresTable: React.FC = () => {
         const baseAuditLog = getBaseAuditLogForCollectionCentreAction(
             "update a collection centre",
             newRow,
-            oldRow
+            oldRow,
+            'Edit'
         );
 
         if (updateCollectionCentreError) {
@@ -232,6 +228,7 @@ const CollectionCentresTable: React.FC = () => {
     ): Promise<CollectionCentresTableRow> => {
         setErrorMessage(null);
         setIsLoading(true);
+
         try {
             if (newRow.isNew) {
                 const { data: newCollectionCentreData, error: newCollectionCentreError } =
@@ -247,7 +244,6 @@ const CollectionCentresTable: React.FC = () => {
             } else {
                 const { error: updateCollectionCentreError } = await updateCollectionCentre(newRow);
                 if (updateCollectionCentreError) {
-                    console.log("error at edit");
                     let message = `Failed to update the collection centre. Log ID: ${updateCollectionCentreError.logId}`;
 
                     if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {

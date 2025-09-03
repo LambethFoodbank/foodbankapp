@@ -55,6 +55,9 @@ export async function adminInviteUser(
     const auditLogInviteUser = {
         action: "send invite link to user by email",
         content: {
+            before: {},
+            after: {},
+            actionType: 'Create',
             email: userDetails.email,
             redirectTo: redirectUrl,
         },
@@ -121,6 +124,9 @@ export async function adminInviteAndCreateUser(
     const auditLogAddProfile = {
         action: "add a profile for user",
         content: {
+            before: {},
+            after: {},
+            actionType: "Create",
             email: userDetails.email,
             newUserId: newUser.id,
         },

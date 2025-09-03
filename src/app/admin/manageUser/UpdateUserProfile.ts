@@ -3,8 +3,9 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { UserRole } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { sendAuditLog } from "@/server/auditLog";
+import { fetchUpdateUserProfile, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
 
-interface UpdateUserProfile {
+export interface UpdateUserProfile {
     profileId: string;
     role: UserRole;
     firstName?: string;
@@ -16,6 +17,21 @@ interface UpdateUserProfile {
 export async function updateUserProfile(
     userDetails: UpdateUserProfile
 ): Promise<PostgrestError | null> {
+
+    const { data: oldRow, error: fetchOldRowError } = await fetchUpdateUserProfile(userDetails.profileId);
+
+    if (fetchOldRowError) {
+        await sendAuditLog({
+            action: "update a user profile",
+            content: {
+                actionType: 'Edit',
+            },
+            wasSuccess: false,
+            logId: fetchOldRowError.logId,
+        });
+        return fetchOldRowError.type;
+    }
+
     const { error } = await supabase
         .from("profiles")
         .update({
@@ -28,14 +44,13 @@ export async function updateUserProfile(
         .eq("primary_key", userDetails.profileId)
         .single();
 
+    const beforeAndAfter = getBeforeAndAfter(oldRow, userDetails);
+
     const auditLog = {
         action: "edit a user",
         content: {
-            role: userDetails.role,
-            firstName: userDetails.firstName,
-            lastName: userDetails.lastName,
-            phoneNumber: userDetails.phoneNumber,
-            email: userDetails.email,
+            ...beforeAndAfter,
+            actionType: "Edit",
         },
         profileId: userDetails.profileId,
     };

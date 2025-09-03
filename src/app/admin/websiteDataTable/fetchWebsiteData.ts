@@ -4,6 +4,7 @@ import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { getReadableWebsiteDataName } from "@/common/format";
+import { fetchWebsiteDataRow, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
 
 type DbWebsiteData = Tables<"website_data">;
 type FetchWebsiteDataErrors = "failedToFetchWebsiteData";
@@ -50,6 +51,14 @@ export const updateDbWebsiteData = async (
         name: row.dbName,
         value: row.value,
     };
+    const { data: oldRow, error: fetchOldRowError }= await fetchWebsiteDataRow(row.dbName);
+    console.log(oldRow);
+
+    if (fetchOldRowError) {
+        const logId = fetchOldRowError.logId;
+        void sendAuditLog({ content: { actionType: 'Edit' }, action: "update website data", wasSuccess: false, logId });
+        return { error: { type: "failedToUpdateWebsiteData", logId } };
+    }
 
     const { data: updatedWebsiteData, error } = await supabase
         .from("website_data")
@@ -58,9 +67,14 @@ export const updateDbWebsiteData = async (
         .select()
         .single();
 
+    const beforeAndAfter = getBeforeAndAfter(oldRow, processedData);
+
     const auditLog = {
         action: "update website data",
-        content: processedData,
+        content: {
+            ...beforeAndAfter,
+            actionType: 'Edit',
+        },
         websiteData: processedData.name,
     } as const satisfies Partial<AuditLog>;
 
@@ -69,6 +83,6 @@ export const updateDbWebsiteData = async (
         void sendAuditLog({ ...auditLog, wasSuccess: false, logId });
         return { error: { type: "failedToUpdateWebsiteData", logId } };
     }
-    void sendAuditLog({ ...auditLog, wasSuccess: true, content: updatedWebsiteData });
+    void sendAuditLog({ ...auditLog, wasSuccess: true });
     return { error: null };
 };
