@@ -1,6 +1,6 @@
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.sort_address_postcode(pc text)
+CREATE OR REPLACE FUNCTION public.create_postcode_sort_key(pc text)
 RETURNS text
 LANGUAGE plpgsql
 AS $function$

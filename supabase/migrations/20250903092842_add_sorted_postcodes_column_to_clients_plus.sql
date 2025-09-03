@@ -8,7 +8,7 @@ select
     clients.is_active,
     family_count.family_count,
     clients.email,
-    sort_address_postcode(clients.address_postcode) AS sorted_address_postcode
+    create_postcode_sort_key(clients.address_postcode) as sorted_address_postcode
 from
     clients
         left join family_count on clients.family_id = family_count.family_id

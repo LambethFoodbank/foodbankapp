@@ -1078,6 +1078,12 @@ export type Database = {
       }
     }
     Functions: {
+      create_postcode_sort_key: {
+        Args: {
+          pc: string
+        }
+        Returns: string
+      }
       deactivateClient: {
         Args: {
           clientid: string
@@ -1107,12 +1113,6 @@ export type Database = {
           id2: string
         }
         Returns: undefined
-      }
-      sort_address_postcode: {
-        Args: {
-          pc: string
-        }
-        Returns: string
       }
       swap_two_wiki_rows: {
         Args: {
