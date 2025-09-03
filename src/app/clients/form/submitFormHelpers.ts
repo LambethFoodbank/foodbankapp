@@ -67,20 +67,6 @@ export const formatClientRecord = (
     };
 };
 
-export const formatDeliveryAreaRecord = (
-    fields: ClientFields
-): DeliveryAreaDatabaseInsertRecord => {
-    if (fields.addressPostcode !== null) {
-        return {
-            postcode: fields.addressPostcode.split(/\s+/)[0],
-        };
-    } else {
-        return {
-            postcode: "",
-        };
-    }
-};
-
 type addClientErrors = "failedToInsertClientAndFamily";
 export type addClientResult =
     | { clientId: string; error: null }
@@ -89,32 +75,6 @@ export type addClientResult =
           error: { type: addClientErrors; logId: string };
       };
 
-type InsertDeliveryAreaErrorType = "failedToInsertDeliveryArea";
-export type InsertDeliveryAreaReturnType = {
-    error: { type: InsertDeliveryAreaErrorType; logId: string } | null;
-};
-type InsertDeliveryAreaType = (
-    deliveryAreaRecord: DeliveryAreaDatabaseInsertRecord
-) => Promise<InsertDeliveryAreaReturnType>;
-
-export const insertDeliveryArea: InsertDeliveryAreaType = async (deliveryAreaRecord) => {
-    const { error } = await supabase.from("delivery_areas").insert(deliveryAreaRecord).single();
-
-    const auditLog = {
-        action: "add a delivery area",
-        content: { deliveryAreaDetails: deliveryAreaRecord },
-    } as const satisfies Partial<AuditLog>;
-
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with insert: delivery area data", error);
-        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-        return { id: null, error: { type: "failedToInsertDeliveryArea", logId } };
-    }
-
-    await sendAuditLog({ ...auditLog, wasSuccess: true });
-    return { error: null };
-};
-
 export const submitAddClientForm = async (fields: ClientFields): Promise<addClientResult> => {
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
@@ -122,9 +82,6 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         clientrecord: clientRecord,
         familymembers: familyMembers,
     });
-
-    const deliveryAreaRecord = formatDeliveryAreaRecord(fields);
-    await insertDeliveryArea(deliveryAreaRecord);
 
     const auditLog = {
         action: "add a client",
@@ -176,8 +133,6 @@ export const submitEditClientForm = async (
             clientid: primaryKey,
         }
     );
-    const deliveryAreaRecord = formatDeliveryAreaRecord(fields);
-    await insertDeliveryArea(deliveryAreaRecord);
 
     const auditLog = {
         action: "edit a client",

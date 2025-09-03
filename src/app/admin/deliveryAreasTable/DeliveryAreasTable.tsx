@@ -48,7 +48,7 @@ const isValidPostcode = (value: string): boolean => prefixPostcodeRegex.test(val
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
     const { setRows, setRowModesModel } = props;
-
+    // The id was initialized as `number of rows+1`, which raised some issues and now it is generated randomly below
     const handleClick = (): void => {
         const id = `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);

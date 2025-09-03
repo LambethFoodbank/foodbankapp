@@ -32,7 +32,7 @@ import { getClientParcelsDetails } from "../getClientParcelsData";
 import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
-import { RoleUpdateContext, roleCanAccessModal } from "@/app/roles";
+import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
 import { rowToAddressColumn } from "@/common/tableRows";
 
 const ClientsPage: React.FC = () => {
@@ -174,7 +174,7 @@ const ClientsPage: React.FC = () => {
     const { role } = useContext(RoleUpdateContext);
 
     const onRowClick = (row: Row<ClientsTableRow>): void => {
-        if (roleCanAccessModal(role, row.data.addressPostcode.isDeliverable)) {
+        if (roleCanAccessOutsideDeliveryAreaModal(role, row.data.addressPostcode.isDeliverable)) {
             router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
         } else {
             router.push("/clients");

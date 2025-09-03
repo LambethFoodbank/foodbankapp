@@ -32,6 +32,8 @@ select
   parcels.referrer_email,
   parcels.referrer_phone,
   clients.email as client_email,
+  parcels.flagged_for_attention as flagged_for_attention,
+  parcels.signposting_call_required as signposting_call_required,
   ((delivery_areas.postcode is not null and clients.is_active) is true or clients.address_postcode is null) as is_deliverable
 from
   parcels
