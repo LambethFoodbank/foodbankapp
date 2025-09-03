@@ -26,6 +26,16 @@ const numberOfAdultsRange = (value: string): boolean => {
     );
 };
 
+export const resizePersonsArray = (current: Person[], target: number): Person[] => {
+    if (current.length === target) {
+        return current;
+    }
+
+    return current.length < target
+        ? [...current, ...Array(target - current.length).fill({} as Person)]
+        : current.slice(0, target);
+};
+
 const setAdultsFields = (
     fieldSetter: ClientSetter,
     adults: Person[],
@@ -55,16 +65,12 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
     fields,
 }) => {
     useEffect(() => {
-        if (fields.numberOfAdults > fields.adults.length) {
-            const newAdults = [...fields.adults];
-            while (newAdults.length < fields.numberOfAdults) {
-                newAdults.push({});
-            }
-            fieldSetter({ adults: newAdults });
-        } else if (fields.numberOfAdults < fields.adults.length) {
-            fieldSetter({ adults: fields.adults.slice(0, fields.numberOfAdults) });
+        const resized = resizePersonsArray(fields.adults, fields.numberOfAdults);
+        if (resized !== fields.adults) {
+            fieldSetter({ adults: resized });
         }
     }, [fields.numberOfAdults, fields.adults, fieldSetter]);
+
     return (
         <GenericFormCard
             title="Number of Adults"
@@ -87,11 +93,9 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                         additionalCondition: numberOfAdultsRange,
                     })}
                 />
-                {fields.adults.map((adult: Person, index: number) => {
-                    if (index >= fields.numberOfAdults) {
-                        return null;
-                    }
-                    return (
+                {fields.adults
+                    .slice(0, fields.numberOfAdults)
+                    .map((adult: Person, index: number) => (
                         <StyledCard key={adult.primaryKey ?? `new-adult-${index}`}>
                             <FormText>Adult {index + 1}</FormText>
                             <ControlledSelect
@@ -122,8 +126,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                                 )}
                             />
                         </StyledCard>
-                    );
-                })}
+                    ))}
             </>
         </GenericFormCard>
     );

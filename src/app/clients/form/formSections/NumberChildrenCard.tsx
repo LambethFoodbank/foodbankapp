@@ -23,6 +23,7 @@ import {
     genderSelectValueForUnknown,
     getGenderSelectLabelsAndValues,
 } from "@/common/getGendersOfFamily";
+import { resizePersonsArray } from "@/app/clients/form/formSections/NumberAdultsCard";
 
 const maxNumberChildren = (value: string): boolean => {
     return parseInt(value) <= 20;
@@ -60,16 +61,12 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
     fields,
 }) => {
     useEffect(() => {
-        if (fields.numberOfChildren > fields.children.length) {
-            const newChildren = [...fields.children];
-            while (newChildren.length < fields.numberOfChildren) {
-                newChildren.push({});
-            }
-            fieldSetter({ children: newChildren });
-        } else if (fields.numberOfChildren < fields.children.length) {
-            fieldSetter({ children: fields.children.slice(0, fields.numberOfChildren) });
+        const resized = resizePersonsArray(fields.children, fields.numberOfChildren);
+        if (resized !== fields.children) {
+            fieldSetter({ children: resized });
         }
     }, [fields.numberOfChildren, fields.children, fieldSetter]);
+
     return (
         <GenericFormCard
             title="Number of Children"
@@ -94,11 +91,9 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                         additionalCondition: maxNumberChildren,
                     })}
                 />
-                {fields.children.map((child: Person, index: number) => {
-                    if (index >= fields.numberOfChildren) {
-                        return null;
-                    }
-                    return (
+                {fields.children
+                    .slice(0, fields.numberOfChildren)
+                    .map((child: Person, index: number) => (
                         <StyledCard key={child.primaryKey ?? `new-child-${index}`}>
                             <FormText>Child {index + 1}</FormText>
                             <ControlledSelect
@@ -145,8 +140,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                 )}
                             />
                         </StyledCard>
-                    );
-                })}
+                    ))}
             </>
         </GenericFormCard>
     );
