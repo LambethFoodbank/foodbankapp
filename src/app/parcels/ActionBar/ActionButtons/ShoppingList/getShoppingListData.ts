@@ -58,39 +58,34 @@ interface FetchShoppingListError {
 }
 
 const getClientAndFamilyData = async (clientID: string): Promise<FetchShoppingListResponse> => {
-    const { data: clientData, error: clientError } = await fetchClient(clientID, supabase);
-    if (clientError) {
-        return { data: null, error: clientError };
+    const [clientResult, dietsResult, itemsResult] = await Promise.all([
+        fetchClient(clientID, supabase),
+        fetchClientDiets(clientID, supabase),
+        fetchClientItems(clientID, "all", supabase),
+    ]);
+
+    if (clientResult.error) {
+        return { data: null, error: clientResult.error };
+    }
+
+    if (dietsResult.error) {
+        return { data: null, error: dietsResult.error };
     }
 
     const { data: familyData, error: familyError } = await fetchFamily(
-        clientData.family_id,
+        clientResult.data.family_id,
         supabase
     );
     if (familyError) {
         return { data: null, error: familyError };
     }
 
-    const { data: clientDietsData, error: dietsError } = await fetchClientDiets(clientID, supabase);
-    if (dietsError) {
-        return { data: null, error: dietsError };
-    }
-
-    const { data: clientPreferredItemsData, error: preferredItemsError } = await fetchClientItems(
-        clientID,
-        "all",
-        supabase
-    );
-    if (preferredItemsError) {
-        return { data: null, error: preferredItemsError };
-    }
-
     return {
         data: {
-            clientData: clientData,
+            clientData: clientResult.data,
             familyData: familyData,
-            clientDietsData: clientDietsData,
-            clientPreferredItemsData: clientPreferredItemsData,
+            clientDietsData: dietsResult.data,
+            clientPreferredItemsData: itemsResult.data,
         },
         error: null,
     };
