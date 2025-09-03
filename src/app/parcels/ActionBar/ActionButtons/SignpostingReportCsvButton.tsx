@@ -26,7 +26,7 @@ const getSignpostingParcelIdsAndStatus = async (
         .lte("packing_date", getDbDate(toDate))
         .eq("client_is_active", true)
         .not("parcel_id", "is", null)
-        .eq("client_signposting_call_required", true);
+        .eq("signposting_call_required", true);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(
@@ -58,9 +58,8 @@ const getSignpostingRawParcelList = async (
         .limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
-            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
+            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id)
         )
-        .eq("signposting_call_required", true)
         .order("packing_date")
         .order("client_id");
     if (parcelFetchError) {
