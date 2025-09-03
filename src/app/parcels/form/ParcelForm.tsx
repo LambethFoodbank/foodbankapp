@@ -6,12 +6,13 @@ import { Button, IconButton } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
+    CardProps,
+    checkboxGroupToArray,
     checkErrorOnSubmit,
+    createSetter,
     Errors,
     Fields,
     FormErrors,
-    createSetter,
-    CardProps,
 } from "@/components/Form/formFunctions";
 import {
     CenterComponent,
@@ -19,16 +20,26 @@ import {
     StyledForm,
     StyledName,
 } from "@/components/Form/formStyling";
+import Icon from "@/components/Icons/Icon";
+import Modal from "@/components/Modal/Modal";
+import { Schema } from "@/databaseUtils";
+
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { useTheme } from "styled-components";
+import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
 import { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
 import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
 import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
+import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
 import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
 import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
-import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
+import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
 import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
-import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
+import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
 import {
     switchErrorForCollectionCentre,
     switchErrorForCollectionDate,
@@ -46,19 +57,14 @@ import {
     DbCollectionCentreWithAvailableDaysType,
     getAvailableDaysForCollectionCentres,
 } from "@/common/fetch";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
-import { useTheme } from "styled-components";
-import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
 import { getDbDate } from "@/common/format";
-import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
-import Icon from "@/components/Icons/Icon";
-import Modal from "@/components/Modal/Modal";
-import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
+import AttentionFlagCard from "@/app/parcels/form/formSections/AttentionFlagCard";
+import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
+import SignpostingCallCard from "@/app/parcels/form/formSections/SignpostingCallCard";
+import ExtraInformationCard from "@/app/parcels/form/formSections/ExtraInformationCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -77,6 +83,10 @@ export interface ParcelFields extends Fields {
     lastUpdated: string | undefined;
     deliveryInstructions: string | null;
     notes: string | null;
+    attentionFlag: boolean | null;
+    signpostingCall: boolean | null;
+    signpostingCallReasons: BooleanGroup | null;
+    extraInformation: string | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -116,6 +126,10 @@ export const initialParcelFields: ParcelFields = {
     lastUpdated: undefined,
     deliveryInstructions: null,
     notes: null,
+    attentionFlag: null,
+    signpostingCall: null,
+    signpostingCallReasons: null,
+    extraInformation: "",
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -155,6 +169,9 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
+    AttentionFlagCard,
+    SignpostingCallCard,
+    ExtraInformationCard,
     ParcelNotesCard,
 ];
 
@@ -164,6 +181,9 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    AttentionFlagCard,
+    SignpostingCallCard,
+    ExtraInformationCard,
     DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
@@ -400,6 +420,13 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             referrer_email: fields.referrerEmail,
             referrer_phone: fields.referrerPhone,
             notes: fields.notes,
+            flagged_for_attention: fields.attentionFlag ?? false,
+            signposting_call_required: fields.signpostingCall ?? false,
+            signposting_call_reasons:
+                fields.signpostingCall && fields.signpostingCallReasons !== null
+                    ? checkboxGroupToArray(fields.signpostingCallReasons)
+                    : [],
+            extra_information: fields.extraInformation ?? "",
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(

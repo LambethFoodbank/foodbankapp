@@ -1,6 +1,7 @@
 import { Json } from "@/databaseTypesFile";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 
 const localeCode = "en-GB";
 
@@ -177,4 +178,10 @@ export const formatDayjsToHoursAndMinutes = (dayjsTime: Dayjs): string => {
     const hours = String(dayjsTime.hour()).padStart(2, "0");
     const minutes = String(dayjsTime.minute()).padStart(2, "0");
     return `${hours}:${minutes}`;
+};
+
+export const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
+    const reverted: BooleanGroup = {};
+    data.forEach((value) => (reverted[value] = true));
+    return reverted;
 };

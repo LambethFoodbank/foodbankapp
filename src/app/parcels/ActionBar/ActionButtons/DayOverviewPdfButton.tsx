@@ -23,7 +23,7 @@ export type ParcelForDayOverview = Pick<
     | "packing_slot_name"
     | "is_delivery"
     | "collection_centre_acronym"
-    | "client_flagged_for_attention"
+    | "flagged_for_attention"
     | "client_full_name"
     | "client_address_postcode"
     | "client_delivery_instructions"
@@ -55,7 +55,7 @@ const getParcelsForDayOverview = async (
             packing_slot_name,
             is_delivery,
             collection_centre_acronym,
-            client_flagged_for_attention,
+            flagged_for_attention,
             client_full_name,
             client_address_postcode,
             client_delivery_instructions,
@@ -81,7 +81,7 @@ const getParcelsForDayOverview = async (
         }
         return {
             ...parcel,
-            client_flagged_for_attention: false,
+            flagged_for_attention: false,
             client_full_name: displayNameForDeletedClient,
             client_address_postcode: "-",
             client_delivery_instructions: "-",
