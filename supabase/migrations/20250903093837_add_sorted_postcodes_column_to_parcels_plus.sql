@@ -33,7 +33,7 @@ select
     parcels.referrer_phone,
     clients.email as client_email,
     parcels.flagged_for_attention,
-    parcels.signposting_call_required
+    parcels.signposting_call_required,
     clients_plus.sorted_address_postcode as sorted_client_address_postcode
 from parcels
      left join collection_centres on parcels.collection_centre = collection_centres.primary_key
