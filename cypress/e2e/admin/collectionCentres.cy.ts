@@ -194,8 +194,7 @@ describe("Edit a collection centre on admins page", () => {
                 .find('[aria-label="Available Day"]') // eslint-disable-line quotes
                 .as("availableDays");
 
-            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
-            cy.get("@availableDays").eq(1).find('input[type="checkbox"]').uncheck(); // eslint-disable-line quotes
+            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').uncheck(); // eslint-disable-line quotes
 
             // Save to close modal
             saveAvailableDaysForCentre(newCollectionCentreName);
@@ -212,8 +211,8 @@ describe("Edit a collection centre on admins page", () => {
                 .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
                 .find('[aria-label="Available Day"]', { timeout: 5000 }) // eslint-disable-line quotes
                 .as("availableDays");
-            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
-            cy.get("@availableDays").eq(1).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
+            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
+            cy.get("@availableDays").eq(1).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
         });
 
         it("Adds a collection centre and does not apply unsaved edits of its availability", () => {
@@ -232,7 +231,7 @@ describe("Edit a collection centre on admins page", () => {
                 .as("availableDays");
 
             // Tick the first day
-            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').check(); // eslint-disable-line quotes
+            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').uncheck(); // eslint-disable-line quotes
 
             // Click somewhere outside the Modal to close it without saving
             cy.get("body").click("topLeft");
@@ -252,7 +251,7 @@ describe("Edit a collection centre on admins page", () => {
                 .find('[aria-label="List of defined available days"]', { timeout: 6000 }) // eslint-disable-line quotes
                 .find('[aria-label="Available Day"]', { timeout: 6000 }) // eslint-disable-line quotes
                 .as("availableDays"); // eslint-disable-line quotes
-            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("not.be.checked"); // eslint-disable-line quotes
+            cy.get("@availableDays").eq(0).find('input[type="checkbox"]').should("be.checked"); // eslint-disable-line quotes
         });
     });
 });
