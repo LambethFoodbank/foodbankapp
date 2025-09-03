@@ -152,17 +152,17 @@ export const typeSearch = <DbData extends DbEmergencyBagRow>(
 };
 
 export const amountSearch = <DbData extends DbEmergencyBagRow>(
-    typeColumnLabel: Extract<keyof DbData, "amount">
+    amountColumnLabel: Extract<keyof DbData, "amount">
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
         const substringAsNumber = Number(substring);
 
         if (Number.isNaN(substringAsNumber) || substringAsNumber === 0) {
-            return `${typeColumnLabel}.eq.-1)`;
+            return `${amountColumnLabel}.eq.-1)`;
         }
         if (substringAsNumber >= 1000) {
-            return `${typeColumnLabel}.gte.1000)`;
+            return `${amountColumnLabel}.gte.1000)`;
         }
-        return `${typeColumnLabel}.eq.${substringAsNumber})`;
+        return `${amountColumnLabel}.eq.${substringAsNumber})`;
     });
 };
