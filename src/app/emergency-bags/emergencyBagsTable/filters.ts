@@ -24,8 +24,9 @@ import { Dayjs } from "dayjs";
 const emergencyBagTypeSearchMethod: EmergencyBagsFilterMethod<string> =
     typeSearch<DbEmergencyBagRow>("type");
 
-const emergencyBagAmountSearchMethod: EmergencyBagsFilterMethod<bigint> =
+const emergencyBagAmountSearchMethod: EmergencyBagsFilterMethod<string> =
     amountSearch<DbEmergencyBagRow>("amount");
+
 const buildDeliveryCollectionFilter = async (): Promise<EmergencyBagsFilter<string[]>> => {
     const deliveryCollectionSearch: EmergencyBagsFilterMethod<string[]> = (query, state) => {
         return state.length === 0 ? query : query.in("collection_centre_acronym", state);
@@ -92,7 +93,7 @@ export const buildEmergencyBagFilters = async (
         buildServerSideTextFilter({
             key: "amount",
             label: "Amount",
-            method: typeSearch<DbEmergencyBagRow>("type"),
+            method: emergencyBagAmountSearchMethod,
         }),
         await buildDeliveryCollectionFilter(),
     ];

@@ -158,11 +158,11 @@ export const amountSearch = <DbData extends DbEmergencyBagRow>(
         const substringAsNumber = Number(substring);
 
         if (Number.isNaN(substringAsNumber) || substringAsNumber === 0) {
-            return `${amountColumnLabel}.eq.-1)`;
+            return `${amountColumnLabel}.eq.-1`;
         }
         if (substringAsNumber >= 1000) {
-            return `${amountColumnLabel}.gte.1000)`;
+            return `${amountColumnLabel}.gte.1000`;
         }
-        return `${amountColumnLabel}.eq.${substringAsNumber})`;
+        return `${amountColumnLabel}.eq.${substringAsNumber}`;
     });
 };
