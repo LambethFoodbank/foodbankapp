@@ -59,6 +59,7 @@ const sampleProcessingData: DbParcelRow[] = [
         flagged_for_attention: false,
         signposting_call_required: true,
         client_email: "full.name@example.com",
+        sorted_client_address_postcode: "SW0001A002AA",
         is_deliverable: true,
     },
 ];
