@@ -34,10 +34,6 @@ const AddClients: () => React.ReactElement = () => {
         petFood: {},
         otherItems: {},
         deliveryInstructions: "",
-        extraInformation: "",
-        attentionFlag: false,
-        signpostingCall: false,
-        signpostingCallReasons: null,
         notes: "",
         lastUpdated: undefined,
     };

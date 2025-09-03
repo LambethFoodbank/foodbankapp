@@ -172,7 +172,15 @@ const main = async (): Promise<never> => {
                             ctx.seed
                         ),
                     list_type: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
-
+                    flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
+                    signposting_call_required: (ctx) => copycat.bool(ctx.seed),
+                    signposting_call_reasons: (ctx) =>
+                        copycat.someOf(
+                            ctx.seed,
+                            [0, possibleSignpostingCallReasons.length],
+                            possibleSignpostingCallReasons
+                        ),
+                    extra_information: () => copycat.oneOf(ctx.seed, defaultExtraInformation),
                     referral_agency: () => agency,
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
                     referrer_email: () => (agency ? copycat.email(ctx.seed) : ""),

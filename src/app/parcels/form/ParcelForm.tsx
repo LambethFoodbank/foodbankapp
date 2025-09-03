@@ -7,6 +7,7 @@ import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
     CardProps,
+    checkboxGroupToArray,
     checkErrorOnSubmit,
     createSetter,
     Errors,
@@ -54,6 +55,10 @@ import { getDbDate } from "@/common/format";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
 import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
+import AttentionFlagCard from "@/app/parcels/form/formSections/AttentionFlagCard";
+import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
+import SignpostingCallCard from "@/app/parcels/form/formSections/SignpostingCallCard";
+import ExtraInformationCard from "@/app/parcels/form/formSections/ExtraInformationCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
@@ -72,6 +77,10 @@ export interface ParcelFields extends Fields {
     lastUpdated: string | undefined;
     deliveryInstructions: string | null;
     notes: string | null;
+    attentionFlag: boolean | null;
+    signpostingCall: boolean | null;
+    signpostingCallReasons: BooleanGroup | null;
+    extraInformation: string | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -111,6 +120,10 @@ export const initialParcelFields: ParcelFields = {
     lastUpdated: undefined,
     deliveryInstructions: null,
     notes: null,
+    attentionFlag: null,
+    signpostingCall: null,
+    signpostingCallReasons: null,
+    extraInformation: "",
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -150,6 +163,9 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
+    AttentionFlagCard,
+    SignpostingCallCard,
+    ExtraInformationCard,
     ParcelNotesCard,
 ];
 
@@ -159,6 +175,9 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    AttentionFlagCard,
+    SignpostingCallCard,
+    ExtraInformationCard,
     DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
@@ -335,6 +354,13 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
             referrer_email: fields.referrerEmail,
             referrer_phone: fields.referrerPhone,
             notes: fields.notes,
+            flagged_for_attention: fields.attentionFlag ?? false,
+            signposting_call_required: fields.signpostingCall ?? false,
+            signposting_call_reasons:
+                fields.signpostingCall && fields.signpostingCallReasons !== null
+                    ? checkboxGroupToArray(fields.signpostingCallReasons)
+                    : [],
+            extra_information: fields.extraInformation ?? "",
         };
 
         const { parcelId, error } = await writeParcelInfoToDatabase(

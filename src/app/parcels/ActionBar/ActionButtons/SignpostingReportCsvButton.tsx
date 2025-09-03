@@ -26,7 +26,7 @@ const getSignpostingParcelIdsAndStatus = async (
         .lte("packing_date", getDbDate(toDate))
         .eq("client_is_active", true)
         .not("parcel_id", "is", null)
-        .eq("client_signposting_call_required", true);
+        .eq("signposting_call_required", true);
 
     if (idFetchError) {
         const logId = await logErrorReturnLogId(

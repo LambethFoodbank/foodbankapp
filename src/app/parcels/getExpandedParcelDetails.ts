@@ -23,7 +23,7 @@ import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/Cookin
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { signpostingCallOptions } from "@/app/parcels/form/formSections/SignpostingCallCard";
 
 type FetchExpandedParcelDetailsResult =
     | {
@@ -60,6 +60,9 @@ const getExpandedParcelDetails = async (
         created_at,
         collection_datetime,
         list_type,
+        signposting_call_required,
+        signposting_call_reasons,
+        extra_information,
         notes,
         packing_slot: packing_slots (
             name
@@ -92,9 +95,6 @@ const getExpandedParcelDetails = async (
             baby_other_items,
             pet_food,
             other_items,
-            extra_information,
-            signposting_call_required,
-            signposting_call_reasons,
             notes,
 
             family:families(
@@ -203,10 +203,10 @@ const getExpandedParcelDetails = async (
                         client.other_items,
                         otherRequirementOptions
                     ),
-                    extraInformation: client.extra_information ?? "",
+                    extraInformation: formatExtraInformation(rawParcelDetails.extra_information),
                     signpostingCall: formatSignpostingCall(
-                        client.signposting_call_required,
-                        client.signposting_call_reasons
+                        rawParcelDetails.signposting_call_required,
+                        rawParcelDetails.signposting_call_reasons
                     ),
                     clientNotes: client.notes ?? "",
                     createdAt: formatDateTime(rawParcelDetails.created_at),
@@ -230,6 +230,11 @@ const getExpandedParcelDetails = async (
                 ),
                 listType: rawParcelDetails.list_type,
                 clientNotes: client.notes,
+                extraInformation: formatExtraInformation(rawParcelDetails.extra_information),
+                signpostingCall: formatSignpostingCall(
+                    rawParcelDetails.signposting_call_required,
+                    rawParcelDetails.signposting_call_reasons
+                ),
                 parcelNotes: rawParcelDetails.notes,
                 packingDateAndSlot: formatPackingDateAndSlot(
                     rawParcelDetails.packing_date,
@@ -256,7 +261,9 @@ interface ParcelDataIndependentOfClient extends Data {
     createdAt: string;
     listType: ListType;
     referralDetails: string;
+    signpostingCall: string;
     parcelNotes: string | null;
+    extraInformation: string | null;
 }
 
 interface ParcelDataForInactiveClient extends ParcelDataIndependentOfClient {
@@ -281,8 +288,6 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     babyProducts: string;
     petFood: string;
     otherRequirements: string;
-    extraInformation: string;
-    signpostingCall: string;
     clientNotes: string;
 }
 
@@ -299,6 +304,10 @@ export const formatDatetimeAsTime = (datetime: string | null): string => {
     }
 
     return new Date(datetime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+};
+
+export const formatExtraInformation = (extraInformation: string | null): string => {
+    return extraInformation ? extraInformation.replace(/[\r\n]+/g, "\n") : "";
 };
 
 const formatPackingDateAndSlot = (

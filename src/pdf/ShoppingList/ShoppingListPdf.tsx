@@ -1,6 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
-import { ClientSummary, RequirementSummary } from "@/common/formatClientsData";
+import { ClientSummaryAndExtraInfo, RequirementSummary } from "@/common/formatClientsData";
 import { HouseholdSummary } from "@/common/formatFamiliesData";
 import {
     formatCamelCaseKey,
@@ -268,19 +268,16 @@ const FormatClientCell: React.FC<FormatClientCellProps> = ({ propKey, propValue 
     );
 };
 
-const DisplayClientSummary: React.FC<ClientSummary> = (clientSummary) => {
+const DisplayClientSummaryAndExtraInfo: React.FC<ClientSummaryAndExtraInfo> = (props) => {
     return (
         <>
             <View style={styles.flexRow}>
-                <FormatClientCell propKey="name" propValue={clientSummary.name} />
-                <FormatClientCell propKey="contact" propValue={clientSummary.contact} />
+                <FormatClientCell propKey="name" propValue={props.name} />
+                <FormatClientCell propKey="contact" propValue={props.contact} />
             </View>
             <View style={styles.flexRow}>
-                <FormatClientCell propKey="address" propValue={clientSummary.address} />
-                <FormatClientCell
-                    propKey="extraInformation"
-                    propValue={clientSummary.extraInformation}
-                />
+                <FormatClientCell propKey="address" propValue={props.address} />
+                <FormatClientCell propKey="extraInformation" propValue={props.extraInformation} />
             </View>
         </>
     );
@@ -321,7 +318,10 @@ const SingleShoppingList: React.FC<SingleShoppingListProps> = ({ parcelData }) =
                     {/* eslint-disable-next-line jsx-a11y/alt-text -- React-PDF Image doesn't  have alt text property*/}
                     <Image src="/logo.png" style={[styles.flexRow, styles.logoStyling]} />
                 </View>
-                <DisplayClientSummary {...parcelData.clientSummary} />
+                <DisplayClientSummaryAndExtraInfo
+                    {...parcelData.clientSummary}
+                    extraInformation={parcelData.parcelInfo.extraInformation}
+                />
                 <View style={styles.flexRow}>
                     <DisplayAsBlock data={parcelData.householdSummary} />
                     <DisplayAsBlock data={parcelData.requirementSummary} />

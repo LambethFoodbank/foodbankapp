@@ -594,6 +594,8 @@ export type Database = {
           collection_centre: string | null
           collection_datetime: string | null
           created_at: string
+          extra_information: string | null
+          flagged_for_attention: boolean | null
           last_updated: string
           list_type: Database["public"]["Enums"]["list_type"]
           notes: string | null
@@ -604,6 +606,8 @@ export type Database = {
           referrer_email: string | null
           referrer_name: string | null
           referrer_phone: string | null
+          signposting_call_reasons: string[] | null
+          signposting_call_required: boolean | null
           voucher_number: string | null
         }
         Insert: {
@@ -611,6 +615,8 @@ export type Database = {
           collection_centre?: string | null
           collection_datetime?: string | null
           created_at?: string
+          extra_information?: string | null
+          flagged_for_attention?: boolean | null
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
           notes?: string | null
@@ -621,6 +627,8 @@ export type Database = {
           referrer_email?: string | null
           referrer_name?: string | null
           referrer_phone?: string | null
+          signposting_call_reasons?: string[] | null
+          signposting_call_required?: boolean | null
           voucher_number?: string | null
         }
         Update: {
@@ -628,6 +636,8 @@ export type Database = {
           collection_centre?: string | null
           collection_datetime?: string | null
           created_at?: string
+          extra_information?: string | null
+          flagged_for_attention?: boolean | null
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
           notes?: string | null
@@ -638,6 +648,8 @@ export type Database = {
           referrer_email?: string | null
           referrer_name?: string | null
           referrer_phone?: string | null
+          signposting_call_reasons?: string[] | null
+          signposting_call_required?: boolean | null
           voucher_number?: string | null
         }
         Relationships: [
@@ -978,6 +990,7 @@ export type Database = {
           collection_datetime: string | null
           created_at: string | null
           family_count: number | null
+          flagged_for_attention: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
@@ -993,6 +1006,7 @@ export type Database = {
           referrer_email: string | null
           referrer_name: string | null
           referrer_phone: string | null
+          signposting_call_required: boolean | null
           voucher_number: string | null
         }
         Relationships: [

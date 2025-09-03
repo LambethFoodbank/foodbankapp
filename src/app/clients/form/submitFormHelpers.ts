@@ -60,13 +60,6 @@ export const formatClientRecord = (
         pet_food: checkboxGroupToArray(fields.petFood),
         other_items: checkboxGroupToArray(fields.otherItems),
         delivery_instructions: fields.deliveryInstructions,
-        extra_information: fields.extraInformation,
-        signposting_call_required: fields.signpostingCall,
-        signposting_call_reasons:
-            fields.signpostingCall && fields.signpostingCallReasons !== null
-                ? checkboxGroupToArray(fields.signpostingCallReasons)
-                : null,
-        flagged_for_attention: fields.attentionFlag,
         last_updated: fields.lastUpdated,
         notes: fields.notes,
     };
