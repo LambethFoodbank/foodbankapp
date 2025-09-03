@@ -58,7 +58,7 @@ const getSignpostingRawParcelList = async (
         .limit(1, { foreignTable: "clients" })
         .in(
             "primary_key",
-            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id)
+            idAndStatusList.map((idAndStatus) => idAndStatus.parcel_id).filter((id) => id !== null)
         )
         .order("packing_date")
         .order("client_id");
