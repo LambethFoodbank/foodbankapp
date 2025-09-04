@@ -284,6 +284,9 @@ const MaterialTable = <
         },
         muiTableBodyProps: {
             sx: {
+                "& tr:nth-of-type(even) > td": {
+                    backgroundColor: theme.main.background[0],
+                },
                 "& tr:nth-of-type(odd) > td": {
                     backgroundColor: theme.main.background[1],
                 },
@@ -368,6 +371,7 @@ const MaterialTable = <
             },
             "mrt-row-actions": {
                 header: "",
+                minSize: 80,
             },
             "mrt-row-select": {
                 size: 2,
