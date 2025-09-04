@@ -3797,7 +3797,7 @@
           "name": "more_info_field",
           "columnName": "more_info_field",
           "type": "bool",
-          "isRequired": false,
+          "isRequired": true,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,

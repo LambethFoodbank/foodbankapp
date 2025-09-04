@@ -29,9 +29,15 @@ export const getFamilyMembersForDatabase = (
 };
 
 export const formatFromPrimaryKey =
-    <T extends { primaryKey: string }, K extends string>(key: K) =>
-    (items: T[]): { [P in K]: string }[] =>
-        items.map((item) => ({ [key]: item.primaryKey }) as { [P in K]: string });
+    <T extends { primaryKey: string; additionalInfo?: string }, K extends string>(key: K) =>
+    (items: T[]): Array<{ [P in K]: string } & { notes?: string }> =>
+        items.map((item) => {
+            const result = { [key]: item.primaryKey } as { [P in K]: string } & { notes?: string };
+            if (item.additionalInfo) {
+                result.notes = item.additionalInfo;
+            }
+            return result;
+        });
 
 export const formatClientRecord = (
     fields: ClientFields
@@ -54,9 +60,6 @@ export const formatClientRecord = (
             fields.dietaryRequirements !== null
                 ? checkboxGroupToArray(fields.dietaryRequirements)
                 : null,
-        hygiene_tampons: fields.hygieneProductsTampons,
-        hygiene_pads: fields.hygieneProductsPads,
-        hygiene_other_items: checkboxGroupToArray(fields.hygieneOtherItems),
         baby_food: fields.babyFood,
         baby_formula: fields.babyFormula,
         baby_nappies: fields.babyNappies,
@@ -90,6 +93,7 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     const clientSelectedItems = formatFromPrimaryKey("item_id")([
         ...fields.preferredItems,
         ...fields.otherItems,
+        ...fields.hygieneProducts,
     ]);
 
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
@@ -146,6 +150,7 @@ export const submitEditClientForm = async (
     const clientSelectedItems = formatFromPrimaryKey("item_id")([
         ...fields.preferredItems,
         ...fields.otherItems,
+        ...fields.hygieneProducts,
     ]);
 
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(

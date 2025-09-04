@@ -56,6 +56,7 @@ export interface Item {
     name: string;
     type?: string;
     notes?: string | null;
+    additionalInfoField?: boolean;
 }
 
 export type Fields = Record<string, unknown>;
