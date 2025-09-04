@@ -157,9 +157,7 @@ const ListsPage: React.FC = () => {
         };
     }, [fetchAndSetData]);
 
-    return isLoading ? (
-        <></>
-    ) : errorMessage ? (
+    return errorMessage ? (
         <ErrorSecondaryText>{errorMessage}</ErrorSecondaryText>
     ) : (
         <ListsDataView
