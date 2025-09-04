@@ -30,36 +30,24 @@ import { mapHeadersToMRTColumns } from "@/components/Tables/materialTable/materi
 import { Box, IconButton } from "@mui/material";
 import { ClientSideSortMethod, ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { SortOrder } from "react-data-table-component";
-import styled, { useTheme } from "styled-components";
+import { useTheme } from "styled-components";
 import TableFiltersBar from "@/components/Tables/TableFiltersBar";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { getDividingLineStyleOptions } from "@/app/parcels/parcelsTable/conditionalStyling";
 import ColumnTogglePopup from "@/components/Tables/ColumnTogglePopup";
-
-const defaultColumnStyleOptions = {
-    grow: 1,
-    minWidth: "2rem",
-    maxWidth: "20rem",
-};
-
-const EditAndReorderArrowDiv = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    transform: translateX(-0.8rem);
-`;
-
-const RelativeContainerForTable = styled.div`
-    position: relative;
-`;
-
-const ColumnSelectorContainer = styled.div`
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    z-index: 900;
-`;
+import {
+    ColumnSelectorContainer,
+    defaultColumnStyleOptions,
+    displayColumnDefOptions,
+    EditAndReorderArrowDiv,
+    muiTableBodyCellProps,
+    muiTableBodyProps,
+    muiTableHeadCellProps,
+    muiTablePaperProps,
+    muiTableProps,
+    RelativeContainerForTable,
+} from "@/components/Tables/materialTable/tableStyles";
 
 type OnRowClickFunction<Data extends MRT_RowData> = (
     row: MRT_Row<Data>,
@@ -256,40 +244,10 @@ const MaterialTable = <
                         )}
                 </EditAndReorderArrowDiv>
             ),
-        muiTablePaperProps: {
-            sx: {
-                margin: "0 !important",
-            },
-        },
-        muiTableProps: {
-            sx: {
-                tableLayout: "fixed",
-                width: "100%",
-                borderCollapse: "collapse",
-            },
-        },
-        muiTableHeadCellProps: {
-            sx: {
-                backgroundColor: theme.main.background[2],
-                color: theme.main.foreground[2],
-                fontSize: "1rem",
-                fontWeight: "bold",
-                borderColor: theme.main.border,
-                whiteSpace: "normal",
-                wordBreak: "break-word",
-                overflowWrap: "anywhere",
-            },
-        },
-        muiTableBodyProps: {
-            sx: {
-                "& tr:nth-of-type(even) > td": {
-                    backgroundColor: theme.main.background[0],
-                },
-                "& tr:nth-of-type(odd) > td": {
-                    backgroundColor: theme.main.background[1],
-                },
-            },
-        },
+        muiTablePaperProps: muiTablePaperProps,
+        muiTableProps: muiTableProps,
+        muiTableHeadCellProps: muiTableHeadCellProps(theme),
+        muiTableBodyProps: muiTableBodyProps(theme),
         muiTableBodyRowProps: ({ row }) => {
             const rowIndex = row.index;
 
@@ -322,12 +280,7 @@ const MaterialTable = <
                 },
             };
         },
-        muiTableBodyCellProps: {
-            sx: {
-                whiteSpace: "normal",
-                wordBreak: "break-word",
-            },
-        },
+        muiTableBodyCellProps: muiTableBodyCellProps,
         muiSelectCheckboxProps: ({ row }) => ({
             inputProps: { "aria-label": `Select row ${row.id}` },
             checked: checkboxConfig.displayed
@@ -361,21 +314,7 @@ const MaterialTable = <
                 }
             },
         }),
-        displayColumnDefOptions: {
-            "mrt-row-drag": {
-                header: "",
-                size: 0,
-                enableSorting: false,
-            },
-            "mrt-row-actions": {
-                header: "",
-                minSize: 80,
-            },
-            "mrt-row-select": {
-                size: 2,
-                enableSorting: false,
-            },
-        },
+        displayColumnDefOptions: displayColumnDefOptions,
         onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: setPagination,
         onSortingChange: setSorting,

@@ -197,11 +197,11 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
         const row2Index = primaryKeys.indexOf(row2.primaryKey);
 
         const row1Item = listOfIngredients[row1Index];
-        const row1Order = row1Item.rowOrder;
+        const rowOrderAux = row1Item.rowOrder;
 
         const row2Item = listOfIngredients[row2Index];
         row1Item.rowOrder = row2Item.rowOrder;
-        row2Item.rowOrder = row1Order;
+        row2Item.rowOrder = rowOrderAux;
 
         const newListOfIngredients = [...listOfIngredients];
         newListOfIngredients[row1Index] = row2Item;
