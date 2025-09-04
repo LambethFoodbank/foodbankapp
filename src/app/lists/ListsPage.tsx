@@ -73,6 +73,7 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
                 itemName: row.item_name,
                 item_type: row.item_type,
                 is_available: row.is_available,
+                more_info_field: row.more_info_field,
                 ...Object.fromEntries(
                     listsHeaderKeysAndLabels
                         .filter(([key]) => /^\d+$/.test(key))

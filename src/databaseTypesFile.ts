@@ -654,6 +654,7 @@ export type Database = {
           item_name: string
           item_type: Database["public"]["Enums"]["item_type"] | null
           list_type: Database["public"]["Enums"]["list_type"]
+          more_info_field: boolean | null
           notes_for_1: string | null
           notes_for_10: string | null
           notes_for_2: string | null
@@ -682,6 +683,7 @@ export type Database = {
           item_name?: string
           item_type?: Database["public"]["Enums"]["item_type"] | null
           list_type?: Database["public"]["Enums"]["list_type"]
+          more_info_field?: boolean | null
           notes_for_1?: string | null
           notes_for_10?: string | null
           notes_for_2?: string | null
@@ -710,6 +712,7 @@ export type Database = {
           item_name?: string
           item_type?: Database["public"]["Enums"]["item_type"] | null
           list_type?: Database["public"]["Enums"]["list_type"]
+          more_info_field?: boolean | null
           notes_for_1?: string | null
           notes_for_10?: string | null
           notes_for_2?: string | null

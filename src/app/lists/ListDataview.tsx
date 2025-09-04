@@ -34,6 +34,7 @@ export interface ListRow {
     itemName: string;
     listType: ListType;
     is_available: boolean;
+    more_info_field: boolean;
     item_type: ItemType;
     "1": QuantityAndNotes;
     "2": QuantityAndNotes;
@@ -65,6 +66,7 @@ interface ListDataViewProps {
 export const listsHeaderKeysAndLabels = [
     ["itemName", "Description"],
     ["is_available", "Availability"],
+    ["more_info_field", "Show additional info field"],
     ["item_type", "Item Type"],
     ["1", "Single"],
     ["2", "Family of 2"],
@@ -105,6 +107,7 @@ export const listRowToListDB = (listRow: ListRow): Schema["lists"] => ({
     list_type: listRow.listType,
     item_type: listRow.item_type,
     is_available: listRow.is_available,
+    more_info_field: listRow.more_info_field,
 });
 
 const displayQuantityAndNotes = (data: QuantityAndNotes): React.ReactElement => {
@@ -119,9 +122,10 @@ const displayBoolean = (value: boolean): React.ReactElement => {
 
 const listDataViewColumnDisplayFunctions = {
     is_available: (value: boolean) => displayBoolean(value),
+    more_info_field: (value: boolean) => displayBoolean(value),
     item_type: (value: ItemType) => itemTypeLabels[value] ?? value,
     ...Object.fromEntries(
-        listsHeaderKeysAndLabels.slice(3).map(([key]) => [key, displayQuantityAndNotes])
+        listsHeaderKeysAndLabels.slice(4).map(([key]) => [key, displayQuantityAndNotes])
     ),
 } satisfies ColumnDisplayFunctions<ListRow>;
 
@@ -333,6 +337,9 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
                 <ClientPaginatedTable<ListRow, string | string[]>
                     headerKeysAndLabels={listsHeaderKeysAndLabels}
                     toggleableHeaders={toggleableHeaders}
+                    defaultShownHeaders={toggleableHeaders.filter(
+                        (key) => key !== "more_info_field"
+                    )}
                     showToggleableHeadersInTableContainer={false}
                     dataPortion={listData}
                     columnDisplayFunctions={listDataViewColumnDisplayFunctions}
