@@ -1,24 +1,13 @@
 # Guide to Table Components
 
-Main elements that need to be addressed:
-
-- [x] Header, Column, and Row Formatting
-- [x] Data and generic types
-- [x] Action buttons
-- [x] Sorting methods
-- [x] Pagination
-- [x] Filtering options
-- [x] Conditional styling
-- [x] Row reordering / drag and drop
-- [ ] Working with column-specific options
-
-### Material Table Workflow & Components
+### Material Table Components
 
 ```typescript jsx
 interface MRTTableProps<
+  PaginationType,
+  FilterState,
   Data extends MRT_RowData,
   DbData extends Record<string, unknown>,
-  PaginationType,
 > {
   ...
 }
@@ -27,7 +16,21 @@ interface MRTTableProps<
 - `useMaterialReactTable()` - main hook for table state and logic
 - `<MaterialReactTable table={table} />` - main table component
 
-### Header, Column, and Row Formatting
+### Header & Column Formatting
+
+MRT headers are defined as a simple list of keys.
+By contrast, columns are objects expected to contain at least the following properties:
+
+- an `accessorKey`/`accessorFn` (actual column identifiers)
+- a `header` label
+
+Because of the different styling options that we want to apply to our table cells, we use the `mapHeadersToMRTColumns`
+method to map the headers received from parent-components to a set of MRT-compatible column objects. This way, we are
+able to customize:
+
+- manual sorting methods
+- cell rendering (`ColumnDisplayFunctions`)
+- column styling (although more options are available in the main MRT hook)
 
 ### Show/Hide Menu and Toggleable Headers
 
@@ -41,18 +44,22 @@ const table = useMaterialReactTable({
     columnVisibility,
   },
   onColumnVisibilityChange: setColumnVisibility,
-};
+});
 ```
 
-To disable columns from the Show/Hide menu, we use the toggleableHeaders prop on the `<MaterialTable />` component,
-paired with the column-specific `visibleInShowHideMenu` option.
-This is done inside the same method that maps original headers to MRT columns (`mapHeadersToMRTColumns()`).
+We do not use the default `Show/Hide Menu` in the MRT library, mainly because of its limitations regarding column
+groups (e.g. toggling multiple columns through a single handler). To some extent, these drawbacks are specific to the
+library version we are currently using (v2.3.0).
+Given this situation, we opted for our own `ColumnTogglePopup` component, which interacts with MRT's `visibility` state.
 
 There is a noteworthy distinction between the different header props that are passed to the `<MaterialTable />`
 component:
 
 - `headerKeysAndLabels` - all headers that are passed to the table, including those that are hidden
-- `toggleableHeaders` - headers that can be toggled in the Show/Hide menu
+- `toggleableHeaders` - headers that can be toggled in the Show/Hide menu (both individual and belonging to column
+  groups)
+- `columnGroups` - groups of headers that can be toggled on/off through a single handler (e.g. the `referral details`
+  key handles the `referral agency`, `referrer name`, `phone` and `email` fields)
 - `defaultShownHeaders` - headers that are shown by default (some of which **may not** be available in the Show/Hide
   menu)
 
@@ -99,7 +106,7 @@ const [pagination, setPagination] = useState<MRT_PaginationState>({
 ```
 
 Passing the `setPagination` function to the `onPaginationChange` option in the `useMaterialReactTable` hook is
-insufficient on its own, because the parents' `onPageChange` and `onPerPageChange` events need to be handled separately.
+not enough on its own, because the parents' `onPageChange` and `onPerPageChange` events need to be handled separately.
 Therefore, an additional useEffect is used to call these functions when the corresponding state variables change:
 
 ```typescript
@@ -120,7 +127,8 @@ const endPoint = startPoint + perPage - 1;
 
 ### Manual Sorting
 
-Column sorting can be configured to be either manual (server-side) or automatic (client-side).
+Column sorting can be configured to be either **manual** (`server-side`) or **automatic** (`client-side`) (through the
+`manualSorting` table prop).
 
 The table receives a `sortingConfig` prop, based on which the sorting behavior is determined.
 
@@ -184,12 +192,12 @@ useEffect(() => {
 
 There are two different types of row selection that are considered:
 
-- Individual on-click events (mutually exclusive; sometimes results in a separate details panel being shown)
+- Individual _on-click_ events (mutually exclusive; sometimes results in a separate details panel being shown)
 - Multiple row selection (checkboxes; can be used for actions/report generation)
 
 **1. Individual on-click events**
 
-This is done by passing an `onRowClick` function inside the `muiTableBodyRowProps` MRT hook option.
+This is done by passing an `onRowClick` function inside the `muiTableBodyRowProps` hook option.
 It's important to note that, besides the event argument, this method requires an **MRT_Row type assertion** for its row
 parameter.
 
@@ -236,11 +244,27 @@ export type CheckboxConfig<Data> =
 };
 ```
 
-The `CheckboxConfig` type contains all the necessary information and functions to handle checkbox behavior. These
+The `CheckboxConfig` type contains all of the necessary information and functions to handle checkbox behavior. These
 methods are called inside the corresponding MRT hook options: `muiSelectCheckboxProps` (for individual row checkboxes)
 and `muiSelectAllCheckboxProps` (for the header checkbox).
 
+### Manual Filtering
+
+Filtering is handled externally through our custom `<TableFiltersBar />` component; MRT's own filter properties are
+disabled by setting the `enableColumnFilters` option to false.
+
 ### Row Reordering / Drag and Drop
 
-Row reordering is activated by setting the `enableRowOrdering` option to `true` in the `useMaterialReactTable` hook.
+Row reordering is activated by setting the `enableRowOrdering` option to `true` in the `useMaterialReactTable` hook. The
+external `onRowReorder` method is called inside the `muiRowDragHandleProps` options to customize each table's
+behaviour (although currently only the `ListsDataview` implements draggable rows).
 
+### Row Actions
+
+Possible row actions and custom buttons/handlers are specified through the `enableRowActions` and `renderRowActions`
+props (these include the edit/remove buttons in the `Lists Dataview`).
+
+### Styling
+
+All (conditional) styling options are passed to the table through specific MUI props. Some basic options are specified
+in the `tableStyles.tsx` file.
