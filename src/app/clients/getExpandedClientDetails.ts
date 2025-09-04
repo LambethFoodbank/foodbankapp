@@ -16,7 +16,6 @@ import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
-import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
 import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
@@ -174,11 +173,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             ),
             (item) => item
         ),
-        hygieneProducts: formatHygieneProducts(
-            client.hygiene_tampons,
-            client.hygiene_pads,
-            client.hygiene_other_items
-        ),
+        hygieneProducts: "-", //TODO
         babyProducts: formatBabyProducts(
             client.baby_food,
             client.baby_formula,
@@ -335,28 +330,6 @@ export const formatRequirementsByCanonicalOrder = (
     }
 
     return sortArrayByCanonicalOrder(requirementsArray, canonicalOrder).join(", ");
-};
-
-export const formatHygieneProducts = (
-    tampons: string | null,
-    pads: string | null,
-    hygieneOtherItems: string[] | null
-): string => {
-    const items = [];
-
-    if (tampons !== null) {
-        items.push("Tampons" + (tampons.length > 0 ? ` (${tampons})` : ""));
-    }
-
-    if (pads !== null) {
-        items.push("Pads" + (pads.length > 0 ? ` (${pads})` : ""));
-    }
-
-    if (hygieneOtherItems !== null && hygieneOtherItems.length > 0) {
-        items.push(formatRequirementsByCanonicalOrder(hygieneOtherItems, hygieneOtherItemsOptions));
-    }
-
-    return items.length > 0 ? items.join(", ") : "None";
 };
 
 export const formatBabyProducts = (

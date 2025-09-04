@@ -9,7 +9,6 @@ import {
     formatBreakdownOfChildrenFromFamilyDetails,
     formatBreakdownFromArray,
     formatHouseholdFromFamilyDetails,
-    formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
     getClientPreferredItemsByType,
 } from "@/app/clients/getExpandedClientDetails";
@@ -217,11 +216,7 @@ const getExpandedParcelDetails = async (
                         ),
                         (item) => item
                     ),
-                    hygieneProducts: formatHygieneProducts(
-                        client.hygiene_tampons,
-                        client.hygiene_pads,
-                        client.hygiene_other_items
-                    ),
+                    hygieneProducts: "-", // TODO
                     babyProducts: formatBabyProducts(
                         client.baby_food,
                         client.baby_formula,

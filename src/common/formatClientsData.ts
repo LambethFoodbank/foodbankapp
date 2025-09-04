@@ -3,7 +3,6 @@ import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format
 import {
     formatBabyProducts,
     formatExtraInformation,
-    formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
@@ -59,11 +58,7 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
 
 export const prepareRequirementSummary = (clientData: Schema["clients"]): RequirementSummary => {
     return {
-        hygieneProducts: formatHygieneProducts(
-            clientData.hygiene_tampons,
-            clientData.hygiene_pads,
-            clientData.hygiene_other_items
-        ),
+        hygieneProducts: "-", //TODO: VFB-460
         babyProducts: formatBabyProducts(
             clientData.baby_food,
             clientData.baby_formula,
