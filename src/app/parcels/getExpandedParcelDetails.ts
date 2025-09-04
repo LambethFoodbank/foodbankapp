@@ -10,7 +10,6 @@ import {
     formatBreakdownFromArray,
     formatHouseholdFromFamilyDetails,
     formatRequirementsByCanonicalOrder,
-    getClientPreferredItemsByType,
 } from "@/app/clients/getExpandedClientDetails";
 import { capitaliseWords, formatDateTime, formatDatetimeAsDate } from "@/common/format";
 import {
@@ -96,7 +95,8 @@ const getExpandedParcelDetails = async (
                 item:lists(
                     item_name,
                     item_type
-                )
+                ),
+                notes
             ),
             
             hygiene_tampons,
@@ -208,15 +208,19 @@ const getExpandedParcelDetails = async (
                         (diet) => diet.diet?.name ?? diet.diet_id
                     ),
                     preferredItems: formatBreakdownFromArray(
-                        getClientPreferredItemsByType(
-                            client.preferred_items,
-                            (item) => item.item?.item_name ?? item.item_id,
-                            (item) => item.item?.item_type ?? null,
-                            "alternative_food"
+                        client.preferred_items.filter(
+                            (item) => item.item?.item_type === "alternative_food"
                         ),
-                        (item) => item
+                        (item) => item.item?.item_name ?? item.item_id,
+                        (item) => item.notes
                     ),
-                    hygieneProducts: "-", // TODO
+                    hygieneProducts: formatBreakdownFromArray(
+                        client.preferred_items.filter(
+                            (item) => item.item?.item_type === "hygiene_product"
+                        ),
+                        (item) => item.item?.item_name ?? item.item_id,
+                        (item) => item.notes
+                    ),
                     babyProducts: formatBabyProducts(
                         client.baby_food,
                         client.baby_formula,
@@ -225,13 +229,9 @@ const getExpandedParcelDetails = async (
                     ),
                     petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
                     otherRequirements: formatBreakdownFromArray(
-                        getClientPreferredItemsByType(
-                            client.preferred_items,
-                            (item) => item.item?.item_name ?? item.item_id,
-                            (item) => item.item?.item_type ?? null,
-                            "others"
-                        ),
-                        (item) => item
+                        client.preferred_items.filter((item) => item.item?.item_type === "others"),
+                        (item) => item.item?.item_name ?? item.item_id,
+                        (item) => item.notes
                     ),
                     extraInformation: client.extra_information ?? "",
                     signpostingCall: formatSignpostingCall(

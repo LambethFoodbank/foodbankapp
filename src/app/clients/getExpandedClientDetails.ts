@@ -64,7 +64,8 @@ const getRawClientDetails = async (clientId: string) => {
                 item:lists(
                     item_name,
                     item_type
-                )
+                ),
+                notes
             ),
             
             hygiene_tampons,
@@ -165,15 +166,15 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             (diet) => diet.diet?.name ?? diet.diet_id
         ),
         preferredItems: formatBreakdownFromArray(
-            getClientPreferredItemsByType(
-                client.preferred_items,
-                (item) => item.item?.item_name ?? item.item_id,
-                (item) => item.item?.item_type ?? null,
-                "alternative_food"
-            ),
-            (item) => item
+            client.preferred_items.filter((item) => item.item?.item_type === "alternative_food"),
+            (item) => item.item?.item_name ?? item.item_id,
+            (item) => item.notes
         ),
-        hygieneProducts: "-", //TODO
+        hygieneProducts: formatBreakdownFromArray(
+            client.preferred_items.filter((item) => item.item?.item_type === "hygiene_product"),
+            (item) => item.item?.item_name ?? item.item_id,
+            (item) => item.notes
+        ),
         babyProducts: formatBabyProducts(
             client.baby_food,
             client.baby_formula,
@@ -182,13 +183,9 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         ),
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
         otherRequirements: formatBreakdownFromArray(
-            getClientPreferredItemsByType(
-                client.preferred_items,
-                (item) => item.item?.item_name ?? item.item_id,
-                (item) => item.item?.item_type ?? null,
-                "others"
-            ),
-            (item) => item
+            client.preferred_items.filter((item) => item.item?.item_type === "others"),
+            (item) => item.item?.item_name ?? item.item_id,
+            (item) => item.notes
         ),
         extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,
@@ -310,13 +307,25 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
 
 export const formatBreakdownFromArray = <T>(
     arr: T[] | null | undefined,
-    getName: (item: T) => string | number | null | undefined
+    getName: (item: T) => string | number | null | undefined,
+    getAdditionalInfo?: (item: T) => string | null | undefined
 ): string => {
     if (!arr || arr.length === 0) {
         return "-";
     }
-    const names = arr.map((item) => getName(item)).filter(Boolean);
-    return names.join(", ");
+    const items = arr
+        .map((item) => {
+            const name = getName(item);
+            if (name === null || name === undefined || `${name}`.trim() === "") {
+                return null;
+            }
+
+            const extra = getAdditionalInfo?.(item);
+            const extraClean = extra && extra.trim() !== "" ? extra : null;
+            return extraClean ? `${name} (${extraClean})` : `${name}`;
+        })
+        .filter((item): item is string => item !== null);
+    return items.length ? items.join(", ") : "None";
 };
 
 export const formatRequirementsByCanonicalOrder = (
@@ -357,22 +366,6 @@ export const formatBabyProducts = (
     }
 
     return items.length > 0 ? items.join(", ") : "None";
-};
-
-export const getClientPreferredItemsByType = <T>(
-    preferredItems: T[] | null | undefined,
-    getName: (item: T) => string | number | null | undefined,
-    getType: (item: T) => string | null | undefined,
-    itemType: string
-): string[] => {
-    if (!preferredItems || preferredItems.length === 0) {
-        return [];
-    }
-
-    return preferredItems
-        .filter((item) => getType(item) === itemType)
-        .map((item) => getName(item))
-        .filter((name): name is string => typeof name === "string" && name.trim() !== "");
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";
