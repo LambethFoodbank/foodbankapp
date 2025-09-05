@@ -8,19 +8,18 @@ import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 type UpdateField = "packingDate" | "packingSlot";
 
-const buildAuditLog = (
-    action: string,
-    updateField: UpdateField,
-    parcel: ParcelsTableRow,
-    count = 1,
-    oldValue = "-",
-    newValue = "-"
-): AuditLog => {
+const buildAuditLog = (action: string, parcel: ParcelsTableRow, count = 1): AuditLog => {
     return {
         action: action,
         content: {
-            before: { [updateField]: oldValue },
-            after: { [updateField]: newValue },
+            parcelDetails: {
+                client_id: parcel.clientId,
+                packing_date: parcel.packingDate?.toString(),
+                packing_slot: parcel.packingSlot,
+                voucher_number: parcel.voucherNumber,
+                collection_centre: parcel.deliveryCollection.collectionCentreName,
+                collection_datetime: parcel.collectionDatetime?.toString(),
+            },
             count: count,
             actionType: "Edit",
         },
@@ -63,7 +62,7 @@ export const hasConcurrencyConflict = async (
     updateField: UpdateField,
     action: string
 ): Promise<boolean> => {
-    const auditLog = buildAuditLog(action, updateField, parcel);
+    const auditLog = buildAuditLog(action, parcel);
     const { error, count } = await supabase
         .from("parcels")
         .select("*", { count: "exact", head: true })
@@ -113,16 +112,13 @@ export const packingDateOrSlotUpdate = async (
             .eq("last_updated", lastUpdated);
     };
     let updateResponse: PostgrestSingleResponse<null>;
-    let oldValue: string;
     switch (updateField) {
         case "packingDate":
-            oldValue = parcel.packingDate?.toString() ?? "";
             updateResponse = await packingDateOrSlotDbUpdate({
                 packing_date: packingDateOrSlotData,
             });
             break;
         case "packingSlot":
-            oldValue = parcel.packingSlot ?? "";
             updateResponse = await packingDateOrSlotDbUpdate({
                 packing_slot: packingDateOrSlotData,
             });
@@ -131,14 +127,7 @@ export const packingDateOrSlotUpdate = async (
 
     const { data: parcelData, error: fetchError } = await fetchParcel(parcel.parcelId, supabase);
 
-    const auditLog = buildAuditLog(
-        action,
-        updateField,
-        parcel,
-        updateResponse.count ?? 1,
-        oldValue,
-        parcelData?.packing_slot?.name
-    );
+    const auditLog = buildAuditLog(action, parcel, updateResponse.count ?? 1);
 
     if (fetchError) {
         const logId = await logErrorReturnLogId("Error with fetching parcel data", fetchError);
