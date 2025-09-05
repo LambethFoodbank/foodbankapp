@@ -135,9 +135,7 @@ const callErrorAndFieldSetters = <SpecificFields extends Fields>(
     input: string,
     options?: OnChangeTextOptions<SpecificFields>
 ): void => {
-    errorSetter({ [key]: errorType } as {
-        [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
-    });
+    errorSetter({ [key]: errorType } as Partial<FormErrors<SpecificFields>>);
     if (errorType === Errors.none) {
         const newValue = options?.formattingFunction ? options.formattingFunction(input) : input;
         fieldSetter({ [key]: newValue } as {
@@ -255,9 +253,7 @@ export const onChangeTextDeferredError = <SpecificFields extends Fields>(
         }
         const input = event.target.value;
         const errorType = getErrorType(input, required, regex, additionalCondition, maxCharacters);
-        errorSetter({ [key]: errorType } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
-        });
+        errorSetter({ [key]: errorType } as Partial<FormErrors<SpecificFields>>);
         const newValue = formattingFunction ? formattingFunction(input) : input;
         fieldSetter({ [key]: newValue } as {
             [key in keyof SpecificFields]: SpecificFields[key];
@@ -307,9 +303,7 @@ export const valueOnChangeRadioGroup = <SpecificFields extends Fields>(
     return (event) => {
         const input = event.target.value;
         fieldSetter({ [key]: input } as { [key in keyof SpecificFields]: SpecificFields[key] });
-        errorSetter({ [key]: Errors.none } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
-        });
+        errorSetter({ [key]: Errors.none } as Partial<FormErrors<SpecificFields>>);
     };
 };
 
@@ -321,9 +315,7 @@ export const valueOnChangeDropdownList = <SpecificFields extends Fields>(
     return (event) => {
         const input = event.target.value;
         fieldSetter({ [key]: input } as { [key in keyof SpecificFields]: SpecificFields[key] });
-        errorSetter({ [key]: Errors.none } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
-        });
+        errorSetter({ [key]: Errors.none } as Partial<FormErrors<SpecificFields>>);
     };
 };
 
@@ -335,15 +327,12 @@ export const onChangeDateOrTime = <SpecificFields extends Fields>(
 ): void => {
     if (value === null || isNaN(Date.parse(value.toString()))) {
         fieldSetter({ [key]: null } as { [key in keyof SpecificFields]: SpecificFields[key] });
-        errorSetter({ [key]: Errors.invalid } as {
-            [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
-        });
+        errorSetter({ [key]: Errors.invalid } as Partial<FormErrors<SpecificFields>>);
+
         return;
     }
     fieldSetter({ [key]: value } as { [key in keyof SpecificFields]: SpecificFields[key] });
-    errorSetter({ [key]: Errors.none } as {
-        [key in keyof FormErrors<SpecificFields>]: Errors | Errors[];
-    });
+    errorSetter({ [key]: Errors.none } as Partial<FormErrors<SpecificFields>>);
 };
 
 export const onChangeDate = <SpecificFields extends Fields>(
