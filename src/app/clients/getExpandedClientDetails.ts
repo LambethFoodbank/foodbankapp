@@ -286,7 +286,7 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
     return childDetails.join(", ");
 };
 
-const formatBreakdownFromArray = <T>(
+export const formatBreakdownFromArray = <T>(
     arr: T[] | null | undefined,
     getName: (item: T) => string | number | null | undefined,
     getAdditionalInfo?: (item: T) => string | null | undefined

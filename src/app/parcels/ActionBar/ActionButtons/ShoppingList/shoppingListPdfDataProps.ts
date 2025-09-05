@@ -11,7 +11,7 @@ export interface ShoppingListItem {
     description: string;
     quantity: string;
     notes: string;
-    additionalClientInfo: string;
+    additionalClientInfo?: string;
 }
 
 export interface ShoppingListPdfData {
@@ -161,11 +161,10 @@ export const prepareItemsListForHousehold = async (
 ): Promise<PrepareItemsListResult> => {
     const { data: listData, error } = await fetchLists(supabase);
     if (error) {
-        return { data: null, error: error };
+        return { data: null, error };
     }
-    const itemsList: ShoppingListItem[] = [];
 
-    const itemsByRequirement = dietsIds
+    const itemsByRequirement = dietsIds?.length
         ? await getItemsByDietaryRequirements(dietsIds)
         : { includedItems: [], excludedItems: [] };
 
@@ -173,15 +172,10 @@ export const prepareItemsListForHousehold = async (
         return { data: null, error: itemsByRequirement.error };
     }
 
-    console.log(clientPreferredItems);
+    const itemsList: ShoppingListItem[] = [];
 
     for (const row of listData) {
-        console.log(row.item_name);
-        if (!row.is_available) {
-            continue;
-        }
-
-        if (row.list_type !== listType) {
+        if (!row.is_available || row.list_type !== listType) {
             continue;
         }
 
@@ -189,35 +183,34 @@ export const prepareItemsListForHousehold = async (
             row,
             householdSize
         );
+
         if (listItemError) {
             return { data: null, error: listItemError };
         }
 
-        if (!["", "0"].includes(listItemData.quantity.trim())) {
-            const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
-            const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
-            const isRegularFood = row.item_type === "regular_food";
-            const isPreferredItem = clientPreferredItems.find(
-                (item) => item.description === row.item_name
-            );
+        if (["", "0"].includes(listItemData.quantity.trim())) {
+            continue;
+        }
 
-            const currentItem = {
-                description: row.item_name,
+        const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
+        const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
+        const isRegularFood = row.item_type === "regular_food";
+        const isPreferredItem = clientPreferredItems.some(
+            (item) => item.description === row.item_name
+        );
+
+        const additionalClientInfo =
+            clientPreferredItems.find((item) => item.description === row.item_name)
+                ?.additionalClientInfo ?? "";
+
+        if ((!isExcluded && isRegularFood) || isIncluded || isPreferredItem) {
+            itemsList.push({
+                description:
+                    row.item_name + (additionalClientInfo ? ` (${additionalClientInfo})` : ""),
                 ...listItemData,
-                additionalClientInfo:
-                    clientPreferredItems.find((item) => item.description === row.item_name)
-                        ?.additionalClientInfo ?? "",
-            };
-
-            // Add item if:
-            // 1. It's not excluded has type "regular_food"
-            // 2. It's explicitly included
-            const shouldAddItem = (!isExcluded && isRegularFood) || isIncluded || isPreferredItem;
-
-            if (shouldAddItem) {
-                itemsList.push(currentItem);
-            }
+            });
         }
     }
+
     return { data: itemsList, error: null };
 };

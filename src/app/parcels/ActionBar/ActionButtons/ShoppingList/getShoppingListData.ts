@@ -163,8 +163,6 @@ const getShoppingListDataForSingleParcel = async (
         })
     );
 
-    console.log(itemsListData);
-
     if (itemsListError) {
         return { data: null, error: itemsListError };
     }
