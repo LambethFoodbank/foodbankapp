@@ -122,7 +122,7 @@ SELECT clientId, (diet->>'diet_id')::uuid
 FROM jsonb_array_elements(clientDiets) diet;
 
 INSERT INTO clients_preferred_items (client_id, item_id, notes)
-SELECT inserted_client_id,
+SELECT client_id,
        (item->>'item_id')::uuid,
     item->>'notes'
 FROM jsonb_array_elements(clientPreferredItems) item;

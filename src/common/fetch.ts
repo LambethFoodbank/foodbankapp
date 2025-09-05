@@ -506,7 +506,7 @@ export const fetchClientItems = async (
         name: item.item_name,
         type: item.item_type as string,
         notes:
-            data.find((preferredItem) => preferredItem.item_id === item.primary_key)?.notes ?? null,
+            data.find((preferredItem) => preferredItem.item_id === item.primary_key)?.notes ?? "",
     }));
 
     return { data: items, error: null };

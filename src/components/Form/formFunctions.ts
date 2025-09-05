@@ -55,7 +55,7 @@ export interface Item {
     primaryKey: string;
     name: string;
     type?: string;
-    notes?: string | null;
+    notes?: string;
     additionalInfoField?: boolean;
 }
 

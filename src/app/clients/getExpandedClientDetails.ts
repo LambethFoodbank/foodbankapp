@@ -310,21 +310,22 @@ export const formatBreakdownFromArray = <T>(
     getName: (item: T) => string | number | null | undefined,
     getAdditionalInfo?: (item: T) => string | null | undefined
 ): string => {
-    if (!arr || arr.length === 0) {
+    if (!arr?.length) {
         return "-";
     }
+
     const items = arr
         .map((item) => {
-            const name = getName(item);
-            if (name === null || name === undefined || `${name}`.trim() === "") {
+            const name = getName(item)?.toString().trim();
+            if (!name) {
                 return null;
             }
 
-            const extra = getAdditionalInfo?.(item);
-            const extraClean = extra && extra.trim() !== "" ? extra : null;
-            return extraClean ? `${name} (${extraClean})` : `${name}`;
+            const extraInfo = getAdditionalInfo?.(item)?.trim();
+            return extraInfo ? `${name} (${extraInfo})` : name;
         })
-        .filter((item): item is string => item !== null);
+        .filter(Boolean);
+
     return items.length ? items.join(", ") : "None";
 };
 
