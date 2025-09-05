@@ -213,12 +213,9 @@ const getExpandedParcelDetails = async (
                         client.preferred_items,
                         "hygiene_product"
                     ),
-                    babyProducts: formatBreakdownFromArray(
-                        client.preferred_items.filter(
-                            (item) => item.item?.item_type === "baby_product"
-                        ),
-                        (item) => item.item?.item_name ?? item.item_id,
-                        (item) => item.notes
+                    babyProducts: formatItemsBreakdownFromArray(
+                        client.preferred_items,
+                        "baby_product"
                     ),
                     petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
                     otherRequirements: formatItemsBreakdownFromArray(

@@ -149,6 +149,7 @@ export const submitEditClientForm = async (
         ...fields.preferredItems,
         ...fields.otherItems,
         ...fields.hygieneProducts,
+        ...fields.babyProducts,
     ]);
 
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
