@@ -1,30 +1,14 @@
+import { ItemsCardProps } from "@/app/clients/form/formSections/PreferredItemsCard";
+import SelectionGenericCard from "@/app/clients/form/formSections/SelectionGenericCard";
 import React from "react";
-import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
-import { checkboxGroupToArray, onChangeCheckboxInGroup } from "@/components/Form/formFunctions";
-import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
 
-export const petFoodOptions = ["Cat", "Dog"];
-
-export const petFoodLabelsAndKeys: [string, string][] = petFoodOptions.map((optionName) => [
-    optionName,
-    optionName,
-]);
-
-const PetFoodCard: React.FC<ClientCardProps> = ({ fieldSetter, fields }) => {
-    return (
-        <GenericFormCard
-            title="Pet Food"
-            required={false}
-            text="Tick all that apply. Specify any other requests in the 'Extra Information' section."
-        >
-            <CheckboxGroupInput
-                labelsAndKeys={petFoodLabelsAndKeys}
-                onChange={onChangeCheckboxInGroup(fieldSetter, fields.petFood, "petFood")}
-                checkedKeys={checkboxGroupToArray(fields.petFood)}
-            />
-        </GenericFormCard>
-    );
-};
+const PetFoodCard: React.FC<ItemsCardProps> = (props) => (
+    <SelectionGenericCard
+        {...props}
+        title="Pet Food"
+        fieldName="petFood"
+        items={props.items.filter((item) => item.type === "pet_food")}
+    />
+);
 
 export default PetFoodCard;

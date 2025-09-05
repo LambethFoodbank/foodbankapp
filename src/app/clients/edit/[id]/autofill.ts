@@ -27,6 +27,7 @@ const autofill = (
     const otherItems = itemsData.filter((item) => item.type === "others");
     const hygieneItems = itemsData.filter((item) => item.type === "hygiene_product");
     const babyItems = itemsData.filter((item) => item.type === "baby_product");
+    const petItems = itemsData.filter((item) => item.type === "pet_food");
 
     return {
         fullName: clientData.full_name ?? "",
@@ -54,7 +55,7 @@ const autofill = (
         preferredItems: preferredItems,
         hygieneProducts: hygieneItems,
         babyProducts: babyItems,
-        petFood: arrayToBooleanGroup(clientData.pet_food ?? []),
+        petFood: petItems,
         otherItems: otherItems,
         deliveryInstructions: clientData.delivery_instructions ?? "",
         extraInformation: clientData.extra_information ?? "",

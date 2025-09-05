@@ -13,7 +13,6 @@ import { ListType } from "@/common/databaseListTypes";
 import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
 import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
 import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
-import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
 
@@ -165,7 +164,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         preferredItems: formatItemsBreakdownFromArray(client.preferred_items, "alternative_food"),
         hygieneProducts: formatItemsBreakdownFromArray(client.preferred_items, "hygiene_product"),
         babyProducts: formatItemsBreakdownFromArray(client.preferred_items, "baby_product"),
-        petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
+        petFood: formatItemsBreakdownFromArray(client.preferred_items, "pet_food"),
         otherRequirements: formatItemsBreakdownFromArray(client.preferred_items, "others"),
         extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,
