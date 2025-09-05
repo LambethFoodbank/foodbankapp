@@ -16,7 +16,6 @@ import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
-import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
     const rawClientDetails = await getRawClientDetails(clientId);
@@ -165,12 +164,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
         preferredItems: formatItemsBreakdownFromArray(client.preferred_items, "alternative_food"),
         hygieneProducts: formatItemsBreakdownFromArray(client.preferred_items, "hygiene_product"),
-        babyProducts: formatBabyProducts(
-            client.baby_food,
-            client.baby_formula,
-            client.baby_nappies,
-            client.baby_other_items
-        ),
+        babyProducts: formatItemsBreakdownFromArray(client.preferred_items, "baby_product"),
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
         otherRequirements: formatItemsBreakdownFromArray(client.preferred_items, "others"),
         extraInformation: formatExtraInformation(client.extra_information),
@@ -347,33 +341,6 @@ export const formatRequirementsByCanonicalOrder = (
     }
 
     return sortArrayByCanonicalOrder(requirementsArray, canonicalOrder).join(", ");
-};
-
-export const formatBabyProducts = (
-    babyFood: string | null,
-    babyFormula: string | null,
-    babyNappySize: string | null,
-    babyOtherItems: string[] | null
-): string => {
-    const items = [];
-
-    if (babyNappySize !== null) {
-        items.push("Nappies" + (babyNappySize.length > 0 ? ` (Size ${babyNappySize})` : ""));
-    }
-
-    if (babyFormula !== null) {
-        items.push("Formula" + (babyFormula.length > 0 ? ` (${babyFormula})` : ""));
-    }
-
-    if (babyFood !== null) {
-        items.push("Baby Food" + (babyFood.length > 0 ? ` (${babyFood})` : ""));
-    }
-
-    if (babyOtherItems !== null && babyOtherItems.length > 0) {
-        items.push(formatRequirementsByCanonicalOrder(babyOtherItems, babyOtherItemsOptions));
-    }
-
-    return items.length > 0 ? items.join(", ") : "None";
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";

@@ -1,112 +1,14 @@
-import React, { useState } from "react";
-import {
-    onChangeText,
-    getDefaultTextValue,
-    onChangeCheckboxInGroup,
-    checkboxGroupToArray,
-} from "@/components/Form/formFunctions";
-import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
-import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
+import { ItemsCardProps } from "@/app/clients/form/formSections/PreferredItemsCard";
+import SelectionGenericCard from "@/app/clients/form/formSections/SelectionGenericCard";
+import React from "react";
 
-export const babyOtherItemsOptions: string[] = ["Baby Wipes", "Baby Toiletries"];
-
-export const babyOtherItemsLabelsAndKeys: [string, string][] = babyOtherItemsOptions.map(
-    (optionName) => [optionName, optionName]
+const BabyItemsCard: React.FC<ItemsCardProps> = (props) => (
+    <SelectionGenericCard
+        {...props}
+        title="Baby Products"
+        fieldName="babyProducts"
+        items={props.items.filter((item) => item.type === "baby_product")}
+    />
 );
 
-const BabyProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter, fields }) => {
-    const [nappiesRequired, setNappiesRequired] = useState(fields["babyNappies"] !== null);
-    const [formulaRequired, setFormulaRequired] = useState(fields["babyFormula"] !== null);
-    const [foodRequired, setFoodRequired] = useState(fields["babyFood"] !== null);
-
-    const handleNappiesCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        setNappiesRequired(event.target.checked);
-
-        if (!event.target.checked) {
-            fieldSetter({ babyNappies: null });
-        }
-    };
-
-    const handleFormulaCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        setFormulaRequired(event.target.checked);
-
-        if (!event.target.checked) {
-            fieldSetter({ babyFormula: null });
-        }
-    };
-
-    const handleFoodCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        setFoodRequired(event.target.checked);
-
-        if (!event.target.checked) {
-            fieldSetter({ babyFood: null });
-        }
-    };
-
-    return (
-        <GenericFormCard title="Baby Products" required={false}>
-            <FormGroup>
-                <FormControlLabel
-                    control={
-                        <Checkbox checked={nappiesRequired} onChange={handleNappiesCheckbox} />
-                    }
-                    label="Nappies"
-                />
-                {nappiesRequired && (
-                    <FreeFormTextInput
-                        label="What Size"
-                        defaultValue={getDefaultTextValue(fields, "babyNappies")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "babyNappies", {
-                            required: false,
-                        })}
-                    />
-                )}
-
-                <FormControlLabel
-                    control={
-                        <Checkbox checked={formulaRequired} onChange={handleFormulaCheckbox} />
-                    }
-                    label="Baby Formula"
-                />
-                {formulaRequired && (
-                    <FreeFormTextInput
-                        label="Specify brand and stage"
-                        defaultValue={getDefaultTextValue(fields, "babyFormula")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "babyFormula", {
-                            required: false,
-                        })}
-                    />
-                )}
-
-                <FormControlLabel
-                    control={<Checkbox checked={foodRequired} onChange={handleFoodCheckbox} />}
-                    label="Baby Food"
-                />
-                {foodRequired && (
-                    <FreeFormTextInput
-                        label="More Info"
-                        defaultValue={getDefaultTextValue(fields, "babyFood")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "babyFood", {
-                            required: false,
-                        })}
-                    />
-                )}
-
-                <CheckboxGroupInput
-                    labelsAndKeys={babyOtherItemsLabelsAndKeys}
-                    onChange={onChangeCheckboxInGroup(
-                        fieldSetter,
-                        fields.babyOtherItems,
-                        "babyOtherItems"
-                    )}
-                    checkedKeys={checkboxGroupToArray(fields.babyOtherItems)}
-                />
-            </FormGroup>
-        </GenericFormCard>
-    );
-};
-
-export default BabyProductsCard;
+export default BabyItemsCard;

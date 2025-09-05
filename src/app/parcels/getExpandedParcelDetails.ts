@@ -4,7 +4,6 @@ import { EventTableRow } from "./EventTable";
 import { logErrorReturnLogId } from "@/logger/logger";
 import {
     formatAddressFromClientDetails,
-    formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
@@ -214,11 +213,12 @@ const getExpandedParcelDetails = async (
                         client.preferred_items,
                         "hygiene_product"
                     ),
-                    babyProducts: formatBabyProducts(
-                        client.baby_food,
-                        client.baby_formula,
-                        client.baby_nappies,
-                        client.baby_other_items
+                    babyProducts: formatBreakdownFromArray(
+                        client.preferred_items.filter(
+                            (item) => item.item?.item_type === "baby_product"
+                        ),
+                        (item) => item.item?.item_name ?? item.item_id,
+                        (item) => item.notes
                     ),
                     petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
                     otherRequirements: formatItemsBreakdownFromArray(
