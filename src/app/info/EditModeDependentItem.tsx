@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DbWikiRow } from "@/databaseUtils";
 import WikiItemDisplay from "@/app/info/WikiItemDisplay";
 import WikiItemEdit from "@/app/info/WikiItemEdit";
@@ -13,6 +13,8 @@ interface EditProps {
     removeRow: (row: DbWikiRow) => number;
     swapRows: (row1: DbWikiRow, direction: DirectionString) => void;
     setErrorMessage: (error: string | null) => void;
+    activeEditRowId: string | null;
+    setActiveEditRowId: (id: string | null) => void;
 }
 
 const EditModeDependentItem: React.FC<EditProps> = ({
@@ -21,9 +23,18 @@ const EditModeDependentItem: React.FC<EditProps> = ({
     removeRow,
     swapRows,
     setErrorMessage,
+    activeEditRowId,
+    setActiveEditRowId,
 }) => {
-    const [rowData, setrowData] = useState<DbWikiRow | undefined>(row);
-    const [isInEditMode, setIsInEditMode] = useState<boolean>(false);
+    const [rowData, setRowData] = useState<DbWikiRow | undefined>(row);
+    const isInEditMode = activeEditRowId === row?.wiki_key;
+
+    useEffect(() => {
+        if (!isInEditMode) {
+            setRowData(row);
+        }
+    }, [row, isInEditMode]);
+
     return (
         <>
             {rowData &&
@@ -31,21 +42,25 @@ const EditModeDependentItem: React.FC<EditProps> = ({
                     <OrganisationRoleDependentView>
                         <WikiItemEdit
                             rowData={rowData}
-                            setRowData={setrowData}
-                            setIsInEditMode={setIsInEditMode}
+                            setRowData={setRowData}
+                            setIsInEditMode={(val) =>
+                                setActiveEditRowId(val ? rowData.wiki_key : null)
+                            }
                             appendNewRow={appendNewRow}
                             removeRow={removeRow}
                             swapRows={swapRows}
                             setErrorMessage={setErrorMessage}
+                            isAnyInEditMode={activeEditRowId !== null}
                         />
                     </OrganisationRoleDependentView>
                 ) : (
                     <WikiItemDisplay
                         rowData={rowData}
                         openEditMode={() => {
-                            setIsInEditMode(true);
+                            setActiveEditRowId(rowData?.wiki_key);
                         }}
                         swapRows={swapRows}
+                        isAnyInEditMode={activeEditRowId !== null}
                     />
                 ))}
         </>

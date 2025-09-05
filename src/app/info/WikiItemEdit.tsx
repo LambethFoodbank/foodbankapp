@@ -32,6 +32,7 @@ interface WikiItemEditProps {
     removeRow: (row: DbWikiRow) => number;
     swapRows: (row1: DbWikiRow, direction: DirectionString) => void;
     setErrorMessage: (error: string | null) => void;
+    isAnyInEditMode?: boolean;
 }
 
 const WikiItemEdit: React.FC<WikiItemEditProps> = ({
@@ -42,6 +43,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
     removeRow,
     swapRows,
     setErrorMessage,
+    isAnyInEditMode = false,
 }) => {
     const [titleValue, setTitleValue] = React.useState(rowData.title);
     const [contentValue, setContentValue] = React.useState(rowData.content);
@@ -189,6 +191,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                     onClick={() => {
                         swapRows(rowData, "up");
                     }}
+                    disabled={isAnyInEditMode}
                     data-testid={`#swap-up-${rowData.row_order}`}
                 >
                     <KeyboardDoubleArrowUpIcon />
@@ -197,6 +200,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                     onClick={() => {
                         swapRows(rowData, "down");
                     }}
+                    disabled={isAnyInEditMode}
                     data-testid={`#swap-down-${rowData.row_order}`}
                 >
                     <KeyboardDoubleArrowDownIcon />

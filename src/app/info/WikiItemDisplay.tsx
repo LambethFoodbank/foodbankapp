@@ -20,9 +20,15 @@ interface DefaultViewProps {
     rowData: DbWikiRow;
     openEditMode: () => void;
     swapRows: (row1: DbWikiRow, direction: DirectionString) => void;
+    isAnyInEditMode?: boolean;
 }
 
-const WikiItemDisplay: React.FC<DefaultViewProps> = ({ rowData, openEditMode, swapRows }) => {
+const WikiItemDisplay: React.FC<DefaultViewProps> = ({
+    rowData,
+    openEditMode,
+    swapRows,
+    isAnyInEditMode = false,
+}) => {
     return (
         <>
             <OrganisationRoleDependentView>
@@ -31,6 +37,7 @@ const WikiItemDisplay: React.FC<DefaultViewProps> = ({ rowData, openEditMode, sw
                         onClick={() => {
                             swapRows(rowData, "up");
                         }}
+                        disabled={isAnyInEditMode}
                         data-testid={"#swap-up-" + rowData.row_order}
                     >
                         <KeyboardDoubleArrowUpIcon />
@@ -39,6 +46,7 @@ const WikiItemDisplay: React.FC<DefaultViewProps> = ({ rowData, openEditMode, sw
                         onClick={() => {
                             swapRows(rowData, "down");
                         }}
+                        disabled={isAnyInEditMode}
                         data-testid={"#swap-down-" + rowData.row_order}
                     >
                         <KeyboardDoubleArrowDownIcon />
