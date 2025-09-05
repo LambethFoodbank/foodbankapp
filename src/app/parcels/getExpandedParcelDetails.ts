@@ -7,9 +7,11 @@ import {
     formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
-    formatBreakdownFromArray,
     formatHouseholdFromFamilyDetails,
     formatRequirementsByCanonicalOrder,
+    formatDietsBreakdownFromArray,
+    ClientDietWithName,
+    formatItemsBreakdownFromArray,
 } from "@/app/clients/getExpandedClientDetails";
 import { capitaliseWords, formatDateTime, formatDatetimeAsDate } from "@/common/format";
 import {
@@ -203,23 +205,14 @@ const getExpandedParcelDetails = async (
                         client.dietary_requirements,
                         dietaryRequirementOptions
                     ),
-                    diets: formatBreakdownFromArray(
-                        client.diets ?? [],
-                        (diet) => diet.diet?.name ?? diet.diet_id
+                    diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
+                    preferredItems: formatItemsBreakdownFromArray(
+                        client.preferred_items,
+                        "alternative_food"
                     ),
-                    preferredItems: formatBreakdownFromArray(
-                        client.preferred_items.filter(
-                            (item) => item.item?.item_type === "alternative_food"
-                        ),
-                        (item) => item.item?.item_name ?? item.item_id,
-                        (item) => item.notes
-                    ),
-                    hygieneProducts: formatBreakdownFromArray(
-                        client.preferred_items.filter(
-                            (item) => item.item?.item_type === "hygiene_product"
-                        ),
-                        (item) => item.item?.item_name ?? item.item_id,
-                        (item) => item.notes
+                    hygieneProducts: formatItemsBreakdownFromArray(
+                        client.preferred_items,
+                        "hygiene_product"
                     ),
                     babyProducts: formatBabyProducts(
                         client.baby_food,
@@ -228,10 +221,9 @@ const getExpandedParcelDetails = async (
                         client.baby_other_items
                     ),
                     petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
-                    otherRequirements: formatBreakdownFromArray(
-                        client.preferred_items.filter((item) => item.item?.item_type === "others"),
-                        (item) => item.item?.item_name ?? item.item_id,
-                        (item) => item.notes
+                    otherRequirements: formatItemsBreakdownFromArray(
+                        client.preferred_items,
+                        "others"
                     ),
                     extraInformation: client.extra_information ?? "",
                     signpostingCall: formatSignpostingCall(

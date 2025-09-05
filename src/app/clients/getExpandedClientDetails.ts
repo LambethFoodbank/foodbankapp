@@ -113,7 +113,8 @@ export interface ClientDietWithName extends Pick<Schema["clients_diets"], "diet_
 }
 
 export interface ClientItemWithName extends Pick<Schema["clients_preferred_items"], "item_id"> {
-    item: { item_name: string | null } | null;
+    item: { item_name: string | null; item_type: string | null } | null;
+    notes: string | null;
 }
 
 export interface ExpandedClientData {
@@ -161,20 +162,9 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.dietary_requirements,
             dietaryRequirementOptions
         ),
-        diets: formatBreakdownFromArray(
-            client.diets ?? [],
-            (diet) => diet.diet?.name ?? diet.diet_id
-        ),
-        preferredItems: formatBreakdownFromArray(
-            client.preferred_items.filter((item) => item.item?.item_type === "alternative_food"),
-            (item) => item.item?.item_name ?? item.item_id,
-            (item) => item.notes
-        ),
-        hygieneProducts: formatBreakdownFromArray(
-            client.preferred_items.filter((item) => item.item?.item_type === "hygiene_product"),
-            (item) => item.item?.item_name ?? item.item_id,
-            (item) => item.notes
-        ),
+        diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
+        preferredItems: formatItemsBreakdownFromArray(client.preferred_items, "alternative_food"),
+        hygieneProducts: formatItemsBreakdownFromArray(client.preferred_items, "hygiene_product"),
         babyProducts: formatBabyProducts(
             client.baby_food,
             client.baby_formula,
@@ -182,11 +172,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.baby_other_items
         ),
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
-        otherRequirements: formatBreakdownFromArray(
-            client.preferred_items.filter((item) => item.item?.item_type === "others"),
-            (item) => item.item?.item_name ?? item.item_id,
-            (item) => item.notes
-        ),
+        otherRequirements: formatItemsBreakdownFromArray(client.preferred_items, "others"),
         extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,
         lastUpdated: client.last_updated,
@@ -305,7 +291,7 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
     return childDetails.join(", ");
 };
 
-export const formatBreakdownFromArray = <T>(
+const formatBreakdownFromArray = <T>(
     arr: T[] | null | undefined,
     getName: (item: T) => string | number | null | undefined,
     getAdditionalInfo?: (item: T) => string | null | undefined
@@ -327,6 +313,27 @@ export const formatBreakdownFromArray = <T>(
         .filter(Boolean);
 
     return items.length ? items.join(", ") : "None";
+};
+
+export const formatDietsBreakdownFromArray = (
+    arr: ClientDietWithName[] | null | undefined
+): string => {
+    return formatBreakdownFromArray(arr, (diet) => diet.diet?.name ?? diet.diet_id);
+};
+
+export const formatItemsBreakdownFromArray = (
+    arr: ClientItemWithName[] | null | undefined,
+    itemType: string
+): string => {
+    if (!arr?.length) {
+        arr = [];
+    }
+
+    return formatBreakdownFromArray(
+        arr.filter((item) => item.item?.item_type === itemType),
+        (item) => item.item?.item_name ?? item.item_id,
+        (item) => item.notes
+    );
 };
 
 export const formatRequirementsByCanonicalOrder = (
