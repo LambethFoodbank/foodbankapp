@@ -11,7 +11,7 @@ interface SelectableItem {
     primaryKey: string;
     name: string;
     additionalInfoField?: boolean;
-    additionalInfo?: string;
+    notes?: string;
 }
 
 interface SelectionCardProps<T extends SelectableItem> extends ClientCardProps {
@@ -68,7 +68,7 @@ function SelectionGenericCard<T extends SelectableItem>({
                                     selected.find(
                                         (selectedItem) =>
                                             selectedItem.primaryKey === item.primaryKey
-                                    )?.additionalInfo ?? ""
+                                    )?.notes ?? ""
                                 }
                                 onChange={(event) =>
                                     handleAdditionalInfoChange(item.primaryKey, event.target.value)
