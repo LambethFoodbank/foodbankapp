@@ -6,7 +6,7 @@ select
     parcels.packing_date,
     parcels.created_at,
     packing_slots.name as packing_slot_name,
-    packing_slots.order as packing_slot_order,
+    packing_slots."order" as packing_slot_order,
     parcels.voucher_number,
     collection_centres.name as collection_centre_name,
     collection_centres.acronym as collection_centre_acronym,
@@ -32,11 +32,13 @@ select
     parcels.referrer_email,
     parcels.referrer_phone,
     clients.email as client_email,
+    parcels.flagged_for_attention as flagged_for_attention,
+    parcels.signposting_call_required as signposting_call_required,
     parcels.last_updated as last_updated
-   from parcels
-     left join collection_centres on parcels.collection_centre = collection_centres.primary_key
-     left join clients on parcels.client_id = clients.primary_key
-     left join packing_slots on parcels.packing_slot = packing_slots.primary_key
-     left join family_count on family_count.family_id = clients.family_id
-     left join parcels_events on parcels_events.parcel_id = parcels.primary_key
-  order by parcels.packing_date desc;
+from parcels
+         left join collection_centres on parcels.collection_centre = collection_centres.primary_key
+         left join clients on parcels.client_id = clients.primary_key
+         left join packing_slots on parcels.packing_slot = packing_slots.primary_key
+         left join family_count on family_count.family_id = clients.family_id
+         left join parcels_events on parcels_events.parcel_id = parcels.primary_key
+order by parcels.packing_date desc;
