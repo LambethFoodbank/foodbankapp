@@ -3,7 +3,6 @@
 import { Dayjs } from "dayjs";
 import React from "react";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
-import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import {
     formatAddressFromClientDetails,
     formatBreakdownOfAdultsFromFamilyDetails,
@@ -57,7 +56,6 @@ export type ReportRow = {
     parcelNotes: string;
     clientNotes: string;
     cookingFacilities: string;
-    dietaryRequirements: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
@@ -226,10 +224,6 @@ export const convertRawParcelListToReportResult = (
                     cookingFacilities: formatRequirementsByCanonicalOrder(
                         rawParcel.client?.cooking_facilities ?? null,
                         cookingFacilitiesOptions
-                    ),
-                    dietaryRequirements: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.dietary_requirements ?? null,
-                        dietaryRequirementOptions
                     ),
                     hygieneProducts: "-", // TODO VFB-521
                     babyProducts: "-", // TODO VFB-521

@@ -32,7 +32,6 @@ import PhoneNumberCard from "@/app/clients/form/formSections/PhoneNumberCard";
 import AddressCard from "@/app/clients/form/formSections/AddressCard";
 import NumberAdultsCard from "@/app/clients/form/formSections/NumberAdultsCard";
 import NumberChildrenCard from "@/app/clients/form/formSections/NumberChildrenCard";
-import DietaryRequirementCard from "@/app/clients/form/formSections/DietaryRequirementCard";
 import DietsCard from "@/app/clients/form/formSections/DietsCard";
 import PreferredItemsCard from "@/app/clients/form/formSections/PreferredItemsCard";
 import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
@@ -119,7 +118,6 @@ const formSections = [
     NumberChildrenCard,
     ListTypeCard,
     CookingFacilitiesCard,
-    DietaryRequirementCard,
     DietsCard,
     PreferredItemsCard,
     HygieneProductsCard,

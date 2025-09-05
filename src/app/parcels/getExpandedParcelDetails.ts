@@ -21,7 +21,6 @@ import {
 import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
-import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 
 type FetchExpandedParcelDetailsResult =
@@ -199,10 +198,6 @@ const getExpandedParcelDetails = async (
                         client.cooking_facilities,
                         cookingFacilitiesOptions
                     ),
-                    dietaryRequirements: formatRequirementsByCanonicalOrder(
-                        client.dietary_requirements,
-                        dietaryRequirementOptions
-                    ),
                     diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
                     preferredItems: formatItemsBreakdownFromArray(
                         client.preferred_items,
@@ -298,7 +293,6 @@ interface ParcelDataForActiveClient extends ParcelDataIndependentOfClient {
     adults: string;
     children: string;
     cookingFacilities: string;
-    dietaryRequirements: string;
     diets: string;
     preferredItems: string;
     hygieneProducts: string;
