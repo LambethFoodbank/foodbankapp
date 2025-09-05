@@ -74,11 +74,7 @@ const main = async (): Promise<never> => {
                 family_id: () => copycat.uuid(ctx.seed),
                 default_list: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
                 additional_phone_numbers: (ctx) =>
-                    copycat.someOf(
-                        ctx.seed,
-                        [0, possiblePhoneNumbers.length],
-                        possiblePhoneNumbers
-                    ),
+                    copycat.someOf(ctx.seed, [0, 4], possiblePhoneNumbers),
                 cooking_facilities: () =>
                     copycat.someOf(
                         ctx.seed,

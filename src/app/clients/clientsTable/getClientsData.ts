@@ -65,11 +65,9 @@ const getClientsDataAndCount = async (
             fullName: client.full_name ?? "",
             familyCategory: familyCountToFamilyCategory(client.family_count ?? 0),
             addressPostcode: client.address_postcode,
-            phoneNumber:
-                client.additional_phone_numbers_text !== null &&
-                client.additional_phone_numbers_text.length > 0
-                    ? client.phone_number + ", " + client.additional_phone_numbers_text
-                    : client.phone_number,
+            phoneNumber: [client.phone_number, client.additional_phone_numbers_text]
+                .filter((phone) => phone && phone.length > 0)
+                .join(", "),
             email: client.email,
         };
     });

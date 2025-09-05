@@ -24,7 +24,6 @@ import {
 } from "@/components/DataViewer/DataViewer";
 import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
-
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { otherRequirementOptions } from "@/app/clients/form/formSections/OtherItemsCard";

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
-    getErrorText,
-    getDefaultTextValue,
-    onChangePhoneNumbers,
+    Errors,
     FormErrors,
+    getDefaultTextValue,
+    getErrorText,
+    onChangePhoneNumbers,
     Setter,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
@@ -52,28 +53,33 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         }
     }, [errorMessage]);
 
+    const getPhoneNumberError = (index: number): boolean => {
+        const error = formErrors.additionalPhoneNumbers?.[index];
+        return error !== undefined && errorExists(error);
+    };
+
+    const validatePhoneSequence = (): string | null => {
+        if (!fields.phoneNumber || fields.phoneNumber.length === 0) {
+            return Errors.emptyPrimaryPhoneNumber;
+        }
+
+        const lastAdditionalIndex = phoneNumbers.length - 2;
+        if (lastAdditionalIndex >= 0) {
+            const lastPhone = fields.additionalPhoneNumbers?.[lastAdditionalIndex];
+            if (!lastPhone || lastPhone.length === 0) {
+                return Errors.emptyPreviousPhoneNumber;
+            }
+        }
+
+        return null;
+    };
+
     const handleAddPhoneNumber = (): void => {
         const newId = phoneNumbers.length - 1;
-        if (newId > 0) {
-            if (
-                fields.additionalPhoneNumbers &&
-                fields.additionalPhoneNumbers[newId - 1] !== undefined &&
-                fields.additionalPhoneNumbers[newId - 1].length > 1
-            ) {
-                setPhoneNumbers([...phoneNumbers, { id: newId }]);
-            } else {
-                setErrorMessage(
-                    "The previous phone number should be filled before adding another phone number."
-                );
-            }
+        if (validatePhoneSequence()) {
+            setErrorMessage(validatePhoneSequence());
         } else {
-            if (fields.phoneNumber && fields.phoneNumber.length > 0) {
-                setPhoneNumbers([...phoneNumbers, { id: newId }]);
-            } else {
-                setErrorMessage(
-                    "The primary phone number should be filled before adding another phone number."
-                );
-            }
+            setPhoneNumbers([...phoneNumbers, { id: newId }]);
         }
     };
 
@@ -83,6 +89,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
         );
 
         const updatedAdditionalPhones = [...(fields.additionalPhoneNumbers || [])];
+        formErrors.additionalPhoneNumbers[indexToRemove - 1] = Errors.none;
         updatedAdditionalPhones.splice(indexToRemove - 1, 1);
 
         fieldSetter({ additionalPhoneNumbers: updatedAdditionalPhones });
@@ -95,78 +102,82 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
             text="Primary Phone Number"
         >
             <GappedDiv>
-                {phoneNumbers.map((phone, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <GappedDiv key={index}>
-                        {index === 1 && (
-                            <>
-                                <Divider aria-hidden="true" orientation="horizontal" flexItem />
-                                <FormText>Additional Phone Numbers</FormText>
-                            </>
-                        )}
-                        {index === 0 && (
-                            <FreeFormTextInput
-                                id="client-phone-number"
-                                label="Primary Phone Number"
-                                defaultValue={getDefaultTextValue(fields, "phoneNumber")}
-                                error={errorExists(formErrors.phoneNumber)}
-                                helperText={getErrorText(formErrors.phoneNumber)}
-                                onChange={onChangePhoneNumbers(
-                                    fieldSetter,
-                                    fields.phoneNumber,
-                                    fields.additionalPhoneNumbers,
-                                    errorSetter as Setter<FormErrors<ClientFields>>,
-                                    "phoneNumber",
-                                    formErrors,
-                                    {
-                                        required: phoneNumberIsRequired,
-                                        regex: phoneNumberRegex,
-                                        formattingFunction: formatPhoneNumber,
-                                    }
-                                )}
-                            />
-                        )}
-                        {index >= 1 && (
-                            <GappedRowDiv>
+                {phoneNumbers.map((phone, index) => {
+                    const isAdditionalPhone = index >= 1;
+                    const additionalPhoneIndex = index - 1;
+                    const displayAdditionalPhoneNumbers = index === 1;
+
+                    return (
+                        <GappedDiv key={phone.id}>
+                            {displayAdditionalPhoneNumbers && (
+                                <>
+                                    <Divider aria-hidden="true" orientation="horizontal" flexItem />
+                                    <FormText>Additional Phone Numbers</FormText>
+                                </>
+                            )}
+                            {!isAdditionalPhone ? (
                                 <FreeFormTextInput
-                                    disabled={errorExists(formErrors.phoneNumber)}
-                                    key={phone.id}
-                                    id={`client-additional-phone-number-${phone.id}`}
-                                    label={`Phone Number ${index > 0 ? index + 1 : ""}`}
-                                    defaultValue={fields.additionalPhoneNumbers?.[index - 1] || ""}
-                                    error={
-                                        formErrors.additionalPhoneNumbers?.[index - 1] !==
-                                            undefined &&
-                                        errorExists(formErrors.additionalPhoneNumbers?.[index - 1])
-                                    }
-                                    helperText={getErrorText(
-                                        formErrors.additionalPhoneNumbers?.[index - 1]
-                                    )}
+                                    id="client-phone-number"
+                                    label="Primary Phone Number"
+                                    defaultValue={getDefaultTextValue(fields, "phoneNumber")}
+                                    error={errorExists(formErrors.phoneNumber)}
+                                    helperText={getErrorText(formErrors.phoneNumber)}
                                     onChange={onChangePhoneNumbers(
                                         fieldSetter,
                                         fields.phoneNumber,
                                         fields.additionalPhoneNumbers,
                                         errorSetter as Setter<FormErrors<ClientFields>>,
-                                        "additionalPhoneNumbers",
+                                        "phoneNumber",
                                         formErrors,
                                         {
                                             required: phoneNumberIsRequired,
                                             regex: phoneNumberRegex,
                                             formattingFunction: formatPhoneNumber,
-                                        },
-                                        index - 1
+                                        }
                                     )}
                                 />
-                                <Button
-                                    color="error"
-                                    startIcon={<DeleteIcon />}
-                                    id={`remove-additional-phone-number-${phone.id}`}
-                                    onClick={() => handleRemovePhoneNumber(index)}
-                                ></Button>
-                            </GappedRowDiv>
-                        )}
-                    </GappedDiv>
-                ))}
+                            ) : (
+                                <GappedRowDiv>
+                                    <FreeFormTextInput
+                                        disabled={errorExists(formErrors.phoneNumber)}
+                                        id={`client-additional-phone-number-${phone.id}`}
+                                        label={`Phone Number ${index + 1}`}
+                                        defaultValue={
+                                            fields.additionalPhoneNumbers?.[additionalPhoneIndex] ||
+                                            ""
+                                        }
+                                        error={getPhoneNumberError(additionalPhoneIndex)}
+                                        helperText={getErrorText(
+                                            formErrors.additionalPhoneNumbers?.[
+                                                additionalPhoneIndex
+                                            ]
+                                        )}
+                                        onChange={onChangePhoneNumbers(
+                                            fieldSetter,
+                                            fields.phoneNumber,
+                                            fields.additionalPhoneNumbers,
+                                            errorSetter as Setter<FormErrors<ClientFields>>,
+                                            "additionalPhoneNumbers",
+                                            formErrors,
+                                            {
+                                                required: phoneNumberIsRequired,
+                                                regex: phoneNumberRegex,
+                                                formattingFunction: formatPhoneNumber,
+                                            },
+                                            index - 1
+                                        )}
+                                    />
+                                    <Button
+                                        color="error"
+                                        startIcon={<DeleteIcon />}
+                                        id={`remove-additional-phone-number-${phone.id}`}
+                                        onClick={() => handleRemovePhoneNumber(index)}
+                                    ></Button>
+                                </GappedRowDiv>
+                            )}
+                        </GappedDiv>
+                    );
+                })}
                 <Button color="primary" startIcon={<AddIcon />} onClick={handleAddPhoneNumber}>
                     Add another phone number
                 </Button>

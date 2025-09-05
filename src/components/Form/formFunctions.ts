@@ -27,7 +27,8 @@ export enum Errors {
     invalidCollectionSlot = "The previous timeslot is no longer available, please select a new timeslot.",
     noCollectionSlotsSet = "There are no collection slots set for this collection centre, please select a different collection centre or contact admin.",
     phoneNumberAlreadyExists = "This phone number already exists, please add a different phone number.",
-    emptyPrimaryPhoneNumber = "The primary phone number should be filled in before any other phone number.",
+    emptyPrimaryPhoneNumber = "The primary phone number should be filled in before adding other phone number.",
+    emptyPreviousPhoneNumber = "The previous phone number should be filled before adding another phone number.",
 }
 
 export const numberRegex = /^\d+$/;
@@ -72,7 +73,6 @@ export const getPhoneNumbersErrorType = (
     index?: number
 ): Errors => {
     const additionalNumbers = currentAdditionalPhoneNumbers || [];
-    const primaryNumber = primaryPhoneNumber || "";
     const isEditingPrimaryPhone = index === undefined;
     const isInputEmpty = input === "";
     const formattedInput = formatPhoneNumber(input);
@@ -81,12 +81,14 @@ export const getPhoneNumbersErrorType = (
         (phoneNumber, ind) => phoneNumber === formattedInput && ind !== index
     );
 
-    const isDuplicateOfPrimaryPhone = formattedInput === formatPhoneNumber(primaryNumber);
+    const isDuplicateOfPrimaryPhone =
+        primaryPhoneNumber && formattedInput === formatPhoneNumber(primaryPhoneNumber);
+
+    if (isEditingPrimaryPhone && isInputEmpty && additionalNumbers.length > 0) {
+        return Errors.emptyPrimaryPhoneNumber;
+    }
 
     if (isEditingPrimaryPhone) {
-        if (additionalNumbers.length && isInputEmpty) {
-            return Errors.emptyPrimaryPhoneNumber;
-        }
         return isDuplicateOfOtherAdditional ? Errors.phoneNumberAlreadyExists : Errors.none;
     }
 
@@ -422,7 +424,11 @@ export const checkErrorOnSubmit = <
                 const updatedErrors = error.map((err) =>
                     err === Errors.initial ? Errors.required : err
                 );
-                if (JSON.stringify(updatedErrors) !== JSON.stringify(error)) {
+                const needsUpdate =
+                    !error.every((err, index) => err === updatedErrors[index]) ||
+                    updatedErrors !== error;
+
+                if (needsUpdate) {
                     amendedErrorTypes = {
                         ...amendedErrorTypes,
                         [errorKey]: updatedErrors,
