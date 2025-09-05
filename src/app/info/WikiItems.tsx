@@ -23,6 +23,8 @@ interface WikiItemProps {
     removeRow: (row: DbWikiRow) => number;
     swapRows: (row1: DbWikiRow, direction: DirectionString) => void;
     setErrorMessage: (errorMessage: string | null) => void;
+    rowsInEditMode: Set<string>;
+    setRowsInEditMode: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 interface ContentPart {
@@ -59,19 +61,14 @@ export const convertContentToElements = (rowContent: string): React.JSX.Element[
     });
 };
 
-const WikiItem: React.FC<
-    WikiItemProps & {
-        activeEditRowId: string | null;
-        setActiveEditRowId: (id: string | null) => void;
-    }
-> = ({
+const WikiItem: React.FC<WikiItemProps> = ({
     row,
     appendNewRow,
     removeRow,
     swapRows,
     setErrorMessage,
-    activeEditRowId,
-    setActiveEditRowId,
+    rowsInEditMode,
+    setRowsInEditMode,
 }) => {
     return (
         <WikiItemPositioner>
@@ -81,8 +78,8 @@ const WikiItem: React.FC<
                 removeRow={removeRow}
                 swapRows={swapRows}
                 setErrorMessage={setErrorMessage}
-                activeEditRowId={activeEditRowId}
-                setActiveEditRowId={setActiveEditRowId}
+                rowsInEditMode={rowsInEditMode}
+                setRowsInEditMode={setRowsInEditMode}
             />
         </WikiItemPositioner>
     );
@@ -117,7 +114,7 @@ const swapTwoRowsInDisplayRows = (
 
 const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-    const [activeEditRowId, setActiveEditRowId] = React.useState<string | null>(null);
+    const [rowsInEditMode, setRowsInEditMode] = React.useState<Set<string>>(new Set());
 
     const sortedRows: DbWikiRow[] = rows.slice().sort((r1: DbWikiRow, r2: DbWikiRow) => {
         return r1.row_order > r2.row_order ? 1 : -1;
@@ -160,6 +157,13 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
             temp.splice(indexToRemove, 1);
             return temp;
         });
+
+        setRowsInEditMode((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(row.wiki_key);
+            return newSet;
+        });
+
         return indexToRemove;
     };
 
@@ -250,8 +254,8 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
                         swapRows={swapRows}
                         key={row.wiki_key}
                         setErrorMessage={setErrorMessage}
-                        activeEditRowId={activeEditRowId}
-                        setActiveEditRowId={setActiveEditRowId}
+                        rowsInEditMode={rowsInEditMode}
+                        setRowsInEditMode={setRowsInEditMode}
                     />
                 );
             })}
