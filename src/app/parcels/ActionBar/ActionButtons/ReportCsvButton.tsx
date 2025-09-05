@@ -4,10 +4,13 @@ import { Dayjs } from "dayjs";
 import React from "react";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import {
+    ClientDietWithName,
     formatAddressFromClientDetails,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
+    formatDietsBreakdownFromArray,
     formatHouseholdFromFamilyDetails,
+    formatItemsBreakdownFromArray,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
 import { formatDatetimeAsDate } from "@/common/format";
@@ -56,6 +59,8 @@ export type ReportRow = {
     parcelNotes: string;
     clientNotes: string;
     cookingFacilities: string;
+    diets: string;
+    preferredItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
@@ -111,16 +116,23 @@ export interface rawParcel {
         address_county: string | null;
         address_postcode: string | null;
         cooking_facilities: string[] | null;
-        dietary_requirements: string[] | null;
-        hygiene_tampons: string | null;
-        hygiene_pads: string | null;
-        hygiene_other_items: string[] | null;
-        baby_food: string | null;
-        baby_formula: string | null;
-        baby_nappies: string | null;
-        baby_other_items: string[] | null;
-        pet_food: string[] | null;
-        other_items: string[] | null;
+
+        diets: {
+            diet_id: string;
+            diet: {
+                name: string | null;
+            } | null;
+        }[];
+
+        preferred_items: {
+            item_id: string;
+            item: {
+                item_name: string | null;
+                item_type: string | null;
+            } | null;
+            notes: string | null;
+        }[];
+
         family: {
             birth_year: number | null;
             birth_month: number | null;
@@ -163,16 +175,22 @@ export const getRawParcelListQuery = `
             address_county,
             address_postcode,
             cooking_facilities,
-            dietary_requirements,
-            hygiene_tampons,
-            hygiene_pads,
-            hygiene_other_items,
-            baby_food,
-            baby_formula,
-            baby_nappies,
-            baby_other_items,
-            pet_food,
-            other_items,
+            
+            diets:clients_diets(
+                diet_id,
+                diet:diets(
+                    name
+                )
+            ),
+            
+            preferred_items:clients_preferred_items(
+                item_id,
+                item:lists(
+                    item_name,
+                    item_type
+                ),
+                notes
+            ),
 
             family:families(
                 birth_year,
@@ -225,11 +243,33 @@ export const convertRawParcelListToReportResult = (
                         rawParcel.client?.cooking_facilities ?? null,
                         cookingFacilitiesOptions
                     ),
-                    hygieneProducts: "-", // TODO VFB-521
-                    babyProducts: "-", // TODO VFB-521
-                    petFood: "-", // TODO VFB-521
-                    seasonalItems: "-", // TODO VFB-521
-                    otherItems: "-", // TODO VFB-521
+                    diets: formatDietsBreakdownFromArray(
+                        rawParcel.client?.diets as ClientDietWithName[]
+                    ),
+                    preferredItems: formatItemsBreakdownFromArray(
+                        rawParcel.client?.preferred_items,
+                        "alternative_food"
+                    ),
+                    hygieneProducts: formatItemsBreakdownFromArray(
+                        rawParcel.client?.preferred_items,
+                        "hygiene_product"
+                    ),
+                    babyProducts: formatItemsBreakdownFromArray(
+                        rawParcel.client?.preferred_items,
+                        "baby_product"
+                    ),
+                    petFood: formatItemsBreakdownFromArray(
+                        rawParcel.client?.preferred_items,
+                        "pet_food"
+                    ),
+                    seasonalItems: formatItemsBreakdownFromArray(
+                        rawParcel.client?.preferred_items,
+                        "seasonal_product"
+                    ),
+                    otherItems: formatItemsBreakdownFromArray(
+                        rawParcel.client?.preferred_items,
+                        "others"
+                    ),
                     household: rawParcel.client
                         ? formatHouseholdFromFamilyDetails(rawParcel.client.family)
                         : "",

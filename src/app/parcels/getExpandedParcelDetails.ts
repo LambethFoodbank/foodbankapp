@@ -80,7 +80,6 @@ const getExpandedParcelDetails = async (
             address_postcode,
             is_active,
             cooking_facilities,
-            dietary_requirements,
             
             diets:clients_diets(
                 diet_id,
@@ -98,15 +97,6 @@ const getExpandedParcelDetails = async (
                 notes
             ),
             
-            hygiene_tampons,
-            hygiene_pads,
-            hygiene_other_items,
-            baby_food,
-            baby_formula,
-            baby_nappies,
-            baby_other_items,
-            pet_food,
-            other_items,
             extra_information,
             signposting_call_required,
             signposting_call_reasons,
