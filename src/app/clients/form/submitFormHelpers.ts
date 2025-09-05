@@ -86,6 +86,7 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     const auditLog = {
         action: "add a client",
         content: {
+            actionType: "Create",
             clientDetails: clientRecord,
             familyMembers: familyMembers,
         },

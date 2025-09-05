@@ -35,6 +35,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
 import { fetchCollectionCentreWithId, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
+import CollectionCentreAvailableDaysModal from "./CollectionCentreAvailableDaysModal";
 
 function getBaseAuditLogForCollectionCentreAction(
     action: string,
@@ -42,7 +43,7 @@ function getBaseAuditLogForCollectionCentreAction(
     oldCollectionCentreRow: CollectionCentresTableRow,
     actionType: string,
 ): Pick<AuditLog, "action" | "content" | "collectionCentreId"> {
-    const beforeAndAfter = getBeforeAndAfter(oldCollectionCentreRow, newCollectionCentreRow, ['timeSlots']);
+    const beforeAndAfter = getBeforeAndAfter(oldCollectionCentreRow, newCollectionCentreRow, ['timeSlots', 'availableDays']);
     return {
         action,
         content: {

@@ -10,6 +10,11 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { ClientDatabaseInsertRecord, ClientDatabaseUpdateRecord, FamilyDatabaseInsertRecord } from "../clients/form/submitFormHelpers";
 import { ListType } from "@/common/databaseListTypes";
 import { Schema } from "@/databaseUtils";
+import { ListRow, listsHeaderKeysAndLabels } from "../lists/ListDataview";
+import { ParcelsTableRow } from "../parcels/parcelsTable/types";
+import { UpdateField } from "../parcels/ActionBar/ActionModals/CommonDateAndSlot";
+import dayjs from "dayjs";
+import { getDbDate } from "@/common/format";
 
 export interface beforeAndAfter {
     before: {};
@@ -57,6 +62,7 @@ export const fetchCollectionCentreWithId = async (
         isShown: latestRow.is_shown,
         lastUpdated: latestRow.last_updated,
         timeSlots: latestRow.time_slots,
+        availableDays: latestRow.available_days,
         isNew: false,
     };
     return {
@@ -125,7 +131,7 @@ export type FetchPackingSlot =
     };
 
 export const fetchPackingSlot = async (
-    packingSlotID: string
+    packingSlotID: string | null
 ): Promise<FetchPackingSlot> => {
     const { data: latestRow, error } = await supabase.from("packing_slots").select().eq("primary_key", packingSlotID).single();
 
@@ -247,7 +253,44 @@ const formatClientRecord = (
     };
 };
 
+type FetchClient = 
+    | {
+        data: ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord,
+        error: null,
+    }
+    | {
+        data: ClientDatabaseRecord,
+        error: null,
+    }
+    | {
+        data: null;
+        error: {
+            type: PostgrestError;
+            logId: string;
+        };
+    };
 
+export const fetchClient = async (
+    clientID: string,
+): Promise<FetchClient> => {
+    const { data: clientData, error: fetchClientError } = await supabase.from("clients").select().eq("primary_key", clientID).single();
+
+    if (fetchClientError || !clientData) {
+        const logId = await logErrorReturnLogId("Error with fetch: client data", fetchClientError);
+        return {
+            data: null,
+            error: {
+                type: fetchClientError,
+                logId
+            }
+        };
+    }
+    const mappedClient = formatClientRecord(clientData) as ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord;
+    return {
+        data: mappedClient,
+        error: null,
+    };
+}
 
 export const fetchClientAndFamily = async (
     clientID: string,
@@ -277,7 +320,6 @@ export const fetchClientAndFamily = async (
             }
         };
     }
-
     const mappedClient = formatClientRecord(clientData) as ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord;
     const mappedFamily = familyData.map((person) => {
         return {
@@ -296,6 +338,102 @@ export const fetchClientAndFamily = async (
     };
 }
 
+type FetchList = 
+    | {
+        data: Partial<Schema["lists"]>,
+        error: null,
+    }
+    | {
+        data: null;
+        error: {
+            type: PostgrestError;
+            logId: string;
+        };
+    };
+    
+export const fetchList = async (
+    listId: string | undefined,
+): Promise<FetchList> => {
+
+    if (!listId) {
+        const logId = await logErrorReturnLogId("Error with fetch: list data");
+        return {
+            data: null,
+            error: {
+                type: {
+                    message: "Invalid listId",
+                    details: "list item undefined",
+                    hint: "",
+                    code: "",
+                },
+                logId,
+            },
+        };
+    }
+    const { data: listData, error: fetchListError } = await supabase.from("lists").select().eq("primary_key", listId).single();
+
+    if (fetchListError || !listData) {
+        const logId = await logErrorReturnLogId("Error with fetch: list data", fetchListError);
+        return {
+            data: null,
+            error: {
+                type: fetchListError,
+                logId
+            }
+        };
+    }
+
+    return {
+        data: listData,
+        error: null,
+    };
+}
+
+type FetchPackingDateOrSlot = 
+    | {
+        data: {
+            oldValue: string,
+            newValue: string
+        },
+        error: null,
+    }
+    | {
+        data: null;
+        error: {
+            type: PostgrestError;
+            logId: string;
+        };
+    };
+
+export const fetchPackingDateOrSlot = async (
+    parcel: ParcelsTableRow,
+    packingDateOrSlotId: string,
+    updateField: UpdateField,
+): Promise<FetchPackingDateOrSlot> => {
+    if (updateField === 'packingDate') {
+        return {
+            data: {
+                newValue: packingDateOrSlotId,
+                oldValue: getDbDate(dayjs(parcel.packingDate)),
+            },
+            error: null,
+        };
+    }
+    else {
+        const packingSlot = await fetchPackingSlot(packingDateOrSlotId);
+
+        return packingSlot.data ? {
+            data: {
+                newValue: packingSlot.data?.name,
+                oldValue: parcel.packingSlot ?? "",
+            },
+            error: null,
+        } : {
+            data: null,
+            error: packingSlot.error,
+        };
+    }
+}
 
 const getBefore = (comparison: IChange[] | undefined): Record<string, any> => {
     if (!comparison) {
@@ -407,12 +545,14 @@ export const getBeforeAndAfter = (
     arrayFields: string[] = [],
 ): { before: Record<string, any>; after: Record<string, any> } => {
     if (!oldRow) {
+        console.log("doen't get to compare");
         return {
             before: {},
             after: {},
         };
     }
     const comparison = diff(oldRow, newRow, { keysToSkip: ['lastUpdated', ...arrayFields] });
+    console.log(oldRow, newRow);
 
     if (arrayFields) {
         const arrayFieldsComparison = arrayFields.map((field) => getStringArrayComparison(normalizeToStringArray(oldRow[field]) ?? [], normalizeToStringArray(newRow[field]) ?? [], field));

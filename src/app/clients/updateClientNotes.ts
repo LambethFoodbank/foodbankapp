@@ -1,6 +1,7 @@
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
+import { fetchClient } from "../logs/fetchForAuditLog";
 
 type UpdateClientNotesResponse =
     | { error: null }
@@ -11,10 +12,20 @@ export const updateClientNotes = async (
     notes: string | null,
     lastUpdated: string | undefined
 ): Promise<UpdateClientNotesResponse> => {
+    const { data: oldRow, error: fetchOldRowError} = await fetchClient(clientId);
+    
+    if (fetchOldRowError) {
+        const logId = fetchOldRowError.logId;
+        await sendAuditLog({ content: { actionType: 'Edit' }, action: 'update client notes', wasSuccess: false, logId });
+        return { error: { type: "updateNotesFailed", logId } };
+    }
     const baseAuditLogProps = {
         action: "update client notes",
         clientId,
-        content: { notes: notes, clientId },
+        content: {
+            before: { notes: oldRow.notes ?? ""},
+            after: { notes: notes },
+        },
     };
 
     const { error, count } = await supabase

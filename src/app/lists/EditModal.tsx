@@ -14,6 +14,7 @@ import Button from "@mui/material/Button/Button";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { capitaliseWords } from "@/common/format";
+import { fetchList, getBeforeAndAfter } from "../logs/fetchForAuditLog";
 
 interface Props {
     onClose: () => void;
@@ -85,7 +86,7 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
             .single();
 
         const auditLog = {
-            content: { itemDetails: listItem },
+            content: { itemDetails: listItem, actionType: "Create" },
             action: "add a list item",
         } as const satisfies Partial<AuditLog>;
 
@@ -107,6 +108,17 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
     };
 
     const editListItem = async (listItem: Partial<Schema["lists"]>): Promise<EditListReturn> => {
+        const { data: oldRow, error: fetchOldRowError } = await fetchList(listItem.primary_key);
+
+        if (fetchOldRowError) {
+            const logId = await logErrorReturnLogId("failed to update list item", {
+                error: fetchOldRowError,
+            });
+            void sendAuditLog({ action: "edit a list item", content: {actionType: "Edit"}, wasSuccess: false, logId });
+            setErrorMessage(`Failed to update a list item. Log ID: ${logId}`);
+            return { error: { type: "failedToEditListItem", logId } };
+        }
+
         const { data: returnedListData, error: updateListItemError } = await supabase
             .from("lists")
             .update(listItem)
@@ -114,11 +126,17 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
             .select()
             .single();
 
+        const beforeAndAfter = getBeforeAndAfter(oldRow, listItem);
+            
         const auditLog = {
-            content: listItem ?? {},
+            content: {
+                ...beforeAndAfter,
+                actionType: "Edit",
+            },
             action: "edit a list item",
             listId: listItem.primary_key,
         } as const satisfies Partial<AuditLog>;
+
 
         if (updateListItemError) {
             const logId = await logErrorReturnLogId("failed to update list item", {

@@ -22,6 +22,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ClientSideFilter } from "@/components/Tables/Filters";
 import { ListType } from "@/common/databaseListTypes";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
+import { fetchList, getBeforeAndAfter } from "../logs/fetchForAuditLog";
 
 export type ListFilter = ClientSideFilter<ListRow, string>;
 
@@ -188,12 +189,23 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
             },
         ]);
 
-        const auditLog = {
+        const auditLog1 = {
             action: `move a list item ${row1.rowOrder <= row2.rowOrder ? "down" : "up"}`,
             listId: row1.primaryKey,
             content: {
-                itemName: row1.itemName,
-                oldRowOrder: row1.rowOrder,
+                before: { 'row_order': row2.rowOrder },
+                after: { 'row_order': row1.rowOrder },
+                actionType: "Edit",
+            },
+        } as const satisfies Partial<AuditLog>;
+
+        const auditLog2 = {
+            action: `move a list item ${row2.rowOrder <= row1.rowOrder ? "down" : "up"}`,
+            listId: row2.primaryKey,
+            content: {
+                before: { 'row_order': row1.rowOrder },
+                after: { 'row_order': row2.rowOrder },
+                actionType: "Edit",
             },
         } as const satisfies Partial<AuditLog>;
 
@@ -203,16 +215,24 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
             });
             setErrorMessage(`Failed to swap rows. Log ID: ${logId}`);
             void sendAuditLog({
-                ...auditLog,
+                ...auditLog1,
+                wasSuccess: false,
+                logId: logId,
+            });
+            void sendAuditLog({
+                ...auditLog2,
                 wasSuccess: false,
                 logId: logId,
             });
             return;
         } else {
             void sendAuditLog({
-                ...auditLog,
+                ...auditLog1,
                 wasSuccess: true,
-                content: { ...auditLog.content, newRowOrder: row2.rowOrder },
+            });
+            void sendAuditLog({
+                ...auditLog2,
+                wasSuccess: true,
             });
         }
 
@@ -231,6 +251,7 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
             const auditLog = {
                 action: "delete a list item",
                 content: {
+                    actionType: "Delete",
                     itemName: itemToDelete.itemName,
                     itemPrimaryKey: itemToDelete.primaryKey,
                 },

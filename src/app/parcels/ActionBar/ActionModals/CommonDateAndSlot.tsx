@@ -5,6 +5,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
+import { fetchPackingDateOrSlot, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
 
 export const getUpdateErrorMessage = ({
     parcelId,
@@ -34,7 +35,7 @@ export const getUpdateErrorMessage = ({
     return `${errorMessage} Parcel Id: ${parcelId} Log Id: ${error?.logId}`;
 };
 
-type UpdateField = "packingDate" | "packingSlot";
+export type UpdateField = "packingDate" | "packingSlot";
 
 export const packingDateOrSlotUpdate = async (
     updateField: UpdateField,
@@ -48,6 +49,8 @@ export const packingDateOrSlotUpdate = async (
         packing_date?: string;
         packing_slot?: string;
     };
+
+    const { data: values, error: fetchOldRowError } = await fetchPackingDateOrSlot(parcel, packingDateOrSlotData, updateField);
 
     const packingDateOrSlotDbUpdate = async (
         fieldToUpdate: FieldToUpdate
@@ -76,41 +79,13 @@ export const packingDateOrSlotUpdate = async (
             break;
     }
 
-    const { data: parcelData, error: fetchError } = await fetchParcel(parcel.parcelId, supabase);
-
-    if (fetchError) {
-        const logId = await logErrorReturnLogId("Error with fetching parcel data", fetchError);
-        await sendAuditLog({
-            action: action,
-            content: {
-                parcelDetails: {
-                    client_id: parcel.clientId,
-                    packing_date: parcel.packingDate?.toString(),
-                    packing_slot: parcel.packingSlot,
-                    voucher_number: parcel.voucherNumber,
-                    collection_centre: parcel.deliveryCollection.collectionCentreName,
-                    collection_datetime: parcel.collectionDatetime?.toString(),
-                },
-            },
-            wasSuccess: false,
-            logId,
-        });
-        return { parcelId: parcel.parcelId, error: fetchError };
-    }
-
-    const parcelRecord = {
-        client_id: parcelData.client_id,
-        packing_date: parcelData.packing_date,
-        packing_slot: parcelData.packing_slot?.primary_key,
-        voucher_number: parcelData.voucher_number,
-        collection_centre: parcelData.collection_centre?.primary_key,
-        collection_datetime: parcelData.collection_datetime,
-        last_updated: parcelData.last_updated,
-    };
-
     const auditLog = {
         action: action,
-        content: { parcelDetails: parcelRecord, count: updateResponse.count },
+        content: {
+            before: { [updateField]: values?.oldValue },
+            after: { [updateField]: values?.newValue },
+            count: updateResponse.count
+        },
         clientId: parcel.clientId,
         parcelId: parcel.parcelId,
     } as const satisfies Partial<AuditLog>;

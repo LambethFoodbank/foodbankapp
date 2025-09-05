@@ -7,6 +7,7 @@ import { Button } from "@mui/material";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
 import { createItemInWikiTable } from "@/app/info/supabaseHelpers";
+import { sendAuditLog } from "@/server/auditLog";
 
 interface WikiRowQuerySuccessType {
     data: DbWikiRow;
@@ -34,10 +35,13 @@ const AddWikiItemButton: React.FC<AddWikiItemButtonProps> = ({
         }
 
         const insertResponse = await createItemInWikiTable();
-
-        insertResponse.error
-            ? logErrorReturnLogId("error inserting and fetching new data", insertResponse.error)
-            : appendNewRow(insertResponse.data, -1);
+        if (insertResponse.error || !insertResponse.data) {
+            const logId = await logErrorReturnLogId("error inserting and fetching new data", insertResponse.error)
+            await sendAuditLog({ action: "add wiki item", content: { actionType: "Create"}, wasSuccess: false, logId });
+        } else {
+            await sendAuditLog({ action: "add wiki item", content: { actionType: "Create" }, wasSuccess: true, wikiId: insertResponse.data.wiki_key});
+            appendNewRow(insertResponse.data, -1);
+        }
     };
 
     return (
