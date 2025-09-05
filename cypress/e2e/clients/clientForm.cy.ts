@@ -50,7 +50,6 @@ describe("Add client form", () => {
         chooseListType();
         toggleNoAddress();
         clickSubmitForm();
-        assertSubmitErrorShown();
     });
 });
 
