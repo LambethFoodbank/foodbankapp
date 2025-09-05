@@ -99,8 +99,11 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                     // eslint-disable-next-line react/no-array-index-key
                     <GappedDiv key={index}>
                         {index === 1 && (
+                            <>
                                 <Divider aria-hidden="true" orientation="horizontal" flexItem />
-                            ) && <FormText>Additional Phone Numbers</FormText>}
+                                <FormText>Additional Phone Numbers</FormText>
+                            </>
+                        )}
                         {index === 0 && (
                             <FreeFormTextInput
                                 id="client-phone-number"
@@ -114,6 +117,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                     fields.additionalPhoneNumbers,
                                     errorSetter as Setter<FormErrors<ClientFields>>,
                                     "phoneNumber",
+                                    formErrors,
                                     {
                                         required: phoneNumberIsRequired,
                                         regex: phoneNumberRegex,
@@ -144,6 +148,7 @@ const PhoneNumberCard: React.FC<ClientCardProps> = ({
                                         fields.additionalPhoneNumbers,
                                         errorSetter as Setter<FormErrors<ClientFields>>,
                                         "additionalPhoneNumbers",
+                                        formErrors,
                                         {
                                             required: phoneNumberIsRequired,
                                             regex: phoneNumberRegex,

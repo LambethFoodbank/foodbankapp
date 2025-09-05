@@ -64,34 +64,37 @@ export const createSetter = <SpecificFields extends Fields>(
         setFields({ ...fieldValues, ...fieldValuesToUpdate });
     };
 };
+
 export const getPhoneNumbersErrorType = (
     input: string,
     currentAdditionalPhoneNumbers?: string[] | null,
     primaryPhoneNumber?: string | null,
     index?: number
 ): Errors => {
-    if (
-        currentAdditionalPhoneNumbers &&
-        currentAdditionalPhoneNumbers.length > 0 &&
-        input === "" &&
-        index === undefined
-    ) {
-        return Errors.emptyPrimaryPhoneNumber;
-    }
-    if (currentAdditionalPhoneNumbers && index !== undefined) {
-        return (currentAdditionalPhoneNumbers.includes(formatPhoneNumber(input)) &&
-            currentAdditionalPhoneNumbers.indexOf(formatPhoneNumber(input)) !== index) ||
-            primaryPhoneNumber === formatPhoneNumber(input)
-            ? Errors.phoneNumberAlreadyExists
-            : Errors.none;
-    } else if (currentAdditionalPhoneNumbers) {
-        return currentAdditionalPhoneNumbers.includes(formatPhoneNumber(input))
-            ? Errors.phoneNumberAlreadyExists
-            : Errors.none;
+    const additionalNumbers = currentAdditionalPhoneNumbers || [];
+    const primaryNumber = primaryPhoneNumber || "";
+    const isEditingPrimaryPhone = index === undefined;
+    const isInputEmpty = input === "";
+    const formattedInput = formatPhoneNumber(input);
+
+    const isDuplicateOfOtherAdditional = additionalNumbers.some(
+        (phoneNumber, ind) => phoneNumber === formattedInput && ind !== index
+    );
+
+    const isDuplicateOfPrimaryPhone = formattedInput === formatPhoneNumber(primaryNumber);
+
+    if (isEditingPrimaryPhone) {
+        if (additionalNumbers.length && isInputEmpty) {
+            return Errors.emptyPrimaryPhoneNumber;
+        }
+        return isDuplicateOfOtherAdditional ? Errors.phoneNumberAlreadyExists : Errors.none;
     }
 
-    return Errors.none;
+    return isDuplicateOfPrimaryPhone || isDuplicateOfOtherAdditional
+        ? Errors.phoneNumberAlreadyExists
+        : Errors.none;
 };
+
 export const getErrorType = (
     input: string,
     required?: boolean,
@@ -124,7 +127,7 @@ interface OnChangeTextOptions<SpecificFields> {
     maxCharacters?: number;
 }
 
-const errorAndFieldSetters = <SpecificFields extends Fields>(
+const callErrorAndFieldSetters = <SpecificFields extends Fields>(
     fieldSetter: Setter<SpecificFields>,
     errorSetter: Setter<FormErrors<SpecificFields>> | Setter<Required<FormErrors<SpecificFields>>>,
     key: keyof SpecificFields,
@@ -149,6 +152,7 @@ export const onChangePhoneNumbers = <SpecificFields extends Fields>(
     currentAdditionalPhoneNumbers: string[] | null,
     errorSetter: Setter<FormErrors<SpecificFields>> | Setter<Required<FormErrors<SpecificFields>>>,
     key: keyof SpecificFields,
+    currentFormErrors: FormErrors<SpecificFields> | Required<FormErrors<SpecificFields>>,
     options?: OnChangeTextOptions<SpecificFields>,
     index?: number
 ): SelectChangeEventHandler => {
@@ -181,10 +185,11 @@ export const onChangePhoneNumbers = <SpecificFields extends Fields>(
         }
 
         if (key === "additionalPhoneNumbers" && index !== undefined) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const currentErrors = Array.isArray((errorSetter as any).additionalPhoneNumbers) // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ? [...(errorSetter as any).additionalPhoneNumbers]
-                : [];
+            const currentErrors = Array.isArray(
+                (currentFormErrors as Record<string, Errors[]>)["additionalPhoneNumbers"]
+            )
+                ? [...(currentFormErrors as Record<string, Errors[]>)["additionalPhoneNumbers"]]
+                : ([] as Errors[]);
 
             while (currentErrors.length <= index) {
                 currentErrors.push(Errors.none);
@@ -209,7 +214,7 @@ export const onChangePhoneNumbers = <SpecificFields extends Fields>(
                 });
             }
         } else {
-            errorAndFieldSetters(fieldSetter, errorSetter, key, errorType, input, options);
+            callErrorAndFieldSetters(fieldSetter, errorSetter, key, errorType, input, options);
         }
     };
 };
@@ -229,7 +234,7 @@ export const onChangeText = <SpecificFields extends Fields>(
             options?.additionalCondition,
             options?.maxCharacters
         );
-        errorAndFieldSetters(fieldSetter, errorSetter, key, errorType, input, options);
+        callErrorAndFieldSetters(fieldSetter, errorSetter, key, errorType, input, options);
     };
 };
 
@@ -420,7 +425,7 @@ export const checkErrorOnSubmit = <
     for (const [errorKey, error] of Object.entries(errorType)) {
         if (!keysToCheck || keysToCheck.includes(errorKey)) {
             // Handle array of errors for additionalPhoneNumbers
-            if (errorKey === "additionalPhoneNumbers" && Array.isArray(error)) {
+            if (Array.isArray(error)) {
                 const hasError = error.some((err) => err !== Errors.none);
                 if (hasError) {
                     errorExists = true;

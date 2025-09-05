@@ -115,10 +115,10 @@ export const GappedRowDiv = styled.div`
     gap: 0.5em;
 
     > :first-child {
-        flex: 0 0 97%;
+        flex: 1;
     }
 
     > :not(:first-child) {
-        flex: 1;
+        flex: 0 0 auto;
     }
 `;
