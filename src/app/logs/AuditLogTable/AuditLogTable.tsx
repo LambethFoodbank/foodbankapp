@@ -17,7 +17,6 @@ interface AuditLogTableProps {
     openAuditLogModal: (rowId: string) => void;
     sortState: AuditLogSortState;
     setSortState: (sortStte: AuditLogSortState) => void;
-    appliedFilters: any[];
     areFiltersLoadingForFirstTime: boolean;
     setErrorMessage: (errorMessage: string | null) => void;
 }
@@ -26,7 +25,6 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
     openAuditLogModal,
     sortState,
     setSortState,
-    appliedFilters,
     areFiltersLoadingForFirstTime,
     setErrorMessage,
 }) => {
@@ -63,7 +61,6 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                 sortState,
                 startPoint,
                 endPoint,
-                appliedFilters,
                 auditLogsTableFetchAbortController.current.signal
             );
             if (currentFetchRequestId === latestFetchRequestId.current) {
@@ -80,7 +77,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
         }
         auditLogsTableFetchAbortController.current = null;
         setIsLoading(false);
-    }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
+    }, [endPoint, sortState, startPoint, setErrorMessage]);
 
     useEffect(() => {
         if (!areFiltersLoadingForFirstTime) {

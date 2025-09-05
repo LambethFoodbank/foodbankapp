@@ -8,7 +8,6 @@ import {
     AuditLogErrorType,
     convertAuditLogPlusRowsToAuditLogRows,
     AuditLogRow,
-    convertSingleAuditLogPlusRowsToAuditLogRow,
 } from "./types";
 import { DbQuery } from "@/components/Tables/Filters";
 import { DbAuditLogRow } from "@/databaseUtils";
@@ -18,7 +17,6 @@ import { PostgrestError } from "@supabase/supabase-js";
 const getAuditLogQuery = (
     supabase: Supabase,
     sortState: AuditLogSortState,
-    filters: any[],
     selectString = "*"
 ): DbQuery<DbAuditLogRow> => {
     let query = supabase.from("audit_log_plus").select(selectString) as DbQuery<DbAuditLogRow>;
@@ -41,10 +39,9 @@ const fetchAuditLogDbRows = async (
     sortState: AuditLogSortState,
     startIndex: number,
     endIndex: number,
-    filters: any[],
     abortSignal: AbortSignal
 ): Promise<GetAuditLogDataResult> => {
-    let query = getAuditLogQuery(supabase, sortState, filters);
+    let query = getAuditLogQuery(supabase, sortState);
     query = query.range(startIndex, endIndex);
     query = query.abortSignal(abortSignal);
 
@@ -76,7 +73,6 @@ export const getAuditLogTableDataAndAllIds = async (
     sortState: AuditLogSortState,
     startIndex: number,
     endIndex: number,
-    filters: any[],
     abortSignal: AbortSignal
 ): Promise<GetAuditLogDataAndIdsResult> => {
     const { logs, error: getDbLogsError } = await fetchAuditLogDbRows(
@@ -84,7 +80,6 @@ export const getAuditLogTableDataAndAllIds = async (
         sortState,
         startIndex,
         endIndex,
-        filters,
         abortSignal
     );
 
@@ -95,7 +90,7 @@ export const getAuditLogTableDataAndAllIds = async (
                 errorType = "abortedFetch";
                 break;
             case "failedToFetchAuditLogTable":
-                errorType = "failedToFetchAuditLogs";
+                errorType = "failedAuditLogFetch";
                 break;
         }
 
@@ -108,7 +103,7 @@ export const getAuditLogTableDataAndAllIds = async (
         };
     }
 
-    const allAuditLogIds = await getAuditLogIds(supabase, sortState, filters, abortSignal);
+    const allAuditLogIds = await getAuditLogIds(supabase, sortState, abortSignal);
 
     const auditLogTableRows = convertAuditLogPlusRowsToAuditLogRows(logs);
 
@@ -124,10 +119,9 @@ export const getAuditLogTableDataAndAllIds = async (
 export const getAuditLogIds = async (
     supabase: Supabase,
     sortState: AuditLogSortState,
-    filters: any[],
     abortSignal: AbortSignal | null = null
 ): Promise<string[]> => {
-    const query = getAuditLogQuery(supabase, sortState, filters, "primary_key");
+    const query = getAuditLogQuery(supabase, sortState, "primary_key");
 
     if (abortSignal) {
         query.abortSignal(abortSignal);
@@ -163,19 +157,6 @@ export const getAuditLogsByIds = async (
     return runAuditLogQueryAndConvertToAuditLogRows(query);
 };
 
-export const getSingleAuditLogById = async (
-    supabase: Supabase,
-    auditLogId: string
-): Promise<AuditLogRow> => {
-    const query = supabase
-        .from("audit_log_plus")
-        .select("*")
-        .eq("primary_key", auditLogId)
-        .single() as DbQuery<DbAuditLogRow>;
-
-    return runAuditLogQueryAndConvertToSingleAuditLogRow(query);
-};
-
 const runAuditLogQueryAndConvertToAuditLogRows = async (
     query: DbQuery<DbAuditLogRow>
 ): Promise<AuditLogRow[]> => {
@@ -190,20 +171,4 @@ const runAuditLogQueryAndConvertToAuditLogRows = async (
 
     const auditLogTableRows = convertAuditLogPlusRowsToAuditLogRows(data);
     return auditLogTableRows;
-};
-
-const runAuditLogQueryAndConvertToSingleAuditLogRow = async (
-    query: DbQuery<DbAuditLogRow>
-): Promise<AuditLogRow> => {
-    const { data, error } = (await query) as {
-        data: DbAuditLogRow;
-        error: Error | null;
-    };
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: audit log table", {}, error);
-        throw new DatabaseError("fetch", "audit log table", logId);
-    }
-
-    const auditLogTableRow = convertSingleAuditLogPlusRowsToAuditLogRow(data);
-    return auditLogTableRow;
 };

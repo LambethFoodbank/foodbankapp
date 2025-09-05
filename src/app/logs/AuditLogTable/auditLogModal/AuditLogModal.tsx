@@ -15,7 +15,7 @@ import PackingSlotAuditLogModalRow from "./auditLogModalRows/PackingSlot";
 import StatusOrderAuditLogModalRow from "./auditLogModalRows/StatusOrder";
 import WebsiteDataAuditLogModalRow from "./auditLogModalRows/WebsiteData";
 import { AuditLogModalItem, Key, TextValueContainer } from "./AuditLogModalRow";
-import { getSingleAuditLogById } from "../fetchAuditLogData";
+import { getAuditLogsByIds } from "../fetchAuditLogData";
 import supabase from "@/supabaseClient";
 
 export const AuditLogModalContainer = styled.div`
@@ -48,7 +48,7 @@ const AuditLogModal: React.FC<AuditLogModalProps> = ({
             return;
         }
 
-        const row = await getSingleAuditLogById(supabase, selectedAuditLogRowId);
+        const row = (await getAuditLogsByIds(supabase, [selectedAuditLogRowId]))[0];
 
         setSelectedAuditLogRow(row);
     }, [selectedAuditLogRowId]);

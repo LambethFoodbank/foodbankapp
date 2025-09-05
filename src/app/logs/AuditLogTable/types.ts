@@ -45,7 +45,7 @@ export type AuditLogCountResponse =
           error: AuditLogCountError;
       };
 
-export type AuditLogErrorType = "abortedFetch" | "failedAuditLogFetch" | "failedToFetchAuditLogs";
+export type AuditLogErrorType = "abortedFetch" | "failedAuditLogFetch";
 
 export interface AuditLogError {
     type: AuditLogErrorType;

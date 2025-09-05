@@ -27,8 +27,6 @@ const AuditLogPage: React.FC = () => {
 
     const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
 
-    const currentlyAppliedFilters: any[] = [];
-
     const refreshAuditLogDetailsRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
@@ -90,7 +88,6 @@ const AuditLogPage: React.FC = () => {
                         openAuditLogModal={openLogModalAndUpdateURL}
                         sortState={sortState}
                         setSortState={setSortState}
-                        appliedFilters={currentlyAppliedFilters}
                         areFiltersLoadingForFirstTime={areFiltersLoadingForFirstTime}
                         setErrorMessage={setErrorMessage}
                     />
