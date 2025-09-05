@@ -152,8 +152,18 @@ const getShoppingListDataForSingleParcel = async (
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
         familyData.length,
         parcelInfoAndClientIdData.parcelInfo.listType,
-        clientDietsData.map((diet) => diet.primaryKey)
+        clientDietsData.map((diet) => diet.primaryKey),
+        clientPreferredItemsData.map((item) => {
+            return {
+                description: item.name,
+                additionalClientInfo: item.notes ?? "",
+                quantity: "",
+                notes: "",
+            };
+        })
     );
+
+    console.log(itemsListData);
 
     if (itemsListError) {
         return { data: null, error: itemsListError };

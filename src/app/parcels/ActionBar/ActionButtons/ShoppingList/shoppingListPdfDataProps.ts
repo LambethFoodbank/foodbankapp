@@ -7,10 +7,11 @@ import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
 
-export interface Item {
+export interface ShoppingListItem {
     description: string;
     quantity: string;
     notes: string;
+    additionalClientInfo: string;
 }
 
 export interface ShoppingListPdfData {
@@ -19,13 +20,13 @@ export interface ShoppingListPdfData {
     clientSummary: ClientSummary;
     householdSummary: HouseholdSummary;
     requirementSummary: RequirementSummary;
-    itemsList: Item[];
+    itemsList: ShoppingListItem[];
     endNotes: string;
 }
 
 type PrepareItemsListResult =
     | {
-          data: Item[];
+          data: ShoppingListItem[];
           error: null;
       }
     | {
@@ -72,7 +73,7 @@ export type FetchDietaryRequirementsError = {
     logId: string;
 };
 type GetQuantityAndNotesResult =
-    | { data: Pick<Item, "quantity" | "notes">; error: null }
+    | { data: Pick<ShoppingListItem, "quantity" | "notes">; error: null }
     | { data: null; error: GetQuantityAndNotesError };
 
 type DietaryRulesPlusRow = {
@@ -155,13 +156,14 @@ const getItemsByDietaryRequirements = async (
 export const prepareItemsListForHousehold = async (
     householdSize: number,
     listType: ListType,
-    dietsIds: string[]
+    dietsIds: string[],
+    clientPreferredItems: ShoppingListItem[]
 ): Promise<PrepareItemsListResult> => {
     const { data: listData, error } = await fetchLists(supabase);
     if (error) {
         return { data: null, error: error };
     }
-    const itemsList: Item[] = [];
+    const itemsList: ShoppingListItem[] = [];
 
     const itemsByRequirement = dietsIds
         ? await getItemsByDietaryRequirements(dietsIds)
@@ -171,16 +173,15 @@ export const prepareItemsListForHousehold = async (
         return { data: null, error: itemsByRequirement.error };
     }
 
+    console.log(clientPreferredItems);
+
     for (const row of listData) {
+        console.log(row.item_name);
         if (!row.is_available) {
             continue;
         }
 
         if (row.list_type !== listType) {
-            continue;
-        }
-
-        if (row.item_type !== "regular_food" && row.item_type !== "alternative_food") {
             continue;
         }
 
@@ -195,14 +196,23 @@ export const prepareItemsListForHousehold = async (
         if (!["", "0"].includes(listItemData.quantity.trim())) {
             const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
             const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
-            const isAlternativeFood = row.item_type === "alternative_food";
+            const isRegularFood = row.item_type === "regular_food";
+            const isPreferredItem = clientPreferredItems.find(
+                (item) => item.description === row.item_name
+            );
 
-            const currentItem = { description: row.item_name, ...listItemData };
+            const currentItem = {
+                description: row.item_name,
+                ...listItemData,
+                additionalClientInfo:
+                    clientPreferredItems.find((item) => item.description === row.item_name)
+                        ?.additionalClientInfo ?? "",
+            };
 
             // Add item if:
             // 1. It's not excluded has type "regular_food"
             // 2. It's explicitly included
-            const shouldAddItem = (!isExcluded && !isAlternativeFood) || isIncluded;
+            const shouldAddItem = (!isExcluded && isRegularFood) || isIncluded || isPreferredItem;
 
             if (shouldAddItem) {
                 itemsList.push(currentItem);
