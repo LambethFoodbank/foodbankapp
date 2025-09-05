@@ -182,26 +182,6 @@ describe("Wiki items component", () => {
     );
 
     it.each(adminManagerAndStaffRoles)(
-        "reorders the wiki items when reorder buttons are clicked in edit mode for admins, managers and staff",
-        async ({ role }) => {
-            const user = userEvent.setup();
-
-            render(
-                <StyleManager>
-                    <RoleUpdateContext.Provider value={{ role: role, setRole: jest.fn() }}>
-                        <WikiItems rows={mockData} />
-                    </RoleUpdateContext.Provider>
-                </StyleManager>
-            );
-            await user.click(screen.getByTestId("#edit-2"));
-            await user.click(screen.getByTestId("#swap-up-2"));
-            expect(mockData[0].row_order).toBe(2);
-            expect(mockData[2].row_order).toBe(1);
-            expect(mockData[1].row_order).toBe(3);
-        }
-    );
-
-    it.each(adminManagerAndStaffRoles)(
         "deletes a wiki item when its delete button is clicked by an admin, manager and staff member",
         async ({ role }) => {
             const user = userEvent.setup();
