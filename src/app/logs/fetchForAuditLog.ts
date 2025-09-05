@@ -317,27 +317,6 @@ const getAfter = (comparison: IChange[] | undefined):  Record<string, any> => {
     }, {} as Record<string, any>);
 }
 
-export const getBeforeAndAfterCollectionCentre = (
-    oldRow: CollectionCentresTableRow,
-    newRow: CollectionCentresTableRow,
-): { before: Record<string, any>; after: Record<string, any> } => {
-    const comparison = diff(
-        oldRow,
-        newRow,
-        {
-            keysToSkip: ['lastUpdated'],
-            embeddedObjKeys: {
-                items: 'timeSlots',
-            }
-        },
-    );
-
-    return {
-        before: getBefore(comparison),
-        after: getAfter(comparison),
-    };
-}
-
 export const getBeforeAndAfterClientAndFamily = (
     oldClient: ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord,
     oldFamily: FamilyDatabaseInsertRecord[],
@@ -348,7 +327,7 @@ export const getBeforeAndAfterClientAndFamily = (
         oldClient,
         newClient,
         {
-            keysToSkip: ['lastUpdated'],
+            keysToSkip: ['lastUpdated', "baby_other_items", "cooking_facilities", "dietary_requirements", "hygiene_other_items", "other_items", "pet_food", "signposting_call_reasons"],
         }
     );
 
@@ -356,16 +335,76 @@ export const getBeforeAndAfterClientAndFamily = (
         oldFamily,
         newFamily,
     );
+
+    const babyOtherItemsComparison = getStringArrayComparison(oldClient.baby_other_items ?? [], newClient.baby_other_items ?? [], "baby_other_items");
+    const cookingFacilitiesComparison = getStringArrayComparison(oldClient.cooking_facilities ?? [], newClient.cooking_facilities ?? [], "cooking_facilities");
+    const dietaryRequirementComparison = getStringArrayComparison(oldClient.dietary_requirements ?? [], newClient.dietary_requirements ?? [], "dietary_requirements");
+    const hygieneOtherItemsComparison = getStringArrayComparison(oldClient.hygiene_other_items ?? [], newClient.hygiene_other_items ?? [], "hygiene_other_items");
+    const otherItemsComparison = getStringArrayComparison(oldClient.other_items ?? [], newClient.other_items ?? [], "other_items");
+    const petFoodComparison = getStringArrayComparison(oldClient.pet_food ?? [], newClient.pet_food ?? [], "pet_food");
+    const signpostingCallReasonsComparison = getStringArrayComparison(oldClient.signposting_call_reasons ?? [], newClient.signposting_call_reasons ?? [], "signposting_call_reasons");
+    const beforeArrays = {
+        ...(babyOtherItemsComparison?.before ?? {}),
+        ...(cookingFacilitiesComparison?.before ?? {}),
+        ...(dietaryRequirementComparison?.before ?? {}),
+        ...(hygieneOtherItemsComparison?.before ?? {}),
+        ...(otherItemsComparison?.before ?? {}),
+        ...(petFoodComparison?.before ?? {}),
+        ...(signpostingCallReasonsComparison?.before ?? {}),
+    };
+    const afterArrays = {
+        ...(babyOtherItemsComparison?.after ?? {}),
+        ...(cookingFacilitiesComparison?.after ?? {}),
+        ...(dietaryRequirementComparison?.after ?? {}),
+        ...(hygieneOtherItemsComparison?.after ?? {}),
+        ...(otherItemsComparison?.after ?? {}),
+        ...(petFoodComparison?.after ?? {}),
+        ...(signpostingCallReasonsComparison?.after ?? {}),
+    };
+
+
     return {
-        before: {...getBefore(clientComparison), ...getBefore(familyComparison)},
-        after: {...getAfter(clientComparison), ...getAfter(familyComparison)},
+        before: {...getBefore(clientComparison), ...getBefore(familyComparison), ...beforeArrays},
+        after: {...getAfter(clientComparison), ...getAfter(familyComparison), ...afterArrays},
     };
 }
+
+const areArraysIdentical = (
+    rowA: any[],
+    rowB: any[],
+): boolean => {
+    if (rowA.length !== rowB.length) return false;
+    const sortedA = [...rowA].sort();
+    const sortedB = [...rowB].sort();
+    return sortedA.every((val, idx) => val === sortedB[idx]);
+}
+
+const getStringArrayComparison = (
+    oldRow: string[],
+    newRow: string[],
+    fieldName: string,
+): { before: Record<string, any>; after: Record<string, any> } | null => {
+    
+    return areArraysIdentical(oldRow, newRow) ? null : {
+        before: {
+            [fieldName]: oldRow.filter((elem) => !newRow.includes(elem))
+        },
+        after: {
+            [fieldName]: newRow.filter((elem) => !oldRow.includes(elem)),
+        }
+    };
+};
+
+const normalizeToStringArray = (input: any[]): string[] => {
+  return input.map((item) =>
+    typeof item === 'string' ? item : JSON.stringify(item)
+  );
+};
 
 export const getBeforeAndAfter = (
     oldRow: Record<string, any> | null,
     newRow: Record<string, any>,
-
+    arrayFields: string[] = [],
 ): { before: Record<string, any>; after: Record<string, any> } => {
     if (!oldRow) {
         return {
@@ -373,7 +412,28 @@ export const getBeforeAndAfter = (
             after: {},
         };
     }
-    const comparison = diff(oldRow, newRow, { keysToSkip: ['lastUpdated'] });
+    const comparison = diff(oldRow, newRow, { keysToSkip: ['lastUpdated', ...arrayFields] });
+
+    if (arrayFields) {
+        const arrayFieldsComparison = arrayFields.map((field) => getStringArrayComparison(normalizeToStringArray(oldRow[field]) ?? [], normalizeToStringArray(newRow[field]) ?? [], field));
+        const beforeArrays = arrayFieldsComparison.reduce((acc, compare) => {
+            if (compare?.before) {
+                Object.assign(acc, compare.before);
+            }
+            return acc;
+        }, {} as Record<string, any>);
+        const afterArrays = arrayFieldsComparison.reduce((acc, compare) => {
+            if (compare?.after) {
+                Object.assign(acc, compare.after);
+            }
+            return acc;
+        }, {} as Record<string, any>);
+        return {
+            before: { ...getBefore(comparison), ...beforeArrays },
+            after: { ...getAfter(comparison), ...afterArrays},
+        };
+    }
+
     return {
         before: getBefore(comparison),
         after: getAfter(comparison),
