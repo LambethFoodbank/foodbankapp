@@ -42,6 +42,10 @@ function SelectionGenericCard<T extends SelectableItem>({
         fieldSetter({ [fieldName]: newSelected });
     };
 
+    if (items.length === 0) {
+        return <></>;
+    }
+
     return (
         <GenericFormCard title={title} required={false}>
             <FormGroup>
