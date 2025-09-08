@@ -67,6 +67,7 @@ export function switchErrorForCollectionDate(
 
 export function switchErrorForCollectionSlot(
     fields: ParcelFields,
+    collectionCentreIsActive: boolean,
     collectionSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues,
     availableDaysForCentre: DbAvailableDaysType
 ): Errors {
@@ -77,6 +78,7 @@ export function switchErrorForCollectionSlot(
 
     // The collection slot should be one of the available options for the centre
     if (
+        !collectionCentreIsActive ||
         !collectionSlotsLabelsAndValues.some(
             (slotLabelAndValue) => slotLabelAndValue[1] === fields.collectionSlot
         ) ||
