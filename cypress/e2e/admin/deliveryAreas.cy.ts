@@ -1,22 +1,22 @@
-describe("Delivery Areas on admins page", () => {
+describe("Edit delivery areas on admins page", () => {
     beforeEach(() => {
         cy.login();
         cy.intercept({ method: "GET", url: "**/rest/v1/delivery_areas*" }).as("getDeliveryAreas");
         cy.visit("/admin");
     });
 
-    it("Initial delivery areas", () => {
+    it("Displays delivery areas in ascending order", () => {
         toggleDeliveryAreaNameSection();
-        deliveryAreas(false);
+        verifyDeliveryAreasOrder("ascending");
     });
 
-    it("Delivery areas descending order", () => {
+    it("Displays delivery areas in descending order", () => {
         toggleDeliveryAreaNameSection();
         orderDeliveryAreas();
-        deliveryAreas(true);
+        verifyDeliveryAreasOrder("descending");
     });
 
-    it("Add a new delivery area", () => {
+    it("Adds a new delivery area successfully", () => {
         toggleDeliveryAreaNameSection();
 
         cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
@@ -41,7 +41,7 @@ describe("Delivery Areas on admins page", () => {
             .should("be.visible");
     });
 
-    it("Prevents adding duplicate delivery area", () => {
+    it("Tries to add a duplicate delivery area and fails", () => {
         toggleDeliveryAreaNameSection();
 
         const existingDeliveryArea = "CR0";
@@ -51,7 +51,7 @@ describe("Delivery Areas on admins page", () => {
         cy.get('[role="alert"]').should("contain", "already"); // eslint-disable-line quotes
     });
 
-    it("Prevents adding empty delivery area", () => {
+    it("Tries to add an empty delivery area and fails", () => {
         toggleDeliveryAreaNameSection();
 
         const emptyDeliveryArea = " ";
@@ -62,18 +62,18 @@ describe("Delivery Areas on admins page", () => {
         cy.get('[role="alert"]').should("contain", "whitespaces"); // eslint-disable-line quotes
     });
 
-    it("Prevents adding wrong delivery area", () => {
+    it("Tries to add an invalid delivery area and fails", () => {
         toggleDeliveryAreaNameSection();
 
-        const wrongDeliveryArea = "dfffdsvcfv";
+        const invalidDeliveryArea = "dfffdsvcfv";
 
         startAddingNewDeliveryArea();
-        fillOutNewDeliveryAreaAndSave(wrongDeliveryArea);
+        fillOutNewDeliveryAreaAndSave(invalidDeliveryArea);
 
         cy.get('[role="alert"]').should("contain", "Invalid"); // eslint-disable-line quotes
     });
 
-    it("Delete a delivery area", () => {
+    it("Deletes a delivery area successfully", () => {
         toggleDeliveryAreaNameSection();
 
         const deletedDeliveryArea = "M14";
@@ -97,22 +97,6 @@ const editDeliveryAreaNameText = "edit delivery areas";
 
 function toggleDeliveryAreaNameSection(): void {
     cy.contains(editDeliveryAreaNameText, { matchCase: false }).click();
-}
-
-function assertDeliveryAreaName({
-    rowIndex,
-    deliveryAreaName,
-}: {
-    rowIndex: number;
-    deliveryAreaName: string;
-}): void {
-    cy.contains(editDeliveryAreaNameText, { matchCase: false })
-        .parents(".MuiPaper-root")
-        .find(`[data-rowindex="${rowIndex}"]`) // eslint-disable-line quotes
-        .find('[data-field="postcode"]') // eslint-disable-line quotes
-        .should(($postcode) => {
-            expect($postcode).to.contain(deliveryAreaName);
-        });
 }
 
 const fillOutNewDeliveryAreaAndSave = (newDeliveryAreaName: string): void => {
@@ -143,77 +127,44 @@ const orderDeliveryAreas = (): void => {
         .click({ force: true });
 };
 
-const deliveryAreas = (descending: boolean): void => {
-    Math.abs(0 - 15 * Number(descending));
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(0 - 15 * Number(descending)),
-        deliveryAreaName: "CR0",
-    });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(1 - 15 * Number(descending)),
-        deliveryAreaName: "CR7",
-    });
+function verifyDeliveryAreasOrder(order: "ascending" | "descending"): void {
+    const expectedPostcodes = [
+        "CR0",
+        "CR7",
+        "SE1",
+        "SE11",
+        "SE19",
+        "SE21",
+        "SE24",
+        "SE25",
+        "SE27",
+        "SE5",
+        "SW12",
+        "SW16",
+        "SW2",
+        "SW4",
+        "SW8",
+        "SW9",
+    ];
 
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(2 - 15 * Number(descending)),
-        deliveryAreaName: "SE1",
-    });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(3 - 15 * Number(descending)),
-        deliveryAreaName: "SE11",
-    });
+    const orderedPostcodes =
+        order === "descending" ? [...expectedPostcodes].reverse() : expectedPostcodes;
 
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(4 - 15 * Number(descending)),
-        deliveryAreaName: "SE19",
+    orderedPostcodes.forEach((postcode, index) => {
+        assertDeliveryAreaAtRow({ rowIndex: index, deliveryAreaName: postcode });
     });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(5 - 15 * Number(descending)),
-        deliveryAreaName: "SE21",
-    });
+}
 
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(6 - 15 * Number(descending)),
-        deliveryAreaName: "SE24",
-    });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(7 - 15 * Number(descending)),
-        deliveryAreaName: "SE25",
-    });
-
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(8 - 15 * Number(descending)),
-        deliveryAreaName: "SE27",
-    });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(9 - 15 * Number(descending)),
-        deliveryAreaName: "SE5",
-    });
-
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(10 - 15 * Number(descending)),
-        deliveryAreaName: "SW12",
-    });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(11 - 15 * Number(descending)),
-        deliveryAreaName: "SW16",
-    });
-
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(12 - 15 * Number(descending)),
-        deliveryAreaName: "SW2",
-    });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(13 - 15 * Number(descending)),
-        deliveryAreaName: "SW4",
-    });
-
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(14 - 15 * Number(descending)),
-        deliveryAreaName: "SW8",
-    });
-    assertDeliveryAreaName({
-        rowIndex: Math.abs(15 - 15 * Number(descending)),
-        deliveryAreaName: "SW9",
-    });
-};
+function assertDeliveryAreaAtRow({
+    rowIndex,
+    deliveryAreaName,
+}: {
+    rowIndex: number;
+    deliveryAreaName: string;
+}): void {
+    cy.contains(editDeliveryAreaNameText, { matchCase: false })
+        .parents(".MuiPaper-root")
+        .find(`[data-rowindex="${rowIndex}"]`)
+        .find('[data-field="postcode"]') // eslint-disable-line quotes
+        .should("contain.text", deliveryAreaName);
+}
