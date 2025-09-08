@@ -79,9 +79,7 @@ export interface ClientFields extends Fields {
     dietaryRequirements: BooleanGroup | null;
     diets: Diet[];
     preferredItems: Item[];
-    hygieneProductsTampons: string | null;
-    hygieneProductsPads: string | null;
-    hygieneOtherItems: BooleanGroup;
+    hygieneProducts: Item[];
     babyFood: string | null;
     babyFormula: string | null;
     babyNappies: string | null;
@@ -142,6 +140,7 @@ const mapListSchemaToItems = (list: Schema["lists"][]): Item[] => {
             primaryKey: item.primary_key,
             name: item.item_name,
             type: item.item_type as string,
+            additionalInfoField: item.more_info_field,
         };
     });
 };

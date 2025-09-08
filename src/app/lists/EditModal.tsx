@@ -95,8 +95,14 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
         }
     };
 
-    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const handleCheckboxChangeForAvailability = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ): void => {
         setToSubmit((prev) => ({ ...prev, is_available: event.target.checked }));
+    };
+
+    const handleCheckboxChangeForMoreInfo = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setToSubmit((prev) => ({ ...prev, more_info_field: event.target.checked }));
     };
 
     const handleItemTypeChange = (event: SelectChangeEvent<ItemType>): void => {
@@ -256,12 +262,24 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                     control={
                         <Checkbox
                             checked={toSubmit?.is_available ?? true}
-                            onChange={handleCheckboxChange}
+                            onChange={handleCheckboxChangeForAvailability}
                             name="is_available"
                             color="primary"
                         />
                     }
                     label="Item is available"
+                />
+
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={toSubmit?.more_info_field ?? false}
+                            onChange={handleCheckboxChangeForMoreInfo}
+                            name="more_info_field"
+                            color="primary"
+                        />
+                    }
+                    label="Show additional info field when selected in the client form"
                 />
 
                 <h3>Item Type</h3>

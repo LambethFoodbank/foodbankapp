@@ -16,7 +16,6 @@ import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
-import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
 import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
 const getExpandedClientDetails = async (clientId: string): Promise<ExpandedClientData> => {
@@ -65,7 +64,8 @@ const getRawClientDetails = async (clientId: string) => {
                 item:lists(
                     item_name,
                     item_type
-                )
+                ),
+                notes
             ),
             
             hygiene_tampons,
@@ -113,7 +113,8 @@ export interface ClientDietWithName extends Pick<Schema["clients_diets"], "diet_
 }
 
 export interface ClientItemWithName extends Pick<Schema["clients_preferred_items"], "item_id"> {
-    item: { item_name: string | null } | null;
+    item: { item_name: string | null; item_type: string | null } | null;
+    notes: string | null;
 }
 
 export interface ExpandedClientData {
@@ -161,24 +162,9 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.dietary_requirements,
             dietaryRequirementOptions
         ),
-        diets: formatBreakdownFromArray(
-            client.diets ?? [],
-            (diet) => diet.diet?.name ?? diet.diet_id
-        ),
-        preferredItems: formatBreakdownFromArray(
-            getClientPreferredItemsByType(
-                client.preferred_items,
-                (item) => item.item?.item_name ?? item.item_id,
-                (item) => item.item?.item_type ?? null,
-                "alternative_food"
-            ),
-            (item) => item
-        ),
-        hygieneProducts: formatHygieneProducts(
-            client.hygiene_tampons,
-            client.hygiene_pads,
-            client.hygiene_other_items
-        ),
+        diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
+        preferredItems: formatItemsBreakdownFromArray(client.preferred_items, "alternative_food"),
+        hygieneProducts: formatItemsBreakdownFromArray(client.preferred_items, "hygiene_product"),
         babyProducts: formatBabyProducts(
             client.baby_food,
             client.baby_formula,
@@ -186,15 +172,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.baby_other_items
         ),
         petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
-        otherRequirements: formatBreakdownFromArray(
-            getClientPreferredItemsByType(
-                client.preferred_items,
-                (item) => item.item?.item_name ?? item.item_id,
-                (item) => item.item?.item_type ?? null,
-                "others"
-            ),
-            (item) => item
-        ),
+        otherRequirements: formatItemsBreakdownFromArray(client.preferred_items, "others"),
         extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,
         lastUpdated: client.last_updated,
@@ -313,15 +291,49 @@ export const formatBreakdownOfChildrenFromFamilyDetails = (
     return childDetails.join(", ");
 };
 
-export const formatBreakdownFromArray = <T>(
+const formatBreakdownFromArray = <T>(
     arr: T[] | null | undefined,
-    getName: (item: T) => string | number | null | undefined
+    getName: (item: T) => string | number | null | undefined,
+    getAdditionalInfo?: (item: T) => string | null | undefined
 ): string => {
     if (!arr || arr.length === 0) {
-        return "-";
+        return "None";
     }
-    const names = arr.map((item) => getName(item)).filter(Boolean);
-    return names.join(", ");
+
+    const items = arr
+        .map((item) => {
+            const name = getName(item)?.toString().trim();
+            if (!name) {
+                return null;
+            }
+
+            const extraInfo = getAdditionalInfo?.(item)?.trim();
+            return extraInfo ? `${name} (${extraInfo})` : name;
+        })
+        .filter(Boolean);
+
+    return items.length ? items.join(", ") : "None";
+};
+
+export const formatDietsBreakdownFromArray = (
+    arr: ClientDietWithName[] | null | undefined
+): string => {
+    return formatBreakdownFromArray(arr, (diet) => diet.diet?.name ?? diet.diet_id);
+};
+
+export const formatItemsBreakdownFromArray = (
+    arr: ClientItemWithName[] | null | undefined,
+    itemType: string
+): string => {
+    if (!arr?.length) {
+        arr = [];
+    }
+
+    return formatBreakdownFromArray(
+        arr.filter((clientPreferredItem) => clientPreferredItem.item?.item_type === itemType),
+        (clientPreferredItem) => clientPreferredItem.item?.item_name ?? clientPreferredItem.item_id,
+        (clientPreferredItem) => clientPreferredItem.notes
+    );
 };
 
 export const formatRequirementsByCanonicalOrder = (
@@ -335,28 +347,6 @@ export const formatRequirementsByCanonicalOrder = (
     }
 
     return sortArrayByCanonicalOrder(requirementsArray, canonicalOrder).join(", ");
-};
-
-export const formatHygieneProducts = (
-    tampons: string | null,
-    pads: string | null,
-    hygieneOtherItems: string[] | null
-): string => {
-    const items = [];
-
-    if (tampons !== null) {
-        items.push("Tampons" + (tampons.length > 0 ? ` (${tampons})` : ""));
-    }
-
-    if (pads !== null) {
-        items.push("Pads" + (pads.length > 0 ? ` (${pads})` : ""));
-    }
-
-    if (hygieneOtherItems !== null && hygieneOtherItems.length > 0) {
-        items.push(formatRequirementsByCanonicalOrder(hygieneOtherItems, hygieneOtherItemsOptions));
-    }
-
-    return items.length > 0 ? items.join(", ") : "None";
 };
 
 export const formatBabyProducts = (
@@ -384,22 +374,6 @@ export const formatBabyProducts = (
     }
 
     return items.length > 0 ? items.join(", ") : "None";
-};
-
-export const getClientPreferredItemsByType = <T>(
-    preferredItems: T[] | null | undefined,
-    getName: (item: T) => string | number | null | undefined,
-    getType: (item: T) => string | null | undefined,
-    itemType: string
-): string[] => {
-    if (!preferredItems || preferredItems.length === 0) {
-        return [];
-    }
-
-    return preferredItems
-        .filter((item) => getType(item) === itemType)
-        .map((item) => getName(item))
-        .filter((name): name is string => typeof name === "string" && name.trim() !== "");
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";

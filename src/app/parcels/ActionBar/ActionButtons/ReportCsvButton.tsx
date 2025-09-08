@@ -11,7 +11,6 @@ import {
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
-    formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
 import { formatDatetimeAsDate } from "@/common/format";
@@ -233,11 +232,7 @@ export const convertRawParcelListToReportResult = (
                         rawParcel.client?.dietary_requirements ?? null,
                         dietaryRequirementOptions
                     ),
-                    hygieneProducts: formatHygieneProducts(
-                        rawParcel.client?.hygiene_tampons ?? null,
-                        rawParcel.client?.hygiene_pads ?? null,
-                        rawParcel.client?.hygiene_other_items ?? []
-                    ),
+                    hygieneProducts: "-", // TODO VFB-521
                     babyProducts: formatBabyProducts(
                         rawParcel.client?.baby_food ?? null,
                         rawParcel.client?.baby_formula ?? null,
