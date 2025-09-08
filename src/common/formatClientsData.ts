@@ -19,6 +19,7 @@ export interface RequirementSummary {
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
+    seasonalItems: string;
     dietaryRequirements: string;
     otherItems: string;
     cookingFacilities: string;
@@ -63,6 +64,7 @@ export const prepareRequirementSummary = (clientData: Schema["clients"]): Requir
             clientData.dietary_requirements,
             dietaryRequirementOptions
         ),
+        seasonalItems: "-", //TODO: VFB-460
         otherItems: "-", //TODO: VFB-460
         cookingFacilities: formatRequirementsByCanonicalOrder(
             clientData.cooking_facilities,

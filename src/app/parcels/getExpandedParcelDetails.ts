@@ -217,6 +217,10 @@ const getExpandedParcelDetails = async (
                         "baby_product"
                     ),
                     petFood: formatItemsBreakdownFromArray(client.preferred_items, "pet_food"),
+                    seasonalItems: formatItemsBreakdownFromArray(
+                        client.preferred_items,
+                        "seasonal_product"
+                    ),
                     otherRequirements: formatItemsBreakdownFromArray(
                         client.preferred_items,
                         "others"

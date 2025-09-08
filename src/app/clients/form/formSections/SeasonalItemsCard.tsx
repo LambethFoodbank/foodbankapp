@@ -2,13 +2,13 @@ import { ItemsCardProps } from "@/app/clients/form/formSections/PreferredItemsCa
 import SelectionGenericCard from "@/app/clients/form/formSections/SelectionGenericCard";
 import React from "react";
 
-const OtherItemsCard: React.FC<ItemsCardProps> = (props) => (
+const SeasonalItemsCard: React.FC<ItemsCardProps> = (props) => (
     <SelectionGenericCard
         {...props}
-        title="Other Items"
-        fieldName="otherItems"
-        items={props.items.filter((item) => item.type === "others")}
+        title="Seasonal Items"
+        fieldName="seasonalItems"
+        items={props.items.filter((item) => item.type === "seasonal_product")}
     />
 );
 
-export default OtherItemsCard;
+export default SeasonalItemsCard;

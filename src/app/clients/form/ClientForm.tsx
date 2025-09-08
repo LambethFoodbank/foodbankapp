@@ -38,6 +38,7 @@ import PreferredItemsCard from "@/app/clients/form/formSections/PreferredItemsCa
 import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
 import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
+import SeasonalItemsCard from "@/app/clients/form/formSections/SeasonalItemsCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
 import DeliveryInstructionsCard from "@/app/clients/form/formSections/DeliveryInstructionsCard";
 import ExtraInformationCard from "@/app/clients/form/formSections/ExtraInformationCard";
@@ -82,6 +83,7 @@ export interface ClientFields extends Fields {
     hygieneProducts: Item[];
     babyProducts: Item[];
     petFood: Item[];
+    seasonalItems: Item[];
     otherItems: Item[];
     deliveryInstructions: string;
     extraInformation: string;
@@ -123,6 +125,7 @@ const formSections = [
     HygieneProductsCard,
     BabyProductsCard,
     PetFoodCard,
+    SeasonalItemsCard,
     OtherItemsCard,
     DeliveryInstructionsCard,
     AttentionFlagCard,

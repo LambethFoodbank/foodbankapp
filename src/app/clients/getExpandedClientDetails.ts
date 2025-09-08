@@ -131,6 +131,7 @@ export interface ExpandedClientData {
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
+    seasonalItems: string;
     otherRequirements: string;
     extraInformation: string;
     signpostingCallRequired: boolean;
@@ -165,6 +166,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         hygieneProducts: formatItemsBreakdownFromArray(client.preferred_items, "hygiene_product"),
         babyProducts: formatItemsBreakdownFromArray(client.preferred_items, "baby_product"),
         petFood: formatItemsBreakdownFromArray(client.preferred_items, "pet_food"),
+        seasonalItems: formatItemsBreakdownFromArray(client.preferred_items, "seasonal_product"),
         otherRequirements: formatItemsBreakdownFromArray(client.preferred_items, "others"),
         extraInformation: formatExtraInformation(client.extra_information),
         signpostingCallRequired: client.signposting_call_required ?? false,

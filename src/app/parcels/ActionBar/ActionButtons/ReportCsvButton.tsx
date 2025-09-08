@@ -61,6 +61,7 @@ export type ReportRow = {
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
+    seasonalItems: string;
     otherItems: string;
     household: string;
     adults: string;
@@ -233,6 +234,7 @@ export const convertRawParcelListToReportResult = (
                     hygieneProducts: "-", // TODO VFB-521
                     babyProducts: "-", // TODO VFB-521
                     petFood: "-", // TODO VFB-521
+                    seasonalItems: "-", // TODO VFB-521
                     otherItems: "-", // TODO VFB-521
                     household: rawParcel.client
                         ? formatHouseholdFromFamilyDetails(rawParcel.client.family)

@@ -91,6 +91,7 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         ...fields.hygieneProducts,
         ...fields.babyProducts,
         ...fields.petFood,
+        ...fields.seasonalItems,
     ]);
 
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
@@ -141,7 +142,6 @@ export const submitEditClientForm = async (
     fields: ClientFields,
     primaryKey: string
 ): Promise<editClientResult> => {
-    console.log(fields);
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
     const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);
@@ -151,6 +151,7 @@ export const submitEditClientForm = async (
         ...fields.hygieneProducts,
         ...fields.babyProducts,
         ...fields.petFood,
+        ...fields.seasonalItems,
     ]);
 
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
