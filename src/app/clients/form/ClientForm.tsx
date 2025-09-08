@@ -80,10 +80,7 @@ export interface ClientFields extends Fields {
     diets: Diet[];
     preferredItems: Item[];
     hygieneProducts: Item[];
-    babyFood: string | null;
-    babyFormula: string | null;
-    babyNappies: string | null;
-    babyOtherItems: BooleanGroup;
+    babyProducts: Item[];
     petFood: BooleanGroup;
     otherItems: Item[];
     deliveryInstructions: string;

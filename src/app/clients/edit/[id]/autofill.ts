@@ -26,6 +26,7 @@ const autofill = (
     const preferredItems = itemsData.filter((item) => item.type === "alternative_food");
     const otherItems = itemsData.filter((item) => item.type === "others");
     const hygieneItems = itemsData.filter((item) => item.type === "hygiene_product");
+    const babyItems = itemsData.filter((item) => item.type === "baby_product");
 
     return {
         fullName: clientData.full_name ?? "",
@@ -52,10 +53,7 @@ const autofill = (
         diets: dietsData.map((diet) => ({ primaryKey: diet }) as Diet),
         preferredItems: preferredItems,
         hygieneProducts: hygieneItems,
-        babyFood: clientData.baby_food,
-        babyFormula: clientData.baby_formula,
-        babyNappies: clientData.baby_nappies,
-        babyOtherItems: arrayToBooleanGroup(clientData.baby_other_items ?? []),
+        babyProducts: babyItems,
         petFood: arrayToBooleanGroup(clientData.pet_food ?? []),
         otherItems: otherItems,
         deliveryInstructions: clientData.delivery_instructions ?? "",

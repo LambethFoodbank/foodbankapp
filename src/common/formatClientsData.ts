@@ -1,7 +1,6 @@
 import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
-    formatBabyProducts,
     formatExtraInformation,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
@@ -59,12 +58,7 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
 export const prepareRequirementSummary = (clientData: Schema["clients"]): RequirementSummary => {
     return {
         hygieneProducts: "-", //TODO: VFB-460
-        babyProducts: formatBabyProducts(
-            clientData.baby_food,
-            clientData.baby_formula,
-            clientData.baby_nappies,
-            clientData.baby_other_items
-        ),
+        babyProducts: "-", //TODO: VFB-460
         petFood: formatRequirementsByCanonicalOrder(clientData.pet_food, petFoodOptions),
         dietaryRequirements: formatRequirementsByCanonicalOrder(
             clientData.dietary_requirements,

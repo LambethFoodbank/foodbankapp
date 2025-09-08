@@ -7,7 +7,6 @@ import { dietaryRequirementOptions } from "@/app/clients/form/formSections/Dieta
 import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import {
     formatAddressFromClientDetails,
-    formatBabyProducts,
     formatBreakdownOfAdultsFromFamilyDetails,
     formatBreakdownOfChildrenFromFamilyDetails,
     formatHouseholdFromFamilyDetails,
@@ -233,12 +232,7 @@ export const convertRawParcelListToReportResult = (
                         dietaryRequirementOptions
                     ),
                     hygieneProducts: "-", // TODO VFB-521
-                    babyProducts: formatBabyProducts(
-                        rawParcel.client?.baby_food ?? null,
-                        rawParcel.client?.baby_formula ?? null,
-                        rawParcel.client?.baby_nappies ?? null,
-                        rawParcel.client?.baby_other_items ?? []
-                    ),
+                    babyProducts: "-", // TODO VFB-521
                     petFood: formatRequirementsByCanonicalOrder(
                         rawParcel.client?.pet_food ?? null,
                         petFoodOptions
