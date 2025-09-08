@@ -22,7 +22,6 @@ import { formatEventName } from "@/app/parcels/format";
 import { ListType } from "@/common/databaseListTypes";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
 import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
-import { petFoodOptions } from "@/app/clients/form/formSections/PetFoodCard";
 import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
 
 type FetchExpandedParcelDetailsResult =
@@ -217,7 +216,7 @@ const getExpandedParcelDetails = async (
                         client.preferred_items,
                         "baby_product"
                     ),
-                    petFood: formatRequirementsByCanonicalOrder(client.pet_food, petFoodOptions),
+                    petFood: formatItemsBreakdownFromArray(client.preferred_items, "pet_food"),
                     otherRequirements: formatItemsBreakdownFromArray(
                         client.preferred_items,
                         "others"

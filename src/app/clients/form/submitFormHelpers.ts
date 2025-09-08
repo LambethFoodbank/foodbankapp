@@ -60,7 +60,6 @@ export const formatClientRecord = (
             fields.dietaryRequirements !== null
                 ? checkboxGroupToArray(fields.dietaryRequirements)
                 : null,
-        pet_food: checkboxGroupToArray(fields.petFood),
         delivery_instructions: fields.deliveryInstructions,
         extra_information: fields.extraInformation,
         signposting_call_required: fields.signpostingCall,
@@ -91,6 +90,7 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         ...fields.otherItems,
         ...fields.hygieneProducts,
         ...fields.babyProducts,
+        ...fields.petFood,
     ]);
 
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
@@ -150,6 +150,7 @@ export const submitEditClientForm = async (
         ...fields.otherItems,
         ...fields.hygieneProducts,
         ...fields.babyProducts,
+        ...fields.petFood,
     ]);
 
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(
