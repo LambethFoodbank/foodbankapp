@@ -43,13 +43,10 @@ describe("Add client form", () => {
     it("Tries to add a client with the same additional phone number and fails", () => {
         fillName(fullName);
         fillPhoneNumber(phoneNumber);
-        fillAdditionalPhoneNumbers(badAdditionalPhoneNumbers, true);
-        fillEmail(email);
-        fillNumberAdults("1");
-        fillNumberChildren("0");
-        chooseListType();
-        toggleNoAddress();
-        clickSubmitForm();
+        fillAdditionalPhoneNumbers(duplicateAdditionalPhoneNumbers);
+        cy.contains(
+            "This phone number already exists, please add a different phone number."
+        ).should("be.visible");
     });
 });
 
@@ -59,7 +56,7 @@ const email = "abc@example.com";
 const noAddressText = "No Address";
 const postcode = "N11AA";
 const additionalPhoneNumbers = ["01234567891", "01234567892"];
-const badAdditionalPhoneNumbers = ["01234567891", "01234567891"];
+const duplicateAdditionalPhoneNumbers = ["01234567891", "01234567891"];
 
 function toggleNoAddress(): void {
     cy.contains(noAddressText, { matchCase: false }).click();
@@ -73,17 +70,11 @@ function fillPhoneNumber(value: string): void {
     fillTextboxWithId("client-phone-number", value);
 }
 
-function fillAdditionalPhoneNumbers(values: string[], test?: boolean): void {
+function fillAdditionalPhoneNumbers(values: string[]): void {
     cy.contains("Add another phone number").click();
     fillTextboxWithId("client-additional-phone-number-0", values[0]);
     cy.contains("Add another phone number").click();
     fillTextboxWithId("client-additional-phone-number-1", values[1]);
-    if (test) {
-        cy.contains(
-            "This phone number already exists, please add a different phone number."
-        ).should("be.visible");
-        cy.get('[id="remove-additional-phone-number-1"]').click(); // eslint-disable-line quotes
-    }
 }
 
 function fillEmail(value: string): void {
