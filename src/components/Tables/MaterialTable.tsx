@@ -190,6 +190,7 @@ const MaterialTable = <
             column: column,
             sortDirection: sortDirection as SortOrder,
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sorting]);
 
     const table = useMaterialReactTable({
@@ -199,8 +200,8 @@ const MaterialTable = <
         state: { isLoading, columnVisibility, pagination, sorting },
         enableColumnFilters: false,
         enableColumnActions: false,
-        manualPagination: manualPagination,
-        manualSorting: manualSorting,
+        manualPagination: manualPagination || paginationConfig.enablePagination,
+        manualSorting: manualSorting || sortConfig.sortPossible,
         enableRowOrdering: enableRowOrdering,
         enableRowSelection: checkboxConfig.displayed,
         enableSorting: sortConfig.sortPossible,
@@ -282,7 +283,7 @@ const MaterialTable = <
         },
         muiTableBodyCellProps: muiTableBodyCellProps,
         muiSelectCheckboxProps: ({ row }) => ({
-            inputProps: { "aria-label": `Select row ${row.id}` },
+            inputProps: { "aria-label": `Select row ${row.index}` },
             checked: checkboxConfig.displayed
                 ? checkboxConfig.isRowChecked(row.original)
                 : undefined,
@@ -318,6 +319,8 @@ const MaterialTable = <
         onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: setPagination,
         onSortingChange: setSorting,
+        enableRowVirtualization: false,
+        enableColumnVirtualization: false,
     });
 
     return (

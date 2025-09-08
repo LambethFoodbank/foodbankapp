@@ -119,7 +119,8 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         setWasSaved(false);
         setHasChanges(false);
-    }, [isOpen, selectedType]); //eslint-disable-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, selectedType]);
 
     useEffect(() => {
         if (warningSaveMessage) {
