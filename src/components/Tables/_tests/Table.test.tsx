@@ -682,7 +682,6 @@ describe("Generic Table component", () => {
                         testableContent={{
                             sortingFlags: {
                                 isSortingOptionsIncluded: true,
-                                isDefaultSortIncluded: false,
                                 sortMethod: mockSortMethod,
                             },
                         }}
@@ -716,19 +715,12 @@ describe("Generic Table component", () => {
                         testableContent={{
                             sortingFlags: {
                                 isSortingOptionsIncluded: true,
-                                isDefaultSortIncluded: true,
                                 sortMethod: mockSortMethod,
                             },
                         }}
                     />
                 </StyleManager>
             );
-        });
-
-        it("should show sorted when loads", () => {
-            //if it is already sorted by ascending then clicking the header again should sort by descending
-            fireEvent.click(screen.getByText(fakeDataHeaders[0][1]));
-            expect(mockSortMethod).toHaveBeenCalledWith("desc");
         });
     });
 });
