@@ -77,12 +77,12 @@ export const getPhoneNumbersErrorType = (
     const isInputEmpty = input === "";
     const formattedInput = formatPhoneNumber(input);
 
-    if (isInputEmpty) {
-        return Errors.none;
-    }
-
     if (isEditingPrimaryPhone && isInputEmpty && additionalNumbers.length > 0) {
         return Errors.emptyPrimaryPhoneNumber;
+    }
+
+    if (isInputEmpty) {
+        return Errors.none;
     }
 
     const isDuplicateOfOtherAdditional = additionalNumbers.some(
@@ -90,7 +90,9 @@ export const getPhoneNumbersErrorType = (
     );
 
     const isDuplicateOfPrimaryPhone =
-        primaryPhoneNumber && formattedInput === formatPhoneNumber(primaryPhoneNumber);
+        primaryPhoneNumber &&
+        primaryPhoneNumber !== formattedInput &&
+        formattedInput === formatPhoneNumber(primaryPhoneNumber);
 
     return isDuplicateOfPrimaryPhone || isDuplicateOfOtherAdditional
         ? Errors.phoneNumberAlreadyExists
