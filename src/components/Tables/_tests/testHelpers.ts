@@ -14,7 +14,6 @@ export interface TestTableWrapperConfig {
     isPaginationIncluded?: boolean;
     sortingFlags?: {
         isSortingOptionsIncluded: boolean;
-        isDefaultSortIncluded: boolean;
         sortMethod: (sortOrder: SortOrder) => void;
     };
     isRowEditableIncluded?: boolean;

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { TestTableWrapperConfig } from "./testHelpers";
 import {
     CheckboxConfig,
-    DefaultSortConfig,
     EditableConfig,
     FilterConfig,
     OnRowClickFunction,
@@ -13,7 +12,6 @@ import {
     TableHeaders,
 } from "../materialTable/tableTypes";
 import { ClientSideSortMethod } from "../sortMethods";
-import { SortOrder } from "react-data-table-component";
 import { ClientSideFilter } from "../Filters";
 import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 import { MRT_RowData } from "material-react-table";
@@ -155,13 +153,6 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
               }
             : { sortPossible: false };
 
-    const defaultSortConfig: DefaultSortConfig | undefined = sortingFlags.isDefaultSortIncluded
-        ? {
-              defaultColumnHeaderKey: mockHeaders[0][0],
-              defaultSortDirection: "asc" as SortOrder,
-          }
-        : undefined;
-
     useEffect(() => {
         if (sortState.sortEnabled && sortState.column.sortMethod) {
             sortState.column.sortMethod(sortState.sortDirection);
@@ -220,7 +211,6 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
                 filterConfig={filterConfig}
                 paginationConfig={paginationConfig}
                 sortConfig={sortConfig}
-                defaultSortConfig={defaultSortConfig}
                 rowActionsConfig={editableConfig}
                 defaultShownHeaders={defaultShownHeaders}
                 toggleableHeaders={toggleableHeaders}
