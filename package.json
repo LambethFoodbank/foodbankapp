@@ -85,7 +85,7 @@
     "encoding": "^0.1.13",
     "export-to-csv": "^1.4.0",
     "file-saver": "^2.0.5",
-    "material-react-table": "^2.3.0",
+    "material-react-table": "^2.3.1",
     "next": "^14.2.35",
     "nyc": "^15.1.0",
     "pdf-parse": "^1.1.1",
