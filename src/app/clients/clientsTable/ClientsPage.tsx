@@ -33,7 +33,7 @@ import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
 import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
-import { rowToAddressColumn } from "@/common/tableRows";
+import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);

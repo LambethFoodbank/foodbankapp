@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     nameColumnWidth: {
         width: "15%",
     },
-    addressPostcodeColumnWidth: {
+    addressColumnWidth: {
         width: "20%",
     },
     contactColumnWidth: {
@@ -151,7 +151,7 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                 <View style={[styles.tableColumn, styles.nameColumnWidth]}>
                     <Text>Name</Text>
                 </View>
-                <View style={[styles.tableColumn, styles.addressPostcodeColumnWidth]}>
+                <View style={[styles.tableColumn, styles.addressColumnWidth]}>
                     <Text>Address</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.contactColumnWidth]}>
@@ -177,7 +177,7 @@ const DriverOverviewCard: React.FC<DriverOverviewCardProps> = ({ data }) => {
                 <View style={[styles.tableColumn, styles.nameColumnWidth]}>
                     <Text>{rowData.name}</Text>
                 </View>
-                <View style={[styles.tableColumn, styles.addressPostcodeColumnWidth]}>
+                <View style={[styles.tableColumn, styles.addressColumnWidth]}>
                     <Text>{rowData.address}</Text>
                 </View>
                 <View style={[styles.tableColumn, styles.contactColumnWidth]}>

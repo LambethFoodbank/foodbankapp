@@ -61,9 +61,10 @@ export const serverSideChecklistFilter = <
                 const checkboxKey = event.target.name as string;
                 if (event.target.checked) {
                     if (isRadio && anySelected()) {
-                        state.pop();
+                        setState([checkboxKey]);
+                    } else {
+                        setState([...state, checkboxKey]);
                     }
-                    setState([...state, checkboxKey]);
                 } else {
                     setState(state.filter((shownKey) => shownKey !== checkboxKey));
                 }

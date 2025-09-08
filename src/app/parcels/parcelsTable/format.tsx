@@ -12,7 +12,7 @@ import {
     GetParcelDataAndCountErrorType,
     ParcelsTableRow,
 } from "./types";
-import { rowToAddressColumn } from "@/common/tableRows";
+import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
 
 const RowToIconsColumn = ({
     flaggedForAttention,

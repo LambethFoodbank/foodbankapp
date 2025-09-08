@@ -52,7 +52,7 @@ export const displayList = (data: string[]): string => {
     return data.length === 0 ? "None" : data.join(", ");
 };
 
-export const formatNullPostcode = (postcodeData: string | null): string => {
+export const getDisplayPostcode = (postcodeData: string | null): string => {
     return postcodeData ?? displayPostcodeForHomelessClient;
 };
 
