@@ -91,7 +91,7 @@ export const getPhoneNumbersErrorType = (
 
     const isDuplicateOfPrimaryPhone =
         primaryPhoneNumber &&
-        primaryPhoneNumber !== formattedInput &&
+        !isEditingPrimaryPhone &&
         formattedInput === formatPhoneNumber(primaryPhoneNumber);
 
     return isDuplicateOfPrimaryPhone || isDuplicateOfOtherAdditional
