@@ -4,8 +4,8 @@ import {
     formatExtraInformation,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { dietaryRequirementOptions } from "@/app/clients/form/formSections/DietaryRequirementCard";
 import { cookingFacilitiesOptions } from "@/app/clients/form/formSections/CookingFacilitiesCard";
+import { Diet, Item } from "@/components/Form/formFunctions";
 
 export interface ClientSummary {
     name: string;
@@ -19,8 +19,9 @@ export interface RequirementSummary {
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
+    diets: string;
+    preferredItems: string;
     seasonalItems: string;
-    dietaryRequirements: string;
     otherItems: string;
     cookingFacilities: string;
 }
@@ -55,15 +56,17 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
     };
 };
 
-export const prepareRequirementSummary = (clientData: Schema["clients"]): RequirementSummary => {
+export const prepareRequirementSummary = (
+    clientData: Schema["clients"],
+    clientDiets: Diet[],
+    clientPreferredItems: Item[]
+): RequirementSummary => {
     return {
         hygieneProducts: "-", //TODO: VFB-460
         babyProducts: "-", //TODO: VFB-460
         petFood: "-", //TODO: VFB-460
-        dietaryRequirements: formatRequirementsByCanonicalOrder(
-            clientData.dietary_requirements,
-            dietaryRequirementOptions
-        ),
+        diets: "-", //TODO: VFB-460
+        preferredItems: "-", //TODO: VFB-460
         seasonalItems: "-", //TODO: VFB-460
         otherItems: "-", //TODO: VFB-460
         cookingFacilities: formatRequirementsByCanonicalOrder(
