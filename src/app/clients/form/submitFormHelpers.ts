@@ -29,12 +29,12 @@ export const getFamilyMembersForDatabase = (
 };
 
 export const formatFromPrimaryKey =
-    <T extends { primaryKey: string; additionalInfo?: string }, K extends string>(key: K) =>
+    <T extends { primaryKey: string; notes?: string }, K extends string>(key: K) =>
     (items: T[]): Array<{ [P in K]: string } & { notes?: string }> =>
         items.map((item) => {
             const result = { [key]: item.primaryKey } as { [P in K]: string } & { notes?: string };
-            if (item.additionalInfo) {
-                result.notes = item.additionalInfo;
+            if (item.notes) {
+                result.notes = item.notes;
             }
             return result;
         });
@@ -144,6 +144,7 @@ export const submitEditClientForm = async (
     fields: ClientFields,
     primaryKey: string
 ): Promise<editClientResult> => {
+    console.log(fields);
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
     const clientDiets = formatFromPrimaryKey("diet_id")(fields.diets);

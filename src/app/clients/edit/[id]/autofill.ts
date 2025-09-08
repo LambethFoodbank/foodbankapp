@@ -26,7 +26,6 @@ const autofill = (
     const preferredItems = itemsData.filter((item) => item.type === "alternative_food");
     const otherItems = itemsData.filter((item) => item.type === "others");
     const hygieneItems = itemsData.filter((item) => item.type === "hygiene_product");
-    console.log(hygieneItems);
 
     return {
         fullName: clientData.full_name ?? "",

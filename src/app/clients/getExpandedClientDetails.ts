@@ -296,8 +296,8 @@ const formatBreakdownFromArray = <T>(
     getName: (item: T) => string | number | null | undefined,
     getAdditionalInfo?: (item: T) => string | null | undefined
 ): string => {
-    if (!arr?.length) {
-        return "-";
+    if (!arr || arr.length === 0) {
+        return "None";
     }
 
     const items = arr
@@ -330,9 +330,9 @@ export const formatItemsBreakdownFromArray = (
     }
 
     return formatBreakdownFromArray(
-        arr.filter((item) => item.item?.item_type === itemType),
-        (item) => item.item?.item_name ?? item.item_id,
-        (item) => item.notes
+        arr.filter((clientPreferredItem) => clientPreferredItem.item?.item_type === itemType),
+        (clientPreferredItem) => clientPreferredItem.item?.item_name ?? clientPreferredItem.item_id,
+        (clientPreferredItem) => clientPreferredItem.notes
     );
 };
 

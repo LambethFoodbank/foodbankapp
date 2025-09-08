@@ -37,7 +37,7 @@ function SelectionGenericCard<T extends SelectableItem>({
 
     const handleAdditionalInfoChange = (key: string, value: string): void => {
         const newSelected = selected.map((item) =>
-            item.primaryKey === key ? { ...item, additionalInfo: value } : item
+            item.primaryKey === key ? { ...item, notes: value } : item
         );
         fieldSetter({ [fieldName]: newSelected });
     };
