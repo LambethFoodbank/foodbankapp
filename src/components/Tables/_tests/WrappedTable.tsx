@@ -43,6 +43,7 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
     const [shownText, setShownText] = useState<string>("");
 
     const [testDataPortion, setTestDataPortion] = useState<MRT_RowData[]>(mockData);
+    const [filteredData, setFilteredData] = useState<MRT_RowData[]>(mockData);
 
     const [checkedRowIds, setCheckedRowIds] = useState<string[]>([]);
     const [isAllCheckBoxSelected, setAllCheckBoxSelected] = useState(false);
@@ -100,16 +101,17 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
         : { primaryFiltersShown: false, additionalFiltersShown: false };
 
     const [perPage, setPerPage] = useState(7);
-    const [currentPage, setCurrentPage] = useState(1);
-    const startPoint = (currentPage - 1) * perPage;
-    const endPoint = currentPage * perPage - 1;
+    const [currentPage, setCurrentPage] = useState(0);
+    const startPoint = currentPage * perPage;
+    const endPoint = startPoint + perPage - 1;
 
     const paginationConfig: PaginationConfig = isPaginationIncluded
         ? {
               enablePagination: true,
-              filteredCount: mockData.length,
+              filteredCount: filteredData.length,
               onPageChange: setCurrentPage,
               onPerPageChange: setPerPage,
+              defaultRowsPerPage: perPage,
               rowsPerPageOptions: [5, 7, 10],
           }
         : { enablePagination: false };
@@ -125,8 +127,12 @@ const WrappedTableForTest: React.FC<MockTableProps> = ({
                 return filter.method(row, filter.state, filter.rowKey);
             });
         });
-        setTestDataPortion(secondaryFilteredData.slice(startPoint, endPoint + 1));
-    }, [primaryFilters, additionalFilters, startPoint, endPoint, mockData]);
+        setFilteredData(secondaryFilteredData);
+    }, [primaryFilters, additionalFilters, mockData]);
+
+    useEffect(() => {
+        setTestDataPortion(filteredData.slice(startPoint, endPoint + 1));
+    }, [startPoint, endPoint, filteredData]);
 
     const [sortState, setSortState] = useState<SortState<MRT_RowData, ClientSideSortMethod>>({
         sortEnabled: false,
