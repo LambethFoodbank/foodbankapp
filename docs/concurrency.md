@@ -1,45 +1,81 @@
-# Concurrency Handling
+# How to Handle Concurrency Issues
 
-Concurrency is a common concern across the site. While the handling may differ between components, similar patterns can be observed in several scenarios.
+Concurrency arises when multiple users try to update the same record at the same time. To prevent overwriting changes and to keep data consistent across the app, we follow a few common patterns.
 
-## Admin Panel
+## General Principles
 
-### 1. Add `last_updated` Field
-- Create a migration to add a `last_updated` column to the table.
-- Use the type `timestamp with time zone` (`timestamptz`) with a default value of `CURRENT_TIMESTAMP`.
+1. **`last_updated` Field**
+   
+   Every table that supports editing should include a `last_updated` column of type `timestamp with time zone` (`timestamptz`)  with default `CURRENT_TIMESTAMP`.
 
-### 2. Automatic Timestamp Update
-- Create a migration to add a trigger that automatically updates the `last_updated` field whenever a row is modified.
+3. **Automatic Timestamp Updates**
+   
+   Use a database trigger to refresh `last_updated` on each modification.
 
-### 3. Track Original Timestamp
-- When opening the edit form, save the current row's timestamp in a variable `originalLastUpdated`.
+5. **Conflict Handling & Messaging**
+   
+   If an update fails because the `last_updated` no longer matches, we show the user a consistent warning:
+   *Record has been edited recently – please refresh the page. Log ID: \${error.logId}*
+   
+---
 
-### 4. Check for Concurrent Edits
-- Before saving changes, compare `originalLastUpdated` with the current `last_updated` value from the database.
+## Case: Inline Edits (Notes)
 
-### 5. Maintain Data Consistency
-- If a concurrency conflict is detected, display the following message:
-  *Record has been edited recently - please refresh the page. Log ID: ${error.logId}*
+* Example: Editing **client notes** in `ExpandedClientDetails`.
+* When a row is opened for editing, store its `last_updated` as `originalLastUpdated`.
+* On save, send both the new data and the `originalLastUpdated` to the database.
+* The update query includes `WHERE last_updated = originalLastUpdated`.
 
-## Parcels Page Actions
+  * If no rows are updated → concurrency conflict.
+* UI response:
 
-### 1. Add `last_updated` Field
-- Create a migration to add a `last_updated` column to the table.
-- Use the type `timestamp with time zone` (`timestamptz`) with a default value of `CURRENT_TIMESTAMP`.
+  * Reset notes to `originalNotes`.
+  * Show concurrency error message.
+  * Reload data from DB to keep state in sync.
 
-### 2. Automatic Timestamp Update
-- Create a migration to add a trigger that automatically updates the `last_updated` field whenever a row is modified.
+---
 
-### 3. Track Concurrent Updates for Selected Parcels
-- For action buttons that operate on selected parcels, fetch the latest state of all selected parcels from the database.
-- For each parcel, check whether it has been updated since it was last fetched.
-- Implement a function that returns true or false depending on whether a parcel was modified in the meantime.
+## Case: Admin Panel Updates
 
-### 4. Check for Any Concurrent Modifications
-- Collect all boolean results from the previous check and combine them with *&&*.
-- If any of the selected parcels have been modified, do not apply the update to any of them.
+* Before running a bulk action, re-fetch the selected rows.
+* For each row, check whether `last_updated` has changed since selection.
+* If **any** selected row is outdated, abort the whole action.
 
-### 5. Maintain Data Consistency
-- If a concurrency conflict is detected, display the following message:
-  *Record has been edited recently - please refresh the page. Log ID: ${error.logId}*
+  * *Avoids partial updates that leave the system in an inconsistent state.*
+* Show the same standardized concurrency warning.
+* Refs in Admin Tables:
+   * When inserting or editing rows that include refs (like `time_slots` for `collection_centres`), store the original `last_updated` of the parent row in memory (`originalTimestampsRef`) and include it on update.
 
+   * On conflict, show the standard concurrency message and reset state by re-fetching both the parent and its ref rows.
+
+---
+
+## Case: Parcel Updates (State Transitions)
+
+* Example: Updating **packing date** or **packing slot**.
+* Uses explicit `supabase.from(...).eq("last_updated", parcel.lastUpdated)` check.
+* If `count === 0` → no row matched → concurrency conflict.
+* Conflict response:
+
+  * Generate warning log via `logWarningReturnLogId`.
+  * Record audit log entry with `wasSuccess: false`.
+  * Return typed error `{ type: "concurrentUpdateConflict", logId }`.
+* If DB update succeeds → fetch latest record to refresh state.
+* Ensures audit log for every attempt (success/failure).
+
+---
+
+## Error Display & Clearing Strategy
+
+* Errors are shown as floating toasts.
+* They clear automatically when:
+
+  * The user cancels.
+  * No rows remain in edit mode.
+* Affected rows stay in a consistent state (either rolled back with a fresh DB fetch, or marked as “conflict”).
+
+---
+
+## Audit Logs 
+
+* Every failed or blocked action logs a warning/error with a unique log ID, ensuring traceability.
