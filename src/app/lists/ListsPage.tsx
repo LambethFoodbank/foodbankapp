@@ -102,7 +102,6 @@ const filters: ListFilter[] = [
 ];
 
 const ListsPage: React.FC = () => {
-    const [isLoading, setIsLoading] = useState(true);
     const [listData, setListData] = useState<ListRow[]>([]);
     const [comment, setComment] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -115,8 +114,6 @@ const ListsPage: React.FC = () => {
     }
 
     const fetchAndSetData = useCallback(async (): Promise<void> => {
-        setIsLoading(true);
-
         latestFetchRequestId.current += 1;
         const currentFetchRequestId = latestFetchRequestId.current;
 
@@ -130,7 +127,6 @@ const ListsPage: React.FC = () => {
 
         if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
-                setIsLoading(false);
                 setErrorMessage(getErrorMessage(error));
                 return;
             }
@@ -140,8 +136,7 @@ const ListsPage: React.FC = () => {
         }
 
         listsTableFetchAbortController.current = null;
-        setIsLoading(false);
-    }, [setIsLoading, setErrorMessage, setListData, setComment]);
+    }, [setErrorMessage, setListData, setComment]);
 
     useEffect(() => {
         fetchAndSetData();
