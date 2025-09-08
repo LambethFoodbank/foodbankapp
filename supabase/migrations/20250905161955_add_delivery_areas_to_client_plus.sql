@@ -8,6 +8,7 @@ select
     clients.is_active,
     family_count.family_count,
     clients.email,
+    array_to_string(clients.additional_phone_numbers, ', ') as additional_phone_numbers_text,
     ((delivery_areas.postcode is not null and clients.is_active is true) or clients.address_postcode is null) as is_deliverable
 from
     clients
