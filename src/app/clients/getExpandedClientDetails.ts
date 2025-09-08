@@ -11,7 +11,6 @@ import {
 } from "@/common/getAgesOfFamily";
 import { ListType } from "@/common/databaseListTypes";
 import { getGenderStringFromGenderField } from "@/common/getGendersOfFamily";
-import { dietaryRequirementOptions } from "./form/formSections/DietaryRequirementCard";
 import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
 import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
@@ -48,7 +47,6 @@ const getRawClientDetails = async (clientId: string) => {
             ),
 
             cooking_facilities,
-            dietary_requirements,
             
             diets:clients_diets(
                 diet_id,
@@ -66,15 +64,6 @@ const getRawClientDetails = async (clientId: string) => {
                 notes
             ),
             
-            hygiene_tampons,
-            hygiene_pads,
-            hygiene_other_items,
-            baby_food,
-            baby_formula,
-            baby_nappies,
-            baby_other_items,
-            pet_food,
-            other_items,
             extra_information,
             signposting_call_required,
             last_updated,
@@ -125,7 +114,6 @@ export interface ExpandedClientData {
     adults: string;
     children: string;
     cookingFacilities: string;
-    dietaryRequirements: string;
     diets: string;
     preferredItems: string;
     hygieneProducts: string;
@@ -156,10 +144,6 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         cookingFacilities: formatRequirementsByCanonicalOrder(
             client.cooking_facilities,
             cookingFacilitiesOptions
-        ),
-        dietaryRequirements: formatRequirementsByCanonicalOrder(
-            client.dietary_requirements,
-            dietaryRequirementOptions
         ),
         diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
         preferredItems: formatItemsBreakdownFromArray(client.preferred_items, "alternative_food"),
