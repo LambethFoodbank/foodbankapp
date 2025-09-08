@@ -78,11 +78,13 @@ export interface ClientFields extends Fields {
     deliveryInstructions: string | null;
     lastUpdated: string | undefined;
     notes: string | null;
+    additionalPhoneNumbers: string[] | null;
 }
 
 export interface ClientErrors extends FormErrors<ClientFields> {
     fullName: Errors;
     phoneNumber: Errors;
+    additionalPhoneNumbers: Errors[];
     email: Errors;
     addressLine1: Errors;
     addressPostcode: Errors;
@@ -93,7 +95,6 @@ export interface ClientErrors extends FormErrors<ClientFields> {
 }
 
 export type ClientSetter = Setter<ClientFields>;
-export type ClientErrorSetter = Setter<ClientErrors>;
 export type ClientCardProps = CardProps<ClientFields, ClientErrors>;
 
 const formSections = [

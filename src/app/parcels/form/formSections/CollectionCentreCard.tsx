@@ -5,10 +5,16 @@ import {
     DbCollectionCentreWithAvailableDaysType,
 } from "@/common/fetch";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import { Errors, getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
 import { ErrorText } from "@/components/Form/formStyling";
+import {
+    Errors,
+    FormErrors,
+    getErrorText,
+    Setter,
+    valueOnChangeDropdownList,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ParcelCardProps } from "../ParcelForm";
+import { ParcelCardProps, ParcelFields } from "../ParcelForm";
 import { StyledAlert } from "../../ActionBar/DuplicateDownloadWarning";
 import { switchErrorForCollectionCentre } from "@/app/parcels/form/submitFormHelpers";
 
@@ -94,7 +100,7 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
                     value={fields.collectionCentre ?? ""}
                     onChange={valueOnChangeDropdownList(
                         fieldSetter,
-                        errorSetter,
+                        errorSetter as Setter<FormErrors<ParcelFields>>,
                         "collectionCentre"
                     )}
                     sx={isUnavailableCentre() ? { paddingBottom: "1rem" } : undefined}

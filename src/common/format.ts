@@ -166,6 +166,28 @@ export const getParcelOverviewString = (
     );
 };
 
+export const formatAdditionalPhoneNumbers = (
+    primaryPhoneNumber: string | null,
+    additionalPhoneNumbers: string[] | null,
+    documentName?: string
+): string => {
+    if (primaryPhoneNumber === null || primaryPhoneNumber.length === 0) {
+        if (documentName !== null) {
+            return "";
+        }
+        return "None";
+    }
+
+    if (additionalPhoneNumbers) {
+        const allPhoneNumbers: string[] = [primaryPhoneNumber, ...additionalPhoneNumbers];
+        if (documentName === "ShippingLabels") {
+            return allPhoneNumbers.slice(0, 3).join(", ");
+        }
+        return allPhoneNumbers.join(", ");
+    }
+    return primaryPhoneNumber;
+};
+
 export const formatTimeStringToHoursAndMinutes = (timeString: string): string => {
     dayjs.extend(customParseFormat);
     const dayjsTime = dayjs(timeString, "HH:mm:ss");

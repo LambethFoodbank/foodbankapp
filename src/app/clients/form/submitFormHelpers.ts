@@ -62,6 +62,7 @@ export const formatClientRecord = (
         delivery_instructions: fields.deliveryInstructions,
         last_updated: fields.lastUpdated,
         notes: fields.notes,
+        additional_phone_numbers: fields.additionalPhoneNumbers,
     };
 };
 

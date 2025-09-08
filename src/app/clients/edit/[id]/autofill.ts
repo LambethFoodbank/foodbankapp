@@ -48,6 +48,7 @@ const autofill = (
         deliveryInstructions: clientData.delivery_instructions ?? "",
         lastUpdated: clientData.last_updated,
         notes: clientData.notes,
+        additionalPhoneNumbers: clientData.additional_phone_numbers ?? [],
     };
 };
 

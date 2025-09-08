@@ -52,6 +52,7 @@ const parcelsFamilySearchMethod: ParcelsFilterMethod<string> = familySearch(
 
 const parcelsPhoneSearchMethod: ParcelsFilterMethod<string> = phoneSearch<DbParcelRow>(
     "client_phone_number",
+    "client_additional_phone_numbers_text",
     "client_is_active"
 );
 const parcelsEmailSearchMethod: ParcelsFilterMethod<string> = emailSearch<DbParcelRow>(

@@ -7,11 +7,13 @@ import {
     Person,
     Gender,
     onChangeText,
+    Setter,
+    FormErrors,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { SelectChangeEventHandler } from "@/components/DataInput/inputHandlerFactories";
 import { FormText, StyledCard } from "@/components/Form/formStyling";
-import { ClientCardProps, ClientSetter } from "@/app/clients/form/ClientForm";
+import { ClientCardProps, ClientFields, ClientSetter } from "@/app/clients/form/ClientForm";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { getAdultBirthYears } from "@/app/clients/form/birthYearDropdown";
 import { MAXIMUM_NUMBER_OF_ADULTS, MINIMUM_NUMBER_OF_ADULTS } from "@/app/clients/form/bounds";
@@ -69,12 +71,17 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                     }
                     error={errorExists(formErrors.numberOfAdults)}
                     helperText={getErrorText(formErrors.numberOfAdults)}
-                    onChange={onChangeText(fieldSetter, errorSetter, "numberOfAdults", {
-                        required: true,
-                        regex: numberRegex,
-                        formattingFunction: parseInt,
-                        additionalCondition: numberOfAdultsRange,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ClientFields>>,
+                        "numberOfAdults",
+                        {
+                            required: true,
+                            regex: numberRegex,
+                            formattingFunction: parseInt,
+                            additionalCondition: numberOfAdultsRange,
+                        }
+                    )}
                 />
                 {fields.adults.map((adult: Person, index: number) => {
                     return (

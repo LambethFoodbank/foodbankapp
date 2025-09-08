@@ -1,8 +1,13 @@
 import React from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import { getDefaultTextValue, onChangeText } from "@/components/Form/formFunctions";
+import {
+    FormErrors,
+    getDefaultTextValue,
+    onChangeText,
+    Setter,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ParcelCardProps } from "@/app/parcels/form/ParcelForm";
+import { ParcelCardProps, ParcelFields } from "@/app/parcels/form/ParcelForm";
 
 const ExtraInformationCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter, fields }) => {
     return (
@@ -14,7 +19,11 @@ const ExtraInformationCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSet
             <FreeFormTextInput
                 label="For example, Tea allergy"
                 defaultValue={getDefaultTextValue(fields, "extraInformation")}
-                onChange={onChangeText(fieldSetter, errorSetter, "extraInformation")}
+                onChange={onChangeText(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ParcelFields>>,
+                    "extraInformation"
+                )}
                 minRows={5}
                 multiline={true}
             />

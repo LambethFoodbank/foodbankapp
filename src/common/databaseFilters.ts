@@ -54,13 +54,19 @@ export const postcodeSearch = <DbData extends DbClientRow | DbParcelRow>(
 
 export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
     phoneColumnLabel: Extract<keyof DbData, "phone_number" | "client_phone_number">,
+    additionalPhoneColumnLabel: Extract<
+        keyof DbData,
+        "additional_phone_numbers_text" | "client_additional_phone_numbers_text"
+    >,
     clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
-        if ("-".includes(substring.toLowerCase())) {
+        if (substring === "-") {
             return `or(${clientIsActiveColumnLabel}.is.false, ${phoneColumnLabel}.ilike.%${substring}%)`;
         }
-        return `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
+        const phoneColumnQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
+        const additionalPhoneQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${additionalPhoneColumnLabel}.ilike.%${substring}%)`;
+        return `or(${phoneColumnQueryActiveClient}, ${additionalPhoneQueryActiveClient})`;
     });
 };
 

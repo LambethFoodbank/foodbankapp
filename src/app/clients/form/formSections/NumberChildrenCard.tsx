@@ -7,12 +7,14 @@ import {
     numberRegex,
     Person,
     Gender,
+    Setter,
+    FormErrors,
 } from "@/components/Form/formFunctions";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { StyledCard, FormText } from "@/components/Form/formStyling";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { SelectChangeEventHandler } from "@/components/DataInput/inputHandlerFactories";
-import { ClientCardProps, ClientSetter } from "@/app/clients/form/ClientForm";
+import { ClientCardProps, ClientFields, ClientSetter } from "@/app/clients/form/ClientForm";
 import {
     childBirthMonthList,
     getChildBirthYears,
@@ -76,12 +78,17 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                     }
                     error={errorExists(formErrors.numberOfChildren)}
                     helperText={getErrorText(formErrors.numberOfChildren)}
-                    onChange={onChangeText(fieldSetter, errorSetter, "numberOfChildren", {
-                        required: true,
-                        regex: numberRegex,
-                        formattingFunction: parseInt,
-                        additionalCondition: maxNumberChildren,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ClientFields>>,
+                        "numberOfChildren",
+                        {
+                            required: true,
+                            regex: numberRegex,
+                            formattingFunction: parseInt,
+                            additionalCondition: maxNumberChildren,
+                        }
+                    )}
                 />
                 {fields.children.map((child: Person, index: number) => {
                     return (

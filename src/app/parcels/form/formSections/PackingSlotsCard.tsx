@@ -1,10 +1,15 @@
 import React from "react";
-import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
+import {
+    FormErrors,
+    getErrorText,
+    Setter,
+    valueOnChangeDropdownList,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { PackingSlotsLabelsAndValues } from "@/common/fetch";
-import { ParcelCardProps } from "../ParcelForm";
+import { ParcelCardProps, ParcelFields } from "../ParcelForm";
 
 interface PackingSlotsCardProps extends ParcelCardProps {
     packingSlotsLabelsAndValues: PackingSlotsLabelsAndValues;
@@ -28,7 +33,11 @@ const PackingSlotsCard: React.FC<PackingSlotsCardProps> = ({
                 labelsAndValues={packingSlotsLabelsAndValues}
                 listTitle="Packing Slot"
                 value={fields.packingSlot ?? ""}
-                onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "packingSlot")}
+                onChange={valueOnChangeDropdownList(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ParcelFields>>,
+                    "packingSlot"
+                )}
             />
             <ErrorText>{getErrorText(formErrors.packingSlot)}</ErrorText>
         </GenericFormCard>

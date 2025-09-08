@@ -11,7 +11,12 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { capitaliseWords, formatDateTime, formatDatetimeAsDate } from "@/common/format";
+import {
+    capitaliseWords,
+    formatDateTime,
+    formatDatetimeAsDate,
+    formatAdditionalPhoneNumbers,
+} from "@/common/format";
 import {
     Data,
     DataForDataViewer,
@@ -96,7 +101,7 @@ const getExpandedParcelDetails = async (
             pet_food,
             other_items,
             notes,
-
+            additional_phone_numbers,
             family:families(
                 birth_year,
                 birth_month,
@@ -174,7 +179,10 @@ const getExpandedParcelDetails = async (
                     ),
                     deliveryInstructions: client.delivery_instructions ?? "",
                     parcelNotes: rawParcelDetails.notes ?? "",
-                    phoneNumber: client.phone_number ?? "",
+                    phoneNumber: formatAdditionalPhoneNumbers(
+                        client.phone_number,
+                        client.additional_phone_numbers
+                    ),
                     email: client.email ?? "",
                     household: formatHouseholdFromFamilyDetails(client.family),
                     adults: formatBreakdownOfAdultsFromFamilyDetails(client.family),

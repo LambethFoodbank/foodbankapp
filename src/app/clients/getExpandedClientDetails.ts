@@ -2,7 +2,7 @@ import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { formatAddress } from "@/common/format";
+import { formatAddress, formatAdditionalPhoneNumbers } from "@/common/format";
 import {
     getAdultAgeStringUsingBirthYear,
     getChildAgeStringUsingBirthYearAndMonth,
@@ -36,6 +36,7 @@ const getRawClientDetails = async (clientId: string) => {
             full_name,
             phone_number,
             email,
+            additional_phone_numbers,
             delivery_instructions,
             address_1,
             address_2,
@@ -115,7 +116,10 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         fullName: client.full_name ?? "",
         address: formatAddressFromClientDetails(client),
         deliveryInstructions: client.delivery_instructions ?? "",
-        phoneNumber: client.phone_number ?? "",
+        phoneNumber: formatAdditionalPhoneNumbers(
+            client.phone_number,
+            client.additional_phone_numbers
+        ),
         email: client.email ?? "",
         defaultList: client.default_list,
         household: formatHouseholdFromFamilyDetails(client.family),

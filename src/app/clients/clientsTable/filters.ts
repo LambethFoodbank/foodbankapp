@@ -21,6 +21,7 @@ const clientsPostcodeSearch: ClientsFilterMethod = postcodeSearch<DbClientRow>(
 
 const clientsPhoneSearch: ClientsFilterMethod = phoneSearch<DbClientRow>(
     "phone_number",
+    "additional_phone_numbers_text",
     "is_active"
 );
 

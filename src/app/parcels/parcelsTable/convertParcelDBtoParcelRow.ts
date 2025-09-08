@@ -34,7 +34,6 @@ const convertParcelDbtoParcelRow = async (
             },
         };
     }
-
     return {
         parcelTableRows: processingData.map((parcel, index) => {
             const clientActive = parcel.client_is_active;
@@ -48,7 +47,11 @@ const convertParcelDbtoParcelRow = async (
                     ? familyCountToFamilyCategory(parcel.family_count ?? 0)
                     : "-",
                 addressPostcode: clientActive ? parcel.client_address_postcode : "-",
-                phoneNumber: clientActive ? parcel.client_phone_number ?? "" : "-",
+                phoneNumber: clientActive
+                    ? [parcel.client_phone_number, parcel.client_additional_phone_numbers_text]
+                          .filter((phone) => phone && phone.length > 0)
+                          .join(", ")
+                    : "-",
                 email: clientActive ? parcel.client_email ?? "" : "-",
                 deliveryCollection: {
                     collectionCentreName: parcel.collection_centre_name ?? "-",

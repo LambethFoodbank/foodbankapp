@@ -8,7 +8,7 @@ import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { displayNameForDeletedClient } from "@/common/format";
+import { displayNameForDeletedClient, formatAdditionalPhoneNumbers } from "@/common/format";
 
 const formatDatetime = (datetimeString: string | null): string => {
     if (datetimeString === null) {
@@ -134,7 +134,13 @@ const getRequiredData = async (
             collection_datetime: formatDatetime(parcel.collection_datetime),
             voucher_number: parcel.voucher_number ?? "",
             full_name: clientIsActive ? client.full_name ?? "" : displayNameForDeletedClient,
-            phone_number: clientIsActive ? client.phone_number ?? "" : "-",
+            phone_number: clientIsActive
+                ? formatAdditionalPhoneNumbers(
+                      client.phone_number,
+                      client.additional_phone_numbers,
+                      "ShippingLabels"
+                  )
+                : "-",
             address_1: clientIsActive ? client.address_1 ?? "" : "", //Seeded deleted clients have is_active set to false, but their personal info fields are non-null
             address_2: clientIsActive ? client.address_2 ?? "" : "",
             address_town: clientIsActive ? client.address_town ?? "" : "",
