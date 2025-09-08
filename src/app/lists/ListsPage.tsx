@@ -102,7 +102,6 @@ const filters: ListFilter[] = [
 ];
 
 const ListsPage: React.FC = () => {
-    const [isLoading, setIsLoading] = useState(true);
     const [listData, setListData] = useState<ListRow[]>([]);
     const [comment, setComment] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -114,7 +113,6 @@ const ListsPage: React.FC = () => {
     }
 
     const fetchAndSetData = useCallback(async (): Promise<void> => {
-        setIsLoading(true);
         if (listsTableFetchAbortController.current) {
             listsTableFetchAbortController.current.abort("stale request");
         }
@@ -123,7 +121,6 @@ const ListsPage: React.FC = () => {
             setErrorMessage(null);
             const { data, error } = await fetchListsData();
             if (error) {
-                setIsLoading(false);
                 setErrorMessage(getErrorMessage(error));
                 return;
             }
@@ -131,9 +128,8 @@ const ListsPage: React.FC = () => {
             setListData(formatListData(data.listsData));
             setComment(data.comment);
             listsTableFetchAbortController.current = null;
-            setIsLoading(false);
         }
-    }, [setIsLoading, setErrorMessage, setListData, setComment]);
+    }, [setErrorMessage, setListData, setComment]);
 
     useEffect(() => {
         fetchAndSetData();
