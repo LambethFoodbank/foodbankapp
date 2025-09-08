@@ -7,10 +7,11 @@ import supabase from "@/supabaseClient";
 import { Schema } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
 
-export interface Item {
+export interface ShoppingListItem {
     description: string;
     quantity: string;
     notes: string;
+    additionalClientInfo?: string;
 }
 
 export interface ShoppingListPdfData {
@@ -19,13 +20,13 @@ export interface ShoppingListPdfData {
     clientSummary: ClientSummary;
     householdSummary: HouseholdSummary;
     requirementSummary: RequirementSummary;
-    itemsList: Item[];
+    itemsList: ShoppingListItem[];
     endNotes: string;
 }
 
 type PrepareItemsListResult =
     | {
-          data: Item[];
+          data: ShoppingListItem[];
           error: null;
       }
     | {
@@ -72,7 +73,7 @@ export type FetchDietaryRequirementsError = {
     logId: string;
 };
 type GetQuantityAndNotesResult =
-    | { data: Pick<Item, "quantity" | "notes">; error: null }
+    | { data: Pick<ShoppingListItem, "quantity" | "notes">; error: null }
     | { data: null; error: GetQuantityAndNotesError };
 
 type DietaryRulesPlusRow = {
@@ -155,15 +156,15 @@ const getItemsByDietaryRequirements = async (
 export const prepareItemsListForHousehold = async (
     householdSize: number,
     listType: ListType,
-    dietsIds: string[]
+    dietsIds: string[],
+    clientPreferredItems: ShoppingListItem[]
 ): Promise<PrepareItemsListResult> => {
     const { data: listData, error } = await fetchLists(supabase);
     if (error) {
-        return { data: null, error: error };
+        return { data: null, error };
     }
-    const itemsList: Item[] = [];
 
-    const itemsByRequirement = dietsIds
+    const itemsByRequirement = dietsIds?.length
         ? await getItemsByDietaryRequirements(dietsIds)
         : { includedItems: [], excludedItems: [] };
 
@@ -171,16 +172,10 @@ export const prepareItemsListForHousehold = async (
         return { data: null, error: itemsByRequirement.error };
     }
 
+    const itemsList: ShoppingListItem[] = [];
+
     for (const row of listData) {
-        if (!row.is_available) {
-            continue;
-        }
-
-        if (row.list_type !== listType) {
-            continue;
-        }
-
-        if (row.item_type !== "regular_food" && row.item_type !== "alternative_food") {
+        if (!row.is_available || row.list_type !== listType) {
             continue;
         }
 
@@ -188,26 +183,34 @@ export const prepareItemsListForHousehold = async (
             row,
             householdSize
         );
+
         if (listItemError) {
             return { data: null, error: listItemError };
         }
 
-        if (!["", "0"].includes(listItemData.quantity.trim())) {
-            const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
-            const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
-            const isAlternativeFood = row.item_type === "alternative_food";
+        if (["", "0"].includes(listItemData.quantity.trim())) {
+            continue;
+        }
 
-            const currentItem = { description: row.item_name, ...listItemData };
+        const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
+        const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
+        const isRegularFood = row.item_type === "regular_food";
+        const isPreferredItem = clientPreferredItems.some(
+            (item) => item.description === row.item_name
+        );
 
-            // Add item if:
-            // 1. It's not excluded has type "regular_food"
-            // 2. It's explicitly included
-            const shouldAddItem = (!isExcluded && !isAlternativeFood) || isIncluded;
+        const additionalClientInfo =
+            clientPreferredItems.find((item) => item.description === row.item_name)
+                ?.additionalClientInfo ?? "";
 
-            if (shouldAddItem) {
-                itemsList.push(currentItem);
-            }
+        if ((!isExcluded && isRegularFood) || isIncluded || isPreferredItem) {
+            itemsList.push({
+                description:
+                    row.item_name + (additionalClientInfo ? ` (${additionalClientInfo})` : ""),
+                ...listItemData,
+            });
         }
     }
+
     return { data: itemsList, error: null };
 };

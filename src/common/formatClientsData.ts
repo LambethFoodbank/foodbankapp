@@ -1,6 +1,7 @@
 import { Schema } from "@/databaseUtils";
 import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
 import {
+    formatBreakdownFromArray,
     formatExtraInformation,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
@@ -62,13 +63,37 @@ export const prepareRequirementSummary = (
     clientPreferredItems: Item[]
 ): RequirementSummary => {
     return {
-        hygieneProducts: "-", //TODO: VFB-460
-        babyProducts: "-", //TODO: VFB-460
-        petFood: "-", //TODO: VFB-460
-        diets: "-", //TODO: VFB-460
-        preferredItems: "-", //TODO: VFB-460
-        seasonalItems: "-", //TODO: VFB-460
-        otherItems: "-", //TODO: VFB-460
+        hygieneProducts: formatBreakdownFromArray(
+            clientPreferredItems.filter((item) => item.type === "hygiene_product"),
+            (item) => item.name,
+            (item) => item.notes
+        ),
+        babyProducts: formatBreakdownFromArray(
+            clientPreferredItems.filter((item) => item.type === "baby_product"),
+            (item) => item.name,
+            (item) => item.notes
+        ),
+        petFood: formatBreakdownFromArray(
+            clientPreferredItems.filter((item) => item.type === "pet_food"),
+            (item) => item.name,
+            (item) => item.notes
+        ),
+        diets: clientDiets.map((diet) => diet.name).join(", ") || "None",
+        preferredItems: formatBreakdownFromArray(
+            clientPreferredItems.filter((item) => item.type === "alternative_food"),
+            (item) => item.name,
+            (item) => item.notes
+        ),
+        seasonalItems: formatBreakdownFromArray(
+            clientPreferredItems.filter((item) => item.type === "seasonal_product"),
+            (item) => item.name,
+            (item) => item.notes
+        ),
+        otherItems: formatBreakdownFromArray(
+            clientPreferredItems.filter((item) => item.type === "others"),
+            (item) => item.name,
+            (item) => item.notes
+        ),
         cookingFacilities: formatRequirementsByCanonicalOrder(
             clientData.cooking_facilities,
             cookingFacilitiesOptions

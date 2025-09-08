@@ -9,7 +9,7 @@ import {
 } from "@/common/format";
 import { ParcelInfo } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/getParcelsData";
 import {
-    Item,
+    ShoppingListItem,
     ShoppingListPdfData,
 } from "@/app/parcels/ActionBar/ActionButtons/ShoppingList/shoppingListPdfDataProps";
 import { faTruck, faShoePrints } from "@fortawesome/free-solid-svg-icons";
@@ -186,7 +186,7 @@ const TableHeadings: React.FC = () => {
     );
 };
 
-const ItemToRow: React.FC<Item> = (item) => {
+const ItemToRow: React.FC<ShoppingListItem> = (item) => {
     return (
         <View style={[styles.flexRow, styles.tableRow]} wrap={false}>
             <View style={styles.tableDone} />
@@ -204,7 +204,7 @@ const ItemToRow: React.FC<Item> = (item) => {
 };
 
 interface DisplayItemsListProps {
-    itemsList: Item[];
+    itemsList: ShoppingListItem[];
 }
 
 const DisplayItemsList: React.FC<DisplayItemsListProps> = ({ itemsList }) => {
