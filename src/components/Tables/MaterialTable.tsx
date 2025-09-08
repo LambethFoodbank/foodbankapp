@@ -202,6 +202,8 @@ const MaterialTable = <
         state: { isLoading, columnVisibility, pagination, sorting },
         enableColumnFilters: false,
         enableColumnActions: false,
+        /* The or-condition is only necessary for the WrappedTable component used inside Jest tests;
+        Usually, the 2 arguments are synchronized for server/client components. */
         manualPagination: manualPagination || paginationConfig.enablePagination,
         manualSorting: manualSorting || sortConfig.sortPossible,
         enableRowOrdering: enableRowOrdering,
