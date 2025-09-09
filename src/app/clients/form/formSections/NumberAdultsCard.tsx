@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
@@ -26,6 +26,16 @@ const numberOfAdultsRange = (value: string): boolean => {
     return (
         parseInt(value) <= MAXIMUM_NUMBER_OF_ADULTS && parseInt(value) >= MINIMUM_NUMBER_OF_ADULTS
     );
+};
+
+export const resizePersonsArray = (current: Person[], target: number): Person[] => {
+    if (current.length === target) {
+        return current;
+    }
+
+    return current.length < target
+        ? [...current, ...Array(target - current.length).fill({} as Person)]
+        : current.slice(0, target);
 };
 
 const setAdultsFields = (
@@ -56,6 +66,13 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
     fieldSetter,
     fields,
 }) => {
+    useEffect(() => {
+        const resized = resizePersonsArray(fields.adults, fields.numberOfAdults);
+        if (resized !== fields.adults) {
+            fieldSetter({ adults: resized });
+        }
+    }, [fields.numberOfAdults, fields.adults, fieldSetter]);
+
     return (
         <GenericFormCard
             title="Number of Adults"
@@ -83,8 +100,9 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                         }
                     )}
                 />
-                {fields.adults.map((adult: Person, index: number) => {
-                    return (
+                {fields.adults
+                    .slice(0, fields.numberOfAdults)
+                    .map((adult: Person, index: number) => (
                         <StyledCard key={adult.primaryKey ?? `new-adult-${index}`}>
                             <FormText>Adult {index + 1}</FormText>
                             <ControlledSelect
@@ -115,8 +133,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                                 )}
                             />
                         </StyledCard>
-                    );
-                })}
+                    ))}
             </>
         </GenericFormCard>
     );

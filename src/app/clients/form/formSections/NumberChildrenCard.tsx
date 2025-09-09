@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
@@ -25,6 +25,7 @@ import {
     genderSelectValueForUnknown,
     getGenderSelectLabelsAndValues,
 } from "@/common/getGendersOfFamily";
+import { resizePersonsArray } from "@/app/clients/form/formSections/NumberAdultsCard";
 
 const maxNumberChildren = (value: string): boolean => {
     return parseInt(value) <= 20;
@@ -61,6 +62,13 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
     fieldSetter,
     fields,
 }) => {
+    useEffect(() => {
+        const resized = resizePersonsArray(fields.children, fields.numberOfChildren);
+        if (resized !== fields.children) {
+            fieldSetter({ children: resized });
+        }
+    }, [fields.numberOfChildren, fields.children, fieldSetter]);
+
     return (
         <GenericFormCard
             title="Number of Children"
@@ -90,8 +98,9 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                         }
                     )}
                 />
-                {fields.children.map((child: Person, index: number) => {
-                    return (
+                {fields.children
+                    .slice(0, fields.numberOfChildren)
+                    .map((child: Person, index: number) => (
                         <StyledCard key={child.primaryKey ?? `new-child-${index}`}>
                             <FormText>Child {index + 1}</FormText>
                             <ControlledSelect
@@ -138,8 +147,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
                                 )}
                             />
                         </StyledCard>
-                    );
-                })}
+                    ))}
             </>
         </GenericFormCard>
     );

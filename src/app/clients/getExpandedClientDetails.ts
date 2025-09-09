@@ -79,7 +79,11 @@ const getRawClientDetails = async (clientId: string) => {
 };
 
 export const familyCountToFamilyCategory = (count: number): string => {
-    if (count <= 1) {
+    if (count === 0) {
+        return "No Family";
+    }
+
+    if (count === 1) {
         return "Single";
     }
 
@@ -199,9 +203,15 @@ export const formatHouseholdFromFamilyDetails = (
     }
 
     const familyCategory = familyCountToFamilyCategory(family.length);
-    const occupantDisplay = `Occupant${adultCount + childCount > 1 ? "s" : ""}`;
+    const totalFamilyMembers = adultCount + childCount;
+    const occupantDisplay =
+        totalFamilyMembers === 0 ? "" : `Occupant${totalFamilyMembers > 1 ? "s" : ""}`;
+    const breakdownString = adultChildBreakdown.join(", ");
 
-    return `${familyCategory} ${occupantDisplay} (${adultChildBreakdown.join(", ")})`;
+    if (breakdownString.length === 0) {
+        return familyCategory;
+    }
+    return `${familyCategory} ${occupantDisplay} (${breakdownString})`;
 };
 
 export const formatBreakdownOfAdultsFromFamilyDetails = (
