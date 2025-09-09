@@ -170,7 +170,7 @@ const DeliveryAreasTable: React.FC = () => {
         if (insertDeliveryAreasError) {
             setErrorMessage("The specified delivery area already exists.");
             setIsLoading(false);
-            throw new Error("Invalid postcode format");
+            throw new Error("Duplicate postcode");
         } else {
             setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
             setRowModesModel((prev) => {
