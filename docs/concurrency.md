@@ -6,7 +6,7 @@ Concurrency arises when multiple users try to update the same record at the same
 
 1. **`last_updated` Field**
    
-   Every table that supports editing should include a `last_updated` column of type `timestamp with time zone` (`timestamptz`)  with default `CURRENT_TIMESTAMP`.
+   Every table that supports editing should include a `last_updated` column of type `timestamp with time zone` (`timestamptz`) with default `CURRENT_TIMESTAMP`.
 
 3. **Automatic Timestamp Updates**
    
@@ -46,7 +46,7 @@ Concurrency arises when multiple users try to update the same record at the same
 * Refs in Admin Tables:
    * When inserting or editing rows that include refs (like `time_slots` for `collection_centres`), store the original `last_updated` of the parent row in memory (`originalTimestampsRef`) and include it on update.
 
-   * On conflict, show the standard concurrency message and reset state by re-fetching both the parent and its ref rows.
+   * On conflict, show the standard concurrency message and reset state by re-fetching both the parent and its ref rows when we exit edit mode, or on reload.
 
 ---
 
@@ -70,8 +70,9 @@ Concurrency arises when multiple users try to update the same record at the same
 * Errors are shown as floating toasts.
 * They clear automatically when:
 
-  * The user cancels.
-  * No rows remain in edit mode.
+  * The user cancels, exiting edit mode.
+  * The user reloads the page.
+  * The user successfully submit another row (for tables).
 * Affected rows stay in a consistent state (either rolled back with a fresh DB fetch, or marked as “conflict”).
 
 ---
