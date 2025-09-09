@@ -19,7 +19,7 @@ type FetchWebsiteDataErrorReturn =
 type UpdateWebsiteDataErrors = "failedToUpdateWebsiteData" | "concurrentEditWebsiteData";
 type UpdateWebsiteDataErrorReturn =
     | {
-          error: { type: UpdateWebsiteDataErrors; logId: string };
+          error: { type: UpdateWebsiteDataErrors; logId: string | null };
       }
     | { error: null };
 
@@ -78,9 +78,7 @@ export const updateDbWebsiteData = async (
     }
 
     if (count === 0) {
-        const logId = await logErrorReturnLogId("Concurrent editing of website data");
-        void sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-        return { error: { type: "concurrentEditWebsiteData", logId } };
+        return { error: { type: "concurrentEditWebsiteData", logId: null } };
     }
 
     void sendAuditLog({ ...auditLog, wasSuccess: true, content: updatedWebsiteData });

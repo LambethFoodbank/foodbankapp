@@ -132,9 +132,7 @@ const WebsiteDataTable: React.FC = () => {
                 let message = `Failed to update website data. Log ID: ${error.logId}`;
 
                 if (error.type === "concurrentEditWebsiteData") {
-                    message =
-                        "Record has been edited recently - please refresh the page. " +
-                        `Log ID: ${error.logId}`;
+                    message = "Record has been edited recently - please refresh the page. ";
                     setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
                 }
 
