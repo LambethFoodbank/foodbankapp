@@ -29,6 +29,7 @@ const autofill = (
     const babyItems = itemsData.filter((item) => item.type === "baby_product");
     const petItems = itemsData.filter((item) => item.type === "pet_food");
     const seasonalItems = itemsData.filter((item) => item.type === "seasonal_product");
+    const choiceItems = itemsData.filter((item) => item.type === "choice_food");
 
     return {
         fullName: clientData.full_name ?? "",
@@ -54,6 +55,7 @@ const autofill = (
                 : null,
         diets: dietsData.map((diet) => ({ primaryKey: diet }) as Diet),
         preferredItems: preferredItems,
+        choiceItems: choiceItems,
         hygieneProducts: hygieneItems,
         babyProducts: babyItems,
         petFood: petItems,

@@ -92,6 +92,7 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
         ...fields.babyProducts,
         ...fields.petFood,
         ...fields.seasonalItems,
+        ...fields.choiceItems,
     ]);
 
     const { data: clientId, error } = await supabase.rpc("insert_client_and_family", {
@@ -152,6 +153,7 @@ export const submitEditClientForm = async (
         ...fields.babyProducts,
         ...fields.petFood,
         ...fields.seasonalItems,
+        ...fields.choiceItems,
     ]);
 
     const { data: clientDataAndCount, error: updateClientError } = await supabase.rpc(

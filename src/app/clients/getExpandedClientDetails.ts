@@ -116,6 +116,7 @@ export interface ExpandedClientData {
     cookingFacilities: string;
     diets: string;
     preferredItems: string;
+    choiceItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
@@ -147,6 +148,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         ),
         diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
         preferredItems: formatItemsBreakdownFromArray(client.preferred_items, "alternative_food"),
+        choiceItems: formatItemsBreakdownFromArray(client.preferred_items, "choice_food"),
         hygieneProducts: formatItemsBreakdownFromArray(client.preferred_items, "hygiene_product"),
         babyProducts: formatItemsBreakdownFromArray(client.preferred_items, "baby_product"),
         petFood: formatItemsBreakdownFromArray(client.preferred_items, "pet_food"),
