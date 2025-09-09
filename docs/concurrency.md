@@ -15,7 +15,7 @@ Concurrency arises when multiple users try to update the same record at the same
 5. **Conflict Handling & Messaging**
    
    If an update fails because the `last_updated` no longer matches, we show the user a consistent warning:
-   *Record has been edited recently – please refresh the page. Log ID: \${error.logId}*
+   *Record has been edited recently – please refresh the page.*
    
 ---
 
@@ -57,11 +57,8 @@ Concurrency arises when multiple users try to update the same record at the same
 * If `count === 0` → no row matched → concurrency conflict.
 * Conflict response:
 
-  * Generate warning log via `logWarningReturnLogId`.
-  * Record audit log entry with `wasSuccess: false`.
-  * Return typed error `{ type: "concurrentUpdateConflict", logId }`.
-* If DB update succeeds → fetch latest record to refresh state.
-* Ensures audit log for every attempt (success/failure).
+  * Show standard concurrency warning.
+* If DB update succeeds or is canceled → fetch latest record to refresh state.
 
 ---
 
@@ -74,9 +71,3 @@ Concurrency arises when multiple users try to update the same record at the same
   * The user reloads the page.
   * The user successfully submits another row (for tables).
 * Affected rows stay in a consistent state (either rolled back with a fresh DB fetch, or marked as “conflict”).
-
----
-
-## Audit Logs 
-
-* Every failed or blocked action logs a warning/error with a unique log ID, ensuring traceability.
