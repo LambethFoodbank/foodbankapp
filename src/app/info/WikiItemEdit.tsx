@@ -142,6 +142,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
 
             return;
         } else {
+            setErrorMessage("");
             const updatedRowWithLastUpdated = await fetchWikiRow(rowData.wiki_key);
             const lastUpdated = updatedRowWithLastUpdated.last_updated;
             const updatedRow: DbWikiRow = {
@@ -163,7 +164,6 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
 
         setIsInEditMode(false);
     };
-
     const deleteWikiItemWithConfirmation = async (): Promise<void> => {
         if (!rowData.title && !rowData.content) {
             const confirmation: boolean = confirm("Confirm discard of this item?");
