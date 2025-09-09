@@ -8,6 +8,7 @@ select
     clients.is_active,
     family_count.family_count,
     clients.email,
+    array_to_string(clients.additional_phone_numbers, ', ') as additional_phone_numbers_text,
     create_postcode_sort_key(clients.address_postcode) as sorted_address_postcode
 from
     clients
