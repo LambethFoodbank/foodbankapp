@@ -6,6 +6,7 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { sendAuditLog } from "@/server/auditLog";
 import { ParcelStatus } from "@/databaseUtils";
 import { ParcelsTableRow } from "../parcelsTable/types";
+import { fetchParcelStatus } from "@/app/logs/fetchForAuditLog";
 
 export type StatusType = ParcelStatus[][number];
 
@@ -36,12 +37,24 @@ export const saveParcelStatus = async (
             };
         })
         .flat();
-
-    const auditLogs = eventsToInsert.map((eventToInsert) => ({
-        action: action ?? "change parcel status",
-        content: { eventToInsert },
-        parcelId: eventToInsert.parcel_id,
-    }));
+    
+    const auditLogs = await eventsToInsert.map( async (eventToInsert) => {
+        const oldStatus = await fetchParcelStatus(eventToInsert.parcel_id);
+        return {
+            action: action ?? "change parcel status",
+            content: {
+                before: {
+                    parcelStatus: oldStatus.data ?? "",
+                },
+                after: {
+                    parcelStatus: eventToInsert.new_parcel_status,
+                },
+                actionType: "Edit",
+                eventToInsert
+            },
+            parcelId: eventToInsert.parcel_id,
+        }
+    });
 
     const { data, error } = await supabase
         .from("events")
@@ -50,16 +63,16 @@ export const saveParcelStatus = async (
 
     if (error || !data) {
         const logId = await logErrorReturnLogId("Error with insert: Status event", error);
-        auditLogs.forEach(
-            (auditLog) => void sendAuditLog({ ...auditLog, wasSuccess: false, logId })
+        await auditLogs.forEach(
+            async (auditLog) => void sendAuditLog({ ...(await auditLog), wasSuccess: false, logId })
         );
         return { error: { type: "eventInsertionFailed", logId: logId } };
     }
 
-    auditLogs.forEach((auditLog) =>
+    auditLogs.forEach( async (auditLog) =>
         sendAuditLog({
-            ...auditLog,
-            eventId: data.find((event) => auditLog.parcelId === event.parcel_id)?.event_id,
+            ...(await auditLog),
+            eventId: data.find(async (event) => (await auditLog).parcelId === event.parcel_id)?.event_id,
             wasSuccess: true,
         })
     );

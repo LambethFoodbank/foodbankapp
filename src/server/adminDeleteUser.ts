@@ -59,6 +59,7 @@ export async function adminDeleteUser(userId: string): Promise<DeleteUserResult>
         content: {
             before: {},
             after: {},
+            actionType: "Delete",
             userId: userId,
             role: userProfile.role,
         },

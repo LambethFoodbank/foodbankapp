@@ -156,6 +156,9 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
             action: "create shipping label pdf",
             wasSuccess: true,
             content: {
+                before: {},
+                after: {},
+                actionType: "File",
                 parcelIds: parcelIds,
                 labelQuantity: labelQuantity,
             },
@@ -175,6 +178,9 @@ const ShippingLabelModal: React.FC<ActionModalProps> = (props) => {
             action: "create shipping label pdf",
             wasSuccess: false,
             content: {
+                before: {},
+                after: {},
+                actionType: "File",
                 parcelIds: parcelIds,
                 labelQuantity: labelQuantity,
             },

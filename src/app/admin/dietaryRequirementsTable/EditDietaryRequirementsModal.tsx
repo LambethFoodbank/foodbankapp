@@ -186,7 +186,13 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
 
         const auditLog = {
             action: "update dietary requirements",
-            content: { included: includedItemsName, excluded: excludedItemsName },
+            content: {
+                before: {},
+                after: {},
+                actionType: "Edit",
+                included: includedItemsName,
+                excluded: excludedItemsName,
+            },
             dietaryRequirement: label,
         };
 

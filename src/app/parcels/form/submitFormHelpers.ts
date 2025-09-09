@@ -4,8 +4,9 @@ import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { Errors } from "@/components/Form/formFunctions";
 import { ParcelFields } from "@/app/parcels/form/ParcelForm";
-import { CollectionTimeSlotsLabelsAndValues, DbAvailableDaysType } from "@/common/fetch";
+import { CollectionTimeSlotsLabelsAndValues, DbAvailableDaysType, fetchParcel } from "@/common/fetch";
 import dayjs from "dayjs";
+import { getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
 
 export type WriteParcelToDatabaseFunction = UpdateParcel | InsertParcel;
 export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelErrorType;
@@ -101,7 +102,11 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
 
     const auditLog = {
         action: "add a parcel",
-        content: { parcelDetails: { ...parcelRecord, deliveryInstructions } },
+        content: {
+            before: {},
+            after: {},
+            actionType: "Create",
+        },
         clientId: parcelRecord.client_id,
         collectionCentreId: parcelRecord.collection_centre
             ? parcelRecord.collection_centre
@@ -146,6 +151,28 @@ type UpdateParcel = (
 
 export const updateParcel: UpdateParcelWithPrimaryKey =
     (primaryKey) => async (parcelRecord, deliveryInstructions) => {
+
+        const { data: oldRow, error: fetchOldRowError } = await fetchParcel(primaryKey, supabase);
+
+        if (fetchOldRowError) {
+            const logId = await logErrorReturnLogId(
+                "Error with update: parcel data",
+                fetchOldRowError
+            );
+            await sendAuditLog({
+                action: "edit a parcel",
+                content: {
+                    before: {},
+                    after: {},
+                    actionType: "Edit",
+                },
+                wasSuccess: false,
+                logId
+            });
+            console.log("Error with old row");
+            return { parcelId: null, error: { type: "failedToUpdateParcel", logId } };
+        }
+
         const { data: parcelDataAndCount, error: updateParcelError } = await supabase.rpc(
             "update_parcel_with_delivery_instructions",
             {
@@ -155,10 +182,34 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
             }
         );
 
+        const { data: newRow, error: fetchNewRowError } = await fetchParcel(primaryKey, supabase);
+        if (fetchNewRowError) {
+            const logId = await logErrorReturnLogId(
+                "Error with update: parcel data",
+                fetchNewRowError
+            );
+            await sendAuditLog({
+                action: "edit a parcel",
+                content: {
+                    before: {},
+                    after: {},
+                    actionType: "Edit",
+                },
+                wasSuccess: false,
+                logId
+            });
+            console.log("Error with new row");
+            return { parcelId: null, error: { type: "failedToUpdateParcel", logId } };
+        }
+
+        const beforeAndAfter = getBeforeAndAfter(oldRow, newRow);
+
         const auditLog = {
             action: "edit a parcel",
             content: {
-                parcelDetails: { ...parcelRecord, deliveryInstructions },
+                before: beforeAndAfter.before,
+                after: beforeAndAfter.after,
+                actionType: "Edit",
                 count: parcelDataAndCount?.[0].rows_updated,
             },
             clientId: parcelRecord.client_id,

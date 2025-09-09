@@ -86,6 +86,8 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     const auditLog = {
         action: "add a client",
         content: {
+            before: {},
+            after: {},
             actionType: "Create",
             clientDetails: clientRecord,
             familyMembers: familyMembers,
@@ -131,7 +133,16 @@ export const submitEditClientForm = async (
 
     if (fetchOldRowError) {
         const logId = fetchOldRowError.logId;
-        await sendAuditLog({ content: { actionType: 'Edit' }, action: 'edit a client', wasSuccess: false, logId });
+        await sendAuditLog({
+            content: {
+                before: {},
+                after: {},
+                actionType: 'Edit',
+            },
+            action: 'edit a client',
+            wasSuccess: false,
+            logId
+        });
         return { clientId: null, error: { type: "failedToUpdateClientAndFamily", logId } };
     }
 
@@ -144,13 +155,22 @@ export const submitEditClientForm = async (
         }
     );
 
-    const beforeAndAfter = getBeforeAndAfterClientAndFamily(oldRow.client, oldRow.family, clientRecord, familyMembers);
+    const beforeAndAfter = getBeforeAndAfterClientAndFamily(
+        oldRow.client,
+        oldRow.family,
+        {
+            ...clientRecord,
+            extra_information: clientRecord.extra_information ?? oldRow.client.extra_information,
+            signposting_call_required: clientRecord.signposting_call_required ?? oldRow.client.signposting_call_required
+        },
+        familyMembers
+    ); // NO EXTRA INFO FIELD AND NO SIGNPOSTING CALL REQUIRED
 
     const auditLog = {
         action: "edit a client",
         content: {
             ...beforeAndAfter,
-            actionType: 'Update'
+            actionType: 'Edit'
         },
         clientId: primaryKey,
     } as const satisfies Partial<AuditLog>;

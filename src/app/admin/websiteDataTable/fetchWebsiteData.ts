@@ -56,7 +56,16 @@ export const updateDbWebsiteData = async (
 
     if (fetchOldRowError) {
         const logId = fetchOldRowError.logId;
-        void sendAuditLog({ content: { actionType: 'Edit' }, action: "update website data", wasSuccess: false, logId });
+        void sendAuditLog({
+            content: {
+                before: {},
+                after: {},
+                actionType: 'Edit',
+            },
+            action: "update website data",
+            wasSuccess: false,
+            logId
+        });
         return { error: { type: "failedToUpdateWebsiteData", logId } };
     }
 

@@ -86,7 +86,12 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
             .single();
 
         const auditLog = {
-            content: { itemDetails: listItem, actionType: "Create" },
+            content: {
+                before: {},
+                after: {},
+                actionType: "Create",
+                itemDetails: listItem,
+            },
             action: "add a list item",
         } as const satisfies Partial<AuditLog>;
 
@@ -114,7 +119,16 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
             const logId = await logErrorReturnLogId("failed to update list item", {
                 error: fetchOldRowError,
             });
-            void sendAuditLog({ action: "edit a list item", content: {actionType: "Edit"}, wasSuccess: false, logId });
+            void sendAuditLog({
+                action: "edit a list item",
+                content: {
+                    before: {},
+                    after: {},
+                    actionType: "Edit"
+                },
+                wasSuccess: false,
+                logId
+            });
             setErrorMessage(`Failed to update a list item. Log ID: ${logId}`);
             return { error: { type: "failedToEditListItem", logId } };
         }

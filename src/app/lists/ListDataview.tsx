@@ -22,7 +22,6 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ClientSideFilter } from "@/components/Tables/Filters";
 import { ListType } from "@/common/databaseListTypes";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
-import { fetchList, getBeforeAndAfter } from "../logs/fetchForAuditLog";
 
 export type ListFilter = ClientSideFilter<ListRow, string>;
 

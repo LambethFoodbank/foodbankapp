@@ -156,7 +156,12 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
         void sendAuditLog({
             action: `generate ${props.reportName}`,
             wasSuccess: true,
-            content: content,
+            content: {
+                ...content,
+                before: {},
+                after: {},
+                actionType: "File",
+            },
         });
         props.actionModalProps.postSuccessCallback();
 
@@ -176,6 +181,9 @@ const ReportModal: React.FC<ReportModalProps> = (props) => {
             action: `generate ${props.reportName}`,
             wasSuccess: false,
             content: {
+                before: {},
+                after: {},
+                actionType: "File",
                 fromDate: dateRange.from.toString(),
                 toDate: dateRange.to.toString(),
             },

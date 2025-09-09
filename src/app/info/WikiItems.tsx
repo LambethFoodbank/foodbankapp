@@ -171,8 +171,15 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
             action: `move a wiki item ${row1.row_order <= row2.row_order ? "down" : "up"}`,
             wikiId: row1.wiki_key,
             content: {
-                itemName: row1.title,
-                oldRowOrder: row1.row_order,
+                before: {
+                    rowOrder: row1.row_order,
+                },
+                after: {
+                    rowOrder: row2.row_order,
+                },
+                actionType: 'Edit',
+                // itemName: row1.title,
+                // oldRowOrder: row1.row_order,
             },
         } as const satisfies Partial<AuditLog>;
 

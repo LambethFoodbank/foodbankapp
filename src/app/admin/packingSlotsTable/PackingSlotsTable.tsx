@@ -210,6 +210,8 @@ const PackingSlotsTable: React.FC = () => {
 
                     void sendAuditLog({
                         content: {
+                            before: {},
+                            after: {},
                             actionType: 'Edit',
                         },
                         action: "update a packing slot",

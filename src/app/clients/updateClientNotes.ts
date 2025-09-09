@@ -16,7 +16,16 @@ export const updateClientNotes = async (
     
     if (fetchOldRowError) {
         const logId = fetchOldRowError.logId;
-        await sendAuditLog({ content: { actionType: 'Edit' }, action: 'update client notes', wasSuccess: false, logId });
+        await sendAuditLog({
+            content: {
+                before: {},
+                after: {},
+                actionType: 'Edit',
+            },
+            action: 'update client notes',
+            wasSuccess: false,
+            logId
+        });
         return { error: { type: "updateNotesFailed", logId } };
     }
     const baseAuditLogProps = {
@@ -25,6 +34,7 @@ export const updateClientNotes = async (
         content: {
             before: { notes: oldRow.notes ?? ""},
             after: { notes: notes },
+            actionType: "Edit",
         },
     };
 

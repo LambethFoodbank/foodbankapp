@@ -159,7 +159,11 @@ const CollectionCentresTable: React.FC = () => {
             );
             await sendAuditLog({
                 action: "update a collection centre",
-                content: {},
+                content: {
+                    before: {},
+                    after: {},
+                    actionType: "Edit",
+                },
                 wasSuccess: false,
                 logId: fetchOldRowError.logId,
             });

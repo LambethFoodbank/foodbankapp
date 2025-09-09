@@ -24,6 +24,8 @@ export async function updateUserProfile(
         await sendAuditLog({
             action: "update a user profile",
             content: {
+                before: {},
+                after: {},
                 actionType: 'Edit',
             },
             wasSuccess: false,

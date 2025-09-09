@@ -17,7 +17,12 @@ const deleteClient = async (clientId: string): Promise<DeleteClientResponse> => 
     const baseAuditLogProps = {
         action: "delete a client",
         clientId,
-        content: { clientId },
+        content: {
+            before: {},
+            after: {},
+            actionType: "Delete",
+            clientId
+        },
     };
 
     if (deleteClientError) {

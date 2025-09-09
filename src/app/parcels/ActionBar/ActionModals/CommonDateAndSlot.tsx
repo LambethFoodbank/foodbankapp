@@ -5,7 +5,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
-import { fetchPackingDateOrSlot, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
+import { fetchPackingDateOrSlot } from "@/app/logs/fetchForAuditLog";
 
 export const getUpdateErrorMessage = ({
     parcelId,
@@ -84,7 +84,8 @@ export const packingDateOrSlotUpdate = async (
         content: {
             before: { [updateField]: values?.oldValue },
             after: { [updateField]: values?.newValue },
-            count: updateResponse.count
+            actionType: 'Edit',
+            count: updateResponse.count,
         },
         clientId: parcel.clientId,
         parcelId: parcel.parcelId,

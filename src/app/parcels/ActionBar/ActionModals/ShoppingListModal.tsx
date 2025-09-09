@@ -109,7 +109,12 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
         void sendAuditLog({
             action: "create shopping list pdf",
             wasSuccess: true,
-            content: { parcelIds: parcelIds },
+            content: {
+                before: {},
+                after: {},
+                actionType: "File",
+                parcelIds: parcelIds
+            },
         });
         props.postSuccessCallback();
 
@@ -125,7 +130,12 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
         void sendAuditLog({
             action: "create shopping list pdf",
             wasSuccess: false,
-            content: { parcelIds: parcelIds },
+            content: {
+                before: {},
+                after: {},
+                actionType: "File",
+                parcelIds: parcelIds
+            },
             logId: pdfError.logId,
         });
     };

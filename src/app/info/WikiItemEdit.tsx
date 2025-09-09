@@ -19,6 +19,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { DirectionString } from "@/app/info/WikiItems";
 import { deleteItemInWikiTable, updateItemInWikiTable } from "@/app/info/supabaseHelpers";
 import { useTheme } from "styled-components";
+import { getBeforeAndAfter } from "../logs/fetchForAuditLog";
 
 interface WikiItemEditProps {
     rowData: DbWikiRow;
@@ -50,6 +51,9 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
         const auditLog = {
             action: "delete a wiki item",
             content: {
+                before: {},
+                after: {},
+                actionType: "Delete",
                 itemName: rowData.title,
                 itemPrimaryKey: rowData.wiki_key,
             },
@@ -94,10 +98,23 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                     rowData.wiki_key
                 );
 
+                const beforeAndAfter = getBeforeAndAfter(
+                    {
+                        title: rowData.title,
+                        content: rowData.content,
+                    },
+                    {
+                        title: newTitle,
+                        content: newContent,
+                    }
+                )
+
                 const auditLog = {
                     action: "edit a wiki item",
                     wikiId: rowData.wiki_key,
                     content: {
+                        ...beforeAndAfter,
+                        actionType: "Edit",
                         itemTitle: newTitle,
                         itemContent: newContent,
                         rowOrder: rowData.row_order,

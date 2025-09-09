@@ -184,6 +184,9 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
             action: "create driver overview pdf",
             wasSuccess: true,
             content: {
+                before: {},
+                after: {},
+                actionType: "File",
                 parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId),
                 date: date.toString(),
                 driverName: driverName,
@@ -204,6 +207,9 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
             action: "create driver overview pdf",
             wasSuccess: false,
             content: {
+                before: {},
+                after: {},
+                actionType: "File",
                 parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId),
                 date: date.toString(),
                 driverName: driverName,

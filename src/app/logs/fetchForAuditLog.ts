@@ -205,10 +205,10 @@ export const fetchWebsiteDataRow = async (
 type FetchClientAndFamily = 
     | {
         data: {
-            client: ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord,
-            family: FamilyDatabaseInsertRecord[],
-        },
-        error: null,
+            client: ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord;
+            family: FamilyDatabaseInsertRecord[];
+        };
+        error: null;
     }
     | {
         data: null;
@@ -255,12 +255,12 @@ const formatClientRecord = (
 
 type FetchClient = 
     | {
-        data: ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord,
-        error: null,
+        data: ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord;
+        error: null;
     }
     | {
-        data: ClientDatabaseRecord,
-        error: null,
+        data: ClientDatabaseRecord;
+        error: null;
     }
     | {
         data: null;
@@ -340,8 +340,8 @@ export const fetchClientAndFamily = async (
 
 type FetchList = 
     | {
-        data: Partial<Schema["lists"]>,
-        error: null,
+        data: Partial<Schema["lists"]>;
+        error: null;
     }
     | {
         data: null;
@@ -392,10 +392,10 @@ export const fetchList = async (
 type FetchPackingDateOrSlot = 
     | {
         data: {
-            oldValue: string,
-            newValue: string
-        },
-        error: null,
+            oldValue: string;
+            newValue: string;
+        };
+        error: null;
     }
     | {
         data: null;
@@ -435,6 +435,39 @@ export const fetchPackingDateOrSlot = async (
     }
 }
 
+type FetchParcelStatus =
+    | {
+        data: string;
+        error: null;
+      }
+    | {
+        data: null;
+        error: {
+            type: PostgrestError;
+            logId: string;
+        };
+    };
+
+export const fetchParcelStatus = async (
+    parcelId: string
+): Promise<FetchParcelStatus> => {
+    const { data: status, error: fetchError } = await supabase.from("parcels_events").select("last_event_name").eq("parcel_id", parcelId).single();
+    if (fetchError || !status) {
+        const logId = await logErrorReturnLogId("Error with fetch: parcel status", fetchError);
+        return {
+            data: null,
+            error: {
+                type: fetchError,
+                logId
+            }
+        };
+    }
+    return {
+        data: status.last_event_name ?? "",
+        error: null,
+    };
+}
+
 const getBefore = (comparison: IChange[] | undefined): Record<string, any> => {
     if (!comparison) {
         return {};
@@ -469,11 +502,12 @@ export const getBeforeAndAfterClientAndFamily = (
         }
     );
 
-    const familyComparison = diff(
-        oldFamily,
-        newFamily,
-    );
-
+    // const familyComparison = diff(
+    //     oldFamily,
+    //     newFamily,
+    
+    // );
+    const familyComparison = getStringArrayComparison(oldFamily.map(toString) ?? [], newFamily.map(toString) ?? [], "family");
     const babyOtherItemsComparison = getStringArrayComparison(oldClient.baby_other_items ?? [], newClient.baby_other_items ?? [], "baby_other_items");
     const cookingFacilitiesComparison = getStringArrayComparison(oldClient.cooking_facilities ?? [], newClient.cooking_facilities ?? [], "cooking_facilities");
     const dietaryRequirementComparison = getStringArrayComparison(oldClient.dietary_requirements ?? [], newClient.dietary_requirements ?? [], "dietary_requirements");
@@ -500,11 +534,13 @@ export const getBeforeAndAfterClientAndFamily = (
         ...(signpostingCallReasonsComparison?.after ?? {}),
     };
 
+    console.log(clientComparison);
 
     return {
-        before: {...getBefore(clientComparison), ...getBefore(familyComparison), ...beforeArrays},
-        after: {...getAfter(clientComparison), ...getAfter(familyComparison), ...afterArrays},
+        before: {...getBefore(clientComparison), ...familyComparison?.before ?? {}, ...beforeArrays},
+        after: {...getAfter(clientComparison), ...familyComparison?.after?? {}, ...afterArrays},
     };
+
 }
 
 const areArraysIdentical = (
@@ -541,18 +577,19 @@ const normalizeToStringArray = (input: any[]): string[] => {
 
 export const getBeforeAndAfter = (
     oldRow: Record<string, any> | null,
-    newRow: Record<string, any>,
+    newRow: Record<string, any> | null,
     arrayFields: string[] = [],
 ): { before: Record<string, any>; after: Record<string, any> } => {
-    if (!oldRow) {
-        console.log("doen't get to compare");
+    if (!oldRow || !newRow) {
         return {
             before: {},
             after: {},
         };
     }
-    const comparison = diff(oldRow, newRow, { keysToSkip: ['lastUpdated', ...arrayFields] });
-    console.log(oldRow, newRow);
+    if (arrayFields.length === 0) {
+        arrayFields = []
+    }
+    const comparison = diff(oldRow, newRow, { keysToSkip: ['lastUpdated', 'last_updated', ...arrayFields] });
 
     if (arrayFields) {
         const arrayFieldsComparison = arrayFields.map((field) => getStringArrayComparison(normalizeToStringArray(oldRow[field]) ?? [], normalizeToStringArray(newRow[field]) ?? [], field));
