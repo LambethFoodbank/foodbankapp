@@ -1,5 +1,5 @@
 create or replace view
-  public.clients_plus as
+  public.clients_plus with (security_invoker = true) as
 select
     clients.primary_key as client_id,
     clients.full_name,
