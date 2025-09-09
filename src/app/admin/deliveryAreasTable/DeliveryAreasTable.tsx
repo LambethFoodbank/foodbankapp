@@ -120,13 +120,13 @@ const DeliveryAreasTable: React.FC = () => {
                         });
                     } catch (error) {
                         setRows([]);
+                        setErrorMessage("Error fetching data, please reload");
                         if (error instanceof Error) {
                             void logErrorReturnLogId(
                                 "Error with fetch: Delivery areas subscription",
                                 {},
                                 error
                             );
-                            setErrorMessage("Error fetching data, please reload");
                         }
                     }
                 }
@@ -143,13 +143,6 @@ const DeliveryAreasTable: React.FC = () => {
             void supabase.removeChannel(subscriptionChannel);
         };
     }, []);
-
-    const handleSaveClick = (id: GridRowId) => () => {
-        setRowModesModel((currentValue) => ({
-            ...currentValue,
-            [id]: { mode: GridRowModes.View },
-        }));
-    };
 
     const processRowUpdate = async (row: DeliveryAreasRow): Promise<DeliveryAreasRow> => {
         setErrorMessage(null);
@@ -170,38 +163,26 @@ const DeliveryAreasTable: React.FC = () => {
         }
 
         row.postcode = row.postcode.toUpperCase();
+        const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
+            await insertNewDeliveryAreas(row);
+        const baseAuditLog = getBaseAuditLogForDeliveryAreasAction("add a delivery area", row);
 
-        if (row.isNew) {
-            const { data: createdDeliveryAreas, error: insertDeliveryAreasError } =
-                await insertNewDeliveryAreas(row);
-            const baseAuditLog = getBaseAuditLogForDeliveryAreasAction(
-                "add a new delivery area",
-                row
-            );
-
-            if (insertDeliveryAreasError) {
-                setErrorMessage(
-                    `The specified delivery area already exists. Log ID: ${insertDeliveryAreasError.logId}`
-                );
-                setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    wasSuccess: false,
-                    logId: insertDeliveryAreasError.logId,
-                });
-            } else {
-                setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
-                setRowModesModel((prev) => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { [String(row.id)]: removed, ...rest } = prev;
-                    return rest;
-                });
-                void sendAuditLog({
-                    ...baseAuditLog,
-                    deliveryAreasId: createdDeliveryAreas.deliveryAreasId,
-                    wasSuccess: true,
-                });
-            }
+        if (insertDeliveryAreasError) {
+            setErrorMessage("The specified delivery area already exists.");
+            setIsLoading(false);
+            throw new Error("Invalid postcode format");
+        } else {
+            setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
+            setRowModesModel((prev) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { [String(row.id)]: removed, ...rest } = prev;
+                return rest;
+            });
+            void sendAuditLog({
+                ...baseAuditLog,
+                deliveryAreasId: createdDeliveryAreas.deliveryAreasId,
+                wasSuccess: true,
+            });
         }
 
         setIsLoading(false);
@@ -213,32 +194,28 @@ const DeliveryAreasTable: React.FC = () => {
             //prevents default behaviour of saving the edited state when clicking away from row being edited, force user to use save or cancel buttons
             event.defaultMuiPrevented = true;
         }
+        setErrorMessage(null);
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
-        setRowModesModel((currentValue) => ({
-            ...currentValue,
-            [id]: { mode: GridRowModes.View, ignoreModifications: true },
-        }));
-
-        const editedRow = rows.find((row) => row.id === id);
-        if (editedRow === undefined) {
-            void logErrorReturnLogId(
-                "Edited row in delivery areas admin table is undefined onCancelClick"
-            );
-            setErrorMessage("Table error, please try again");
-        } else if (editedRow.isNew) {
-            setRows((currentValue) => currentValue.filter((row) => row.id !== id));
-        }
+        setErrorMessage(null);
+        setRows((currentValue) => currentValue.filter((row) => row.id !== id));
     };
 
     const handleRemoveClick = (id: GridRowId) => () => {
-        const editedRow = rows.find((row) => row.id === id);
-        if (editedRow != undefined) {
-            deleteDbDeliveryAreas(editedRow).then(() =>
+        const row = rows.find((row) => row.id === id);
+        if (row != undefined) {
+            deleteDbDeliveryAreas(row).then(() =>
                 setRows((oldRows) => oldRows.filter((row) => row.id !== id))
             );
         }
+    };
+
+    const handleSaveClick = (id: GridRowId) => () => {
+        setRowModesModel((currentValue) => ({
+            ...currentValue,
+            [id]: { mode: GridRowModes.View },
+        }));
     };
 
     const deliveryAreasColumns: GridColDef[] = [
@@ -249,7 +226,6 @@ const DeliveryAreasTable: React.FC = () => {
             flex: 1,
             editable: true,
             align: "center",
-            valueParser: (value) => value,
             renderHeader: (params) => <Header {...params} />,
             disableColumnMenu: true,
         },

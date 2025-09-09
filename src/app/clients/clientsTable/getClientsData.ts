@@ -72,7 +72,6 @@ const getClientsDataAndCount = async (
                 .filter((phone) => phone && phone.length > 0)
                 .join(", "),
             email: client.email,
-            isActive: client.is_active,
         };
     });
 

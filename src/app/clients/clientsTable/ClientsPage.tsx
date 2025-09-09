@@ -181,10 +181,6 @@ const ClientsPage: React.FC = () => {
         }
     };
 
-    const clientTableColumnDisplayFunctions = {
-        addressPostcode: rowToAddressColumn,
-    };
-
     return (
         <>
             {isLoadingForFirstTime ? (
@@ -229,7 +225,7 @@ const ClientsPage: React.FC = () => {
                             editableConfig={{ editable: false }}
                             isLoading={isLoading}
                             pointerOnHover={true}
-                            columnDisplayFunctions={clientTableColumnDisplayFunctions}
+                            columnDisplayFunctions={{ addressPostcode: rowToAddressColumn }}
                         />
                     </TableSurface>
 

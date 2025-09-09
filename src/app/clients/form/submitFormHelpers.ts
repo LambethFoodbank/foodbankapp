@@ -1,15 +1,14 @@
-import { ListType } from "@/common/databaseListTypes";
-import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
-import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import supabase from "@/supabaseClient";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { ClientFields } from "./ClientForm";
+import { AuditLog, sendAuditLog } from "@/server/auditLog";
+import { ListType } from "@/common/databaseListTypes";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
 export type ClientDatabaseUpdateRecord = UpdateSchema["clients"];
-export type DeliveryAreaDatabaseInsertRecord = InsertSchema["delivery_areas"];
 
 const personToFamilyRecordWithoutFamilyId = (person: Person): FamilyDatabaseInsertRecord => {
     return {

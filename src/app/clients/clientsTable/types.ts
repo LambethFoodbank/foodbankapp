@@ -47,5 +47,4 @@ export interface ClientsTableRow {
     };
     phoneNumber: Schema["clients"]["phone_number"];
     email: string | null;
-    isActive: boolean | null;
 }
