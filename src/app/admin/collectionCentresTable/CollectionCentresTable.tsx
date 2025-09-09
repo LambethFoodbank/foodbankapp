@@ -159,11 +159,13 @@ const CollectionCentresTable: React.FC = () => {
         );
 
         if (updateCollectionCentreError) {
-            await sendAuditLog({
-                ...baseAuditLog,
-                wasSuccess: false,
-                logId: updateCollectionCentreError.logId,
-            });
+            if (updateCollectionCentreError.type !== "ConcurrentEditCollectionCentre") {
+                await sendAuditLog({
+                    ...baseAuditLog,
+                    wasSuccess: false,
+                    logId: updateCollectionCentreError.logId ?? "",
+                });
+            }
             setIsLoading(false);
             return { error: updateCollectionCentreError };
         }
@@ -226,8 +228,7 @@ const CollectionCentresTable: React.FC = () => {
 
                     if (updateCollectionCentreError.type === "ConcurrentEditCollectionCentre") {
                         message =
-                            "Record has been edited recently - please refresh the page." +
-                            `Log ID: ${updateCollectionCentreError.logId}`;
+                            "Record has been edited recently - please refresh the page.";
                     }
                     setErrorMessage(message);
                     throw new Error(message);

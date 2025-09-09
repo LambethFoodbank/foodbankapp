@@ -110,12 +110,12 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     return { clientId: clientId, error: null };
 };
 
-type editClientErrors = "failedToUpdateClientAndFamily" | "noRowsUpdated";
+type editClientErrors = "failedToUpdateClientAndFamily" | "noRowsUpdated" | "concurrentEdit";
 type editClientResult =
     | { clientId: string; error: null }
     | {
           clientId: null;
-          error: { type: editClientErrors; logId: string } | null;
+          error: { type: editClientErrors; logId: string | null} | null;
       };
 
 export const submitEditClientForm = async (
@@ -154,11 +154,7 @@ export const submitEditClientForm = async (
     }
 
     if (clientDataAndCount.updatedrows === 0) {
-        const logId = await logWarningReturnLogId(
-            "Concurrent editing of client or editing deleted client"
-        );
-        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-        return { clientId: null, error: { type: "noRowsUpdated", logId } };
+        return { clientId: null, error: { type: "concurrentEdit", logId: null } };
     }
 
     await sendAuditLog({

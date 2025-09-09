@@ -4,7 +4,8 @@ import supabase from "@/supabaseClient";
 
 type UpdateClientNotesResponse =
     | { error: null }
-    | { error: { type: "updateNotesFailed"; logId: string } };
+    | { error: { type: "updateNotesFailed"; logId: string } }
+    | { error: { type: "concurrentEdit" } };
 
 export const updateClientNotes = async (
     clientId: string,
@@ -30,9 +31,7 @@ export const updateClientNotes = async (
     }
 
     if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of parcel");
-        await sendAuditLog({ ...baseAuditLogProps, wasSuccess: false, logId });
-        return { error: { type: "updateNotesFailed", logId } };
+        return { error: { type: "concurrentEdit" } };
     }
 
     await sendAuditLog({ ...baseAuditLogProps, wasSuccess: true });

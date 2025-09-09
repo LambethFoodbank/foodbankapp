@@ -81,8 +81,7 @@ const ExpandedClientDetails: React.FC<Props> = ({ clientId, displayClientsParcel
             const { error } = await updateClientNotes(clientId, notes, clientDetails?.lastUpdated);
             if (error) {
                 setErrorMessage(
-                    `Record has been edited recently - please refresh the page. Log ID: ${error.logId}`
-                );
+                    error.type === "concurrentEdit" ? `Record has been edited recently - please refresh the page.` : `Failed to fetch Client Details, please refresh.`);
                 setNotes(originalNotes);
             } else {
                 setNotes(notes);

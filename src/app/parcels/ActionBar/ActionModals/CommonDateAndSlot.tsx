@@ -7,7 +7,6 @@ import supabase from "@/supabaseClient";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 export const getUpdateErrorMessage = ({
-    parcelId,
     error,
 }: {
     parcelId: string | null;
@@ -31,7 +30,7 @@ export const getUpdateErrorMessage = ({
     if (errorMessage === "") {
         return;
     }
-    return `${errorMessage} Parcel Id: ${parcelId} Log Id: ${error?.logId}`;
+    return errorMessage;
 };
 
 type UpdateField = "packingDate" | "packingSlot";
