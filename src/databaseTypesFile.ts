@@ -1311,6 +1311,7 @@ export type Database = {
       item_type:
         | "regular_food"
         | "alternative_food"
+        | "choice_food"
         | "pet_food"
         | "hygiene_product"
         | "baby_product"
