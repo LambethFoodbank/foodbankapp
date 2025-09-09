@@ -67,23 +67,31 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
     const emergencyBagsTableFetchAbortController = useRef<AbortController | null>(null);
 
     const fetchAndDisplayEmergencyBagsData = useCallback(async (): Promise<void> => {
-        if (emergencyBagsTableFetchAbortController.current) {
+        if (
+            emergencyBagsTableFetchAbortController.current &&
+            !emergencyBagsTableFetchAbortController.current.signal.aborted
+        ) {
             emergencyBagsTableFetchAbortController.current.abort("stale request");
         }
 
         emergencyBagsTableFetchAbortController.current = new AbortController();
+        const currentController = emergencyBagsTableFetchAbortController.current;
 
-        if (emergencyBagsTableFetchAbortController.current) {
+        try {
             setErrorMessage(null);
 
             const { data, error } = await getEmergencyBagsTableDataAndAllIds(
                 supabase,
                 appliedFilters,
                 sortState,
-                emergencyBagsTableFetchAbortController.current.signal,
+                currentController.signal,
                 startPoint,
                 endPoint
             );
+
+            if (currentController.signal.aborted) {
+                return;
+            }
 
             if (error) {
                 const newErrorMessage = getEmergencyBagDataErrorMessage(error.type);
@@ -94,23 +102,15 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
                 setEmergencyBagsDataPortion(data.emergencyBagTableRows);
                 setFilteredEmergencyBagCount(data.allEmergencyBagIds.length);
                 setAllFilteredEmergencyBagIds(data.allEmergencyBagIds);
-
-                // if (sortState.sortEnabled && sortState.column.headerKey) {
-                //     setEmergencyBagRowBreakPointConfig(
-                //         searchForBreakPoints(sortState.column.headerKey, data.emergencyBagTableRows)
-                //     );
-                // } else {
-                //     // The user hasn't request a specific sort, so breakpoints are as per default sorting
-                //     setEmergencyBagRowBreakPointConfig(
-                //         searchForBreakPoints(
-                //             defaultEmergencyBagsSortConfig.defaultColumnHeaderKey as keyof EmergencyBagsTableRow,
-                //             data.emergencyBagTableRows
-                //         )
-                //     );
-                // }
             }
-
-            emergencyBagsTableFetchAbortController.current = null;
+        } catch (err) {
+            if (!currentController.signal.aborted) {
+                setErrorMessage("Error loading emergency bags data, please try again");
+            }
+        } finally {
+            if (emergencyBagsTableFetchAbortController.current === currentController) {
+                emergencyBagsTableFetchAbortController.current = null;
+            }
             setIsLoading(false);
         }
     }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);

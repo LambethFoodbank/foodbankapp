@@ -72,23 +72,31 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const parcelsTableFetchAbortController = useRef<AbortController | null>(null);
 
     const fetchAndDisplayParcelsData = useCallback(async (): Promise<void> => {
-        if (parcelsTableFetchAbortController.current) {
+        if (
+            parcelsTableFetchAbortController.current &&
+            !parcelsTableFetchAbortController.current.signal.aborted
+        ) {
             parcelsTableFetchAbortController.current.abort("stale request");
         }
 
         parcelsTableFetchAbortController.current = new AbortController();
+        const currentController = parcelsTableFetchAbortController.current;
 
-        if (parcelsTableFetchAbortController.current) {
+        try {
             setErrorMessage(null);
 
             const { data, error } = await getParcelsTableDataAndAllIds(
                 supabase,
                 appliedFilters,
                 sortState,
-                parcelsTableFetchAbortController.current.signal,
+                currentController.signal,
                 startPoint,
                 endPoint
             );
+
+            if (currentController.signal.aborted) {
+                return;
+            }
 
             if (error) {
                 const newErrorMessage = getParcelDataErrorMessage(error.type);
@@ -105,7 +113,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                         searchForBreakPoints(sortState.column.headerKey, data.parcelTableRows)
                     );
                 } else {
-                    // The user hasn't request a specific sort, so breakpoints are as per default sorting
                     setParcelRowBreakPointConfig(
                         searchForBreakPoints(
                             defaultParcelsSortConfig.defaultColumnHeaderKey as keyof ParcelsTableRow,
@@ -114,8 +121,14 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     );
                 }
             }
-
-            parcelsTableFetchAbortController.current = null;
+        } catch (err) {
+            if (!currentController.signal.aborted) {
+                setErrorMessage("Error loading parcels data, please try again");
+            }
+        } finally {
+            if (parcelsTableFetchAbortController.current === currentController) {
+                parcelsTableFetchAbortController.current = null;
+            }
             setIsLoading(false);
         }
     }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
