@@ -394,6 +394,47 @@ export type Database = {
           },
         ]
       }
+      collection_centres_availability: {
+        Row: {
+          collection_centre_id: string
+          day_index: number
+          is_active: boolean
+          last_updated: string
+          primary_key: string
+          time_slots:
+            | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
+            | null
+        }
+        Insert: {
+          collection_centre_id: string
+          day_index: number
+          is_active: boolean
+          last_updated?: string
+          primary_key?: string
+          time_slots?:
+            | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
+            | null
+        }
+        Update: {
+          collection_centre_id?: string
+          day_index?: number
+          is_active?: boolean
+          last_updated?: string
+          primary_key?: string
+          time_slots?:
+            | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_collection_centre"
+            columns: ["collection_centre_id"]
+            isOneToOne: false
+            referencedRelation: "collection_centres"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
       events: {
         Row: {
           event_data: string | null
@@ -600,8 +641,6 @@ export type Database = {
           collection_centre: string | null
           collection_datetime: string | null
           created_at: string
-          extra_information: string | null
-          flagged_for_attention: boolean | null
           last_updated: string
           list_type: Database["public"]["Enums"]["list_type"]
           notes: string | null
@@ -1073,6 +1112,23 @@ export type Database = {
           rows_inserted: number
         }[]
       }
+      insert_collection_centre_with_availability: {
+        Args: {
+          centre_data: Json
+          availability_data: Json
+        }
+        Returns: {
+          acronym: string
+          is_delivery: boolean
+          is_shown: boolean
+          last_updated: string
+          name: string
+          primary_key: string
+          time_slots:
+            | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
+            | null
+        }
+      }
       packing_slot_order_swap: {
         Args: {
           id1: string
@@ -1105,6 +1161,24 @@ export type Database = {
           returned_parcel_primary_key: string
           rows_updated: number
         }[]
+      }
+      update_collection_centre_with_availability: {
+        Args: {
+          centre_data: Json
+          availability_data: Json
+          original_last_updated: string
+        }
+        Returns: {
+          acronym: string
+          is_delivery: boolean
+          is_shown: boolean
+          last_updated: string
+          name: string
+          primary_key: string
+          time_slots:
+            | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
+            | null
+        }
       }
       user_is_admin: {
         Args: Record<PropertyKey, never>

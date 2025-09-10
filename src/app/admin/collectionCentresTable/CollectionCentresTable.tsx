@@ -16,7 +16,6 @@ import {
 } from "@mui/x-data-grid";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-    CollectionCentreAvailability,
     CollectionCentresTableRow,
     fetchCollectionCentresForTable,
     FormattedAvailableDaysWithPrimaryKey,
@@ -197,7 +196,7 @@ const CollectionCentresTable: React.FC = () => {
             isDelivery: latestRow.is_delivery,
             isShown: latestRow.is_shown,
             availability: latestRow.collection_centres_availability
-                .sort((a, b) => a.day_index - b.day_index)
+                .sort((first, second) => first.day_index - second.day_index)
                 .map((day) => ({
                     dayIndex: day.day_index,
                     isActive: day.is_active,

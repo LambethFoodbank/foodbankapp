@@ -50,9 +50,6 @@ export interface FormattedAvailableDaysWithPrimaryKey {
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
 
-type DbCollectionCentre = Omit<Tables<"collection_centres">, "last_updated">;
-type NewDbCollectionCentre = Omit<DbCollectionCentre, "primary_key">;
-
 type FetchCollectionCentresResult =
     | {
           data: CollectionCentresTableRow[];
@@ -116,7 +113,7 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
 
     const formattedData = data.map((row) => {
         const availabilityByDay = (row.collection_centres_availability || [])
-            .sort((a, b) => a.day_index - b.day_index)
+            .sort((first, second) => first.day_index - second.day_index)
             .map((day) => ({
                 dayIndex: day.day_index,
                 isActive: day.is_active,
