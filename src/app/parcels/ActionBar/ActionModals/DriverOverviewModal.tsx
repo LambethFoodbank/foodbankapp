@@ -208,7 +208,7 @@ const DriverOverviewModalContent: React.FC<ContentProps> = ({
                 {sendToCircuit && parcelListContainsCollectionsCentres && (
                     <Centerer>
                         <DriverOverviewMessage>
-                            * The list has <strong>Collection</strong> parcels — they won&#39;t be
+                            * The list has <strong>Collection</strong> parcels — they will not be
                             included in the Driver’s route.
                         </DriverOverviewMessage>
                     </Centerer>

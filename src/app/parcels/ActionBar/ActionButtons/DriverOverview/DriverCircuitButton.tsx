@@ -24,7 +24,7 @@ const DriverCircuitButton = ({ onRouteSendCompleted, disabled }: Props): React.R
             type="submit"
             disabled={disabled}
         >
-            Send to Driver&#39;s Circuit
+            Send to Circuit
         </Button>
     );
 };

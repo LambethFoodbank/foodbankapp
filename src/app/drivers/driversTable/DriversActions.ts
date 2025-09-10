@@ -11,6 +11,17 @@ import { Tables } from "@/databaseTypesFile";
 type DbDriver = Tables<"drivers">;
 type NewDbDriver = Omit<DbDriver, "id">;
 
+export type FetchDriverResponse =
+    | { data: DriversRow; error: null }
+    | { data: null; error: FetchDriverError };
+
+export type FetchDriverErrorType = "failedToFetchDriver" | "noMatchingDrivers";
+
+export interface FetchDriverError extends Record<string, string> {
+    type: FetchDriverErrorType;
+    logId: string;
+}
+
 export const fetchDrivers = async (): Promise<DriversRow[]> => {
     const { data, error } = await supabase.from("drivers").select();
 
