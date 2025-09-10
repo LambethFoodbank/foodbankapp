@@ -3,11 +3,16 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
+    FormErrors,
     getErrorText,
     numberRegex,
     onChangeText,
+    Setter,
 } from "@/components/Form/formFunctions";
-import { EmergencyBagCardProps } from "@/app/emergency-bags/form/EmergencyBagForm";
+import {
+    EmergencyBagCardProps,
+    EmergencyBagFields,
+} from "@/app/emergency-bags/form/EmergencyBagForm";
 import {
     MAXIMUM_NUMBER_OF_EMERGENCY_BAGS,
     MINIMUM_NUMBER_OF_EMERGENCY_BAGS,
@@ -39,12 +44,17 @@ const AmountCard: React.FC<EmergencyBagCardProps> = ({
                     defaultValue={fields.amount !== 0 ? fields.amount.toString() : undefined}
                     error={errorExists(formErrors.amount)}
                     helperText={getErrorText(formErrors.amount)}
-                    onChange={onChangeText(fieldSetter, errorSetter, "amount", {
-                        required: true,
-                        regex: numberRegex,
-                        formattingFunction: parseInt,
-                        additionalCondition: numberOfEBRange,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<EmergencyBagFields>>,
+                        "amount",
+                        {
+                            required: true,
+                            regex: numberRegex,
+                            formattingFunction: parseInt,
+                            additionalCondition: numberOfEBRange,
+                        }
+                    )}
                 />
             </>
         </GenericFormCard>
