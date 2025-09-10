@@ -50,7 +50,6 @@ import { getEmergencyBagsByIdsWithFiltersAndSorting } from "@/app/emergency-bags
 
 type ParcelTableFilterState = string | DateRangeState | string[];
 type EmergencyBagTableFilterState = string | DateRangeState | string[];
-type EmergencyBagsFiltersAllStates = EmergencyBagsFilter<EmergencyBagTableFilterState>;
 
 const ParcelsPage: React.FC = () => {
     const searchParams = useSearchParams();
@@ -91,10 +90,7 @@ const ParcelsPage: React.FC = () => {
     const [emergencyBagsSortState, setEmergencyBagsSortState] = useState<EmergencyBagsSortState>({
         sortEnabled: false,
     });
-    const [emergencyBagsError, setEmergencyBagsError] = useState<string | null>(null);
-    const [emergencyBagsFilters, setEmergencyBagsFilters] = useState<
-        EmergencyBagsFiltersAllStates[]
-    >([]);
+    const [emergencyBagsErrorMessage, setEmergencyBagsErrorMessage] = useState<string | null>(null);
 
     const selectedParcelMessage = getSelectedParcelCountMessage(checkedParcelIds.length);
     const selectedEmergencyBagMessage = getSelectedEmergencyBagCountMessage(
@@ -106,7 +102,6 @@ const ParcelsPage: React.FC = () => {
 
     const [hasEBs, setHasEBs] = useState(false);
 
-    // Replace the useEffect dependency array with this:
     useEffect(() => {
         (async () => {
             if (urlParamsHaveBeenProcessed) {
@@ -117,8 +112,8 @@ const ParcelsPage: React.FC = () => {
 
             const urlParams = parseQueryParams(searchParams.toString());
 
-            const parcelUrlParams: Record<string, any> = {};
-            const emergencyBagUrlParams: Record<string, any> = {};
+            const parcelUrlParams: Record<string, string | string[] | null | undefined> = {};
+            const emergencyBagUrlParams: Record<string, string | string[] | null | undefined> = {};
 
             Object.entries(urlParams).forEach(([key, value]) => {
                 if (key.startsWith("eb_")) {
@@ -371,9 +366,9 @@ const ParcelsPage: React.FC = () => {
                 </Centerer>
             ) : (
                 <>
-                    {errorMessage && (
+                    {(errorMessage || emergencyBagsErrorMessage) && (
                         <FloatingToast
-                            message={errorMessage}
+                            message={(errorMessage ?? emergencyBagsErrorMessage) || undefined}
                             severity="warning"
                             variant="filled"
                         ></FloatingToast>
@@ -424,7 +419,7 @@ const ParcelsPage: React.FC = () => {
                                 areFiltersLoadingForFirstTime={
                                     areEmergencyBagFiltersLoadingForFirstTime
                                 }
-                                setErrorMessage={setEmergencyBagsError}
+                                setErrorMessage={setEmergencyBagsErrorMessage}
                             />
                         </>
                     )}
