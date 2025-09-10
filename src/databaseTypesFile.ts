@@ -17,8 +17,8 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
-          delivery_areas_id: string | null
           dietary_requirement: string | null
+          driver_id: string | null
           event_id: string | null
           list_id: string | null
           log_id: string | null
@@ -38,8 +38,8 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
-          delivery_areas_id?: string | null
           dietary_requirement?: string | null
+          driver_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -59,8 +59,8 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
-          delivery_areas_id?: string | null
           dietary_requirement?: string | null
+          driver_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -103,10 +103,10 @@ export type Database = {
             referencedColumns: ["client_id"]
           },
           {
-            foreignKeyName: "audit_log_delivery_areas_id_fkey"
-            columns: ["delivery_areas_id"]
+            foreignKeyName: "audit_log_driver_id_fkey"
+            columns: ["driver_id"]
             isOneToOne: false
-            referencedRelation: "delivery_areas"
+            referencedRelation: "drivers"
             referencedColumns: ["id"]
           },
           {
@@ -336,21 +336,6 @@ export type Database = {
         }
         Relationships: []
       }
-      delivery_areas: {
-        Row: {
-          id: string
-          postcode: string
-        }
-        Insert: {
-          id?: string
-          postcode: string
-        }
-        Update: {
-          id?: string
-          postcode?: string
-        }
-        Relationships: []
-      }
       dietary_requirements: {
         Row: {
           dairy_free: Database["public"]["Enums"]["item_dietary_status"] | null
@@ -418,6 +403,27 @@ export type Database = {
             referencedColumns: ["primary_key"]
           },
         ]
+      }
+      drivers: {
+        Row: {
+          circuit_id: string | null
+          id: string
+          last_updated: string
+          name: string
+        }
+        Insert: {
+          circuit_id?: string | null
+          id?: string
+          last_updated?: string
+          name: string
+        }
+        Update: {
+          circuit_id?: string | null
+          id?: string
+          last_updated?: string
+          name?: string
+        }
+        Relationships: []
       }
       events: {
         Row: {
@@ -956,7 +962,6 @@ export type Database = {
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
-          is_deliverable: boolean | null
           phone_number: string | null
         }
         Relationships: []
@@ -1025,7 +1030,6 @@ export type Database = {
           created_at: string | null
           family_count: number | null
           flagged_for_attention: boolean | null
-          is_deliverable: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
