@@ -30,6 +30,12 @@ export const Paragraph = styled.p`
     margin: 0.3rem;
 `;
 
+export const DriverOverviewMessage = styled.p`
+    font-size: 0.9rem;
+    margin: 1rem;
+    text-align: center;
+`;
+
 export const ModalInner = styled.div`
     display: flex;
     flex-direction: column;

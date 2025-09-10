@@ -11,6 +11,17 @@ import { Tables } from "@/databaseTypesFile";
 type DbDriver = Tables<"drivers">;
 type NewDbDriver = Omit<DbDriver, "id">;
 
+export type FetchDriverResponse =
+    | { data: DriversRow; error: null }
+    | { data: null; error: FetchDriverError };
+
+export type FetchDriverErrorType = "failedToFetchDriver" | "noMatchingDrivers";
+
+export interface FetchDriverError extends Record<string, string> {
+    type: FetchDriverErrorType;
+    logId: string;
+}
+
 export const fetchDrivers = async (): Promise<DriversRow[]> => {
     const { data, error } = await supabase.from("drivers").select();
 
@@ -28,6 +39,29 @@ export const fetchDrivers = async (): Promise<DriversRow[]> => {
             lastUpdated: row.last_updated,
         })
     );
+};
+
+export const fetchDriverNamesByCircuitPresence = async (
+    hasCircuitId: boolean
+): Promise<string[]> => {
+    let query = supabase.from("drivers").select("name,circuit_id");
+
+    if (hasCircuitId) {
+        query = query.not("circuit_id", "is", null).neq("circuit_id", "");
+    } else {
+        query = query.or("circuit_id.is.null,circuit_id.eq.");
+    }
+
+    const { data, error } = await query;
+    if (error) {
+        const logId = await logErrorReturnLogId(
+            "Error with fetch: drivers (names by circuit presence)",
+            error
+        );
+        throw new DatabaseError("fetch", "drivers", logId);
+    }
+
+    return (data ?? []).map((row) => row.name as string);
 };
 
 const formatExistingRowToDBDriver = (row: DriversRow): DbDriver => {

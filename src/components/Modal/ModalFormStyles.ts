@@ -12,6 +12,14 @@ export const SpaceBetween = styled.div`
     justify-content: space-between;
 `;
 
+export const FormDiv = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+`;
+
 export const OutsideDiv = styled.div`
     display: flex;
     flex-direction: column;
@@ -28,4 +36,10 @@ export const ButtonsDiv = styled.div`
 
 export const InputContainer = styled.div`
     max-width: 10rem;
+`;
+
+export const ButtonCenterer = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
 `;

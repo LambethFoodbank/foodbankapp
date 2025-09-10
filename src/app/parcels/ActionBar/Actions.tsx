@@ -39,7 +39,7 @@ export type ActionName =
     | "Download Shopping Lists"
     | "Download Shipping Labels"
     | "Generate Map"
-    | "Download Driver Overview"
+    | "Generate Driver Overview"
     | "Delete Parcel"
     | "Download Signposting Report"
     | "Download Missing Voucher Report"
@@ -91,7 +91,7 @@ const availableActions: ActionTypes[] = [
         availableToRole: allRoles,
     },
     {
-        actionName: "Download Driver Overview",
+        actionName: "Generate Driver Overview",
         errorCondition: isNotAtLeastOne,
         errorMessage: errorMessageForIsNotAtLeastOne,
         availableToRole: allRoles,
@@ -150,7 +150,7 @@ const getActionModal = (
             return <ShippingLabelModal key={elementKey} {...actionModalProps} />;
         case "Download Shopping Lists":
             return <ShoppingListModal key={elementKey} {...actionModalProps} />;
-        case "Download Driver Overview":
+        case "Generate Driver Overview":
             return <DriverOverviewModal key={elementKey} {...actionModalProps} />;
         case "Generate Map":
             return <GenerateMapModal key={elementKey} {...actionModalProps} />;
