@@ -2,7 +2,7 @@ import { FetchParcelError, fetchParcel } from "@/common/fetch";
 import { UpdateParcelError } from "../../form/submitFormHelpers";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
@@ -76,13 +76,6 @@ export const hasConcurrencyConflict = async (
             wasSuccess: false,
             logId,
         });
-    } else if (count === 0) {
-        const logId = await logWarningReturnLogId(`Concurrent editing of ${updateField}.`);
-        await sendAuditLog({
-            ...auditLog,
-            wasSuccess: false,
-            logId,
-        });
     }
     return !(error || count === 0);
 };
@@ -150,10 +143,9 @@ export const packingDateOrSlotUpdate = async (
     }
 
     if (updateResponse.count === 0) {
-        const logId = await logWarningReturnLogId(`Concurrent editing of ${updateField}`);
         return {
             parcelId: null,
-            error: { type: "concurrentUpdateConflict", logId },
+            error: { type: "concurrentUpdateConflict", logId: null },
         };
     }
 
@@ -188,16 +180,9 @@ export const packingDateOrSlotUpdate = async (
     }
 
     if (updateResponse.count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of parcel");
-        await sendAuditLog({
-            ...auditLog,
-            content: content,
-            wasSuccess: false,
-            logId,
-        });
         return {
             parcelId: null,
-            error: { type: "concurrentUpdateConflict", logId } as UpdateParcelError,
+            error: { type: "concurrentUpdateConflict", logId: null } as UpdateParcelError,
         };
     }
 
