@@ -19,7 +19,6 @@ export const fetchDrivers = async (): Promise<DriversRow[]> => {
         throw new DatabaseError("fetch", "drivers", logId);
     }
 
-    console.log(data);
     return data.map(
         (row): DriversRow => ({
             id: row.id,
@@ -35,7 +34,6 @@ export const fetchDriverNamesByCircuitPresence = async (
     hasCircuitId: boolean
 ): Promise<string[]> => {
     let query = supabase.from("drivers").select("name,circuit_id");
-    //const { data, error } = await supabase.from("drivers").select("name,circuit_id");
 
     if (hasCircuitId) {
         query = query.not("circuit_id", "is", null).neq("circuit_id", "");
