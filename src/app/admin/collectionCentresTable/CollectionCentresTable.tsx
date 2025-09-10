@@ -520,9 +520,10 @@ const CollectionCentresTable: React.FC = () => {
 
                         const updatedRow: CollectionCentresTableRow = {
                             ...selectedRowForAvailableDaysEdit,
-                            availableDays: payload.availableDays.map((availableDayObject) => ({
-                                day: availableDayObject.day,
-                                is_active: availableDayObject.isActive,
+                            availability: payload.availableDays.map((availableDayObject) => ({
+                                dayIndex: 0,
+                                timeSlots: [],
+                                isActive: availableDayObject.isActive,
                             })),
                         };
                         setRows((prevRows) =>

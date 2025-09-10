@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "styled-components";
 import {
     CollectionCentresTableRow,
-    FormattedAvailableDayType,
     FormattedAvailableDaysWithPrimaryKey,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 import { Heading } from "@/app/parcels/ActionBar/ActionModals/GeneralActionModal";
@@ -28,24 +27,40 @@ interface Props {
 const formatCollectionCentreAvailableDaysDbData = (
     row: CollectionCentresTableRow
 ): FormattedAvailableDaysWithPrimaryKey => {
-    if (row.availableDays === undefined) {
+    const defaultDays: Record<DaysOfWeekType, boolean> = {
+        Monday: true,
+        Tuesday: true,
+        Wednesday: true,
+        Thursday: true,
+        Friday: true,
+        Saturday: false,
+        Sunday: false,
+    };
+
+    if (!row.availability || row.availability.length === 0) {
+        const availableDays = Object.entries(defaultDays).map(([day, isActive]) => ({
+            day: day as DaysOfWeekType,
+            isActive,
+        }));
+
         return {
             primaryKey: row.id,
-            availableDays: [],
+            availableDays,
             lastUpdated: row.lastUpdated,
         };
     }
 
-    const formattedAvailableDays: FormattedAvailableDayType[] = row.availableDays
-        .filter((dayObj) => dayObj.day !== null)
-        .map((availableDayObject) => ({
-            day: availableDayObject.day as DaysOfWeekType,
-            isActive: availableDayObject.is_active ?? false,
-        }));
+    const availableDays = Object.entries(defaultDays).map(([day, _], index) => {
+        const dayAvailability = row.availability.find((dayObj) => dayObj.dayIndex === index);
+        return {
+            day: day as DaysOfWeekType,
+            isActive: dayAvailability ? dayAvailability.isActive : false,
+        };
+    });
 
     return {
         primaryKey: row.id,
-        availableDays: formattedAvailableDays,
+        availableDays,
         lastUpdated: row.lastUpdated,
     };
 };

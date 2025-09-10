@@ -1,10 +1,8 @@
 import { PostgrestError } from "@supabase/supabase-js";
-import { Tables } from "@/databaseTypesFile";
 import { Schema } from "@/databaseUtils";
 import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
-import { DbAvailableDaysType } from "@/common/fetch";
 
 export interface CollectionCentreAvailability {
     dayIndex: number;
@@ -50,6 +48,27 @@ export interface FormattedAvailableDaysWithPrimaryKey {
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
 
+interface DbTimeSlot {
+    time: string | null;
+    is_active: boolean | null;
+}
+
+interface DbAvailabilityDay {
+    day_index: number;
+    is_active: boolean;
+    time_slots: DbTimeSlot[];
+}
+
+interface DbCollectionCentreWithAvailability {
+    primary_key: string;
+    name: string;
+    acronym: string;
+    is_shown: boolean;
+    is_delivery: boolean;
+    last_updated: string;
+    availability: DbAvailabilityDay[];
+}
+
 type FetchCollectionCentresResult =
     | {
           data: CollectionCentresTableRow[];
@@ -60,50 +79,10 @@ type FetchCollectionCentresResult =
           error: { type: "failedToFetchCollectionCentres"; logId: string };
       };
 
-export const initialCollectionAvailableDays: DbAvailableDaysType = [
-    {
-        day: "Monday",
-        is_active: true,
-    },
-    {
-        day: "Tuesday",
-        is_active: true,
-    },
-    {
-        day: "Wednesday",
-        is_active: true,
-    },
-    {
-        day: "Thursday",
-        is_active: true,
-    },
-    {
-        day: "Friday",
-        is_active: true,
-    },
-    {
-        day: "Saturday",
-        is_active: true,
-    },
-    {
-        day: "Sunday",
-        is_active: true,
-    },
-];
-
 export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionCentresResult> => {
     const { data, error } = await supabase
-        .from("collection_centres")
-        .select(
-            `
-            *,
-            collection_centres_availability(
-                day_index,
-                is_active,
-                time_slots
-            )
-        `
-        )
+        .from("collection_centres_with_availability")
+        .select("*")
         .order("name");
 
     if (error) {
@@ -111,8 +90,13 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
         return { data: null, error: { type: "failedToFetchCollectionCentres", logId } };
     }
 
-    const formattedData = data.map((row) => {
-        const availabilityByDay = (row.collection_centres_availability || [])
+    const typedData = data as DbCollectionCentreWithAvailability[];
+
+    const formattedData = typedData.map((row) => {
+        console.log(row.availability);
+        const availabilityArray: DbAvailabilityDay[] = row.availability || [];
+
+        const availabilityByDay = availabilityArray
             .sort((first, second) => first.day_index - second.day_index)
             .map((day) => ({
                 dayIndex: day.day_index,
@@ -136,34 +120,10 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
     });
 
     console.log(formattedData);
+    console.log(typeof typedData[0].availability);
+    //console.log(JSON.parse(typedData[0].availability));
+
     return { data: formattedData, error: null };
-};
-
-const formatExistingRowToDBCollectionCentre = (
-    row: CollectionCentresTableRow
-): DbCollectionCentre => {
-    return {
-        primary_key: row.id,
-        name: row.name,
-        acronym: row.acronym,
-        is_shown: row.isShown,
-        is_delivery: row.isDelivery,
-        time_slots: row.timeSlots,
-        available_days: row.availableDays,
-    };
-};
-
-const formatNewRowToDBCollectionCentre = (
-    newRow: CollectionCentresTableRow
-): NewDbCollectionCentre => {
-    return {
-        name: newRow.name,
-        acronym: newRow.acronym,
-        is_shown: newRow.isShown,
-        is_delivery: newRow.isDelivery,
-        time_slots: newRow.timeSlots,
-        available_days: initialCollectionAvailableDays,
-    };
 };
 
 export type InsertCollectionCentreResult =
