@@ -36,6 +36,8 @@ const convertEmergencyBagDBtoEBRow = async (
         error: null,
     };
 };
+
+// TODO: VFB-494
 //
 // export const processLastStatusEmergencyBag = (
 //     event:

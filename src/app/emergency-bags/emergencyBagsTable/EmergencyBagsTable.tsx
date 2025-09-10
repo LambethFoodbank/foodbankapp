@@ -1,10 +1,6 @@
 import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
-import {
-    defaultNumberOfParcelsPerPage,
-    numberOfParcelsPerPageOptions,
-} from "@/app/parcels/parcelsTable/constants";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { EmergencyBagsFilter, EmergencyBagsSortState, EmergencyBagsTableRow } from "./types";
@@ -21,6 +17,10 @@ import emergencyBagsSortableColumns, {
 } from "@/app/emergency-bags/emergencyBagsTable/sortableColumns";
 import supabase from "@/supabaseClient";
 import { parcelTableColumnStyleOptions } from "@/app/parcels/parcelsTable/styles";
+import {
+    defaultNumberOfEmergencyBagsPerPage,
+    numberOfEmergencyBagsPerPageOptions,
+} from "@/app/emergency-bags/emergencyBagsTable/constants";
 
 interface EmergencyBagsTableProps {
     checkedEmergencyBagIds: string[];
@@ -58,7 +58,7 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
     const fetchEmergencyBagsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [emergencyBagCountPerPage, setEmergencyBagCountPerPage] = useState(
-        defaultNumberOfParcelsPerPage
+        defaultNumberOfEmergencyBagsPerPage
     );
     const [currentPage, setCurrentPage] = useState(1);
     const startPoint = (currentPage - 1) * emergencyBagCountPerPage;
@@ -233,8 +233,8 @@ const EmergencyBagsTable: React.FC<EmergencyBagsTableProps> = ({
                     filteredCount: filteredEmergencyBagCount,
                     onPageChange: setCurrentPage,
                     onPerPageChange: setEmergencyBagCountPerPage,
-                    defaultRowsPerPage: defaultNumberOfParcelsPerPage,
-                    rowsPerPageOptions: numberOfParcelsPerPageOptions,
+                    defaultRowsPerPage: defaultNumberOfEmergencyBagsPerPage,
+                    rowsPerPageOptions: numberOfEmergencyBagsPerPageOptions,
                 }}
                 headerKeysAndLabels={emergencyBagTableHeaderKeysAndLabels}
                 columnDisplayFunctions={emergencyBagTableColumnDisplayFunctions}

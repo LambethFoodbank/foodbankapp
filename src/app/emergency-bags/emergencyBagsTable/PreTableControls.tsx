@@ -1,5 +1,4 @@
 import { EmergencyBagsTableRow } from "./types";
-import { ActionsContainer } from "@/components/controlsStyling";
 
 interface PreTableControlsProps {
     selectedEmergencyBagMessage: string | null;
@@ -11,12 +10,13 @@ const PreEmergencyBagsTableControls: React.FC<PreTableControlsProps> = (props) =
     return (
         <>
             {props.selectedEmergencyBagMessage && <span>{props.selectedEmergencyBagMessage}</span>}
-            {/*<ActionsContainer>*/}
-            {/*    <ActionAndStatusBar*/}
-            {/*        fetchSelectedParcels={props.getCheckedEmergencyBagsData}*/}
-            {/*        postCheckedParcelActivity={props.postCheckedEmergencyBagActivity}*/}
-            {/*    />*/}
-            {/*</ActionsContainer>*/}
+            {/* TODO: VFB-494
+            <ActionsContainer>
+                <ActionAndStatusBar
+                    fetchSelectedParcels={props.getCheckedEmergencyBagsData}
+                    postCheckedParcelActivity={props.postCheckedEmergencyBagActivity}
+                />
+            </ActionsContainer>*/}
         </>
     );
 };

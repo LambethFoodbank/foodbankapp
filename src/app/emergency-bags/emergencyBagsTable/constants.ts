@@ -1,5 +1,5 @@
-export const emergencyBagIdParam = "parcelId";
+export const emergencyBagIdParam = "emergencyBagId";
 
-export const defaultNumberOfParcelsPerPage = 100;
+export const defaultNumberOfEmergencyBagsPerPage = 10;
 
-export const numberOfParcelsPerPageOptions = [10, 25, 50, 100];
+export const numberOfEmergencyBagsPerPageOptions = [5, 10, 25, 50];

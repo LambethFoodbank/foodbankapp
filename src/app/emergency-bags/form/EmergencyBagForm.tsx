@@ -184,7 +184,7 @@ const EmergencyBagForm: React.FC<EmergencyBagProps> = ({
             if (returnPath) {
                 router.push(decodeURIComponent(returnPath));
             } else {
-                //TODO: change to emergency bags for that bagId page when it is created
+                // TODO: change to emergency bags for that bagId page when it is created
                 router.push("/parcels");
             }
         }

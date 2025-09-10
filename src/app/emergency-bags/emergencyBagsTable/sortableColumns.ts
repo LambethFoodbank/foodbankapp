@@ -38,7 +38,7 @@ const emergencyBagsSortableColumns: SortOptions<EmergencyBagsTableRow, Emergency
                     .order("emergency_bag_id"),
         },
         {
-            // TODO: implement sorting method after status integration with EBs
+            // TODO: implement sorting method after status integration in VFB-494 with EBs
             key: "lastStatus",
             sortMethod: (sortDirection, query) =>
                 query
