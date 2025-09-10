@@ -5,7 +5,7 @@ import {
 } from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import { DatabaseError } from "@/app/errorClasses";
 import { Tables } from "@/databaseTypesFile";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 
 type DbPackingSlot = Tables<"packing_slots">;

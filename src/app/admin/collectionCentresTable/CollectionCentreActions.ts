@@ -2,7 +2,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { Tables } from "@/databaseTypesFile";
 import { Schema } from "@/databaseUtils";
 import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { DbAvailableDaysType } from "@/common/fetch";
 
@@ -203,7 +203,7 @@ export const updateDbCollectionCentre = async (
     }
 
     if (count === 0) {
-        return { error: { type: "ConcurrentEditCollectionCentre", logId: null} };
+        return { error: { type: "ConcurrentEditCollectionCentre", logId: null } };
     }
 
     return { error: null };

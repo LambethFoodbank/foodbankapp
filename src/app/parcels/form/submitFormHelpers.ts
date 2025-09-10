@@ -1,6 +1,6 @@
 import supabase from "@/supabaseClient";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { Errors } from "@/components/Form/formFunctions";
 import { ParcelFields } from "@/app/parcels/form/ParcelForm";

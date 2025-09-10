@@ -1,7 +1,7 @@
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import supabase from "@/supabaseClient";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { ClientFields } from "./ClientForm";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
@@ -115,7 +115,7 @@ type editClientResult =
     | { clientId: string; error: null }
     | {
           clientId: null;
-          error: { type: editClientErrors; logId: string | null} | null;
+          error: { type: editClientErrors; logId: string | null } | null;
       };
 
 export const submitEditClientForm = async (
