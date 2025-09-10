@@ -7,18 +7,18 @@ interface PreTableControlsProps {
     postCheckedEmergencyBagActivity: () => void;
 }
 
-const PreTableControls: React.FC<PreTableControlsProps> = (props) => {
+const PreEmergencyBagsTableControls: React.FC<PreTableControlsProps> = (props) => {
     return (
         <>
             {props.selectedEmergencyBagMessage && <span>{props.selectedEmergencyBagMessage}</span>}
-            <ActionsContainer>
-                {/*<ActionAndStatusBar*/}
-                {/*    fetchSelectedParcels={props.getCheckedEmergencyBagsData}*/}
-                {/*    postCheckedParcelActivity={props.postCheckedEmergencyBagActivity}*/}
-                {/*/>*/}
-            </ActionsContainer>
+            {/*<ActionsContainer>*/}
+            {/*    <ActionAndStatusBar*/}
+            {/*        fetchSelectedParcels={props.getCheckedEmergencyBagsData}*/}
+            {/*        postCheckedParcelActivity={props.postCheckedEmergencyBagActivity}*/}
+            {/*    />*/}
+            {/*</ActionsContainer>*/}
         </>
     );
 };
 
-export default PreTableControls;
+export default PreEmergencyBagsTableControls;

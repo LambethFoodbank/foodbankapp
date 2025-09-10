@@ -208,6 +208,7 @@ const runEmergencyBagsQueryAndConvertToEmergencyBagTableRows = async (
         data: DbEmergencyBagRow[];
         error: Error | null;
     };
+
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: emergency bag table", {}, error);
         throw new DatabaseError("fetch", "emergency bag table", logId);
@@ -221,7 +222,6 @@ const runEmergencyBagsQueryAndConvertToEmergencyBagTableRows = async (
             cause: processEmergencyBagDataError,
         });
     }
-
     return emergencyBagTableRows;
 };
 

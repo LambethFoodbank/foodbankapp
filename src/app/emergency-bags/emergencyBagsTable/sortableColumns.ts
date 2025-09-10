@@ -8,7 +8,7 @@ const emergencyBagsSortableColumns: SortOptions<EmergencyBagsTableRow, Emergency
             key: "type",
             sortMethod: (sortDirection, query) =>
                 query
-                    .order("packing_date")
+                    .order("type", { ascending: sortDirection === "asc" })
                     .order("collection_centre_name")
                     .order("emergency_bag_id"),
         },
@@ -25,7 +25,7 @@ const emergencyBagsSortableColumns: SortOptions<EmergencyBagsTableRow, Emergency
             key: "deliveryCollection",
             sortMethod: (sortDirection, query) =>
                 query
-                    .order("collection_centre_name")
+                    .order("collection_centre_name", { ascending: sortDirection === "asc" })
                     .order("packing_date")
                     .order("emergency_bag_id"),
         },
@@ -38,7 +38,8 @@ const emergencyBagsSortableColumns: SortOptions<EmergencyBagsTableRow, Emergency
                     .order("emergency_bag_id"),
         },
         {
-            key: "createdAt",
+            // TODO: implement sorting method after status integration with EBs
+            key: "lastStatus",
             sortMethod: (sortDirection, query) =>
                 query
                     .order("created_at", { ascending: sortDirection === "asc" })

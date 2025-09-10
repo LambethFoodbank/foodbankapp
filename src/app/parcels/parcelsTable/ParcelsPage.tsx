@@ -44,6 +44,9 @@ import {
     buildQueryParamsFromEmergencyBagFilters,
     updateEmergencyBagFiltersFromQueryParams,
 } from "@/app/emergency-bags/emergencyBagsTable/filters";
+import PreEmergencyBagsTableControls from "@/app/emergency-bags/emergencyBagsTable/PreTableControls";
+import { getSelectedEmergencyBagCountMessage } from "@/app/emergency-bags/emergencyBagsTable/format";
+import { getEmergencyBagsByIdsWithFiltersAndSorting } from "@/app/emergency-bags/emergencyBagsTable/fetchEmergencyBagTableData";
 
 type ParcelTableFilterState = string | DateRangeState | string[];
 type EmergencyBagTableFilterState = string | DateRangeState | string[];
@@ -94,12 +97,16 @@ const ParcelsPage: React.FC = () => {
     >([]);
 
     const selectedParcelMessage = getSelectedParcelCountMessage(checkedParcelIds.length);
+    const selectedEmergencyBagMessage = getSelectedEmergencyBagCountMessage(
+        checkedEmergencyBagIds.length
+    );
 
     const today = useMemo(() => dayjs().startOf("day"), []);
     const yesterday = useMemo(() => today.subtract(1, "day"), [today]);
 
     const [hasEBs, setHasEBs] = useState(false);
 
+    // Replace the useEffect dependency array with this:
     useEffect(() => {
         (async () => {
             if (urlParamsHaveBeenProcessed) {
@@ -110,10 +117,21 @@ const ParcelsPage: React.FC = () => {
 
             const urlParams = parseQueryParams(searchParams.toString());
 
-            let filtersObject = await buildParcelFilters(today);
+            const parcelUrlParams: Record<string, any> = {};
+            const emergencyBagUrlParams: Record<string, any> = {};
 
+            Object.entries(urlParams).forEach(([key, value]) => {
+                if (key.startsWith("eb_")) {
+                    const cleanKey = key.substring(3);
+                    emergencyBagUrlParams[cleanKey] = value;
+                } else {
+                    parcelUrlParams[key] = value;
+                }
+            });
+
+            let filtersObject = await buildParcelFilters(today);
             filtersObject = updateFiltersFromQueryParams(
-                urlParams,
+                parcelUrlParams,
                 filtersObject.primaryFilters,
                 filtersObject.additionalFilters
             );
@@ -129,7 +147,7 @@ const ParcelsPage: React.FC = () => {
 
             let emergencyBagFiltersObject = await buildEmergencyBagFilters(today);
             emergencyBagFiltersObject = updateEmergencyBagFiltersFromQueryParams(
-                urlParams,
+                emergencyBagUrlParams,
                 emergencyBagFiltersObject.primaryFilters,
                 emergencyBagFiltersObject.additionalFilters
             );
@@ -138,13 +156,13 @@ const ParcelsPage: React.FC = () => {
             setAdditionalFiltersEmergencyBags(emergencyBagFiltersObject.additionalFilters);
             setAreEmergencyBagFiltersLoadingForFirstTime(false);
 
-            if (urlParams[parcelIdParam]) {
-                openParcelModal(urlParams[parcelIdParam] as string);
+            if (parcelUrlParams[parcelIdParam]) {
+                openParcelModal(parcelUrlParams[parcelIdParam] as string);
             }
 
             setUrlParamsHaveBeenProcessed(true);
         })();
-    }, [urlParamsHaveBeenProcessed, searchParams, primaryFilters, additionalFilters, today]);
+    }, [urlParamsHaveBeenProcessed, searchParams, today]);
 
     useEffect(() => {
         setPackingManagerViewPrimaryFilters(
@@ -228,8 +246,25 @@ const ParcelsPage: React.FC = () => {
         );
     };
 
+    const getCheckedEmergencyBagsData = async (): Promise<EmergencyBagsTableRow[]> => {
+        if (checkedEmergencyBagIds.length === 0) {
+            return [];
+        }
+
+        return await getEmergencyBagsByIdsWithFiltersAndSorting(
+            supabase,
+            currentlyAppliedEmergencyBagFilters,
+            emergencyBagsSortState,
+            checkedEmergencyBagIds
+        );
+    };
+
     const postCheckedParcelActivity = (): void => {
         setCheckedParcelIds([]);
+    };
+
+    const postCheckedEmergencyBagActivity = (): void => {
+        setCheckedEmergencyBagIds([]);
     };
 
     const setIsPackingManagerViewInternal = (isPackingManager: boolean): void => {
@@ -357,6 +392,13 @@ const ParcelsPage: React.FC = () => {
                     {hasEBs && (
                         <>
                             <PreTableControlsContainer>
+                                <PreEmergencyBagsTableControls
+                                    selectedEmergencyBagMessage={selectedEmergencyBagMessage}
+                                    getCheckedEmergencyBagsData={getCheckedEmergencyBagsData}
+                                    postCheckedEmergencyBagActivity={
+                                        postCheckedEmergencyBagActivity
+                                    }
+                                />
                                 <TableFiltersBar<
                                     EmergencyBagsTableRow,
                                     DistributeServerFilter<
