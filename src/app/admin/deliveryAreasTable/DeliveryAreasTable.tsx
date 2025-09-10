@@ -36,6 +36,7 @@ interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
     setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
     rows: DeliveryAreasRow[];
+    setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface DeliveryAreasRow {
@@ -47,10 +48,11 @@ export interface DeliveryAreasRow {
 const isValidPostcode = (value: string): boolean => prefixPostcodeRegex.test(value);
 
 function EditToolbar(props: EditToolbarProps): React.JSX.Element {
-    const { setRows, setRowModesModel } = props;
+    const { setRows, setRowModesModel, setErrorMessage } = props;
     // The id was initialized as `number of rows+1`, which raised some issues and now it is generated randomly below
     const handleClick = (): void => {
         const id = `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        setErrorMessage(null);
         setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
         setRowModesModel((oldModel) => ({
             ...oldModel,
@@ -194,7 +196,6 @@ const DeliveryAreasTable: React.FC = () => {
             //prevents default behaviour of saving the edited state when clicking away from row being edited, force user to use save or cancel buttons
             event.defaultMuiPrevented = true;
         }
-        setErrorMessage(null);
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
@@ -309,7 +310,7 @@ const DeliveryAreasTable: React.FC = () => {
                         loadingOverlay: LinearProgress,
                     }}
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows },
+                        toolbar: { setRows, setRowModesModel, rows, setErrorMessage },
                     }}
                     loading={isLoading}
                     getRowClassName={(params) =>

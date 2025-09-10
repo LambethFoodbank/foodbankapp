@@ -261,7 +261,7 @@ export const buildParcelFilters = async (
         await buildDeliveryCollectionFilter(),
         await buildPackingSlotFilter(),
         await buildLastStatusFilter(),
-        deliveryAreaFilter("is_deliverable", "client_is_active"),
+        deliveryAreaFilter("is_deliverable"),
         buildSpecialViewFilter(today),
     ];
 

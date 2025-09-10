@@ -73,7 +73,7 @@ export const deleteDbDeliveryAreas = async (
         },
     } as const satisfies Partial<AuditLog>;
 
-    const { error } = await supabase.from("delivery_areas").delete().eq("id", row.id).select();
+    const { error } = await supabase.from("delivery_areas").delete().eq("id", row.id);
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to delete delivery area", {

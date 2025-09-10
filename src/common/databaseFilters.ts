@@ -111,14 +111,13 @@ export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
 };
 
 export function deliveryAreaFilter(
-    deliverableColumnLabel: string,
-    clientIsActiveColumnLabel: string
+    deliverableColumnLabel: string
 ): ServerSideFilter<ParcelsTableRow, string[], DbParcelRow> {
     const deliveryAreasSearch: ParcelsFilterMethod<string[]> = (query, state) => {
         if (state.length === 0) {
             return query;
         }
-        return query.eq(clientIsActiveColumnLabel, true).in(deliverableColumnLabel, state);
+        return query.in(deliverableColumnLabel, state);
     };
 
     const optionsSet = [

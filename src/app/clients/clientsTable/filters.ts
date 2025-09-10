@@ -56,7 +56,7 @@ const clientsFilters: ClientsFilter[] = [
         label: "Email",
         method: clientsEmailSearch,
     }),
-    deliveryAreaFilter("is_deliverable", "is_active") as unknown as ClientsFilter,
+    deliveryAreaFilter("is_deliverable") as unknown as ClientsFilter,
 ];
 
 export default clientsFilters;
