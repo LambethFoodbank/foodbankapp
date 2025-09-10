@@ -11,7 +11,7 @@ describe("Parcels page url params", () => {
 
     it("Initial URL params are set to be the current date", () => {
         const formattedDate = formatTodaysDateAsYYYYMMDD();
-        const expectedUrl = `/parcels?packingDate[]=${formattedDate}&packingDate[]=${formattedDate}`;
+        const expectedUrl = `/parcels?eb_packingDate[]=${formattedDate}&eb_packingDate[]=${formattedDate}&packingDate[]=${formattedDate}&packingDate[]=${formattedDate}`;
         cy.url().should("include", expectedUrl);
     });
 
@@ -20,7 +20,7 @@ describe("Parcels page url params", () => {
 
         cy.get("[data-testid='text-filter-fullName']").type("th");
 
-        const expectedUrl = `/parcels?fullName=th&packingDate[]=${formattedDate}&packingDate[]=${formattedDate}`;
+        const expectedUrl = `/parcels?eb_packingDate[]=${formattedDate}&eb_packingDate[]=${formattedDate}&fullName=th&packingDate[]=${formattedDate}&packingDate[]=${formattedDate}`;
         cy.url().should("include", expectedUrl);
     });
 
@@ -33,7 +33,7 @@ describe("Parcels page url params", () => {
 
         cy.url().should(
             "include",
-            `/parcels?packingDate[]=${formattedDate}&packingDate[]=${formattedDate}`
+            `/parcels?eb_packingDate[]=${formattedDate}&eb_packingDate[]=${formattedDate}&packingDate[]=${formattedDate}&packingDate[]=${formattedDate}`
         );
         cy.url().should("not.include", "fullName=");
     });
@@ -46,7 +46,7 @@ describe("Parcels page url params", () => {
         const newFullName = "er";
 
         cy.visit(
-            `/parcels?fullName=${newFullName}&packingDate[]=${fromDateYmd}&packingDate[]=${toDateYmd}`
+            `/parcels?eb_packingDate[]=${fromDateDmy}&eb_packingDate[]=${toDateDmy}&fullName=${newFullName}&packingDate[]=${fromDateYmd}&packingDate[]=${toDateYmd}`
         );
 
         cy.get("[data-testid='text-filter-fullName']")
