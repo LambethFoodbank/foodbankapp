@@ -79,8 +79,8 @@ const convertParcelDbtoParcelRow = async (
                     flaggedForAttention: parcel.flagged_for_attention ?? false,
                     requiresFollowUpPhoneCall: parcel.signposting_call_required ?? false,
                 },
-                clientIsActive: parcel.client_is_active ?? false,
                 createdAt: parcel.created_at ? new Date(parcel.created_at) : null,
+                clientIsActive: parcel.client_is_active ?? false,
             };
         }),
         error: null,
