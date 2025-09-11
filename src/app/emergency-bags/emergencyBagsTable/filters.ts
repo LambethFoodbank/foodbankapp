@@ -102,6 +102,25 @@ export const buildEmergencyBagFilters = async (
     return { primaryFilters: primaryFilters, additionalFilters: additionalFilters };
 };
 
+export const buildPackingManagerPrimaryFiltersEmergencyBags = (
+    primaryFilters: EmergencyBagsFilters,
+    today: Dayjs,
+    yesterday: Dayjs
+): EmergencyBagsFilters => {
+    return primaryFilters.map((filter) => {
+        if (filter.key === "packingDate") {
+            return {
+                ...filter,
+                state: { from: yesterday, to: today },
+                isDisabled: true,
+                isHiddenInUrl: true,
+            } as EmergencyBagsFilter<DateRangeState>;
+        }
+
+        return { ...filter };
+    });
+};
+
 export const updateEmergencyBagFiltersFromQueryParams = (
     urlParams: UrlQueryParamsRecord,
     primaryFilters: EmergencyBagsFilters,
@@ -134,19 +153,19 @@ export const updateEmergencyBagFiltersFromQueryParams = (
         return filter;
     });
 
-    additionalFilters = additionalFilters.map((filter) => {
-        const paramValForFilter = filter.readStateFromUrlQueryParams(urlParams);
-        if (paramValForFilter !== null) {
-            if (["lastStatus"].includes(filter.key)) {
-                return {
-                    ...filter,
-                    state: paramValForFilter,
-                } as EmergencyBagsFilter<string>;
-            }
-        }
-
-        return filter;
-    });
+    // additionalFilters = additionalFilters.map((filter) => {
+    //     const paramValForFilter = filter.readStateFromUrlQueryParams(urlParams);
+    //     if (paramValForFilter !== null) {
+    //         if (["lastStatus"].includes(filter.key)) {
+    //             return {
+    //                 ...filter,
+    //                 state: paramValForFilter,
+    //             } as EmergencyBagsFilter<string>;
+    //         }
+    //     }
+    //
+    //     return filter;
+    // });
 
     return { primaryFilters, additionalFilters };
 };

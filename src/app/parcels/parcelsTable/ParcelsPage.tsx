@@ -41,6 +41,7 @@ import {
 import { getDbDate } from "@/common/format";
 import {
     buildEmergencyBagFilters,
+    buildPackingManagerPrimaryFiltersEmergencyBags,
     buildQueryParamsFromEmergencyBagFilters,
     updateEmergencyBagFiltersFromQueryParams,
 } from "@/app/emergency-bags/emergencyBagsTable/filters";
@@ -73,6 +74,10 @@ const ParcelsPage: React.FC = () => {
     const [isPackingManagerView, setIsPackingManagerView] = useState<boolean>(false);
     const [packingManagerViewPrimaryFilters, setPackingManagerViewPrimaryFilters] =
         useState<ParcelsFilters>([]);
+    const [
+        packingManagerViewPrimaryFiltersEmergencyBags,
+        setPackingManagerViewPrimaryFiltersEmergencyBags,
+    ] = useState<EmergencyBagsFilters>([]);
 
     const [areFiltersLoadingForFirstTime, setAreFiltersLoadingForFirstTime] =
         useState<boolean>(true);
@@ -131,15 +136,6 @@ const ParcelsPage: React.FC = () => {
                 filtersObject.additionalFilters
             );
 
-            setPrimaryFilters(filtersObject.primaryFilters);
-            setAdditionalFilters(filtersObject.additionalFilters);
-            setAreFiltersLoadingForFirstTime(false);
-
-            setIsPackingManagerView(
-                filtersObject.primaryFilters.find((filter) => filter.key === pageViewTypeQueryParam)
-                    ?.state === pageViewTypePackingManager
-            );
-
             let emergencyBagFiltersObject = await buildEmergencyBagFilters(today);
             emergencyBagFiltersObject = updateEmergencyBagFiltersFromQueryParams(
                 emergencyBagUrlParams,
@@ -147,9 +143,18 @@ const ParcelsPage: React.FC = () => {
                 emergencyBagFiltersObject.additionalFilters
             );
 
+            setPrimaryFilters(filtersObject.primaryFilters);
+            setAdditionalFilters(filtersObject.additionalFilters);
+            setAreFiltersLoadingForFirstTime(false);
+
             setPrimaryFiltersEmergencyBags(emergencyBagFiltersObject.primaryFilters);
             setAdditionalFiltersEmergencyBags(emergencyBagFiltersObject.additionalFilters);
             setAreEmergencyBagFiltersLoadingForFirstTime(false);
+
+            setIsPackingManagerView(
+                filtersObject.primaryFilters.find((filter) => filter.key === pageViewTypeQueryParam)
+                    ?.state === pageViewTypePackingManager
+            );
 
             if (parcelUrlParams[parcelIdParam]) {
                 openParcelModal(parcelUrlParams[parcelIdParam] as string);
@@ -165,6 +170,16 @@ const ParcelsPage: React.FC = () => {
         );
     }, [primaryFilters, today, yesterday]);
 
+    useEffect(() => {
+        setPackingManagerViewPrimaryFiltersEmergencyBags(
+            buildPackingManagerPrimaryFiltersEmergencyBags(
+                primaryFiltersEmergencyBags,
+                today,
+                yesterday
+            )
+        );
+    }, [primaryFiltersEmergencyBags, today, yesterday]);
+
     const currentlyAppliedFilters = useMemo(() => {
         return isPackingManagerView
             ? [...packingManagerViewPrimaryFilters, ...additionalFilters]
@@ -173,8 +188,15 @@ const ParcelsPage: React.FC = () => {
 
     // Create emergency bags filters based on current applied filters
     const currentlyAppliedEmergencyBagFilters = useMemo(() => {
-        return [...primaryFiltersEmergencyBags, ...additionalFiltersEmergencyBags];
-    }, [primaryFiltersEmergencyBags, additionalFiltersEmergencyBags]);
+        return isPackingManagerView
+            ? [...packingManagerViewPrimaryFiltersEmergencyBags, ...additionalFiltersEmergencyBags]
+            : [...primaryFiltersEmergencyBags, ...additionalFiltersEmergencyBags];
+    }, [
+        isPackingManagerView,
+        packingManagerViewPrimaryFiltersEmergencyBags,
+        primaryFiltersEmergencyBags,
+        additionalFiltersEmergencyBags,
+    ]);
 
     useEffect(() => {
         if (!urlParamsHaveBeenProcessed || areEmergencyBagFiltersLoadingForFirstTime) {
@@ -185,7 +207,7 @@ const ParcelsPage: React.FC = () => {
             (filter) => filter.key === "packingDate"
         );
 
-        if (parcelDateFilter && parcelDateFilter.state) {
+        if (parcelDateFilter && parcelDateFilter.state && !parcelDateFilter.isDisabled) {
             setPrimaryFiltersEmergencyBags((prevFilters) =>
                 prevFilters.map((filter) => {
                     if (filter.key === "packingDate") {
@@ -216,7 +238,9 @@ const ParcelsPage: React.FC = () => {
 
         const mergedParams = { ...paramsRecord };
         Object.entries(emergencyBagParamsRecord).forEach(([key, value]) => {
-            mergedParams[`eb_${key}`] = value;
+            if (key !== "packingDate") {
+                mergedParams[`eb_${key}`] = value;
+            }
         });
 
         mergeParamsIntoURL(mergedParams);
@@ -295,7 +319,7 @@ const ParcelsPage: React.FC = () => {
 
     useEffect(() => {
         const checkEBs = async (): Promise<void> => {
-            const dateFilter = currentlyAppliedFilters.find(
+            const dateFilter = currentlyAppliedEmergencyBagFilters.find(
                 (filter) => filter.key === "packingDate"
             );
 
@@ -330,7 +354,11 @@ const ParcelsPage: React.FC = () => {
         if (!areFiltersLoadingForFirstTime && urlParamsHaveBeenProcessed) {
             void checkEBs();
         }
-    }, [currentlyAppliedFilters, areFiltersLoadingForFirstTime, urlParamsHaveBeenProcessed]);
+    }, [
+        areFiltersLoadingForFirstTime,
+        urlParamsHaveBeenProcessed,
+        currentlyAppliedEmergencyBagFilters,
+    ]);
 
     return (
         <>
@@ -403,8 +431,16 @@ const ParcelsPage: React.FC = () => {
                                     >,
                                     EmergencyBagTableFilterState
                                 >
-                                    primaryFilters={primaryFiltersEmergencyBags}
-                                    setPrimaryFilters={setPrimaryFiltersEmergencyBags}
+                                    primaryFilters={
+                                        isPackingManagerView
+                                            ? packingManagerViewPrimaryFiltersEmergencyBags
+                                            : primaryFiltersEmergencyBags
+                                    }
+                                    setPrimaryFilters={
+                                        isPackingManagerView
+                                            ? setPackingManagerViewPrimaryFiltersEmergencyBags
+                                            : setPrimaryFiltersEmergencyBags
+                                    }
                                     additionalFilters={additionalFiltersEmergencyBags}
                                     setAdditionalFilters={setAdditionalFiltersEmergencyBags}
                                 />
