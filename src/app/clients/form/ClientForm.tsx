@@ -123,11 +123,11 @@ const formSections = [
     DietsCard,
     PreferredItemsCard,
     ChoiceItemsCard,
+    OtherItemsCard,
     HygieneProductsCard,
     BabyProductsCard,
     PetFoodCard,
     SeasonalItemsCard,
-    OtherItemsCard,
     DeliveryInstructionsCard,
     AttentionFlagCard,
     SignpostingCallCard,
@@ -140,6 +140,7 @@ const mapListSchemaToItems = (list: Schema["lists"][]): Item[] => {
         return {
             primaryKey: item.primary_key,
             name: item.item_name,
+            isAvailable: item.is_available ?? true,
             type: item.item_type as string,
             additionalInfoField: item.more_info_field,
         };

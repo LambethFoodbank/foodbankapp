@@ -493,7 +493,7 @@ export const fetchClientItems = async (
     const itemIds = data.map((item) => item.item_id);
     const { data: itemsData, error: itemsError } = await supabase
         .from("lists")
-        .select("primary_key, item_name, item_type")
+        .select("primary_key, item_name, item_type, is_available")
         .in("primary_key", itemIds);
 
     if (itemsError) {
@@ -505,6 +505,7 @@ export const fetchClientItems = async (
         primaryKey: item.primary_key,
         name: item.item_name,
         type: item.item_type as string,
+        isAvailable: item.is_available ?? true,
         notes:
             data.find((preferredItem) => preferredItem.item_id === item.primary_key)?.notes ?? "",
     }));

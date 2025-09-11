@@ -7,6 +7,7 @@ const SeasonalItemsCard: React.FC<ItemsCardProps> = (props) => (
         {...props}
         title="Seasonal Items"
         fieldName="seasonalItems"
+        showIfNotAvailable={false}
         items={props.items.filter((item) => item.type === "seasonal_product")}
     />
 );

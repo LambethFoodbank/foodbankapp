@@ -10,6 +10,7 @@ import { ClientCardProps } from "../ClientForm";
 interface SelectableItem {
     primaryKey: string;
     name: string;
+    isAvailable: boolean;
     additionalInfoField?: boolean;
     notes?: string;
 }
@@ -18,6 +19,7 @@ interface SelectionCardProps<T extends SelectableItem> extends ClientCardProps {
     items: T[];
     title: string;
     cardDetails?: string;
+    showIfNotAvailable?: boolean;
     fieldName: keyof ClientCardProps["fields"];
 }
 
@@ -27,12 +29,15 @@ function SelectionGenericCard<T extends SelectableItem>({
     items,
     title,
     cardDetails,
+    showIfNotAvailable = true,
     fieldName,
 }: SelectionCardProps<T>): React.JSX.Element {
     const selected = (fields[fieldName] ?? []) as T[];
     const selectedKeys = selected.map((item) => item.primaryKey);
 
-    const groupedItems = items.reduce((acc, item) => {
+    const visibleItems = showIfNotAvailable ? items : items.filter((item) => item.isAvailable);
+
+    const groupedItems = visibleItems.reduce((acc, item) => {
         if (!acc.has(item.name)) {
             acc.set(item.name, []);
         }
@@ -61,7 +66,7 @@ function SelectionGenericCard<T extends SelectableItem>({
         fieldSetter({ [fieldName]: newSelected });
     };
 
-    if (items.length === 0) {
+    if (groupedItems.size === 0) {
         return <></>;
     }
 
