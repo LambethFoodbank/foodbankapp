@@ -1508,6 +1508,20 @@
           "hasDefaultValue": false
         },
         {
+          "name": "collection_centres_availability",
+          "type": "collection_centres_availability",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "collection_centres_availabilityTocollection_centres",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "parcels",
           "type": "parcels",
           "isRequired": false,
@@ -1546,6 +1560,124 @@
         },
         {
           "name": "collection_centres_primary_key_key",
+          "fields": [
+            "primary_key"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "collection_centres_availability": {
+      "id": "public.collection_centres_availability",
+      "schemaName": "public",
+      "tableName": "collection_centres_availability",
+      "fields": [
+        {
+          "id": "public.collection_centres_availability.primary_key",
+          "name": "primary_key",
+          "columnName": "primary_key",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.collection_centres_availability.collection_centre_id",
+          "name": "collection_centre_id",
+          "columnName": "collection_centre_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.collection_centres_availability.day_index",
+          "name": "day_index",
+          "columnName": "day_index",
+          "type": "int2",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.collection_centres_availability.is_active",
+          "name": "is_active",
+          "columnName": "is_active",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.collection_centres_availability.time_slots",
+          "name": "time_slots",
+          "columnName": "time_slots",
+          "type": "collection_timeslot_type[]",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.collection_centres_availability.last_updated",
+          "name": "last_updated",
+          "columnName": "last_updated",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "collection_centres",
+          "type": "collection_centres",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "collection_centres_availabilityTocollection_centres",
+          "relationFromFields": [
+            "collection_centre_id"
+          ],
+          "relationToFields": [
+            "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "collection_centres_availability_pkey",
           "fields": [
             "primary_key"
           ],

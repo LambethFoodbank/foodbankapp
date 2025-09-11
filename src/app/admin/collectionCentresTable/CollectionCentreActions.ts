@@ -1,10 +1,14 @@
 import { PostgrestError } from "@supabase/supabase-js";
-import { Tables } from "@/databaseTypesFile";
 import { Schema } from "@/databaseUtils";
 import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
-import { DbAvailableDaysType } from "@/common/fetch";
+
+export interface CollectionCentreAvailability {
+    dayIndex: number;
+    timeSlots: { time: string | null; is_active: boolean | null }[];
+    isActive: boolean;
+}
 
 export interface CollectionCentresTableRow {
     acronym: Schema["collection_centres"]["acronym"];
@@ -12,8 +16,7 @@ export interface CollectionCentresTableRow {
     id: Schema["collection_centres"]["primary_key"];
     isDelivery: Schema["collection_centres"]["is_delivery"];
     isShown: Schema["collection_centres"]["is_shown"];
-    timeSlots: Schema["collection_centres"]["time_slots"];
-    availableDays: Schema["collection_centres"]["available_days"];
+    availability: CollectionCentreAvailability[];
     isNew: boolean;
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
@@ -45,8 +48,26 @@ export interface FormattedAvailableDaysWithPrimaryKey {
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
 
-type DbCollectionCentre = Omit<Tables<"collection_centres">, "last_updated">;
-type NewDbCollectionCentre = Omit<DbCollectionCentre, "primary_key">;
+interface DbTimeSlot {
+    time: string | null;
+    is_active: boolean | null;
+}
+
+interface DbAvailabilityDay {
+    day_index: number;
+    is_active: boolean;
+    time_slots: DbTimeSlot[];
+}
+
+interface DbCollectionCentreWithAvailability {
+    primary_key: string;
+    name: string;
+    acronym: string;
+    is_shown: boolean;
+    is_delivery: boolean;
+    last_updated: string;
+    availability: DbAvailabilityDay[];
+}
 
 type FetchCollectionCentresResult =
     | {
@@ -58,86 +79,51 @@ type FetchCollectionCentresResult =
           error: { type: "failedToFetchCollectionCentres"; logId: string };
       };
 
-export const initialCollectionAvailableDays: DbAvailableDaysType = [
-    {
-        day: "Monday",
-        is_active: true,
-    },
-    {
-        day: "Tuesday",
-        is_active: true,
-    },
-    {
-        day: "Wednesday",
-        is_active: true,
-    },
-    {
-        day: "Thursday",
-        is_active: true,
-    },
-    {
-        day: "Friday",
-        is_active: true,
-    },
-    {
-        day: "Saturday",
-        is_active: true,
-    },
-    {
-        day: "Sunday",
-        is_active: true,
-    },
-];
-
 export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionCentresResult> => {
-    const { data, error } = await supabase.from("collection_centres").select().order("name");
+    const { data, error } = await supabase
+        .from("collection_centres_with_availability")
+        .select("*")
+        .order("name");
+
     if (error) {
         const logId = await logErrorReturnLogId("Failed to fetch collection centres", { error });
         return { data: null, error: { type: "failedToFetchCollectionCentres", logId } };
     }
 
-    const formattedData = data.map(
-        (row): CollectionCentresTableRow => ({
+    const typedData = data as DbCollectionCentreWithAvailability[];
+
+    const formattedData = typedData.map((row) => {
+        console.log(row.availability);
+        const availabilityArray: DbAvailabilityDay[] = row.availability || [];
+
+        const availabilityByDay = availabilityArray
+            .sort((first, second) => first.day_index - second.day_index)
+            .map((day) => ({
+                dayIndex: day.day_index,
+                isActive: day.is_active,
+                timeSlots: (day.time_slots || []).map((slot) => ({
+                    time: slot.time,
+                    is_active: slot.is_active ?? false,
+                })),
+            }));
+
+        return {
             name: row.name,
             acronym: row.acronym,
             id: row.primary_key,
             isShown: row.is_shown,
             isDelivery: row.is_delivery,
-            timeSlots: row.time_slots,
-            availableDays: row.available_days,
+            availability: availabilityByDay,
             isNew: false,
             lastUpdated: row.last_updated,
-        })
-    );
+        };
+    });
+
+    console.log(formattedData);
+    console.log(typeof typedData[0].availability);
+    //console.log(JSON.parse(typedData[0].availability));
 
     return { data: formattedData, error: null };
-};
-
-const formatExistingRowToDBCollectionCentre = (
-    row: CollectionCentresTableRow
-): DbCollectionCentre => {
-    return {
-        primary_key: row.id,
-        name: row.name,
-        acronym: row.acronym,
-        is_shown: row.isShown,
-        is_delivery: row.isDelivery,
-        time_slots: row.timeSlots,
-        available_days: row.availableDays,
-    };
-};
-
-const formatNewRowToDBCollectionCentre = (
-    newRow: CollectionCentresTableRow
-): NewDbCollectionCentre => {
-    return {
-        name: newRow.name,
-        acronym: newRow.acronym,
-        is_shown: newRow.isShown,
-        is_delivery: newRow.isDelivery,
-        time_slots: newRow.timeSlots,
-        available_days: initialCollectionAvailableDays,
-    };
 };
 
 export type InsertCollectionCentreResult =
@@ -156,17 +142,28 @@ export type InsertCollectionCentreResult =
 export const insertNewCollectionCentre = async (
     newRow: CollectionCentresTableRow
 ): Promise<InsertCollectionCentreResult> => {
-    const data = formatNewRowToDBCollectionCentre(newRow);
     const { data: collectionCentre, error } = await supabase
-        .from("collection_centres")
-        .insert(data)
-        .select()
-        .single();
-
+        .rpc("insert_collection_centre_with_availability", {
+            centre_data: {
+                name: newRow.name,
+                acronym: newRow.acronym,
+                is_shown: newRow.isShown,
+                is_delivery: newRow.isDelivery,
+            },
+            availability_data: newRow.availability.map((day) => ({
+                day_index: day.dayIndex,
+                is_active: day.isActive,
+                time_slots: day.timeSlots.map((slot) => ({
+                    time: slot.time,
+                    is_active: slot.is_active,
+                })),
+            })),
+        })
+        .single<{ primary_key: string }>();
     if (error) {
         const logId = await logErrorReturnLogId("Failed to add a collection centre", {
             error,
-            newCollectionCentre: data,
+            newCollectionCentre: newRow,
         });
         return { data: null, error: { dbError: error, logId } };
     }
@@ -184,25 +181,37 @@ export type UpdateCollectionCentreResult = {
 export const updateDbCollectionCentre = async (
     rowWithOriginalLastUpdated: CollectionCentresTableRowWithOriginalLastUpdated
 ): Promise<UpdateCollectionCentreResult> => {
-    const processedData = formatExistingRowToDBCollectionCentre(rowWithOriginalLastUpdated);
+    const { id, name, acronym, isShown, isDelivery, availability } = rowWithOriginalLastUpdated;
     const lastUpdated = rowWithOriginalLastUpdated.originalLastUpdated;
 
-    const { error, count } = await supabase
-        .from("collection_centres")
-        .update(processedData, { count: "exact" })
-        .eq("primary_key", processedData.primary_key)
-        .eq("last_updated", lastUpdated);
+    const { data: updatedCentre, error } = await supabase
+        .rpc("update_collection_centre_with_availability", {
+            centre_data: {
+                primary_key: id,
+                name,
+                acronym,
+                is_shown: isShown,
+                is_delivery: isDelivery,
+            },
+            availability_data: availability.map((day) => ({
+                day_index: day.dayIndex,
+                is_active: day.isActive,
+                time_slots: day.timeSlots,
+            })),
+            original_last_updated: lastUpdated,
+        })
+        .single();
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update collection centre", {
             error,
-            newCollectionCentreData: processedData,
+            collectionCentre: rowWithOriginalLastUpdated,
         });
 
         return { error: { type: "UpdateCollectionCentreFailed", logId } };
     }
 
-    if (count === 0) {
+    if (!updatedCentre) {
         const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
         return { error: { type: "ConcurrentEditCollectionCentre", logId } };
     }
