@@ -34,6 +34,7 @@ import NumberAdultsCard from "@/app/clients/form/formSections/NumberAdultsCard";
 import NumberChildrenCard from "@/app/clients/form/formSections/NumberChildrenCard";
 import DietsCard from "@/app/clients/form/formSections/DietsCard";
 import PreferredItemsCard from "@/app/clients/form/formSections/PreferredItemsCard";
+import ChoiceItemsCard from "@/app/clients/form/formSections/ChoiceItemsCard";
 import HygieneProductsCard from "@/app/clients/form/formSections/HygieneProductsCard";
 import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
@@ -79,6 +80,7 @@ export interface ClientFields extends Fields {
     dietaryRequirements: BooleanGroup | null;
     diets: Diet[];
     preferredItems: Item[];
+    choiceItems: Item[];
     hygieneProducts: Item[];
     babyProducts: Item[];
     petFood: Item[];
@@ -120,11 +122,12 @@ const formSections = [
     CookingFacilitiesCard,
     DietsCard,
     PreferredItemsCard,
+    ChoiceItemsCard,
+    OtherItemsCard,
     HygieneProductsCard,
     BabyProductsCard,
     PetFoodCard,
     SeasonalItemsCard,
-    OtherItemsCard,
     DeliveryInstructionsCard,
     AttentionFlagCard,
     SignpostingCallCard,
@@ -137,6 +140,7 @@ const mapListSchemaToItems = (list: Schema["lists"][]): Item[] => {
         return {
             primaryKey: item.primary_key,
             name: item.item_name,
+            isAvailable: item.is_available ?? true,
             type: item.item_type as string,
             additionalInfoField: item.more_info_field,
         };

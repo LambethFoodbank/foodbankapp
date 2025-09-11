@@ -57,6 +57,7 @@ export interface Item {
     type?: string;
     notes?: string;
     additionalInfoField?: boolean;
+    isAvailable: boolean;
 }
 
 export type Fields = Record<string, unknown>;

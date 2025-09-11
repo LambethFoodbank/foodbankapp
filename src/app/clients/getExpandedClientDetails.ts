@@ -116,6 +116,7 @@ export interface ExpandedClientData {
     cookingFacilities: string;
     diets: string;
     preferredItems: string;
+    choiceItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
@@ -147,6 +148,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         ),
         diets: formatDietsBreakdownFromArray(client.diets as ClientDietWithName[]),
         preferredItems: formatItemsBreakdownFromArray(client.preferred_items, "alternative_food"),
+        choiceItems: formatItemsBreakdownFromArray(client.preferred_items, "choice_food"),
         hygieneProducts: formatItemsBreakdownFromArray(client.preferred_items, "hygiene_product"),
         babyProducts: formatItemsBreakdownFromArray(client.preferred_items, "baby_product"),
         petFood: formatItemsBreakdownFromArray(client.preferred_items, "pet_food"),
@@ -279,12 +281,16 @@ export const formatBreakdownFromArray = <T>(
         return "None";
     }
 
+    const seenNames = new Set<string>();
     const items = arr
         .map((item) => {
-            const name = getName(item)?.toString().trim();
-            if (!name) {
+            const rawName = getName(item);
+            const name = rawName?.toString().trim();
+            if (!name || seenNames.has(name)) {
                 return null;
             }
+
+            seenNames.add(name);
 
             const extraInfo = getAdditionalInfo?.(item)?.trim();
             return extraInfo ? `${name} (${extraInfo})` : name;
@@ -307,14 +313,12 @@ export const formatItemsBreakdownFromArray = (
     if (!arr?.length) {
         arr = [];
     }
-
     return formatBreakdownFromArray(
         arr.filter((clientPreferredItem) => clientPreferredItem.item?.item_type === itemType),
         (clientPreferredItem) => clientPreferredItem.item?.item_name ?? clientPreferredItem.item_id,
         (clientPreferredItem) => clientPreferredItem.notes
     );
 };
-
 export const formatRequirementsByCanonicalOrder = (
     requirementsArray: string[] | null,
     canonicalOrder: string[]

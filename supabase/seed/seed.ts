@@ -148,7 +148,7 @@ const main = async (): Promise<never> => {
 
     await seed.collection_centres(collectionCentresWithStringSlots);
 
-    await seed.lists(listsSeedRequired);
+    // await seed.lists(listsSeedRequired);
 
     await seed.parcels(
         (generate) =>

@@ -193,6 +193,10 @@ const getExpandedParcelDetails = async (
                         client.preferred_items,
                         "alternative_food"
                     ),
+                    choiceItems: formatItemsBreakdownFromArray(
+                        client.preferred_items,
+                        "choice_food"
+                    ),
                     hygieneProducts: formatItemsBreakdownFromArray(
                         client.preferred_items,
                         "hygiene_product"

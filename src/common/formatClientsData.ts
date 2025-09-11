@@ -22,6 +22,7 @@ export interface RequirementSummary {
     petFood: string;
     diets: string;
     preferredItems: string;
+    choiceItems: string;
     seasonalItems: string;
     otherItems: string;
     cookingFacilities: string;
@@ -81,6 +82,11 @@ export const prepareRequirementSummary = (
         diets: clientDiets.map((diet) => diet.name).join(", ") || "None",
         preferredItems: formatBreakdownFromArray(
             clientPreferredItems.filter((item) => item.type === "alternative_food"),
+            (item) => item.name,
+            (item) => item.notes
+        ),
+        choiceItems: formatBreakdownFromArray(
+            clientPreferredItems.filter((item) => item.type === "choice_food"),
             (item) => item.name,
             (item) => item.notes
         ),

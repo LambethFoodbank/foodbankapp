@@ -90,7 +90,7 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
         const { data: itemsData } = await supabase
             .from("lists")
             .select("primary_key, item_name, item_type, list_type")
-            .in("item_type", ["alternative_food", "regular_food"])
+            .in("item_type", ["alternative_food", "regular_food", "choice_food"])
             .order("list_type")
             .order("item_name");
         setItems(
@@ -366,7 +366,11 @@ export const EditDietaryRequirementsModal: React.FC<Props> = ({ isOpen, onClose 
                     </Typography>
                     <Grid container spacing={0.5}>
                         {items
-                            .filter((item) => item.item_type === "regular_food")
+                            .filter(
+                                (item) =>
+                                    item.item_type === "regular_food" ||
+                                    item.item_type === "choice_food"
+                            )
                             .map((item) => (
                                 <Grid item xs={6} sm={4} md={4} key={`excluded-${item.id}`}>
                                     <FormControlLabel

@@ -61,6 +61,7 @@ export type ReportRow = {
     cookingFacilities: string;
     diets: string;
     preferredItems: string;
+    choiceItems: string;
     hygieneProducts: string;
     babyProducts: string;
     petFood: string;
@@ -249,6 +250,10 @@ export const convertRawParcelListToReportResult = (
                     preferredItems: formatItemsBreakdownFromArray(
                         rawParcel.client?.preferred_items,
                         "alternative_food"
+                    ),
+                    choiceItems: formatItemsBreakdownFromArray(
+                        rawParcel.client?.preferred_items,
+                        "choice_food"
                     ),
                     hygieneProducts: formatItemsBreakdownFromArray(
                         rawParcel.client?.preferred_items,
