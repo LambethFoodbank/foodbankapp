@@ -194,7 +194,9 @@ export const prepareItemsListForHousehold = async (
 
         const isIncluded = itemsByRequirement.includedItems.includes(row.item_name);
         const isExcluded = itemsByRequirement.excludedItems.includes(row.item_name);
-        const isRegularFood = row.item_type === "regular_food";
+
+        // shopping list has by default only regular_food and choice_food
+        const isRegularFood = row.item_type === "regular_food" || row.item_type === "choice_food";
         const isPreferredItem = clientPreferredItems.some(
             (item) => item.description === row.item_name
         );
