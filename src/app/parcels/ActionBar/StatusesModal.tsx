@@ -6,9 +6,8 @@ import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { ParcelsTableRow } from "../parcelsTable/types";
 import SelectedParcelsOverview from "./SelectedParcelsOverview";
-import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
-import { FormElementWithSpacing } from "@/components/Form/formStyling";
+import { FormElementWithSpacing, FormErrorText } from "@/components/Form/formStyling";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
 
 const NO_RESPONSE_FOLLOW_UP = ["Voicemail", "Text", "Email"];
@@ -25,6 +24,7 @@ interface StatusesModalProps extends React.ComponentProps<typeof Modal> {
     onSubmit: (date: Dayjs, callNoResponseFollowUp: string[]) => void;
     selectedStatus?: string | null;
     errorText: string | null;
+    setErrorText: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const Row = styled.div`
@@ -42,26 +42,58 @@ const ModalInner = styled.div`
 
 const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     const [date, setDate] = useState(dayjs(new Date()));
+    const [isValidDate, setIsValidDate] = useState(true);
     const [callNoResponseFollowUp, setCallNoResponseFollowUp] = useState<string[]>([]);
 
     useEffect(() => {
         setDate(dayjs(new Date()));
     }, [props.isOpen]);
 
-    const onDateChange = (newDate: Dayjs | null): void =>
-        setDate((date) =>
-            date
-                .set("year", newDate?.year() ?? date.year())
-                .set("month", newDate?.month() ?? date.month())
-                .set("date", newDate?.date() ?? date.date())
-        );
+    useEffect(() => {
+        const firstRegisteredDate = dayjs("2000-01-01");
+        const currentDate = dayjs();
 
-    const onTimeChange = (newDate: Dayjs | null): void =>
-        setDate((date) =>
-            date
-                .set("hour", newDate?.hour() ?? date.hour())
-                .set("minute", newDate?.minute() ?? date.minute())
+        if (
+            !date ||
+            !date.isValid() ||
+            date.isBefore(firstRegisteredDate) ||
+            date.isAfter(currentDate)
+        ) {
+            setIsValidDate(false);
+            props.setErrorText("Please choose a valid date.");
+        } else {
+            setIsValidDate(true);
+            props.setErrorText(null);
+        }
+    }, [date, props]);
+
+    const onDateChange = (newDate: Dayjs | null): void => {
+        if (!newDate) {
+            return;
+        }
+        setDate(
+            dayjs(new Date())
+                .set("year", newDate.year() ?? date.year())
+                .set("month", newDate.month() ?? date.month())
+                .set("date", newDate.date() ?? date.date())
+                .set("hour", isValidDate ? date.hour() : 8)
+                .set("minute", isValidDate ? date.minute() : 0)
         );
+    };
+
+    const onTimeChange = (newDate: Dayjs | null): void => {
+        if (!newDate) {
+            return;
+        }
+        setDate(
+            dayjs(new Date())
+                .set("year", date.year())
+                .set("month", date.month())
+                .set("date", date.date())
+                .set("hour", newDate.hour() ?? date.hour())
+                .set("minute", newDate.minute() ?? date.minute())
+        );
+    };
 
     useEffect(() => {
         if (props.isOpen) {
@@ -82,7 +114,6 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     return (
         <Modal {...props}>
             <ModalInner>
-                {props.errorText && <ErrorSecondaryText>{props.errorText}</ErrorSecondaryText>}
                 <Centerer>
                     <Row>
                         Date:
@@ -91,9 +122,22 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                             defaultValue={date}
                             onChange={onDateChange}
                             disableFuture
+                            onError={() => {
+                                setIsValidDate(false);
+                                props.setErrorText("Please choose a valid date.");
+                            }}
+                            minDate={dayjs("2000-01-01")}
                         />
                         Time:
-                        <TimePicker value={date} onChange={onTimeChange} disableFuture />
+                        <TimePicker
+                            value={date}
+                            onChange={onTimeChange}
+                            disableFuture={date.day() === dayjs().day()}
+                            onError={() => {
+                                setIsValidDate(false);
+                                props.setErrorText("Please choose a valid date.");
+                            }}
+                        />
                     </Row>
                 </Centerer>
                 <SelectedParcelsOverview
@@ -115,10 +159,14 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                         type="button"
                         variant="contained"
                         onClick={() => props.onSubmit(date, callNoResponseFollowUp)}
+                        disabled={!isValidDate}
                     >
                         Submit
                     </Button>
                 </Centerer>
+                {props.errorText && (
+                    <FormErrorText style={{ marginBottom: "0" }}>{props.errorText}</FormErrorText>
+                )}
             </ModalInner>
         </Modal>
     );

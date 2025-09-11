@@ -136,6 +136,7 @@ const Statuses: React.FC<Props> = ({
                 headerId="status-modal-header"
                 onSubmit={submitStatus}
                 errorText={serverErrorMessage}
+                setErrorText={setServerErrorMessage}
                 selectedStatus={selectedStatus}
             >
                 <></>
