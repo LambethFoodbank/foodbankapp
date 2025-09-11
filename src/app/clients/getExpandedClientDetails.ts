@@ -281,12 +281,16 @@ export const formatBreakdownFromArray = <T>(
         return "None";
     }
 
+    const seenNames = new Set<string>();
     const items = arr
         .map((item) => {
-            const name = getName(item)?.toString().trim();
-            if (!name) {
+            const rawName = getName(item);
+            const name = rawName?.toString().trim();
+            if (!name || seenNames.has(name)) {
                 return null;
             }
+
+            seenNames.add(name);
 
             const extraInfo = getAdditionalInfo?.(item)?.trim();
             return extraInfo ? `${name} (${extraInfo})` : name;
@@ -309,24 +313,12 @@ export const formatItemsBreakdownFromArray = (
     if (!arr?.length) {
         arr = [];
     }
-
-    const seenNames = new Set<string | null>();
-    const filteredArr = arr.filter((clientPreferredItem) => {
-        const name = clientPreferredItem.item?.item_name ?? clientPreferredItem.item_id;
-        if (clientPreferredItem.item?.item_type === itemType && !seenNames.has(name)) {
-            seenNames.add(name);
-            return true;
-        }
-        return false;
-    });
-
     return formatBreakdownFromArray(
-        filteredArr,
+        arr.filter((clientPreferredItem) => clientPreferredItem.item?.item_type === itemType),
         (clientPreferredItem) => clientPreferredItem.item?.item_name ?? clientPreferredItem.item_id,
         (clientPreferredItem) => clientPreferredItem.notes
     );
 };
-
 export const formatRequirementsByCanonicalOrder = (
     requirementsArray: string[] | null,
     canonicalOrder: string[]
