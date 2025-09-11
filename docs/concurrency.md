@@ -70,4 +70,3 @@ Concurrency arises when multiple users try to update the same record at the same
   * The user cancels, exiting edit mode.
   * The user reloads the page.
   * The user successfully submits another row (for tables).
-* Affected rows stay in a consistent state (either rolled back with a fresh DB fetch, or marked as “conflict”).
