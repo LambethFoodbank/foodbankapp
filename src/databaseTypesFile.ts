@@ -62,7 +62,6 @@ export type Database = {
           content?: Json | null
           created_at?: string
           delivery_areas_id?: string | null
-          emergency_bag_id?: string | null
           dietary_requirement?: string | null
           emergency_bag_id?: string | null
           event_id?: string | null
