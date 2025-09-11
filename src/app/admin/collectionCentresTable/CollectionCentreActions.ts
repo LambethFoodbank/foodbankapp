@@ -3,12 +3,7 @@ import { Schema } from "@/databaseUtils";
 import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
-
-export interface CollectionCentreAvailability {
-    dayIndex: number;
-    timeSlots: { time: string | null; is_active: boolean | null }[];
-    isActive: boolean;
-}
+import { Json } from "@/databaseTypesFile";
 
 export interface CollectionCentresTableRow {
     acronym: Schema["collection_centres"]["acronym"];
@@ -16,7 +11,7 @@ export interface CollectionCentresTableRow {
     id: Schema["collection_centres"]["primary_key"];
     isDelivery: Schema["collection_centres"]["is_delivery"];
     isShown: Schema["collection_centres"]["is_shown"];
-    availability: CollectionCentreAvailability[];
+    availability: FormattedAvailability[];
     isNew: boolean;
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
@@ -48,25 +43,10 @@ export interface FormattedAvailableDaysWithPrimaryKey {
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
 
-interface DbTimeSlot {
-    time: string | null;
-    is_active: boolean | null;
-}
-
-interface DbAvailabilityDay {
-    day_index: number;
-    is_active: boolean;
-    time_slots: DbTimeSlot[];
-}
-
-interface DbCollectionCentreWithAvailability {
-    primary_key: string;
-    name: string;
-    acronym: string;
-    is_shown: boolean;
-    is_delivery: boolean;
-    last_updated: string;
-    availability: DbAvailabilityDay[];
+export interface FormattedAvailability {
+    dayIndex: number;
+    isActive: boolean;
+    timeSlots: FormattedTimeSlot[];
 }
 
 type FetchCollectionCentresResult =
@@ -85,44 +65,42 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
         .select("*")
         .order("name");
 
+    console.log("Raw Supabase data:", data);
+
     if (error) {
         const logId = await logErrorReturnLogId("Failed to fetch collection centres", { error });
         return { data: null, error: { type: "failedToFetchCollectionCentres", logId } };
     }
 
-    const typedData = data as DbCollectionCentreWithAvailability[];
+    const formattedData: CollectionCentresTableRow[] = (data || []).map((row: any) => {
+        const availabilityArray: any[] = Array.isArray(row.availability)
+            ? row.availability
+            : JSON.parse(row.availability || "[]");
 
-    const formattedData = typedData.map((row) => {
-        console.log(row.availability);
-        const availabilityArray: DbAvailabilityDay[] = row.availability || [];
-
-        const availabilityByDay = availabilityArray
-            .sort((first, second) => first.day_index - second.day_index)
+        const availability: FormattedAvailability[] = (availabilityArray || [])
+            .filter((day) => day && day.day_index != null)
             .map((day) => ({
                 dayIndex: day.day_index,
                 isActive: day.is_active,
-                timeSlots: (day.time_slots || []).map((slot) => ({
+                timeSlots: (day.time_slots || []).map((slot: any) => ({
                     time: slot.time,
-                    is_active: slot.is_active ?? false,
+                    isActive: slot.is_active,
                 })),
             }));
 
         return {
+            id: row.primary_key,
             name: row.name,
             acronym: row.acronym,
-            id: row.primary_key,
             isShown: row.is_shown,
             isDelivery: row.is_delivery,
-            availability: availabilityByDay,
-            isNew: false,
             lastUpdated: row.last_updated,
+            availability,
+            isNew: false,
         };
     });
 
-    console.log(formattedData);
-    console.log(typeof typedData[0].availability);
-    //console.log(JSON.parse(typedData[0].availability));
-
+    console.log("Formatted data:", formattedData);
     return { data: formattedData, error: null };
 };
 
@@ -155,7 +133,7 @@ export const insertNewCollectionCentre = async (
                 is_active: day.isActive,
                 time_slots: day.timeSlots.map((slot) => ({
                     time: slot.time,
-                    is_active: slot.is_active,
+                    is_active: slot.isActive,
                 })),
             })),
         })
@@ -196,8 +174,11 @@ export const updateDbCollectionCentre = async (
             availability_data: availability.map((day) => ({
                 day_index: day.dayIndex,
                 is_active: day.isActive,
-                time_slots: day.timeSlots,
-            })),
+                time_slots: day.timeSlots.map((slot) => ({
+                    time: slot.time,
+                    is_active: slot.isActive,
+                })) as unknown as Json,
+            })) as unknown as Json[],
             original_last_updated: lastUpdated,
         })
         .single();
