@@ -2,7 +2,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { Tables } from "@/databaseTypesFile";
 import { Schema } from "@/databaseUtils";
 import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 import { DbAvailableDaysType } from "@/common/fetch";
 
@@ -177,7 +177,7 @@ export const insertNewCollectionCentre = async (
 export type UpdateCollectionCentreResult = {
     error: {
         type: "UpdateCollectionCentreFailed" | "ConcurrentEditCollectionCentre";
-        logId: string;
+        logId: string | null;
     } | null;
 };
 
@@ -203,8 +203,7 @@ export const updateDbCollectionCentre = async (
     }
 
     if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of collection centre");
-        return { error: { type: "ConcurrentEditCollectionCentre", logId } };
+        return { error: { type: "ConcurrentEditCollectionCentre", logId: null } };
     }
 
     return { error: null };

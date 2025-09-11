@@ -199,7 +199,7 @@ const parcelModalRouterPath = (parcelId: string): string => `/parcels?parcelId=$
 
 const databaseErrorMessageFromErrorType = (
     errorType: WriteParcelToDatabaseErrors,
-    logId: string
+    logId: string | null
 ): string => {
     switch (errorType) {
         case "failedToInsertParcel":
@@ -209,7 +209,7 @@ const databaseErrorMessageFromErrorType = (
         case "failedToUpdateDeliveryInstructions":
             return `Failed to update delivery instructions. Log ID: ${logId}`;
         case "concurrentUpdateConflict":
-            return `Record has been edited recently - please refresh the page. LogID: ${logId}`;
+            return "Record has been edited recently - please refresh the page.";
     }
 };
 

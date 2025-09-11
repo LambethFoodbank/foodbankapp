@@ -1,7 +1,7 @@
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { checkboxGroupToArray, Person } from "@/components/Form/formFunctions";
 import supabase from "@/supabaseClient";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { ClientFields } from "./ClientForm";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
@@ -110,12 +110,12 @@ export const submitAddClientForm = async (fields: ClientFields): Promise<addClie
     return { clientId: clientId, error: null };
 };
 
-type editClientErrors = "failedToUpdateClientAndFamily" | "noRowsUpdated";
+type editClientErrors = "failedToUpdateClientAndFamily" | "noRowsUpdated" | "concurrentEdit";
 type editClientResult =
     | { clientId: string; error: null }
     | {
           clientId: null;
-          error: { type: editClientErrors; logId: string } | null;
+          error: { type: editClientErrors; logId: string | null } | null;
       };
 
 export const submitEditClientForm = async (
@@ -154,11 +154,7 @@ export const submitEditClientForm = async (
     }
 
     if (clientDataAndCount.updatedrows === 0) {
-        const logId = await logWarningReturnLogId(
-            "Concurrent editing of client or editing deleted client"
-        );
-        await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-        return { clientId: null, error: { type: "noRowsUpdated", logId } };
+        return { clientId: null, error: { type: "concurrentEdit", logId: null } };
     }
 
     await sendAuditLog({

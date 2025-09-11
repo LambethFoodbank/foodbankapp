@@ -213,18 +213,16 @@ const PackingSlotsTable: React.FC = () => {
                     let message = `Failed to update the packing slot. Log ID: ${updatePackingSlotError.logId}`;
 
                     if (updatePackingSlotError.type === "ConcurrentEditPackingSlots") {
-                        message =
-                            "Record has been edited recently - please refresh the page." +
-                            `Log ID: ${updatePackingSlotError.logId}`;
+                        message = "Record has been edited recently - please refresh the page.";
+                    } else {
+                        void sendAuditLog({
+                            ...baseAuditLog,
+                            wasSuccess: false,
+                            logId: updatePackingSlotError.logId ?? "",
+                        });
                     }
 
                     setErrorMessage(message);
-
-                    void sendAuditLog({
-                        ...baseAuditLog,
-                        wasSuccess: false,
-                        logId: updatePackingSlotError.logId,
-                    });
 
                     throw new Error(message);
                 } else {

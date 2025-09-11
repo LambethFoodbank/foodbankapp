@@ -5,7 +5,7 @@ import {
 } from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import { DatabaseError } from "@/app/errorClasses";
 import { Tables } from "@/databaseTypesFile";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 
 type DbPackingSlot = Tables<"packing_slots">;
@@ -86,7 +86,7 @@ export const insertNewPackingSlot = async (
 type UpdatePackingSlotResult = {
     error: {
         type: "UpdatePackingSlotsFailed" | "ConcurrentEditPackingSlots";
-        logId: string;
+        logId: string | null;
     } | null;
 };
 
@@ -118,8 +118,7 @@ export const updateDbPackingSlot = async (
         return { error: { type: "UpdatePackingSlotsFailed", logId } };
     }
     if (count === 0) {
-        const logId = await logWarningReturnLogId("Concurrent editing of packing slots");
-        return { error: { type: "ConcurrentEditPackingSlots", logId } };
+        return { error: { type: "ConcurrentEditPackingSlots", logId: null } };
     }
 
     return { error: null };

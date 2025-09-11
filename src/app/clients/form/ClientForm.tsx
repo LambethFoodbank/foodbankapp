@@ -190,6 +190,11 @@ const ClientForm: React.FC<Props> = ({
                             `Update failed, please refresh. If the error persists, the client may have been deleted. Log ID: ${editClientError.logId}`
                         );
                         break;
+                    case "concurrentEdit":
+                        setSubmitErrorMessage(
+                            "Record has been edited recently - please refresh the page."
+                        );
+                        break;
                 }
                 setSubmitDisabled(false);
                 return;
