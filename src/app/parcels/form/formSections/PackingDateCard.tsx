@@ -1,5 +1,11 @@
-import React from "react";
-import { FormErrors, getErrorText, onChangeDate, Setter } from "@/components/Form/formFunctions";
+import React, { useEffect } from "react";
+import {
+    Errors,
+    FormErrors,
+    getErrorText,
+    onChangeDate,
+    Setter,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ErrorText } from "@/components/Form/formStyling";
@@ -12,6 +18,20 @@ const PackingDateCard: React.FC<ParcelCardProps> = ({
     formErrors,
     fields,
 }) => {
+    useEffect(() => {
+        const firstRegisteredDate = dayjs("2000-01-01");
+
+        if (
+            !fields.packingDate ||
+            !dayjs(fields.packingDate).isValid() ||
+            dayjs(fields.packingDate).isBefore(firstRegisteredDate)
+        ) {
+            errorSetter({ packingDate: Errors.invalid });
+        } else {
+            errorSetter({ packingDate: Errors.none });
+        }
+    }, [fields.packingDate]);
+
     return (
         <GenericFormCard
             title="Packing Date"
