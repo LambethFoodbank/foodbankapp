@@ -1,6 +1,6 @@
 import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
 import { displayPostcodeForHomelessClient } from "./format";
-import { DbClientRow, DbParcelRow } from "@/databaseUtils";
+import { DbClientRow, DbEmergencyBagRow, DbParcelRow } from "@/databaseUtils";
 import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/format";
 import { ParcelsFilterMethod, ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { serverSideChecklistFilter } from "@/components/Tables/ChecklistFilter";
@@ -9,7 +9,9 @@ const textFilterDelimiter = ",";
 const defaultQueryFilterRegex = /[^a-zA-Z0-9 '\-+?]/g;
 const emailQueryFilterRegex = /[^a-zA-Z0-9+-~!#$&`./=^'{}|@]/g;
 
-export const dbFilterWithSubstringQueries = <DbData extends DbClientRow | DbParcelRow>(
+export const dbFilterWithSubstringQueries = <
+    DbData extends DbClientRow | DbParcelRow | DbEmergencyBagRow,
+>(
     substringToSubqueryMap: (value: string) => string,
     regex: RegExp = defaultQueryFilterRegex
 ): ServerSideFilterMethod<DbData, string> => {
@@ -140,3 +142,27 @@ export function deliveryAreaFilter(
         isRadio: true,
     });
 }
+
+export const typeSearch = <DbData extends DbEmergencyBagRow>(
+    typeColumnLabel: Extract<keyof DbData, "type">
+): ServerSideFilterMethod<DbData, string> => {
+    return dbFilterWithSubstringQueries((substring) => {
+        return `${typeColumnLabel}.ilike.%${substring.toLowerCase()}%)`;
+    });
+};
+
+export const amountSearch = <DbData extends DbEmergencyBagRow>(
+    amountColumnLabel: Extract<keyof DbData, "amount">
+): ServerSideFilterMethod<DbData, string> => {
+    return dbFilterWithSubstringQueries((substring) => {
+        const substringAsNumber = Number(substring);
+
+        if (Number.isNaN(substringAsNumber) || substringAsNumber === 0) {
+            return `${amountColumnLabel}.eq.-1`;
+        }
+        if (substringAsNumber >= 1000) {
+            return `${amountColumnLabel}.gte.1000`;
+        }
+        return `${amountColumnLabel}.eq.${substringAsNumber}`;
+    });
+};

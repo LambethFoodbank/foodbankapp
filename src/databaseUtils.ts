@@ -29,10 +29,12 @@ export type TableNames = keyof Tables;
 export type ViewNames = keyof Views;
 
 export type ParcelStatus = Schema["status_order"]["event_name"];
+export type EmergencyBagStatus = ParcelStatus;
 
 export type DbAuditLogRow = ViewSchema["audit_log_plus"];
 export type DbClientRow = ViewSchema["clients_plus"];
 export type DbParcelRow = ViewSchema["parcels_plus"];
 export type DbReportRow = ViewSchema["reports"];
 export type DbWikiRow = Schema["wiki"];
+export type DbEmergencyBagRow = ViewSchema["emergency_bags_plus"];
 export type DbClientTableRow = Schema["clients"];

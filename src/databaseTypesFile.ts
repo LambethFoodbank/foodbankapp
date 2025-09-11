@@ -120,6 +120,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "audit_log_emergency_bag_id_fkey"
+            columns: ["emergency_bag_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_bags_plus"
+            referencedColumns: ["emergency_bag_id"]
+          },
+          {
             foreignKeyName: "audit_log_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
@@ -1024,6 +1031,19 @@ export type Database = {
             | null
           vegan: Database["public"]["Enums"]["item_dietary_status"] | null
           vegetarian: Database["public"]["Enums"]["item_dietary_status"] | null
+        }
+        Relationships: []
+      }
+      emergency_bags_plus: {
+        Row: {
+          amount: number | null
+          collection_centre_acronym: string | null
+          collection_centre_name: string | null
+          created_at: string | null
+          emergency_bag_id: string | null
+          is_delivery: boolean | null
+          packing_date: string | null
+          type: string | null
         }
         Relationships: []
       }
