@@ -10,7 +10,7 @@ import { ClientCardProps } from "../ClientForm";
 interface SelectableItem {
     primaryKey: string;
     name: string;
-    isAvailable: boolean;
+    isAvailable?: boolean;
     additionalInfoField?: boolean;
     notes?: string;
 }
