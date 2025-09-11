@@ -342,6 +342,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 ),
                 collectionSlot: switchErrorForCollectionSlot(
                     fields,
+                    collectionCentreIsActive,
                     collectionSlotsLabelsAndValues,
                     availableDaysForCentre
                 ),
