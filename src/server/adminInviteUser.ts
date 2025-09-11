@@ -57,7 +57,7 @@ export async function adminInviteUser(
         content: {
             before: {},
             after: {},
-            actionType: 'Create',
+            actionType: "Create",
             email: userDetails.email,
             redirectTo: redirectUrl,
         },

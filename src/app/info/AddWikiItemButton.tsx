@@ -35,10 +35,23 @@ const AddWikiItemButton: React.FC<AddWikiItemButtonProps> = ({
         }
         const insertResponse = await createItemInWikiTable();
         if (insertResponse.error || !insertResponse.data) {
-            const logId = await logErrorReturnLogId("error inserting and fetching new data", insertResponse.error)
-            await sendAuditLog({ action: "add wiki item", content: { before: {}, after: {}, actionType: "Create"}, wasSuccess: false, logId });
+            const logId = await logErrorReturnLogId(
+                "error inserting and fetching new data",
+                insertResponse.error
+            );
+            await sendAuditLog({
+                action: "add wiki item",
+                content: { before: {}, after: {}, actionType: "Create" },
+                wasSuccess: false,
+                logId,
+            });
         } else {
-            await sendAuditLog({ action: "add wiki item", content: { before: {}, after: {}, actionType: "Create" }, wasSuccess: true, wikiId: insertResponse.data.wiki_key});
+            await sendAuditLog({
+                action: "add wiki item",
+                content: { before: {}, after: {}, actionType: "Create" },
+                wasSuccess: true,
+                wikiId: insertResponse.data.wiki_key,
+            });
             appendNewRow(insertResponse.data, -1);
         }
     };

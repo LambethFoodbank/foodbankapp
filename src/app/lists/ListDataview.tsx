@@ -192,8 +192,8 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
             action: `move a list item ${row1.rowOrder <= row2.rowOrder ? "down" : "up"}`,
             listId: row1.primaryKey,
             content: {
-                before: { 'row_order': row2.rowOrder },
-                after: { 'row_order': row1.rowOrder },
+                before: { row_order: row2.rowOrder },
+                after: { row_order: row1.rowOrder },
                 actionType: "Edit",
             },
         } as const satisfies Partial<AuditLog>;
@@ -202,8 +202,8 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
             action: `move a list item ${row2.rowOrder <= row1.rowOrder ? "down" : "up"}`,
             listId: row2.primaryKey,
             content: {
-                before: { 'row_order': row1.rowOrder },
-                after: { 'row_order': row2.rowOrder },
+                before: { row_order: row1.rowOrder },
+                after: { row_order: row2.rowOrder },
                 actionType: "Edit",
             },
         } as const satisfies Partial<AuditLog>;

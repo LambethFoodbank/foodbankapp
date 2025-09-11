@@ -7,7 +7,6 @@ import { Json } from "@/databaseTypesFile";
 import { getSupabaseServerComponentClient } from "@/supabaseServer";
 import { getCurrentProfile } from "./getCurrentProfile";
 
-
 type AuditLogInsertRecord = InsertSchema["audit_log"];
 export interface AuditLog {
     action: string;
@@ -66,4 +65,3 @@ export async function sendAuditLog(auditLogProps: AuditLog): Promise<void> {
         throw new DatabaseError("insert", "audit log", logId);
     }
 }
-

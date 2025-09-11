@@ -113,7 +113,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
                 before: {},
                 after: {},
                 actionType: "File",
-                parcelIds: parcelIds
+                parcelIds: parcelIds,
             },
         });
         props.postSuccessCallback();
@@ -134,7 +134,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
                 before: {},
                 after: {},
                 actionType: "File",
-                parcelIds: parcelIds
+                parcelIds: parcelIds,
             },
             logId: pdfError.logId,
         });

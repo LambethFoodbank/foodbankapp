@@ -34,20 +34,29 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
-import { fetchCollectionCentreWithId, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
+import {
+    fetchCollectionCentreWithId,
+    getBeforeAndAfter,
+    RowType,
+} from "@/app/logs/fetchForAuditLog";
 import CollectionCentreAvailableDaysModal from "./CollectionCentreAvailableDaysModal";
 
 function getBaseAuditLogForCollectionCentreAction(
     action: string,
     newCollectionCentreRow: CollectionCentresTableRow,
     oldCollectionCentreRow: CollectionCentresTableRow,
-    actionType: string,
+    actionType: string
 ): Pick<AuditLog, "action" | "content" | "collectionCentreId"> {
-    const beforeAndAfter = getBeforeAndAfter(oldCollectionCentreRow, newCollectionCentreRow, ['timeSlots', 'availableDays']);
+    const beforeAndAfter = getBeforeAndAfter(
+        oldCollectionCentreRow as unknown as RowType,
+        newCollectionCentreRow as unknown as RowType,
+        ["timeSlots", "availableDays"]
+    );
     return {
         action,
         content: {
-            ...beforeAndAfter,
+            before: JSON.stringify(beforeAndAfter.before),
+            after: JSON.stringify(beforeAndAfter.after),
             actionType,
         },
         collectionCentreId: newCollectionCentreRow.id,
@@ -151,12 +160,12 @@ const CollectionCentresTable: React.FC = () => {
             ...newRow,
             originalLastUpdated: originalTimestampsRef.current[newRow.id],
         };
-        const {data: oldRow, error: fetchOldRowError }= await fetchCollectionCentreWithId(newRow.id);
+        const { data: oldRow, error: fetchOldRowError } = await fetchCollectionCentreWithId(
+            newRow.id
+        );
 
         if (fetchOldRowError) {
-            setErrorMessage(
-                `Failed to fetch collection centre. Log ID: ${fetchOldRowError.logId}`
-            );
+            setErrorMessage(`Failed to fetch collection centre. Log ID: ${fetchOldRowError.logId}`);
             await sendAuditLog({
                 action: "update a collection centre",
                 content: {
@@ -172,7 +181,7 @@ const CollectionCentresTable: React.FC = () => {
                 error: {
                     type: "UpdateCollectionCentreFailed",
                     logId: fetchOldRowError.logId,
-                }
+                },
             };
         }
 
@@ -182,7 +191,7 @@ const CollectionCentresTable: React.FC = () => {
             "update a collection centre",
             newRow,
             oldRow,
-            'Edit'
+            "Edit"
         );
 
         if (updateCollectionCentreError) {

@@ -70,7 +70,7 @@ const DayOverviewModal: React.FC<ActionModalProps> = (props) => {
                 before: {},
                 after: {},
                 actionType: "File",
-                parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId)
+                parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId),
             },
         });
         props.postSuccessCallback();
@@ -91,7 +91,7 @@ const DayOverviewModal: React.FC<ActionModalProps> = (props) => {
                 before: {},
                 after: {},
                 actionType: "File",
-                parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId)
+                parcelIds: props.selectedParcels.map((parcel) => parcel.parcelId),
             },
             logId: pdfError.logId,
         });

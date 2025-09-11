@@ -1,4 +1,4 @@
-import { FetchParcelError, fetchParcel } from "@/common/fetch";
+import { FetchParcelError } from "@/common/fetch";
 import { UpdateParcelError } from "../../form/submitFormHelpers";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
@@ -50,7 +50,34 @@ export const packingDateOrSlotUpdate = async (
         packing_slot?: string;
     };
 
-    const { data: values, error: fetchOldRowError } = await fetchPackingDateOrSlot(parcel, packingDateOrSlotData, updateField);
+    const { data: values, error: fetchOldRowError } = await fetchPackingDateOrSlot(
+        parcel,
+        packingDateOrSlotData,
+        updateField
+    );
+
+    if (fetchOldRowError) {
+        const logId = await logErrorReturnLogId(
+            "Error with update: parcel data",
+            fetchOldRowError.type
+        );
+        await sendAuditLog({
+            action: updateField === "packingDate" ? "change packing date" : "change packing slot",
+            content: {
+                before: {},
+                after: {},
+                actionType: "Edit",
+            },
+            clientId: parcel.clientId,
+            parcelId: parcel.parcelId,
+            wasSuccess: false,
+            logId,
+        });
+        return {
+            parcelId: null,
+            error: { type: "failedToUpdateParcel", logId } as UpdateParcelError,
+        };
+    }
 
     const packingDateOrSlotDbUpdate = async (
         fieldToUpdate: FieldToUpdate
@@ -84,7 +111,7 @@ export const packingDateOrSlotUpdate = async (
         content: {
             before: { [updateField]: values?.oldValue },
             after: { [updateField]: values?.newValue },
-            actionType: 'Edit',
+            actionType: "Edit",
             count: updateResponse.count,
         },
         clientId: parcel.clientId,

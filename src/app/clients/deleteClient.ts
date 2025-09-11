@@ -21,7 +21,7 @@ const deleteClient = async (clientId: string): Promise<DeleteClientResponse> => 
             before: {},
             after: {},
             actionType: "Delete",
-            clientId
+            clientId,
         },
     };
 

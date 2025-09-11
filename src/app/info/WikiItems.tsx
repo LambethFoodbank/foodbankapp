@@ -177,7 +177,7 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
                 after: {
                     rowOrder: row2.row_order,
                 },
-                actionType: 'Edit',
+                actionType: "Edit",
                 // itemName: row1.title,
                 // oldRowOrder: row1.row_order,
             },

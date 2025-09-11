@@ -4,9 +4,13 @@ import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { Errors } from "@/components/Form/formFunctions";
 import { ParcelFields } from "@/app/parcels/form/ParcelForm";
-import { CollectionTimeSlotsLabelsAndValues, DbAvailableDaysType, fetchParcel } from "@/common/fetch";
+import {
+    CollectionTimeSlotsLabelsAndValues,
+    DbAvailableDaysType,
+    fetchParcel,
+} from "@/common/fetch";
 import dayjs from "dayjs";
-import { getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
+import { getBeforeAndAfter, RowType } from "@/app/logs/fetchForAuditLog";
 
 export type WriteParcelToDatabaseFunction = UpdateParcel | InsertParcel;
 export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelErrorType;
@@ -151,7 +155,6 @@ type UpdateParcel = (
 
 export const updateParcel: UpdateParcelWithPrimaryKey =
     (primaryKey) => async (parcelRecord, deliveryInstructions) => {
-
         const { data: oldRow, error: fetchOldRowError } = await fetchParcel(primaryKey, supabase);
 
         if (fetchOldRowError) {
@@ -167,7 +170,7 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
                     actionType: "Edit",
                 },
                 wasSuccess: false,
-                logId
+                logId,
             });
             console.log("Error with old row");
             return { parcelId: null, error: { type: "failedToUpdateParcel", logId } };
@@ -196,19 +199,22 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
                     actionType: "Edit",
                 },
                 wasSuccess: false,
-                logId
+                logId,
             });
             console.log("Error with new row");
             return { parcelId: null, error: { type: "failedToUpdateParcel", logId } };
         }
 
-        const beforeAndAfter = getBeforeAndAfter(oldRow, newRow);
+        const beforeAndAfter = getBeforeAndAfter(
+            oldRow as unknown as RowType,
+            newRow as unknown as RowType
+        );
 
         const auditLog = {
             action: "edit a parcel",
             content: {
-                before: beforeAndAfter.before,
-                after: beforeAndAfter.after,
+                before: JSON.stringify(beforeAndAfter.before),
+                after: JSON.stringify(beforeAndAfter.after),
                 actionType: "Edit",
                 count: parcelDataAndCount?.[0].rows_updated,
             },

@@ -51,7 +51,7 @@ export const updateDbWebsiteData = async (
         name: row.dbName,
         value: row.value,
     };
-    const { data: oldRow, error: fetchOldRowError }= await fetchWebsiteDataRow(row.dbName);
+    const { data: oldRow, error: fetchOldRowError } = await fetchWebsiteDataRow(row.dbName);
     console.log(oldRow);
 
     if (fetchOldRowError) {
@@ -60,16 +60,16 @@ export const updateDbWebsiteData = async (
             content: {
                 before: {},
                 after: {},
-                actionType: 'Edit',
+                actionType: "Edit",
             },
             action: "update website data",
             wasSuccess: false,
-            logId
+            logId,
         });
         return { error: { type: "failedToUpdateWebsiteData", logId } };
     }
 
-    const { data: updatedWebsiteData, error } = await supabase
+    const { error } = await supabase
         .from("website_data")
         .update(processedData)
         .eq("name", processedData.name)
@@ -81,8 +81,9 @@ export const updateDbWebsiteData = async (
     const auditLog = {
         action: "update website data",
         content: {
-            ...beforeAndAfter,
-            actionType: 'Edit',
+            before: JSON.stringify(beforeAndAfter.before),
+            after: JSON.stringify(beforeAndAfter.after),
+            actionType: "Edit",
         },
         websiteData: processedData.name,
     } as const satisfies Partial<AuditLog>;

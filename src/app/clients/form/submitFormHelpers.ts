@@ -5,7 +5,10 @@ import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { ClientFields } from "./ClientForm";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ListType } from "@/common/databaseListTypes";
-import { fetchClientAndFamily, getBeforeAndAfterClientAndFamily } from "@/app/logs/fetchForAuditLog";
+import {
+    fetchClientAndFamily,
+    getBeforeAndAfterClientAndFamily,
+} from "@/app/logs/fetchForAuditLog";
 
 export type FamilyDatabaseInsertRecord = Omit<InsertSchema["families"], "family_id">;
 export type ClientDatabaseInsertRecord = InsertSchema["clients"];
@@ -129,7 +132,7 @@ export const submitEditClientForm = async (
     const clientRecord = formatClientRecord(fields);
     const familyMembers = getFamilyMembersForDatabase(fields.adults, fields.children);
 
-    const { data: oldRow, error: fetchOldRowError} = await fetchClientAndFamily(primaryKey);
+    const { data: oldRow, error: fetchOldRowError } = await fetchClientAndFamily(primaryKey);
 
     if (fetchOldRowError) {
         const logId = fetchOldRowError.logId;
@@ -137,11 +140,11 @@ export const submitEditClientForm = async (
             content: {
                 before: {},
                 after: {},
-                actionType: 'Edit',
+                actionType: "Edit",
             },
-            action: 'edit a client',
+            action: "edit a client",
             wasSuccess: false,
-            logId
+            logId,
         });
         return { clientId: null, error: { type: "failedToUpdateClientAndFamily", logId } };
     }
@@ -160,17 +163,16 @@ export const submitEditClientForm = async (
         oldRow.family,
         {
             ...clientRecord,
-            extra_information: clientRecord.extra_information ?? oldRow.client.extra_information,
-            signposting_call_required: clientRecord.signposting_call_required ?? oldRow.client.signposting_call_required
         },
         familyMembers
-    ); // NO EXTRA INFO FIELD AND NO SIGNPOSTING CALL REQUIRED
+    );
 
     const auditLog = {
         action: "edit a client",
         content: {
-            ...beforeAndAfter,
-            actionType: 'Edit'
+            before: JSON.stringify(beforeAndAfter.before),
+            after: JSON.stringify(beforeAndAfter.after),
+            actionType: "Edit",
         },
         clientId: primaryKey,
     } as const satisfies Partial<AuditLog>;

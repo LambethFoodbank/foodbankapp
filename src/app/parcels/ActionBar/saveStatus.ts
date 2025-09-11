@@ -37,8 +37,8 @@ export const saveParcelStatus = async (
             };
         })
         .flat();
-    
-    const auditLogs = await eventsToInsert.map( async (eventToInsert) => {
+
+    const auditLogs = await eventsToInsert.map(async (eventToInsert) => {
         const oldStatus = await fetchParcelStatus(eventToInsert.parcel_id);
         return {
             action: action ?? "change parcel status",
@@ -50,10 +50,10 @@ export const saveParcelStatus = async (
                     parcelStatus: eventToInsert.new_parcel_status,
                 },
                 actionType: "Edit",
-                eventToInsert
+                eventToInsert,
             },
             parcelId: eventToInsert.parcel_id,
-        }
+        };
     });
 
     const { data, error } = await supabase
@@ -69,10 +69,11 @@ export const saveParcelStatus = async (
         return { error: { type: "eventInsertionFailed", logId: logId } };
     }
 
-    auditLogs.forEach( async (auditLog) =>
+    auditLogs.forEach(async (auditLog) =>
         sendAuditLog({
             ...(await auditLog),
-            eventId: data.find(async (event) => (await auditLog).parcelId === event.parcel_id)?.event_id,
+            eventId: data.find(async (event) => (await auditLog).parcelId === event.parcel_id)
+                ?.event_id,
             wasSuccess: true,
         })
     );

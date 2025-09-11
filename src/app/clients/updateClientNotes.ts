@@ -12,19 +12,19 @@ export const updateClientNotes = async (
     notes: string | null,
     lastUpdated: string | undefined
 ): Promise<UpdateClientNotesResponse> => {
-    const { data: oldRow, error: fetchOldRowError} = await fetchClient(clientId);
-    
+    const { data: oldRow, error: fetchOldRowError } = await fetchClient(clientId);
+
     if (fetchOldRowError) {
         const logId = fetchOldRowError.logId;
         await sendAuditLog({
             content: {
                 before: {},
                 after: {},
-                actionType: 'Edit',
+                actionType: "Edit",
             },
-            action: 'update client notes',
+            action: "update client notes",
             wasSuccess: false,
-            logId
+            logId,
         });
         return { error: { type: "updateNotesFailed", logId } };
     }
@@ -32,7 +32,7 @@ export const updateClientNotes = async (
         action: "update client notes",
         clientId,
         content: {
-            before: { notes: oldRow.notes ?? ""},
+            before: { notes: oldRow.notes ?? "" },
             after: { notes: notes },
             actionType: "Edit",
         },

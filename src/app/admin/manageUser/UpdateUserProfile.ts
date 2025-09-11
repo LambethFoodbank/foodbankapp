@@ -3,7 +3,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { UserRole } from "@/databaseUtils";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { sendAuditLog } from "@/server/auditLog";
-import { fetchUpdateUserProfile, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
+import { fetchUpdateUserProfile, getBeforeAndAfter, RowType } from "@/app/logs/fetchForAuditLog";
 
 export interface UpdateUserProfile {
     profileId: string;
@@ -17,8 +17,9 @@ export interface UpdateUserProfile {
 export async function updateUserProfile(
     userDetails: UpdateUserProfile
 ): Promise<PostgrestError | null> {
-
-    const { data: oldRow, error: fetchOldRowError } = await fetchUpdateUserProfile(userDetails.profileId);
+    const { data: oldRow, error: fetchOldRowError } = await fetchUpdateUserProfile(
+        userDetails.profileId
+    );
 
     if (fetchOldRowError) {
         await sendAuditLog({
@@ -26,7 +27,7 @@ export async function updateUserProfile(
             content: {
                 before: {},
                 after: {},
-                actionType: 'Edit',
+                actionType: "Edit",
             },
             wasSuccess: false,
             logId: fetchOldRowError.logId,
@@ -46,12 +47,16 @@ export async function updateUserProfile(
         .eq("primary_key", userDetails.profileId)
         .single();
 
-    const beforeAndAfter = getBeforeAndAfter(oldRow, userDetails);
+    const beforeAndAfter = getBeforeAndAfter(
+        oldRow as unknown as RowType,
+        userDetails as unknown as RowType
+    );
 
     const auditLog = {
         action: "edit a user",
         content: {
-            ...beforeAndAfter,
+            before: JSON.stringify(beforeAndAfter.before),
+            after: JSON.stringify(beforeAndAfter.after),
             actionType: "Edit",
         },
         profileId: userDetails.profileId,

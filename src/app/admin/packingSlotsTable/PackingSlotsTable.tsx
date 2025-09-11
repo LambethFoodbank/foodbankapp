@@ -33,7 +33,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import StyledDataGrid from "../common/StyledDataGrid";
 import Header from "../websiteDataTable/Header";
-import { fetchPackingSlot, getBeforeAndAfter } from "@/app/logs/fetchForAuditLog";
+import { fetchPackingSlot, getBeforeAndAfter, RowType } from "@/app/logs/fetchForAuditLog";
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -84,11 +84,15 @@ function getBaseAuditLogForPackingSlotAction(
     oldRow: PackingSlotRow,
     actionType: string
 ): Pick<AuditLog, "action" | "content" | "packingSlotId"> {
-    const beforeAndAfter = getBeforeAndAfter(packingSlotRow, oldRow);
+    const beforeAndAfter = getBeforeAndAfter(
+        packingSlotRow as unknown as RowType,
+        oldRow as unknown as RowType
+    );
     return {
         action,
         content: {
-            ...beforeAndAfter,
+            before: JSON.stringify(beforeAndAfter.before),
+            after: JSON.stringify(beforeAndAfter.after),
             actionType,
         },
         packingSlotId: packingSlotRow.id,
@@ -177,7 +181,7 @@ const PackingSlotsTable: React.FC = () => {
                     "add a new packing slot",
                     newRow,
                     {} as PackingSlotRow,
-                    'Create'
+                    "Create"
                 );
 
                 if (insertPackingSlotError) {
@@ -201,10 +205,12 @@ const PackingSlotsTable: React.FC = () => {
                     });
                 }
             } else {
-                const { data: oldRow, error: fetchOldRowError } = await fetchPackingSlot(rowWithOriginal.id);
+                const { data: oldRow, error: fetchOldRowError } = await fetchPackingSlot(
+                    rowWithOriginal.id
+                );
 
                 if (fetchOldRowError) {
-                    let message = `Failed to update the packing slot. Log ID: ${fetchOldRowError.logId}`;
+                    const message = `Failed to update the packing slot. Log ID: ${fetchOldRowError.logId}`;
 
                     setErrorMessage(message);
 
@@ -212,7 +218,7 @@ const PackingSlotsTable: React.FC = () => {
                         content: {
                             before: {},
                             after: {},
-                            actionType: 'Edit',
+                            actionType: "Edit",
                         },
                         action: "update a packing slot",
                         packingSlotId: rowWithOriginal.id,
@@ -230,7 +236,7 @@ const PackingSlotsTable: React.FC = () => {
                     "update a packing slot",
                     newRow,
                     oldRow,
-                    'Edit'
+                    "Edit"
                 );
 
                 if (updatePackingSlotError) {
@@ -316,7 +322,12 @@ const PackingSlotsTable: React.FC = () => {
             const rowTwo = rows[rowIndex - 1];
             const { error: swapRowsError } = await swapRows(rowOne, rowTwo);
 
-            const baseAuditLog = getBaseAuditLogForPackingSlotAction("move a packing slot up", row, {...row, order: row.order - 1}, 'Edit');
+            const baseAuditLog = getBaseAuditLogForPackingSlotAction(
+                "move a packing slot up",
+                row,
+                { ...row, order: row.order - 1 },
+                "Edit"
+            );
 
             if (swapRowsError) {
                 setErrorMessage(
@@ -348,7 +359,7 @@ const PackingSlotsTable: React.FC = () => {
                 "move a packing slot down",
                 row,
                 { ...row, order: row.order + 1 },
-                'Edit'
+                "Edit"
             );
 
             if (swapRowsError) {

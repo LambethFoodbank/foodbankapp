@@ -107,13 +107,14 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                         title: newTitle,
                         content: newContent,
                     }
-                )
+                );
 
                 const auditLog = {
                     action: "edit a wiki item",
                     wikiId: rowData.wiki_key,
                     content: {
-                        ...beforeAndAfter,
+                        before: JSON.stringify(beforeAndAfter.before),
+                        after: JSON.stringify(beforeAndAfter.after),
                         actionType: "Edit",
                         itemTitle: newTitle,
                         itemContent: newContent,

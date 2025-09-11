@@ -14,7 +14,7 @@ import Button from "@mui/material/Button/Button";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { capitaliseWords } from "@/common/format";
-import { fetchList, getBeforeAndAfter } from "../logs/fetchForAuditLog";
+import { fetchList, getBeforeAndAfter, RowType } from "../logs/fetchForAuditLog";
 
 interface Props {
     onClose: () => void;
@@ -124,10 +124,10 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
                 content: {
                     before: {},
                     after: {},
-                    actionType: "Edit"
+                    actionType: "Edit",
                 },
                 wasSuccess: false,
-                logId
+                logId,
             });
             setErrorMessage(`Failed to update a list item. Log ID: ${logId}`);
             return { error: { type: "failedToEditListItem", logId } };
@@ -140,17 +140,20 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
             .select()
             .single();
 
-        const beforeAndAfter = getBeforeAndAfter(oldRow, listItem);
-            
+        const beforeAndAfter = getBeforeAndAfter(
+            oldRow as unknown as RowType,
+            listItem as unknown as RowType
+        );
+
         const auditLog = {
             content: {
-                ...beforeAndAfter,
+                before: JSON.stringify(beforeAndAfter.before),
+                after: JSON.stringify(beforeAndAfter.after),
                 actionType: "Edit",
             },
             action: "edit a list item",
             listId: listItem.primary_key,
         } as const satisfies Partial<AuditLog>;
-
 
         if (updateListItemError) {
             const logId = await logErrorReturnLogId("failed to update list item", {
