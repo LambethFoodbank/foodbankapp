@@ -310,8 +310,18 @@ export const formatItemsBreakdownFromArray = (
         arr = [];
     }
 
+    const seenNames = new Set<string | null>();
+    const filteredArr = arr.filter((clientPreferredItem) => {
+        const name = clientPreferredItem.item?.item_name ?? clientPreferredItem.item_id;
+        if (clientPreferredItem.item?.item_type === itemType && !seenNames.has(name)) {
+            seenNames.add(name);
+            return true;
+        }
+        return false;
+    });
+
     return formatBreakdownFromArray(
-        arr.filter((clientPreferredItem) => clientPreferredItem.item?.item_type === itemType),
+        filteredArr,
         (clientPreferredItem) => clientPreferredItem.item?.item_name ?? clientPreferredItem.item_id,
         (clientPreferredItem) => clientPreferredItem.notes
     );

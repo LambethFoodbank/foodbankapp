@@ -30,14 +30,28 @@ function SelectionGenericCard<T extends SelectableItem>({
     const selected = (fields[fieldName] ?? []) as T[];
     const selectedKeys = selected.map((item) => item.primaryKey);
 
-    const handleChange = (key: string, checked: boolean): void => {
-        const newSelected = onChangeSelectionByPrimaryKey(selected, items, key, checked);
+    const groupedItems = items.reduce((acc, item) => {
+        if (!acc.has(item.name)) {
+            acc.set(item.name, []);
+        }
+        acc.get(item.name)?.push(item);
+        return acc;
+    }, new Map<string, T[]>());
+
+    const handleChangeByName = (name: string, checked: boolean): void => {
+        const group = groupedItems.get(name) || [];
+        const newSelected = group.reduce(
+            (acc, item) => onChangeSelectionByPrimaryKey(acc, items, item.primaryKey, checked),
+            selected
+        );
         fieldSetter({ [fieldName]: newSelected });
     };
 
-    const handleAdditionalInfoChange = (key: string, value: string): void => {
+    const handleAdditionalInfoChange = (group: T[], value: string): void => {
         const newSelected = selected.map((item) =>
-            item.primaryKey === key ? { ...item, notes: value } : item
+            group.some((g) => g.primaryKey === item.primaryKey && g.additionalInfoField)
+                ? { ...item, notes: value }
+                : item
         );
         fieldSetter({ [fieldName]: newSelected });
     };
@@ -49,38 +63,44 @@ function SelectionGenericCard<T extends SelectableItem>({
     return (
         <GenericFormCard title={title} required={false}>
             <FormGroup>
-                {items.map((item) => (
-                    <>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    name={item.primaryKey}
-                                    checked={selectedKeys.includes(item.primaryKey)}
-                                    onChange={(event) => {
-                                        const { name: key, checked } =
-                                            event.target as HTMLInputElement;
-                                        handleChange(key, checked);
-                                    }}
-                                />
-                            }
-                            label={item.name}
-                        />
-                        {item.additionalInfoField && selectedKeys.includes(item.primaryKey) && (
-                            <FreeFormTextInput
-                                label="Additional Info"
-                                defaultValue={
-                                    selected.find(
-                                        (selectedItem) =>
-                                            selectedItem.primaryKey === item.primaryKey
-                                    )?.notes ?? ""
+                {Array.from(groupedItems.entries()).map(([name, group]) => {
+                    const isChecked = group.every((item) => selectedKeys.includes(item.primaryKey));
+
+                    const showAdditionalInfo = group.some(
+                        (item) => item.additionalInfoField && selectedKeys.includes(item.primaryKey)
+                    );
+
+                    const firstSelectedItemWithNotes = group.find(
+                        (item) => selectedKeys.includes(item.primaryKey) && item.notes !== undefined
+                    );
+
+                    return (
+                        <React.Fragment key={name}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name={name}
+                                        checked={isChecked}
+                                        onChange={(event) => {
+                                            const { name, checked } = event.target;
+                                            handleChangeByName(name, checked);
+                                        }}
+                                    />
                                 }
-                                onChange={(event) =>
-                                    handleAdditionalInfoChange(item.primaryKey, event.target.value)
-                                }
+                                label={name}
                             />
-                        )}
-                    </>
-                ))}
+                            {showAdditionalInfo && (
+                                <FreeFormTextInput
+                                    label="Additional Info"
+                                    defaultValue={firstSelectedItemWithNotes?.notes ?? ""}
+                                    onChange={(event) =>
+                                        handleAdditionalInfoChange(group, event.target.value)
+                                    }
+                                />
+                            )}
+                        </React.Fragment>
+                    );
+                })}
             </FormGroup>
         </GenericFormCard>
     );
