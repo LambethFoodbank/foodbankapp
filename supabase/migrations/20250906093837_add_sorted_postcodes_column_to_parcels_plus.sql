@@ -35,6 +35,7 @@ select
     parcels.flagged_for_attention,
     parcels.signposting_call_required,
     array_to_string(clients.additional_phone_numbers, ', ') as client_additional_phone_numbers_text,
+    ((delivery_areas.postcode is not null and clients.is_active) is true or clients.address_postcode is null) as is_deliverable,
     clients_plus.sorted_address_postcode as sorted_client_address_postcode
 from parcels
      left join collection_centres on parcels.collection_centre = collection_centres.primary_key
@@ -43,6 +44,7 @@ from parcels
      left join packing_slots on parcels.packing_slot = packing_slots.primary_key
      left join family_count on family_count.family_id = clients.family_id
      left join parcels_events on parcels_events.parcel_id = parcels.primary_key
+     left join delivery_areas on split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode
 order by parcels.packing_date desc;
 
 

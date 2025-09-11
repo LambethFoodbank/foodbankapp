@@ -9,9 +9,11 @@ select
     family_count.family_count,
     clients.email,
     array_to_string(clients.additional_phone_numbers, ', ') as additional_phone_numbers_text,
+    ((delivery_areas.postcode is not null and clients.is_active is true) or clients.address_postcode is null) as is_deliverable,
     create_postcode_sort_key(clients.address_postcode) as sorted_address_postcode
 from
     clients
         left join family_count on clients.family_id = family_count.family_id
+        left join delivery_areas on split_part(clients.address_postcode, ' ', 1) = delivery_areas.postcode
 order by
     clients.full_name;
