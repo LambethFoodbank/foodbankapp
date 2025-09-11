@@ -17,6 +17,7 @@ interface SelectableItem {
 interface SelectionCardProps<T extends SelectableItem> extends ClientCardProps {
     items: T[];
     title: string;
+    cardDetails?: string;
     fieldName: keyof ClientCardProps["fields"];
 }
 
@@ -25,6 +26,7 @@ function SelectionGenericCard<T extends SelectableItem>({
     fields,
     items,
     title,
+    cardDetails,
     fieldName,
 }: SelectionCardProps<T>): React.JSX.Element {
     const selected = (fields[fieldName] ?? []) as T[];
@@ -49,7 +51,10 @@ function SelectionGenericCard<T extends SelectableItem>({
 
     const handleAdditionalInfoChange = (group: T[], value: string): void => {
         const newSelected = selected.map((item) =>
-            group.some((g) => g.primaryKey === item.primaryKey && g.additionalInfoField)
+            group.some(
+                (groupItem) =>
+                    groupItem.primaryKey === item.primaryKey && groupItem.additionalInfoField
+            )
                 ? { ...item, notes: value }
                 : item
         );
@@ -62,6 +67,7 @@ function SelectionGenericCard<T extends SelectableItem>({
 
     return (
         <GenericFormCard title={title} required={false}>
+            {cardDetails && <p>{cardDetails}</p>}
             <FormGroup>
                 {Array.from(groupedItems.entries()).map(([name, group]) => {
                     const isChecked = group.every((item) => selectedKeys.includes(item.primaryKey));
