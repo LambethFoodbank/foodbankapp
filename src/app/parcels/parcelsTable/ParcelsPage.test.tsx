@@ -59,6 +59,7 @@ const sampleProcessingData: DbParcelRow[] = [
         flagged_for_attention: false,
         signposting_call_required: true,
         client_email: "full.name@example.com",
+        is_deliverable: true,
     },
 ];
 
@@ -83,8 +84,11 @@ describe("Parcels Page", () => {
                     clientId: "PRIMARY_KEY2",
                     fullName: "CLIENT_NAME",
                     familyCategory: "Family of 3",
-                    addressPostcode: "SW1A 2AA",
                     phoneNumber: "08642 123",
+                    addressPostcode: {
+                        postcode: "SW1A 2AA",
+                        isDeliverable: true,
+                    },
                     collectionDatetime: new Date("2023-08-04T13:30:00+00:00"),
                     deliveryCollection: {
                         collectionCentreName: "COLLECTION_CENTRE",

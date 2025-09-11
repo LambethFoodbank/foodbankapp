@@ -11,8 +11,11 @@ import Localization from "@/app/Localization";
 const mockData: ParcelsTableRow[] = [
     {
         clientId: "primaryKey1",
-        addressPostcode: "AB1 2CD",
         phoneNumber: "0987 654321",
+        addressPostcode: {
+            postcode: "AB1 2CD",
+            isDeliverable: false,
+        },
         deliveryCollection: {
             collectionCentreName: "Centre 1",
             collectionCentreAcronym: "C1",
@@ -48,8 +51,11 @@ const mockData: ParcelsTableRow[] = [
     },
     {
         clientId: "primaryKey2",
-        addressPostcode: "AB1 aaaa2CD",
         phoneNumber: "+1 234 567",
+        addressPostcode: {
+            postcode: "AB1 aaaa2CD",
+            isDeliverable: false,
+        },
         deliveryCollection: {
             collectionCentreName: "Centraaaae 1",
             collectionCentreAcronym: "C2",

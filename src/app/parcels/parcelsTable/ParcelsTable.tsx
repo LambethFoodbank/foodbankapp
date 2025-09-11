@@ -20,11 +20,12 @@ import { parcelTableColumnStyleOptions } from "@/app/parcels/parcelsTable/styles
 import parcelsSortableColumns, {
     defaultParcelsSortConfig,
 } from "@/app/parcels/parcelsTable/sortableColumns";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { getParcelsTableDataAndAllIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
 import supabase from "@/supabaseClient";
 import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyling";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
+import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
 
 interface ParcelsTableProps {
     checkedParcelIds: string[];
@@ -214,8 +215,12 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         }
     }, [filteredParcelCount, checkedParcelIds, isAllCheckBoxSelected]);
 
+    const { role } = useContext(RoleUpdateContext);
+
     const onParcelTableRowClick = (row: Row<ParcelsTableRow>): void => {
-        openParcelModal(row.data.parcelId);
+        if (roleCanAccessOutsideDeliveryAreaModal(role, row.data.addressPostcode.isDeliverable)) {
+            openParcelModal(row.data.parcelId);
+        }
     };
 
     return (

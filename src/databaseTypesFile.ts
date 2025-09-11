@@ -17,6 +17,7 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
+          delivery_areas_id: string | null
           dietary_requirement: string | null
           event_id: string | null
           list_id: string | null
@@ -37,6 +38,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
@@ -57,6 +59,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
@@ -98,6 +101,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "parcels_plus"
             referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "audit_log_delivery_areas_id_fkey"
+            columns: ["delivery_areas_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_areas"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_event_id_fkey"
@@ -323,6 +333,21 @@ export type Database = {
           time_slots?:
             | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
             | null
+        }
+        Relationships: []
+      }
+      delivery_areas: {
+        Row: {
+          id: string
+          postcode: string
+        }
+        Insert: {
+          id?: string
+          postcode: string
+        }
+        Update: {
+          id?: string
+          postcode?: string
         }
         Relationships: []
       }
@@ -931,6 +956,7 @@ export type Database = {
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
+          is_deliverable: boolean | null
           phone_number: string | null
         }
         Relationships: []
@@ -999,6 +1025,7 @@ export type Database = {
           created_at: string | null
           family_count: number | null
           flagged_for_attention: boolean | null
+          is_deliverable: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null

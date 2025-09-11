@@ -63,8 +63,9 @@ const GenerateMapModal: React.FC<ActionModalProps> = (props) => {
 
     const formattedPostcodes = props.selectedParcels.reduce<string[]>(
         (formattedPostcodes, parcel) => {
-            if (parcel.addressPostcode && parcel.addressPostcode !== "-") {
-                formattedPostcodes.push(parcel.addressPostcode.replaceAll(" ", ""));
+            const parcelPostcode = parcel.addressPostcode.postcode;
+            if (parcelPostcode && parcelPostcode !== "-") {
+                formattedPostcodes.push(parcelPostcode.replaceAll(" ", ""));
             }
             return formattedPostcodes;
         },
