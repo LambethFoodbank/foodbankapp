@@ -3,12 +3,17 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import {
+    FormErrors,
     getDefaultTextValue,
     getErrorText,
     onChangeText,
+    Setter,
     valueOnChangeDropdownList,
 } from "@/components/Form/formFunctions";
-import { EmergencyBagCardProps } from "@/app/emergency-bags/form/EmergencyBagForm";
+import {
+    EmergencyBagCardProps,
+    EmergencyBagFields,
+} from "@/app/emergency-bags/form/EmergencyBagForm";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 
 const EMERGENCY_BAG_TYPES = ["Emergency Parcels", "Out of Date Crates", "Other"];
@@ -29,7 +34,11 @@ const TypeOfEmergencyBagCard: React.FC<EmergencyBagCardProps> = ({
                     labelsAndValues={typeOptions}
                     listTitle="Type"
                     value={fields.type ?? ""}
-                    onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "type")}
+                    onChange={valueOnChangeDropdownList(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<EmergencyBagFields>>,
+                        "type"
+                    )}
                 />
                 <ErrorText>{getErrorText(formErrors.type)}</ErrorText>
 
@@ -40,9 +49,14 @@ const TypeOfEmergencyBagCard: React.FC<EmergencyBagCardProps> = ({
                             id="other-type-information"
                             label="Extra information"
                             defaultValue={getDefaultTextValue(fields, "otherInfo")}
-                            onChange={onChangeText(fieldSetter, errorSetter, "otherInfo", {
-                                required: true,
-                            })}
+                            onChange={onChangeText(
+                                fieldSetter,
+                                errorSetter as Setter<FormErrors<EmergencyBagFields>>,
+                                "otherInfo",
+                                {
+                                    required: true,
+                                }
+                            )}
                         />
                         <ErrorText>{getErrorText(formErrors.otherInfo)}</ErrorText>
                     </>

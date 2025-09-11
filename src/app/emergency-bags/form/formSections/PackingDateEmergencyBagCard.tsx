@@ -1,10 +1,13 @@
 import React from "react";
-import { getErrorText, onChangeDate } from "@/components/Form/formFunctions";
+import { FormErrors, getErrorText, onChangeDate, Setter } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ErrorText } from "@/components/Form/formStyling";
 import dayjs from "dayjs";
-import { EmergencyBagCardProps } from "@/app/emergency-bags/form/EmergencyBagForm";
+import {
+    EmergencyBagCardProps,
+    EmergencyBagFields,
+} from "@/app/emergency-bags/form/EmergencyBagForm";
 
 const PackingDateCard: React.FC<EmergencyBagCardProps> = ({
     errorSetter,
@@ -21,7 +24,12 @@ const PackingDateCard: React.FC<EmergencyBagCardProps> = ({
             <>
                 <DatePicker
                     onChange={(value): void => {
-                        onChangeDate(fieldSetter, errorSetter, "packingDate", value);
+                        onChangeDate(
+                            fieldSetter,
+                            errorSetter as Setter<FormErrors<EmergencyBagFields>>,
+                            "packingDate",
+                            value
+                        );
                     }}
                     label="Date"
                     value={fields.packingDate ? dayjs(fields.packingDate) : null}
