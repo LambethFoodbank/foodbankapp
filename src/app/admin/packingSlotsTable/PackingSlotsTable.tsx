@@ -102,6 +102,8 @@ const PackingSlotsTable: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const originalTimestampsRef = React.useRef<Record<string, string>>({});
+    const [blockedSaveRows, setBlockedSaveRows] = useState<Set<GridRowId>>(new Set());
+    const [rowErrors, setRowErrors] = useState<{ [id: string]: string }>({});
 
     useEffect(() => {
         setErrorMessage(null);
@@ -216,8 +218,10 @@ const PackingSlotsTable: React.FC = () => {
                         message =
                             "Record has been edited recently - please refresh the page." +
                             `Log ID: ${updatePackingSlotError.logId}`;
+                        setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
                     }
 
+                    setRowErrors((prev) => ({ ...prev, [newRow.id]: message }));
                     setErrorMessage(message);
 
                     void sendAuditLog({
@@ -234,6 +238,19 @@ const PackingSlotsTable: React.FC = () => {
                     });
                 }
             }
+
+            // Clear any previous errors for this row
+            setRowErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[newRow.id];
+                return newErrors;
+            });
+
+            setBlockedSaveRows((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(newRow.id);
+                return newSet;
+            });
 
             return { ...newRow, isNew: false };
         } finally {
@@ -267,6 +284,18 @@ const PackingSlotsTable: React.FC = () => {
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
+        setRowErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[id];
+            return newErrors;
+        });
+
+        setBlockedSaveRows((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(id);
+            return newSet;
+        });
+
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -425,6 +454,8 @@ const PackingSlotsTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             getActions: ({ id }) => {
                 const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+                const isBlocked = blockedSaveRows.has(id);
+                const rowError = rowErrors[id];
 
                 if (isInEditMode) {
                     return [
@@ -434,7 +465,13 @@ const PackingSlotsTable: React.FC = () => {
                             sx={{
                                 color: "primary.main",
                             }}
-                            onClick={handleSaveClick(id)}
+                            onClick={() => {
+                                if (isBlocked && rowErrors) {
+                                    setErrorMessage(rowError);
+                                } else {
+                                    handleSaveClick(id)();
+                                }
+                            }}
                             key="Save"
                         />,
                         <GridActionsCellItem
