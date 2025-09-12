@@ -27,8 +27,8 @@ const convertEmergencyBagDBtoEBRow = async (
                     collectionCentreName: emergencyBag.collection_centre_name ?? "-",
                     collectionCentreAcronym: emergencyBag.collection_centre_acronym ?? "-",
                 },
-                lastStatus: { name: "", eventData: "", timestamp: new Date(), workflowOrder: -1 }, // TODO: implement in actions ticket
-                allStatuses: [""], // TODO: implement in actions ticket
+                lastStatus: { name: "", eventData: "", timestamp: new Date(), workflowOrder: -1 }, // TODO: implement in actions ticket (VFB-494)
+                allStatuses: [""], // TODO: implement in actions ticket (VFB-494)
                 packingDate: emergencyBag.packing_date ? new Date(emergencyBag.packing_date) : null,
                 createdAt: emergencyBag.created_at ? new Date(emergencyBag.created_at) : null,
             };
