@@ -1,11 +1,6 @@
-import supabase from "@/supabaseClient";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { generateReturnPathQueryParam } from "@/common/urlQueryParams";
-import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
-import ExpandedParcelDetails from "../ExpandedEmergencyBagDetails";
 import ExpandedEmergencyBagDetailsFallback from "../ExpandedEmergencyBagDetailsFallback";
-import { getParcelsByIds } from "@/app/parcels/parcelsTable/fetchParcelTableData";
-import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 import Modal from "@/components/Modal/Modal";
 import { Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
 import LinkButton from "@/components/Buttons/LinkButton";
@@ -13,27 +8,21 @@ import Icon from "@/components/Icons/Icon";
 import { faBoxArchive } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "styled-components";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
-import { Button } from "@mui/material";
-import { ArrowDropDown } from "@mui/icons-material";
-import Statuses from "@/app/parcels/ActionBar/Statuses";
+import ExpandedEmergencyBagDetails from "../ExpandedEmergencyBagDetails";
 
-interface ParcelsModalProps {
+interface EmergencyBagsModalProps {
     modalIsOpen: boolean;
-    selectedParcelId: string | null;
-    closeParcelModal: () => void;
+    selectedEmergencyBagId: string | null;
+    closeEmergencyBagModal: () => void;
 }
 
-const EmergencyBagsModal: React.FC<ParcelsModalProps> = ({
+const EmergencyBagsModal: React.FC<EmergencyBagsModalProps> = ({
     modalIsOpen,
-    selectedParcelId,
-    closeParcelModal,
+    selectedEmergencyBagId,
+    closeEmergencyBagModal,
 }) => {
-    const [statusAnchorElement, setStatusAnchorElement] = useState<HTMLElement | null>(null);
-    const refreshParcelDetailsRef = useRef<(() => void) | null>(null);
+    const refreshEmergencyBagDetailsRef = useRef<(() => void) | null>(null);
 
-    const [parcelClientId, setParcelClientId] = useState<string | null>(null);
-    const [isClientActive, setIsClientActive] = useState<boolean | null>(null);
-    const [modalErrorMessage, setModalErrorMessage] = useState<string | null>(null);
     const [returnPathQueryParamForLinks, setReturnPathQueryParamForLinks] = useState<string | null>(
         null
     );
@@ -44,74 +33,28 @@ const EmergencyBagsModal: React.FC<ParcelsModalProps> = ({
         setReturnPathQueryParamForLinks(generateReturnPathQueryParam(window.location));
     }, [modalIsOpen]);
 
-    const fetchParcel = async (): Promise<ParcelsTableRow[]> => {
-        return await getParcelsByIds(supabase, [selectedParcelId as string]);
-    };
-
-    const refreshDetails = (): void => {
-        if (refreshParcelDetailsRef.current) {
-            refreshParcelDetailsRef.current();
-        }
-    };
-
-    const postSetStatusCallback = (): void => {
-        refreshDetails();
-    };
-
     return (
         <>
-            <Statuses
-                fetchSelectedParcels={fetchParcel}
-                postSuccessCallback={postSetStatusCallback}
-                statusAnchorElement={statusAnchorElement}
-                setStatusAnchorElement={setStatusAnchorElement}
-                setModalError={setModalErrorMessage}
-            />
             <Modal
                 header={
                     <>
-                        <Icon icon={faBoxArchive} color={theme.primary.largeForeground[2]} /> Parcel
-                        Details
+                        <Icon icon={faBoxArchive} color={theme.primary.largeForeground[2]} />{" "}
+                        Emergency Bag Details
                     </>
                 }
                 isOpen={modalIsOpen}
                 onClose={() => {
-                    closeParcelModal();
+                    closeEmergencyBagModal();
                 }}
-                headerId="expandedParcelDetailsModal"
+                headerId="expandedEmergencyBagDetailsModal"
                 footer={
                     <Centerer>
                         <ConfirmButtons>
                             <LinkButton
-                                link={`/parcels/edit/${selectedParcelId}?${returnPathQueryParamForLinks}`}
+                                link={`/parcels/edit/${selectedEmergencyBagId}?${returnPathQueryParamForLinks}`}
                             >
-                                Edit Parcel
+                                Edit Emergency Bag
                             </LinkButton>
-                            <Button
-                                variant="contained"
-                                onClick={(event) => setStatusAnchorElement(event.currentTarget)}
-                                type="button"
-                                id="status-button"
-                                endIcon={<ArrowDropDown />}
-                            >
-                                Set Status
-                            </Button>
-                            {parcelClientId && (
-                                <>
-                                    <LinkButton
-                                        link={`/clients?clientId=${parcelClientId}&${returnPathQueryParamForLinks}`}
-                                        disabled={!isClientActive}
-                                    >
-                                        See Client Details
-                                    </LinkButton>
-                                    <LinkButton
-                                        link={`/clients/edit/${parcelClientId}?${returnPathQueryParamForLinks}`}
-                                        disabled={!isClientActive}
-                                    >
-                                        Edit Client Details
-                                    </LinkButton>
-                                </>
-                            )}
                         </ConfirmButtons>
                     </Centerer>
                 }
@@ -119,19 +62,14 @@ const EmergencyBagsModal: React.FC<ParcelsModalProps> = ({
                 <OutsideDiv>
                     <ContentDiv>
                         <Suspense fallback={<ExpandedEmergencyBagDetailsFallback />}>
-                            <ExpandedParcelDetails
-                                parcelId={selectedParcelId}
-                                setParcelClientId={setParcelClientId}
-                                setIsClientActive={setIsClientActive}
+                            <ExpandedEmergencyBagDetails
+                                emergencyBagId={selectedEmergencyBagId}
                                 refreshCallback={(refresh) => {
-                                    refreshParcelDetailsRef.current = refresh;
+                                    refreshEmergencyBagDetailsRef.current = refresh;
                                 }}
                             />
                         </Suspense>
                     </ContentDiv>
-                    {modalErrorMessage && (
-                        <ErrorSecondaryText>{modalErrorMessage}</ErrorSecondaryText>
-                    )}
                 </OutsideDiv>
             </Modal>
         </>

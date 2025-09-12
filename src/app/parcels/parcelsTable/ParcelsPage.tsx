@@ -48,6 +48,8 @@ import {
 import PreEmergencyBagsTableControls from "@/app/emergency-bags/emergencyBagsTable/PreTableControls";
 import { getSelectedEmergencyBagCountMessage } from "@/app/emergency-bags/emergencyBagsTable/format";
 import { getEmergencyBagsByIdsWithFiltersAndSorting } from "@/app/emergency-bags/emergencyBagsTable/fetchEmergencyBagTableData";
+import { emergencyBagIdParam } from "@/app/emergency-bags/emergencyBagsTable/constants";
+import EmergencyBagsModal from "@/app/emergency-bags/emergencyBagsTable/EmergencyBagsModal";
 
 type ParcelTableFilterState = string | DateRangeState | string[];
 type EmergencyBagTableFilterState = string | DateRangeState | string[];
@@ -56,10 +58,12 @@ const ParcelsPage: React.FC = () => {
     const searchParams = useSearchParams();
 
     const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
+    const [selectedEmergencyBagId, setSelectedEmergencyBagId] = useState<string | null>(null);
 
     const [checkedParcelIds, setCheckedParcelIds] = useState<string[]>([]);
 
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+    const [modalIsOpenEmergencyBag, setModalIsOpenEmergencyBag] = useState<boolean>(false);
 
     const [sortState, setSortState] = useState<ParcelsSortState>({ sortEnabled: false });
 
@@ -317,6 +321,28 @@ const ParcelsPage: React.FC = () => {
         mergeParamsIntoURL(paramsRecord);
     };
 
+    const openEmergencyBagModal = (emergencyBagId: string): void => {
+        setSelectedEmergencyBagId(emergencyBagId);
+        setModalIsOpenEmergencyBag(true);
+    };
+
+    const openEmergencyBagModalAndUpdateURL = (emergencyBagId: string): void => {
+        openEmergencyBagModal(emergencyBagId);
+
+        const paramsRecord: Record<string, string> = {};
+        paramsRecord[emergencyBagIdParam] = emergencyBagId;
+        mergeParamsIntoURL(paramsRecord);
+    };
+
+    const closeEmergencyBagModalAndUpdateURL = (): void => {
+        setModalIsOpenEmergencyBag(false);
+        setSelectedEmergencyBagId(null);
+
+        const paramsRecord: Record<string, string | null> = {};
+        paramsRecord[emergencyBagIdParam] = null;
+        mergeParamsIntoURL(paramsRecord);
+    };
+
     useEffect(() => {
         const checkEBs = async (): Promise<void> => {
             const dateFilter = currentlyAppliedEmergencyBagFilters.find(
@@ -448,7 +474,7 @@ const ParcelsPage: React.FC = () => {
                             <EmergencyBagsTable
                                 checkedEmergencyBagIds={checkedEmergencyBagIds}
                                 setCheckedEmergencyBagIds={setCheckedEmergencyBagIds}
-                                openEmergencyBagModal={openParcelModalAndUpdateURL}
+                                openEmergencyBagModal={openEmergencyBagModalAndUpdateURL}
                                 sortState={emergencyBagsSortState}
                                 setSortState={setEmergencyBagsSortState}
                                 appliedFilters={currentlyAppliedEmergencyBagFilters}
@@ -463,6 +489,11 @@ const ParcelsPage: React.FC = () => {
                         modalIsOpen={modalIsOpen}
                         selectedParcelId={selectedParcelId}
                         closeParcelModal={closeParcelModalAndUpdateURL}
+                    />
+                    <EmergencyBagsModal
+                        modalIsOpen={modalIsOpenEmergencyBag}
+                        selectedEmergencyBagId={selectedEmergencyBagId}
+                        closeEmergencyBagModal={closeEmergencyBagModalAndUpdateURL}
                     />
                 </>
             )}
