@@ -21,7 +21,6 @@ const buildAuditLog = (action: string, parcel: ParcelsTableRow, count = 1): Audi
                 collection_datetime: parcel.collectionDatetime?.toString(),
             },
             count: count,
-            actionType: "Edit",
         },
         clientId: parcel.clientId,
         parcelId: parcel.parcelId,
@@ -59,7 +58,6 @@ export const getUpdateErrorMessage = ({
 
 export const hasConcurrencyConflict = async (
     parcel: ParcelsTableRow,
-    updateField: UpdateField,
     action: string
 ): Promise<boolean> => {
     const auditLog = buildAuditLog(action, parcel);
@@ -76,8 +74,9 @@ export const hasConcurrencyConflict = async (
             wasSuccess: false,
             logId,
         });
+        return true;
     }
-    return !(error || count === 0);
+    return !(count === 0);
 };
 
 export const packingDateOrSlotUpdate = async (
@@ -126,16 +125,6 @@ export const packingDateOrSlotUpdate = async (
         const logId = await logErrorReturnLogId("Error with fetching parcel data", fetchError);
         await sendAuditLog({
             ...auditLog,
-            content: {
-                parcelDetails: {
-                    client_id: parcel.clientId,
-                    packing_date: parcel.packingDate?.toString(),
-                    packing_slot: parcel.packingSlot,
-                    voucher_number: parcel.voucherNumber,
-                    collection_centre: parcel.deliveryCollection.collectionCentreName,
-                    collection_datetime: parcel.collectionDatetime?.toString(),
-                },
-            },
             wasSuccess: false,
             logId,
         });
@@ -158,8 +147,7 @@ export const packingDateOrSlotUpdate = async (
         collection_datetime: parcelData.collection_datetime,
         last_updated: parcelData.last_updated,
     };
-    let content = auditLog.content;
-    content = { ...{ content }, parcelDetails: parcelRecord };
+    let content =  { parcelDetails: parcelRecord };
 
     if (updateResponse.error) {
         const logId = await logErrorReturnLogId(

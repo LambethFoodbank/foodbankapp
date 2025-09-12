@@ -107,13 +107,13 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
             return;
         }
 
-        const checks = props.selectedParcels.map((parcel) =>
-            hasConcurrencyConflict(parcel, "packingSlot", "Change Packing Slot")
+        const concurrencyChecks = await Promise.all(
+            props.selectedParcels.map((parcel) =>
+                hasConcurrencyConflict(parcel, "packingSlot")
+            )
         );
-        const results = await Promise.all(checks);
-        const packingSlotConcurrencyUpdateFlag = results.every(Boolean);
 
-        if (!packingSlotConcurrencyUpdateFlag) {
+        if (!concurrencyChecks.every(Boolean)) {
             setErrorMessage("Record has been edited recently - please refresh the page.");
             setActionCompleted(true);
             return;
