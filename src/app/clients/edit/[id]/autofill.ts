@@ -22,7 +22,8 @@ const autofill = (
         addressLine2: noPostcode ? "" : clientData.address_2 ?? "",
         addressTown: noPostcode ? "" : clientData.address_town ?? "",
         addressCounty: noPostcode ? "" : clientData.address_county ?? "",
-        addressPostcode: clientData.address_postcode ?? "",
+        // This should not be set to the empty string because the null value is used to indicate an NFA client
+        addressPostcode: clientData.address_postcode,
         numberOfAdults: adults.length,
         adults: adults,
         numberOfChildren: children.length,
