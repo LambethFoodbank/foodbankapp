@@ -50,7 +50,7 @@ export const postcodeSearch = <DbData extends DbClientRow | DbParcelRow>(
         if (displayPostcodeForHomelessClient.toLowerCase().includes(substring.toLowerCase())) {
             return `and(${clientIsActiveColumnLabel}.is.true, or(${postcodeColumnLabel}.ilike.%${substring}%, ${postcodeColumnLabel}.is.null))`;
         }
-        return `and(${clientIsActiveColumnLabel}.is.true, ${postcodeColumnLabel}.ilike.%${substring}%)`;
+        return `and(${clientIsActiveColumnLabel}.is.true, split_part(${postcodeColumnLabel}, ' ', 1).ilike.%${substring}%)`;
     });
 };
 
