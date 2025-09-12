@@ -86,7 +86,6 @@ const getParcelsForDelivery = async (parcelIds: string[]): Promise<ParcelsForDel
 
     const dataWithNonNullClients: ParcelForDelivery[] = [];
     for (const parcel of data) {
-        // do we still need to check for null clients?
         if (parcel.client === null) {
             const logId = await logErrorReturnLogId(
                 "Error with fetch: Parcels. No matching client found"
