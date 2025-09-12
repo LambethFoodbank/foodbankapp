@@ -958,6 +958,7 @@ export type Database = {
           is_active: boolean | null
           is_deliverable: boolean | null
           phone_number: string | null
+          sorted_address_postcode: string | null
         }
         Relationships: []
       }
@@ -1042,6 +1043,7 @@ export type Database = {
           referrer_name: string | null
           referrer_phone: string | null
           signposting_call_required: boolean | null
+          sorted_client_address_postcode: string | null
           voucher_number: string | null
         }
         Relationships: [
@@ -1077,6 +1079,12 @@ export type Database = {
       }
     }
     Functions: {
+      create_postcode_sort_key: {
+        Args: {
+          pc: string
+        }
+        Returns: string
+      }
       deactivateClient: {
         Args: {
           clientid: string

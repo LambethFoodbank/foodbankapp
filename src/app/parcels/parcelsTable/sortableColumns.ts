@@ -34,7 +34,7 @@ const parcelsSortableColumns: SortOptions<ParcelsTableRow, ParcelsSortMethod>[] 
         sortMethod: (sortDirection, query) =>
             query
                 .order("client_is_active", { ascending: sortDirection !== "asc" })
-                .order("client_address_postcode", { ascending: sortDirection === "asc" })
+                .order("sorted_client_address_postcode", { ascending: sortDirection === "asc" })
                 .order("packing_date")
                 .order("packing_slot_order")
                 .order("is_delivery", { ascending: false })
