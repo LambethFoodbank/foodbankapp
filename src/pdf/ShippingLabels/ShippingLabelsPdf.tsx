@@ -62,7 +62,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         display: "flex",
         flexDirection: "row",
-        maxHeight: "38%",
+        maxHeight: "100%",
+        width: "100%",
+        gap: "4px",
     },
     secondRow: { display: "flex" },
     thirdRow: { flex: 1, display: "flex", flexDirection: "column" },
@@ -82,6 +84,13 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
+    },
+    contactText: {
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        flex: 1,
+        marginRight: "8px",
     },
 });
 
@@ -130,11 +139,12 @@ const SingleLabelCard: React.FC<LabelCardProps> = ({ data, index, quantity }) =>
                     </View>
                     <View style={[styles.rightCol, { flexDirection: "column" }]}>
                         <View style={styles.firstRow}>
-                            <View style={{ flexDirection: "row" }}>
+                            <View style={{ flexDirection: "row", flex: 1 }}>
                                 <Text style={styles.headingText}>Contact: </Text>
-                                <Text>{data.phone_number}</Text>
+                                <Text style={styles.contactText}>{data.phone_number}</Text>
                             </View>
                             <Text style={styles.headingText}>Packed:</Text>
+                            <Text>{dayjs(data.packing_date).format("DD/MM/YYYY")}</Text>
                         </View>
                         <View
                             style={[
@@ -148,7 +158,6 @@ const SingleLabelCard: React.FC<LabelCardProps> = ({ data, index, quantity }) =>
                             <Text style={[styles.headingText, { right: 0 }]}>
                                 Delivery Instructions:{" "}
                             </Text>
-                            <Text>{dayjs(data.packing_date).format("DD/MM/YYYY")}</Text>
                         </View>
                         <View style={styles.thirdRow}>
                             <Text style={styles.deliveryInstructionText}>

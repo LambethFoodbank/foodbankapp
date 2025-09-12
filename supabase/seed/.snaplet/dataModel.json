@@ -378,6 +378,20 @@
           "maxLength": null
         },
         {
+          "id": "public.audit_log.delivery_areas_id",
+          "name": "delivery_areas_id",
+          "columnName": "delivery_areas_id",
+          "type": "uuid",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "clients",
           "type": "clients",
           "isRequired": false,
@@ -406,6 +420,24 @@
           ],
           "relationToFields": [
             "primary_key"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "delivery_areas",
+          "type": "delivery_areas",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "audit_logTodelivery_areas",
+          "relationFromFields": [
+            "delivery_areas_id"
+          ],
+          "relationToFields": [
+            "id"
           ],
           "isList": false,
           "isId": false,
@@ -1303,6 +1335,20 @@
           "maxLength": null
         },
         {
+          "id": "public.clients.additional_phone_numbers",
+          "name": "additional_phone_numbers",
+          "columnName": "additional_phone_numbers",
+          "type": "text[]",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "audit_log",
           "type": "audit_log",
           "isRequired": false,
@@ -1466,6 +1512,20 @@
           "maxLength": null
         },
         {
+          "id": "public.collection_centres.available_days",
+          "name": "available_days",
+          "columnName": "available_days",
+          "type": "collection_availability_day[]",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "audit_log",
           "type": "audit_log",
           "isRequired": false,
@@ -1520,6 +1580,71 @@
           "name": "collection_centres_primary_key_key",
           "fields": [
             "primary_key"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "delivery_areas": {
+      "id": "public.delivery_areas",
+      "schemaName": "public",
+      "tableName": "delivery_areas",
+      "fields": [
+        {
+          "id": "public.delivery_areas.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.delivery_areas.postcode",
+          "name": "postcode",
+          "columnName": "postcode",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "audit_log",
+          "type": "audit_log",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "audit_logTodelivery_areas",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "delivery_areas_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "delivery_areas_postcode_key",
+          "fields": [
+            "postcode"
           ],
           "nullNotDistinct": false
         }
@@ -4791,6 +4916,62 @@
           "id": "public.parcels.referrer_phone",
           "name": "referrer_phone",
           "columnName": "referrer_phone",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.parcels.flagged_for_attention",
+          "name": "flagged_for_attention",
+          "columnName": "flagged_for_attention",
+          "type": "bool",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.parcels.signposting_call_reasons",
+          "name": "signposting_call_reasons",
+          "columnName": "signposting_call_reasons",
+          "type": "text[]",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.parcels.signposting_call_required",
+          "name": "signposting_call_required",
+          "columnName": "signposting_call_required",
+          "type": "bool",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.parcels.extra_information",
+          "name": "extra_information",
+          "columnName": "extra_information",
           "type": "text",
           "isRequired": false,
           "kind": "scalar",
@@ -8157,6 +8338,32 @@
         },
         {
           "name": "stream_xchacha20"
+        }
+      ]
+    },
+    "day_of_week": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "Friday"
+        },
+        {
+          "name": "Monday"
+        },
+        {
+          "name": "Saturday"
+        },
+        {
+          "name": "Sunday"
+        },
+        {
+          "name": "Thursday"
+        },
+        {
+          "name": "Tuesday"
+        },
+        {
+          "name": "Wednesday"
         }
       ]
     },

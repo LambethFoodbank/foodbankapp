@@ -6,6 +6,7 @@ which only gets generated after running npx snaplet generate with local database
 import { createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
 import { packingSlots } from "./packingSlotsSeed";
+import { possibleDeliveryAreas } from "./postcodeSeed";
 import {
     booleansWeightedToTrue,
     possibleBabyOtherItems,
@@ -22,6 +23,7 @@ import {
     defaultNotes,
     defaultDeliveryInstructions,
     defaultExtraInformation,
+    possiblePhoneNumbers,
 } from "./clientsSeed";
 import { genders } from "./families";
 import { collectionCentresWithStringSlots } from "./collectionCentresSeed";
@@ -43,7 +45,6 @@ import {
     possibleReferralAgency,
     defaultParcelNotes,
 } from "./parcelsSeed";
-import type { Enums } from "@/databaseTypesFile";
 
 const main = async (): Promise<never> => {
     const seed = await createSeedClient({
@@ -53,6 +54,8 @@ const main = async (): Promise<never> => {
     await seed.$resetDatabase(); // Clears all existing data in the database, but keep the structure
 
     await seed.packing_slots(packingSlots);
+
+    await seed.delivery_areas(possibleDeliveryAreas);
 
     const today = new Date();
     const thisYear = today.getFullYear();
@@ -73,6 +76,8 @@ const main = async (): Promise<never> => {
                 delivery_instructions: () => copycat.oneOf(ctx.seed, defaultDeliveryInstructions),
                 family_id: () => copycat.uuid(ctx.seed),
                 default_list: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
+                additional_phone_numbers: (ctx) =>
+                    copycat.someOf(ctx.seed, [0, 4], possiblePhoneNumbers),
                 cooking_facilities: () =>
                     copycat.someOf(
                         ctx.seed,
@@ -173,7 +178,15 @@ const main = async (): Promise<never> => {
                             ctx.seed
                         ),
                     list_type: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
-
+                    flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
+                    signposting_call_required: (ctx) => copycat.bool(ctx.seed),
+                    signposting_call_reasons: (ctx) =>
+                        copycat.someOf(
+                            ctx.seed,
+                            [0, possibleSignpostingCallReasons.length],
+                            possibleSignpostingCallReasons
+                        ),
+                    extra_information: () => copycat.oneOf(ctx.seed, defaultExtraInformation),
                     referral_agency: () => agency,
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
                     referrer_email: () => (agency ? copycat.email(ctx.seed) : ""),
@@ -182,35 +195,6 @@ const main = async (): Promise<never> => {
                     created_at: parcelCreationDateTime,
                 };
             }),
-        { connect: true }
-    );
-
-    await seed.dietary_requirements(
-        listsSeedRequired.map(() => {
-            const dietaryRequirement: {
-                halal: Enums<"item_dietary_status">;
-                vegetarian: Enums<"item_dietary_status">;
-                vegan: Enums<"item_dietary_status">;
-                meat: Enums<"item_dietary_status">;
-                gluten_free: Enums<"item_dietary_status">;
-                pescatarian: Enums<"item_dietary_status">;
-                dairy_free: Enums<"item_dietary_status">;
-                seafood_allergy: Enums<"item_dietary_status">;
-                pet_food: Enums<"item_dietary_status">;
-            } = {
-                halal: "not_specified",
-                vegetarian: "not_specified",
-                vegan: "not_specified",
-                meat: "not_specified",
-                gluten_free: "not_specified",
-                pescatarian: "not_specified",
-                dairy_free: "not_specified",
-                seafood_allergy: "not_specified",
-                pet_food: "not_specified",
-            };
-
-            return dietaryRequirement;
-        }),
         { connect: true }
     );
 

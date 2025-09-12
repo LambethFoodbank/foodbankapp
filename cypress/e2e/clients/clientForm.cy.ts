@@ -7,6 +7,7 @@ describe("Add client form", () => {
     it("Add a client with no address", () => {
         fillName(fullName);
         fillPhoneNumber(phoneNumber);
+        fillAdditionalPhoneNumbers(additionalPhoneNumbers);
         fillEmail(email);
         fillNumberAdults("1");
         fillNumberChildren("0");
@@ -38,6 +39,15 @@ describe("Add client form", () => {
 
         assertPostcodeContentNotDisplayed();
     });
+
+    it("Tries to add a client with the same additional phone number and fails", () => {
+        fillName(fullName);
+        fillPhoneNumber(phoneNumber);
+        fillAdditionalPhoneNumbers(duplicateAdditionalPhoneNumbers);
+        cy.contains(
+            "This phone number already exists, please add a different phone number."
+        ).should("be.visible");
+    });
 });
 
 const fullName = "First Last";
@@ -45,6 +55,8 @@ const phoneNumber = "01234567890";
 const email = "abc@example.com";
 const noAddressText = "No Address";
 const postcode = "N11AA";
+const additionalPhoneNumbers = ["01234567891", "01234567892"];
+const duplicateAdditionalPhoneNumbers = ["01234567891", "01234567891"];
 
 function toggleNoAddress(): void {
     cy.contains(noAddressText, { matchCase: false }).click();
@@ -56,6 +68,13 @@ function fillName(value: string): void {
 
 function fillPhoneNumber(value: string): void {
     fillTextboxWithId("client-phone-number", value);
+}
+
+function fillAdditionalPhoneNumbers(values: string[]): void {
+    cy.contains("Add another phone number").click();
+    fillTextboxWithId("client-additional-phone-number-0", values[0]);
+    cy.contains("Add another phone number").click();
+    fillTextboxWithId("client-additional-phone-number-1", values[1]);
 }
 
 function fillEmail(value: string): void {

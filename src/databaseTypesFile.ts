@@ -17,6 +17,7 @@ export type Database = {
           collection_centre_id: string | null
           content: Json | null
           created_at: string
+          delivery_areas_id: string | null
           dietary_requirement: string | null
           event_id: string | null
           list_id: string | null
@@ -37,6 +38,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
@@ -57,6 +59,7 @@ export type Database = {
           collection_centre_id?: string | null
           content?: Json | null
           created_at?: string
+          delivery_areas_id?: string | null
           dietary_requirement?: string | null
           event_id?: string | null
           list_id?: string | null
@@ -98,6 +101,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "parcels_plus"
             referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "audit_log_delivery_areas_id_fkey"
+            columns: ["delivery_areas_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_areas"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_event_id_fkey"
@@ -187,6 +197,7 @@ export type Database = {
       }
       clients: {
         Row: {
+          additional_phone_numbers: string[] | null
           address_1: string | null
           address_2: string | null
           address_county: string | null
@@ -219,6 +230,7 @@ export type Database = {
           signposting_call_required: boolean | null
         }
         Insert: {
+          additional_phone_numbers?: string[] | null
           address_1?: string | null
           address_2?: string | null
           address_county?: string | null
@@ -251,6 +263,7 @@ export type Database = {
           signposting_call_required?: boolean | null
         }
         Update: {
+          additional_phone_numbers?: string[] | null
           address_1?: string | null
           address_2?: string | null
           address_county?: string | null
@@ -287,6 +300,7 @@ export type Database = {
       collection_centres: {
         Row: {
           acronym: string
+          available_days: Database["public"]["CompositeTypes"]["collection_availability_day"][]
           is_delivery: boolean
           is_shown: boolean
           last_updated: string
@@ -298,6 +312,7 @@ export type Database = {
         }
         Insert: {
           acronym?: string
+          available_days?: Database["public"]["CompositeTypes"]["collection_availability_day"][]
           is_delivery?: boolean
           is_shown?: boolean
           last_updated?: string
@@ -309,6 +324,7 @@ export type Database = {
         }
         Update: {
           acronym?: string
+          available_days?: Database["public"]["CompositeTypes"]["collection_availability_day"][]
           is_delivery?: boolean
           is_shown?: boolean
           last_updated?: string
@@ -317,6 +333,21 @@ export type Database = {
           time_slots?:
             | Database["public"]["CompositeTypes"]["collection_timeslot_type"][]
             | null
+        }
+        Relationships: []
+      }
+      delivery_areas: {
+        Row: {
+          id: string
+          postcode: string
+        }
+        Insert: {
+          id?: string
+          postcode: string
+        }
+        Update: {
+          id?: string
+          postcode?: string
         }
         Relationships: []
       }
@@ -594,6 +625,8 @@ export type Database = {
           collection_centre: string | null
           collection_datetime: string | null
           created_at: string
+          extra_information: string | null
+          flagged_for_attention: boolean | null
           last_updated: string
           list_type: Database["public"]["Enums"]["list_type"]
           notes: string | null
@@ -604,6 +637,8 @@ export type Database = {
           referrer_email: string | null
           referrer_name: string | null
           referrer_phone: string | null
+          signposting_call_reasons: string[] | null
+          signposting_call_required: boolean | null
           voucher_number: string | null
         }
         Insert: {
@@ -611,6 +646,8 @@ export type Database = {
           collection_centre?: string | null
           collection_datetime?: string | null
           created_at?: string
+          extra_information?: string | null
+          flagged_for_attention?: boolean | null
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
           notes?: string | null
@@ -621,6 +658,8 @@ export type Database = {
           referrer_email?: string | null
           referrer_name?: string | null
           referrer_phone?: string | null
+          signposting_call_reasons?: string[] | null
+          signposting_call_required?: boolean | null
           voucher_number?: string | null
         }
         Update: {
@@ -628,6 +667,8 @@ export type Database = {
           collection_centre?: string | null
           collection_datetime?: string | null
           created_at?: string
+          extra_information?: string | null
+          flagged_for_attention?: boolean | null
           last_updated?: string
           list_type?: Database["public"]["Enums"]["list_type"]
           notes?: string | null
@@ -638,6 +679,8 @@ export type Database = {
           referrer_email?: string | null
           referrer_name?: string | null
           referrer_phone?: string | null
+          signposting_call_reasons?: string[] | null
+          signposting_call_required?: boolean | null
           voucher_number?: string | null
         }
         Relationships: [
@@ -909,12 +952,14 @@ export type Database = {
       }
       clients_plus: {
         Row: {
+          additional_phone_numbers_text: string | null
           address_postcode: string | null
           client_id: string | null
           email: string | null
           family_count: number | null
           full_name: string | null
           is_active: boolean | null
+          is_deliverable: boolean | null
           phone_number: string | null
         }
         Relationships: []
@@ -967,6 +1012,7 @@ export type Database = {
       parcels_plus: {
         Row: {
           all_events: string[] | null
+          client_additional_phone_numbers_text: string | null
           client_address_postcode: string | null
           client_delivery_instructions: string | null
           client_email: string | null
@@ -981,6 +1027,8 @@ export type Database = {
           collection_datetime: string | null
           created_at: string | null
           family_count: number | null
+          flagged_for_attention: boolean | null
+          is_deliverable: boolean | null
           is_delivery: boolean | null
           last_status_event_data: string | null
           last_status_event_name: string | null
@@ -996,6 +1044,7 @@ export type Database = {
           referrer_email: string | null
           referrer_name: string | null
           referrer_phone: string | null
+          signposting_call_required: boolean | null
           voucher_number: string | null
         }
         Relationships: [
@@ -1101,12 +1150,24 @@ export type Database = {
       }
     }
     Enums: {
+      day_of_week:
+        | "Monday"
+        | "Tuesday"
+        | "Wednesday"
+        | "Thursday"
+        | "Friday"
+        | "Saturday"
+        | "Sunday"
       gender: "male" | "female" | "other"
       item_dietary_status: "included" | "excluded" | "not_specified"
       list_type: "regular" | "hotel"
       role: "volunteer" | "admin" | "manager" | "staff"
     }
     CompositeTypes: {
+      collection_availability_day: {
+        day: Database["public"]["Enums"]["day_of_week"] | null
+        is_active: boolean | null
+      }
       collection_timeslot_type: {
         time: string | null
         is_active: boolean | null

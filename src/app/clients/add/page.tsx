@@ -34,17 +34,15 @@ const AddClients: () => React.ReactElement = () => {
         petFood: {},
         otherItems: {},
         deliveryInstructions: "",
-        extraInformation: "",
-        attentionFlag: false,
-        signpostingCall: false,
-        signpostingCallReasons: null,
         notes: "",
         lastUpdated: undefined,
+        additionalPhoneNumbers: [],
     };
 
     const initialFormErrors: ClientErrors = {
         fullName: Errors.initial,
         phoneNumber: Errors.none,
+        additionalPhoneNumbers: [],
         email: Errors.none,
         addressLine1: Errors.initial,
         addressPostcode: Errors.initial,

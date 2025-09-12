@@ -1,16 +1,19 @@
+import { ListType } from "@/common/databaseListTypes";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
-import { SortState } from "@/components/Tables/Table";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
+import { SortState } from "@/components/Tables/Table";
 import { DbParcelRow, ParcelStatus, Schema } from "@/databaseUtils";
-import { ListType } from "@/common/databaseListTypes";
 
 export interface ParcelsTableRow {
     parcelId: Schema["parcels"]["primary_key"];
     clientId: Schema["clients"]["primary_key"];
     fullName: Schema["clients"]["full_name"];
     familyCategory: string;
-    addressPostcode: Schema["clients"]["address_postcode"];
+    addressPostcode: {
+        postcode: Schema["clients"]["address_postcode"];
+        isDeliverable: boolean | null;
+    };
     phoneNumber: Schema["clients"]["phone_number"];
     deliveryCollection: {
         collectionCentreName: string;

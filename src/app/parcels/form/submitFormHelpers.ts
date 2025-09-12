@@ -1,7 +1,11 @@
+import supabase from "@/supabaseClient";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
-import supabase from "@/supabaseClient";
+import { Errors } from "@/components/Form/formFunctions";
+import { ParcelFields } from "@/app/parcels/form/ParcelForm";
+import { CollectionTimeSlotsLabelsAndValues, DbAvailableDaysType } from "@/common/fetch";
+import dayjs from "dayjs";
 
 export type WriteParcelToDatabaseFunction = UpdateParcel | InsertParcel;
 export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelErrorType;
@@ -19,6 +23,72 @@ type InsertParcel = (
     parcelRecord: ParcelDatabaseInsertRecord,
     deliveryInstructions: string
 ) => Promise<InsertParcelReturnType>;
+
+export function switchErrorForCollectionCentre(
+    fields: ParcelFields,
+    collectionCentreIsActive: boolean,
+    deliveryPrimaryKey: string
+): Errors {
+    if (!collectionCentreIsActive) {
+        return Errors.invalidCollectionCentre;
+    }
+
+    if (fields.collectionCentre === deliveryPrimaryKey) {
+        return Errors.initial;
+    }
+
+    return Errors.none;
+}
+
+export function switchErrorForCollectionDate(
+    fields: ParcelFields,
+    collectionCentreIsActive: boolean,
+    availableDaysForCentre: DbAvailableDaysType
+): Errors {
+    const collectionDateDayIndex =
+        dayjs(fields.collectionDate).day() !== 0 ? dayjs(fields.collectionDate).day() - 1 : 6;
+
+    // Date field is required
+    if (!fields.collectionDate) {
+        return Errors.initial;
+    }
+
+    // The collection centre should be available on the selected day
+    if (
+        (availableDaysForCentre.length > 0 &&
+            !availableDaysForCentre[collectionDateDayIndex].is_active) ||
+        !collectionCentreIsActive
+    ) {
+        return Errors.invalidCollectionDate;
+    }
+
+    return Errors.none;
+}
+
+export function switchErrorForCollectionSlot(
+    fields: ParcelFields,
+    collectionCentreIsActive: boolean,
+    collectionSlotsLabelsAndValues: CollectionTimeSlotsLabelsAndValues,
+    availableDaysForCentre: DbAvailableDaysType
+): Errors {
+    // Slot field is required
+    if (!fields.collectionSlot || fields.collectionSlot === "-") {
+        return Errors.initial;
+    }
+
+    // The collection slot should be one of the available options for the centre
+    if (
+        !collectionCentreIsActive ||
+        !collectionSlotsLabelsAndValues.some(
+            (slotLabelAndValue) => slotLabelAndValue[1] === fields.collectionSlot
+        ) ||
+        !availableDaysForCentre.some((day) => day.is_active)
+    ) {
+        return Errors.invalidCollectionSlot;
+    }
+
+    return Errors.none;
+}
 
 export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructions) => {
     const { data: parcelDataWithCount, error: insertParcelError } = await supabase.rpc(

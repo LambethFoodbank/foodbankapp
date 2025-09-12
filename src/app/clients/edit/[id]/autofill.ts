@@ -1,14 +1,8 @@
 import { Schema } from "@/databaseUtils";
 import { ClientFields } from "@/app/clients/form/ClientForm";
-import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 import { isAdultFamilyMember, isChildFamilyMember } from "@/common/getAgesOfFamily";
 import { getFormattedPeople } from "@/common/formatFamiliesData";
-
-const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
-    const reverted: BooleanGroup = {};
-    data.forEach((value) => (reverted[value] = true));
-    return reverted;
-};
+import { arrayToBooleanGroup } from "@/common/format";
 
 const autofill = (
     clientData: Schema["clients"],
@@ -28,7 +22,7 @@ const autofill = (
         addressLine2: noPostcode ? "" : clientData.address_2 ?? "",
         addressTown: noPostcode ? "" : clientData.address_town ?? "",
         addressCounty: noPostcode ? "" : clientData.address_county ?? "",
-        addressPostcode: clientData.address_postcode,
+        addressPostcode: clientData.address_postcode ?? "",
         numberOfAdults: adults.length,
         adults: adults,
         numberOfChildren: children.length,
@@ -52,15 +46,9 @@ const autofill = (
         petFood: arrayToBooleanGroup(clientData.pet_food ?? []),
         otherItems: arrayToBooleanGroup(clientData.other_items ?? []),
         deliveryInstructions: clientData.delivery_instructions ?? "",
-        extraInformation: clientData.extra_information ?? "",
-        attentionFlag: clientData.flagged_for_attention ?? false,
-        signpostingCall: clientData.signposting_call_required ?? false,
-        signpostingCallReasons:
-            clientData.signposting_call_reasons !== null
-                ? arrayToBooleanGroup(clientData.signposting_call_reasons)
-                : null,
         lastUpdated: clientData.last_updated,
         notes: clientData.notes,
+        additionalPhoneNumbers: clientData.additional_phone_numbers ?? [],
     };
 };
 

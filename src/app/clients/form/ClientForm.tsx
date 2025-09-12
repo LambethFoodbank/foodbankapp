@@ -32,9 +32,6 @@ import BabyProductsCard from "@/app/clients/form/formSections/BabyProductsCard";
 import PetFoodCard from "@/app/clients/form/formSections/PetFoodCard";
 import OtherItemsCard from "@/app/clients/form/formSections/OtherItemsCard";
 import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
-import ExtraInformationCard from "@/app/clients/form/formSections/ExtraInformationCard";
-import AttentionFlagCard from "@/app/clients/form/formSections/AttentionFlagCard";
-import SignpostingCallCard from "@/app/clients/form/formSections/SignpostingCallCard";
 import Button from "@mui/material/Button";
 import { submitAddClientForm, submitEditClientForm } from "@/app/clients/form/submitFormHelpers";
 import Title from "@/components/Title/Title";
@@ -79,17 +76,15 @@ export interface ClientFields extends Fields {
     petFood: BooleanGroup;
     otherItems: BooleanGroup;
     deliveryInstructions: string | null;
-    extraInformation: string;
-    attentionFlag: boolean;
-    signpostingCall: boolean;
-    signpostingCallReasons: BooleanGroup | null;
     lastUpdated: string | undefined;
     notes: string | null;
+    additionalPhoneNumbers: string[] | null;
 }
 
 export interface ClientErrors extends FormErrors<ClientFields> {
     fullName: Errors;
     phoneNumber: Errors;
+    additionalPhoneNumbers: Errors[];
     email: Errors;
     addressLine1: Errors;
     addressPostcode: Errors;
@@ -100,7 +95,6 @@ export interface ClientErrors extends FormErrors<ClientFields> {
 }
 
 export type ClientSetter = Setter<ClientFields>;
-export type ClientErrorSetter = Setter<ClientErrors>;
 export type ClientCardProps = CardProps<ClientFields, ClientErrors>;
 
 const formSections = [
@@ -118,9 +112,6 @@ const formSections = [
     PetFoodCard,
     OtherItemsCard,
     DeliveryInstructionsCard,
-    AttentionFlagCard,
-    SignpostingCallCard,
-    ExtraInformationCard,
     ClientNotesCard,
 ];
 

@@ -14,6 +14,7 @@ import {
     IconDefinition,
     faServer,
     faRectangleList,
+    faTruck,
 } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,6 +22,7 @@ import CollectionCentresTable from "@/app/admin/collectionCentresTable/Collectio
 import PackingSlotsTable from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import WebsiteDataTable from "./websiteDataTable/WebsiteDataTable";
 import AuditLogTable from "./auditLogTable/AuditLogTable";
+import DeliveryAreasTable from "@/app/admin/deliveryAreasTable/DeliveryAreasTable";
 import { faBowlFood } from "@fortawesome/free-solid-svg-icons/faBowlFood";
 import DietaryRequirementsTable from "@/app/admin/dietaryRequirementsTable/DietaryRequirementsTable";
 
@@ -62,6 +64,11 @@ const AdminPage: React.FC = () => {
             panelTitle: "Dietary Requirements",
             panelIcon: faBowlFood,
             panelContent: <DietaryRequirementsTable />,
+        },
+        {
+            panelTitle: "Edit Delivery Areas",
+            panelIcon: faTruck,
+            panelContent: <DeliveryAreasTable />,
         },
         {
             panelTitle: "Edit Website Data",

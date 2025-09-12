@@ -113,7 +113,7 @@ const DayOverviewRow: React.FC<DayOverviewRowProps> = ({ parcel }) => {
         <View style={styles.row} wrap={false}>
             <View style={[styles.cellLogo, styles.cell, styles.row]}>
                 <CustomSVG icon={faSquare} color="black" fill={false} />
-                {parcel.client_flagged_for_attention && (
+                {parcel.flagged_for_attention && (
                     <CustomSVG icon={faFlag} color="orange" fill={true} />
                 )}
             </View>

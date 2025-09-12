@@ -45,6 +45,10 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     referrer_email: string | null;
     referrer_phone: string | null;
     notes: string | null;
+    flagged_for_attention: boolean | null;
+    signposting_call_required: boolean | null;
+    signposting_call_reasons: string[] | null;
+    extra_information: string | null;
 }
 
 export type FetchParcelResponse =
@@ -174,6 +178,30 @@ type DbCollectionTimeSlotType = {
     is_active: boolean;
 };
 
+type FetchCollectionAvailableDaysResponse =
+    | {
+          data: DbCollectionCentreWithAvailableDaysType[];
+          error: null;
+      }
+    | {
+          data: null;
+          error: FetchCollectionAvailableDaysError;
+      };
+
+type FetchCollectionAvailableDaysErrorType = "collectionAvailableDaysFetchFailed";
+
+export type FetchCollectionAvailableDaysError = {
+    type: FetchCollectionAvailableDaysErrorType;
+    logId: string;
+};
+
+export type DbAvailableDaysType = Schema["collection_centres"]["available_days"];
+
+export type DbCollectionCentreWithAvailableDaysType = {
+    available_days: DbAvailableDaysType;
+    primary_key: Schema["collection_centres"]["primary_key"];
+} | null;
+
 export const getActiveTimeSlotsForCollectionCentre = async (
     collectionCentrePrimaryKey: string,
     supabase: Supabase
@@ -208,6 +236,29 @@ export const getActiveTimeSlotsForCollectionCentre = async (
         ]);
 
     return { data: activeTimeSlots, error: null };
+};
+
+export const getAvailableDaysForCollectionCentres = async (
+    supabase: Supabase
+): Promise<FetchCollectionAvailableDaysResponse> => {
+    const { data, error } = await supabase
+        .from("collection_centres")
+        .select("available_days, primary_key")
+        .eq("is_delivery", false);
+
+    if (error) {
+        const logId = await logErrorReturnLogId(
+            "Error with fetch: Collection available days data",
+            error
+        );
+        return { data: null, error: { type: "collectionAvailableDaysFetchFailed", logId: logId } };
+    }
+
+    if (!data) {
+        return { data: [], error: null };
+    }
+
+    return { data, error: null };
 };
 
 export type FetchClientError = { type: FetchClientErrorType; logId: string };

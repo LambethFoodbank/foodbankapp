@@ -4,11 +4,11 @@ import LinkButton from "@/components/Buttons/LinkButton";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { ButtonsDiv, Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
-import { ServerPaginatedTable } from "@/components/Tables/Table";
+import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import supabase from "@/supabaseClient";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import React, { useEffect, useState, Suspense, useRef, useCallback } from "react";
+import React, { useEffect, useState, Suspense, useRef, useCallback, useContext } from "react";
 import { useTheme } from "styled-components";
 import getClientsDataAndCount from "./getClientsData";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -17,7 +17,6 @@ import ExpandedClientDetailsFallback from "@/app/clients/ExpandedClientDetailsFa
 import { CircularProgress } from "@mui/material";
 import { ErrorSecondaryText } from "../../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { displayPostcodeForHomelessClient } from "@/common/format";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import DeleteButton from "@/components/Buttons/DeleteButton";
 import deleteClient from "../deleteClient";
@@ -33,6 +32,8 @@ import { getClientParcelsDetails } from "../getClientParcelsData";
 import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
+import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
+import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -148,10 +149,6 @@ const ClientsPage: React.FC = () => {
         })();
     }, [clientId]);
 
-    const formatNullPostcode = (postcodeData: ClientsTableRow["addressPostcode"]): string => {
-        return postcodeData ?? displayPostcodeForHomelessClient;
-    };
-
     const onDeleteClient = async (): Promise<void> => {
         if (clientId) {
             const deletedClientsParcels = await getClientParcelsDetails(clientId);
@@ -170,6 +167,16 @@ const ClientsPage: React.FC = () => {
                 return;
             }
             setDeleteClientErrorMessage(null);
+            router.push("/clients");
+        }
+    };
+
+    const { role } = useContext(RoleUpdateContext);
+
+    const onRowClick = (row: Row<ClientsTableRow>): void => {
+        if (roleCanAccessOutsideDeliveryAreaModal(role, row.data.addressPostcode.isDeliverable)) {
+            router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
+        } else {
             router.push("/clients");
         }
     };
@@ -207,9 +214,7 @@ const ClientsPage: React.FC = () => {
                                 setSortState: setSortState,
                             }}
                             headerKeysAndLabels={clientsHeaders}
-                            onRowClick={(row) => {
-                                router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
-                            }}
+                            onRowClick={onRowClick}
                             filterConfig={{
                                 primaryFiltersShown: true,
                                 primaryFilters: primaryFilters,
@@ -220,7 +225,7 @@ const ClientsPage: React.FC = () => {
                             editableConfig={{ editable: false }}
                             isLoading={isLoading}
                             pointerOnHover={true}
-                            columnDisplayFunctions={{ addressPostcode: formatNullPostcode }}
+                            columnDisplayFunctions={{ addressPostcode: rowToAddressColumn }}
                         />
                     </TableSurface>
 

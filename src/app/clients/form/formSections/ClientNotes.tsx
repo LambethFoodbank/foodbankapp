@@ -1,8 +1,13 @@
 import React from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import { getDefaultTextValue, onChangeText } from "@/components/Form/formFunctions";
+import {
+    FormErrors,
+    getDefaultTextValue,
+    onChangeText,
+    Setter,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
+import { ClientCardProps, ClientFields } from "../ClientForm";
 
 const ClientNotesCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter, fields }) => {
     return (
@@ -14,7 +19,11 @@ const ClientNotesCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter, 
             <FreeFormTextInput
                 label="For example, received Microwave on 14/05/2024"
                 defaultValue={getDefaultTextValue(fields, "notes")}
-                onChange={onChangeText(fieldSetter, errorSetter, "notes")}
+                onChange={onChangeText(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ClientFields>>,
+                    "notes"
+                )}
                 minRows={5}
                 multiline={true}
             />

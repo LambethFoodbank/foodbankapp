@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import styled, { useTheme } from "styled-components";
+import { useTheme } from "styled-components";
 import { ErrorTextModalFooter } from "@/app/errorStylingandMessages";
 import { FormGroup } from "@mui/material";
 import Icon from "@/components/Icons/Icon";
@@ -26,6 +26,12 @@ import {
     FormattedTimeSlot,
     FormattedTimeSlotsWithPrimaryKey,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
+import {
+    ColumnContainer,
+    ModalRow,
+    ModalContainer,
+    RowContainer,
+} from "@/app/admin/common/modalStyles";
 
 interface Props {
     selectedCollectionCentreInfo: CollectionCentresTableRow | null;
@@ -33,25 +39,6 @@ interface Props {
     onClose: () => void;
     onSave: (updated: FormattedTimeSlotsWithPrimaryKey) => void;
 }
-
-const ModalTimeSlotsContainer = styled.div`
-    max-height: 40vh;
-    overflow-y: auto;
-`;
-
-const ModalTimeSlotRow = styled.div`
-    width: 20rem;
-`;
-
-const ColumnContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-`;
-
-const RowContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-`;
 
 const formatCollectionCentreTimeSlotDbData = (
     row: CollectionCentresTableRow
@@ -268,12 +255,12 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                         <Heading>{props.selectedCollectionCentreInfo?.name}</Heading>
                     </Centerer>
                     <Centerer>
-                        <ModalTimeSlotsContainer aria-label="List of defined time slots">
+                        <ModalContainer aria-label="List of defined time slots">
                             <FormGroup>
                                 {timeSlotModalData &&
                                     timeSlotModalData.timeSlots.map((timeSlot) => {
                                         return (
-                                            <ModalTimeSlotRow key={timeSlot.time}>
+                                            <ModalRow key={timeSlot.time}>
                                                 <SpaceBetween>
                                                     <CheckboxInput
                                                         label={timeSlot.time}
@@ -297,11 +284,11 @@ const CollectionCentreTimeSlotsModal: React.FC<Props> = (props) => {
                                                         />
                                                     </StyledIconButton>
                                                 </SpaceBetween>
-                                            </ModalTimeSlotRow>
+                                            </ModalRow>
                                         );
                                     })}
                             </FormGroup>
-                        </ModalTimeSlotsContainer>
+                        </ModalContainer>
                     </Centerer>
                 </ContentDiv>
             </OutsideDiv>

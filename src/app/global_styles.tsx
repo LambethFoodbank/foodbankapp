@@ -6,12 +6,12 @@ import {
     Theme,
 } from "@mui/material";
 
-const GlobalStyle = createGlobalStyle`    
+const GlobalStyle = createGlobalStyle`
     * {
         box-sizing: border-box;
         margin: 0;
     }
-      
+
     html, body {
         height: auto;
         width: 100%;
@@ -24,7 +24,7 @@ const GlobalStyle = createGlobalStyle`
     }
 
     :root {
-      color-scheme: ${(props) => (props.theme.light ? "light" : "dark")}
+        color-scheme: ${(props) => (props.theme.light ? "light" : "dark")}
     }
 `;
 
@@ -113,11 +113,22 @@ const materialTheme = (chosenTheme: DefaultTheme): Theme =>
                     },
                 },
             },
+            MuiOutlinedInput: {
+                styleOverrides: {
+                    notchedOutline: {
+                        "& legend": {
+                            visibility: "visible",
+                        },
+                    },
+                },
+            },
         },
     });
+
 interface Props {
     children: React.ReactNode;
 }
+
 const MaterialAndGlobalStyle: React.FC<Props> = ({ children }) => {
     const chosenTheme = useTheme();
 

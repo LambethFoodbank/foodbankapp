@@ -1,9 +1,14 @@
 import React from "react";
-import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
+import {
+    FormErrors,
+    getErrorText,
+    Setter,
+    valueOnChangeDropdownList,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import { ClientCardProps } from "@/app/clients/form/ClientForm";
+import { ClientCardProps, ClientFields } from "@/app/clients/form/ClientForm";
 import { LIST_TYPES_ARRAY } from "@/common/databaseListTypes";
 import { capitaliseWords } from "@/common/format";
 
@@ -31,7 +36,11 @@ const ListTypeCard: React.FC<ClientCardProps> = ({
                 labelsAndValues={listTypeLabelsAndValues}
                 listTitle="List Type"
                 value={fields.listType ?? ""}
-                onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "listType")}
+                onChange={valueOnChangeDropdownList(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ClientFields>>,
+                    "listType"
+                )}
             />
             <ErrorText>{getErrorText(formErrors.listType)}</ErrorText>
         </GenericFormCard>

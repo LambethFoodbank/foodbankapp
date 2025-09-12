@@ -5,9 +5,11 @@ import {
     getErrorText,
     getDefaultTextValue,
     onChangeText,
+    Setter,
+    FormErrors,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "@/app/clients/form/ClientForm";
+import { ClientCardProps, ClientFields } from "@/app/clients/form/ClientForm";
 
 const FullNameCard: React.FC<ClientCardProps> = ({
     formErrors,
@@ -23,7 +25,12 @@ const FullNameCard: React.FC<ClientCardProps> = ({
                 defaultValue={getDefaultTextValue(fields, "fullName")}
                 error={errorExists(formErrors.fullName)}
                 helperText={getErrorText(formErrors.fullName)}
-                onChange={onChangeText(fieldSetter, errorSetter, "fullName", { required: true })}
+                onChange={onChangeText(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ClientFields>>,
+                    "fullName",
+                    { required: true }
+                )}
             />
         </GenericFormCard>
     );

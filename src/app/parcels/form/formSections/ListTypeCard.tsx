@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getErrorText, valueOnChangeDropdownList } from "@/components/Form/formFunctions";
+import {
+    FormErrors,
+    getErrorText,
+    Setter,
+    valueOnChangeDropdownList,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ErrorText } from "@/components/Form/formStyling";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
-import { ParcelCardProps } from "../ParcelForm";
+import { ParcelCardProps, ParcelFields } from "../ParcelForm";
 import { ListTypeLabelsAndValues, ListType } from "@/common/databaseListTypes";
 
 interface ListTypeCardProps extends ParcelCardProps {
@@ -42,7 +47,11 @@ const ListTypeCard: React.FC<ListTypeCardProps> = ({
                 labelsAndValues={listTypeLabelsAndValues}
                 listTitle="List Type"
                 value={fields.listType ?? ""}
-                onChange={valueOnChangeDropdownList(fieldSetter, errorSetter, "listType")}
+                onChange={valueOnChangeDropdownList(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ParcelFields>>,
+                    "listType"
+                )}
             />
             <ErrorText>{getErrorText(formErrors.listType)}</ErrorText>
         </GenericFormCard>

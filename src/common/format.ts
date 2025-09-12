@@ -1,6 +1,7 @@
 import { Json } from "@/databaseTypesFile";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
 
 const localeCode = "en-GB";
 
@@ -21,6 +22,13 @@ export const phoneNumberRegex = /^((0|\+44)\d{9,11}|\+(?!44)\d{7,15})?$/;
 
 export const emailFormatSymbolsRegex = /[\s]/g;
 export const emailRegex = /^\S+@\S+$/;
+
+// Regex source: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/488478/Bulk_Data_Transfer_-_additional_validation_valid_from_12_November_2015.pdf
+// The regex has been updated to have a mandatory whitespace in between the outward and inward code
+export const postcodeRegex =
+    /^(([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?)))) [0-9][A-Za-z]{2}))$/;
+export const prefixPostcodeRegex =
+    /^(([Gg][Ii][Rr])|(([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?)))))$/;
 
 export const formatPhoneNumber = (value: string): string => {
     const numericInput = value.replace(/(\D)/g, "");
@@ -47,6 +55,10 @@ export const toSnakeCase = (str: string): string =>
 
 export const displayList = (data: string[]): string => {
     return data.length === 0 ? "None" : data.join(", ");
+};
+
+export const getDisplayPostcode = (postcodeData: string | null): string => {
+    return postcodeData ?? displayPostcodeForHomelessClient;
 };
 
 export const formatAddress = (
@@ -165,6 +177,28 @@ export const getParcelOverviewString = (
     );
 };
 
+export const formatAdditionalPhoneNumbers = (
+    primaryPhoneNumber: string | null,
+    additionalPhoneNumbers: string[] | null,
+    documentName?: string
+): string => {
+    if (primaryPhoneNumber === null || primaryPhoneNumber.length === 0) {
+        if (documentName !== null) {
+            return "";
+        }
+        return "None";
+    }
+
+    if (additionalPhoneNumbers) {
+        const allPhoneNumbers: string[] = [primaryPhoneNumber, ...additionalPhoneNumbers];
+        if (documentName === "ShippingLabels") {
+            return allPhoneNumbers.slice(0, 3).join(", ");
+        }
+        return allPhoneNumbers.join(", ");
+    }
+    return primaryPhoneNumber;
+};
+
 export const formatTimeStringToHoursAndMinutes = (timeString: string): string => {
     dayjs.extend(customParseFormat);
     const dayjsTime = dayjs(timeString, "HH:mm:ss");
@@ -177,4 +211,10 @@ export const formatDayjsToHoursAndMinutes = (dayjsTime: Dayjs): string => {
     const hours = String(dayjsTime.hour()).padStart(2, "0");
     const minutes = String(dayjsTime.minute()).padStart(2, "0");
     return `${hours}:${minutes}`;
+};
+
+export const arrayToBooleanGroup = (data: string[]): BooleanGroup => {
+    const reverted: BooleanGroup = {};
+    data.forEach((value) => (reverted[value] = true));
+    return reverted;
 };

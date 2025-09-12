@@ -1,8 +1,11 @@
 import { Schema } from "@/databaseUtils";
-import { displayPostcodeForHomelessClient, formatAddress } from "@/common/format";
+import {
+    displayPostcodeForHomelessClient,
+    formatAdditionalPhoneNumbers,
+    formatAddress,
+} from "@/common/format";
 import {
     formatBabyProducts,
-    formatExtraInformation,
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
@@ -16,6 +19,9 @@ export interface ClientSummary {
     contact: string;
     address: string;
     email: string;
+}
+
+export interface ClientSummaryAndExtraInfo extends ClientSummary {
     extraInformation: string;
 }
 
@@ -37,8 +43,8 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
         address_postcode,
         full_name,
         phone_number,
+        additional_phone_numbers,
         email,
-        extra_information,
     } = clientData;
 
     const formattedAddress = formatAddress(
@@ -51,10 +57,13 @@ export const prepareClientSummary = (clientData: Schema["clients"]): ClientSumma
 
     return {
         name: full_name ?? "",
-        contact: phone_number ?? "",
+        contact: formatAdditionalPhoneNumbers(
+            phone_number,
+            additional_phone_numbers,
+            "ShoppingList"
+        ),
         email: email ?? "",
         address: address_postcode ? formattedAddress : displayPostcodeForHomelessClient,
-        extraInformation: formatExtraInformation(extra_information),
     };
 };
 

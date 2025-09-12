@@ -4,10 +4,12 @@ import {
     getDefaultTextValue,
     onChangeCheckboxInGroup,
     checkboxGroupToArray,
+    Setter,
+    FormErrors,
 } from "@/components/Form/formFunctions";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
+import { ClientCardProps, ClientFields } from "../ClientForm";
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
 
@@ -59,9 +61,14 @@ const BabyProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter,
                     <FreeFormTextInput
                         label="What Size"
                         defaultValue={getDefaultTextValue(fields, "babyNappies")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "babyNappies", {
-                            required: false,
-                        })}
+                        onChange={onChangeText(
+                            fieldSetter,
+                            errorSetter as Setter<FormErrors<ClientFields>>,
+                            "babyNappies",
+                            {
+                                required: false,
+                            }
+                        )}
                     />
                 )}
 
@@ -75,9 +82,14 @@ const BabyProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter,
                     <FreeFormTextInput
                         label="Specify brand and stage"
                         defaultValue={getDefaultTextValue(fields, "babyFormula")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "babyFormula", {
-                            required: false,
-                        })}
+                        onChange={onChangeText(
+                            fieldSetter,
+                            errorSetter as Setter<FormErrors<ClientFields>>,
+                            "babyFormula",
+                            {
+                                required: false,
+                            }
+                        )}
                     />
                 )}
 
@@ -89,9 +101,14 @@ const BabyProductsCard: React.FC<ClientCardProps> = ({ errorSetter, fieldSetter,
                     <FreeFormTextInput
                         label="More Info"
                         defaultValue={getDefaultTextValue(fields, "babyFood")}
-                        onChange={onChangeText(fieldSetter, errorSetter, "babyFood", {
-                            required: false,
-                        })}
+                        onChange={onChangeText(
+                            fieldSetter,
+                            errorSetter as Setter<FormErrors<ClientFields>>,
+                            "babyFood",
+                            {
+                                required: false,
+                            }
+                        )}
                     />
                 )}
 

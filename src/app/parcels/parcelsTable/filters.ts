@@ -28,6 +28,7 @@ import {
     fullNameSearch,
     phoneSearch,
     postcodeSearch,
+    deliveryAreaFilter,
 } from "@/common/databaseFilters";
 import {
     packingManagerParcelStatuses,
@@ -52,6 +53,7 @@ const parcelsFamilySearchMethod: ParcelsFilterMethod<string> = familySearch(
 
 const parcelsPhoneSearchMethod: ParcelsFilterMethod<string> = phoneSearch<DbParcelRow>(
     "client_phone_number",
+    "client_additional_phone_numbers_text",
     "client_is_active"
 );
 const parcelsEmailSearchMethod: ParcelsFilterMethod<string> = emailSearch<DbParcelRow>(
@@ -259,6 +261,7 @@ export const buildParcelFilters = async (
         await buildDeliveryCollectionFilter(),
         await buildPackingSlotFilter(),
         await buildLastStatusFilter(),
+        deliveryAreaFilter("is_deliverable"),
         buildSpecialViewFilter(today),
     ];
 
@@ -348,7 +351,11 @@ export const updateFiltersFromQueryParams = (
                     ...filter,
                     state: paramValForFilter,
                 } as ParcelsFilter<string>;
-            } else if (["deliveryCollection", "packingSlot", "lastStatus"].includes(filter.key)) {
+            } else if (
+                ["deliveryCollection", "packingSlot", "lastStatus", "is_deliverable"].includes(
+                    filter.key
+                )
+            ) {
                 return {
                     ...filter,
                     state: paramValForFilter,

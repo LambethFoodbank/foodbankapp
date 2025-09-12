@@ -35,3 +35,4 @@ export type DbClientRow = ViewSchema["clients_plus"];
 export type DbParcelRow = ViewSchema["parcels_plus"];
 export type DbReportRow = ViewSchema["reports"];
 export type DbWikiRow = Schema["wiki"];
+export type DbClientTableRow = Schema["clients"];

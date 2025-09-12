@@ -37,6 +37,7 @@ const sampleProcessingData: DbParcelRow[] = [
         client_full_name: "CLIENT_NAME",
         client_address_postcode: "SW1A 2AA",
         client_phone_number: "08642 123",
+        client_additional_phone_numbers_text: "",
         client_flagged_for_attention: false,
         client_signposting_call_required: true,
         family_count: 3,
@@ -55,7 +56,10 @@ const sampleProcessingData: DbParcelRow[] = [
         referrer_name: "John Smith",
         referrer_phone: "0987 654321",
         referral_agency: "Agency 1",
+        flagged_for_attention: false,
+        signposting_call_required: true,
         client_email: "full.name@example.com",
+        is_deliverable: true,
     },
 ];
 
@@ -80,8 +84,11 @@ describe("Parcels Page", () => {
                     clientId: "PRIMARY_KEY2",
                     fullName: "CLIENT_NAME",
                     familyCategory: "Family of 3",
-                    addressPostcode: "SW1A 2AA",
                     phoneNumber: "08642 123",
+                    addressPostcode: {
+                        postcode: "SW1A 2AA",
+                        isDeliverable: true,
+                    },
                     collectionDatetime: new Date("2023-08-04T13:30:00+00:00"),
                     deliveryCollection: {
                         collectionCentreName: "COLLECTION_CENTRE",

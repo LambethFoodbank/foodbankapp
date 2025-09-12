@@ -16,6 +16,7 @@ REPLACE_THIS_LINE
 - [ ] Make sure you've tested via `npm run test`
 
 If you have made any changes to the database...
+  - [ ] I have checked that no concurrency issues can occur, and all situations where they might arise (e.g. modifying the same value in multiple places simultaneously) have been properly handled.
   - [ ] The migration files are up-to-date with my final set up (`npx supabase db diff -f <name_of_migration>` should create nothing at this point)
   - [ ] I have updated the typescript definitions for the database with `npm run generate_types:local`
   - [ ] I have modified the seed in `supabase/seed/seed.ts` if appropriate

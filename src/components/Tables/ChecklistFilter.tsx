@@ -19,6 +19,7 @@ interface ChecklistFilterProps<
     isDisabled?: boolean;
     isHidden?: boolean;
     isHiddenInUrl?: boolean;
+    isRadio?: boolean;
 }
 
 export const serverSideChecklistFilter = <
@@ -34,6 +35,7 @@ export const serverSideChecklistFilter = <
     isDisabled = false,
     isHidden = false,
     isHiddenInUrl = false,
+    isRadio = false,
 }: ChecklistFilterProps<Data, DbData>): ServerSideFilter<Data, string[], DbData> => {
     return {
         key: key,
@@ -58,7 +60,11 @@ export const serverSideChecklistFilter = <
             const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
                 const checkboxKey = event.target.name as string;
                 if (event.target.checked) {
-                    setState([...state, checkboxKey]);
+                    if (isRadio && anySelected()) {
+                        setState([checkboxKey]);
+                    } else {
+                        setState([...state, checkboxKey]);
+                    }
                 } else {
                     setState(state.filter((shownKey) => shownKey !== checkboxKey));
                 }
