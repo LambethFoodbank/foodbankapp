@@ -91,9 +91,7 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
         const newPackingDate = getDbDate(dayjs(date));
 
         const concurrencyChecks = await Promise.all(
-            props.selectedParcels.map((parcel) =>
-                hasConcurrencyConflict(parcel, "packingDate")
-            )
+            props.selectedParcels.map((parcel) => hasConcurrencyConflict(parcel, "packingDate"))
         );
 
         if (!concurrencyChecks.every(Boolean)) {

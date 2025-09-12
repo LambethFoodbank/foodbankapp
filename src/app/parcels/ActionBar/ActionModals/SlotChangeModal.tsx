@@ -108,9 +108,7 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
         }
 
         const concurrencyChecks = await Promise.all(
-            props.selectedParcels.map((parcel) =>
-                hasConcurrencyConflict(parcel, "packingSlot")
-            )
+            props.selectedParcels.map((parcel) => hasConcurrencyConflict(parcel, "packingSlot"))
         );
 
         if (!concurrencyChecks.every(Boolean)) {

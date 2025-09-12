@@ -147,7 +147,6 @@ export const packingDateOrSlotUpdate = async (
         collection_datetime: parcelData.collection_datetime,
         last_updated: parcelData.last_updated,
     };
-    let content =  { parcelDetails: parcelRecord };
 
     if (updateResponse.error) {
         const logId = await logErrorReturnLogId(
@@ -157,7 +156,9 @@ export const packingDateOrSlotUpdate = async (
 
         await sendAuditLog({
             ...auditLog,
-            content: content,
+            content: {
+                parcelDetails: parcelRecord,
+            },
             wasSuccess: false,
             logId,
         });
@@ -176,7 +177,9 @@ export const packingDateOrSlotUpdate = async (
 
     sendAuditLog({
         ...auditLog,
-        content: content,
+        content: {
+            parcelDetails: parcelRecord,
+        },
         wasSuccess: true,
     });
 
