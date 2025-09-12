@@ -105,7 +105,7 @@ const ShoppingListModal: React.FC<ActionModalProps> = (props) => {
 
     const onPdfCreationCompleted = async (): Promise<void> => {
         const { error } = await saveParcelTableRowsStatus(
-            props.selectedParcels,
+            props.selectedParcels.filter((parcel) => parcel.clientIsActive),
             "Shopping List Downloaded"
         );
         if (error) {
