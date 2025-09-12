@@ -84,6 +84,7 @@ const FileGenerationButton = <Data, ErrorType extends string>({
             disabled={disabled}
             ref={buttonToFocusRef}
             type={formSubmitButton ? "submit" : undefined}
+            sx={{ marginTop: "1em" }}
         >
             {children}
         </Button>
