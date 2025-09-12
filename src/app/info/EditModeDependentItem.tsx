@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { DbWikiRow } from "@/databaseUtils";
 import WikiItemDisplay from "@/app/info/WikiItemDisplay";
-import WikiItemEdit from "@/app/info/WikiItemEdit";
+import { WikiItemEdit } from "@/app/info/WikiItemEdit";
 import OrganisationRoleDependentView from "@/app/info/OrganisationRoleDependentView";
 import { DirectionString } from "@/app/info/WikiItems";
 

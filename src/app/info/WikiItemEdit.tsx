@@ -35,7 +35,7 @@ interface WikiItemEditProps {
     isAnyInEditMode?: boolean;
 }
 
-const WikiItemEdit: React.FC<WikiItemEditProps> = ({
+export const WikiItemEdit: React.FC<WikiItemEditProps> = ({
     rowData,
     setRowData,
     setIsInEditMode,
@@ -132,14 +132,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
             if (updateError.message.includes("edited recently")) {
                 setErrorMessage(updateError.message);
                 return;
-            } else {
-                const logId = await logErrorReturnLogId(
-                    "error updating wiki row item",
-                    updateError
-                );
-                setErrorMessage(`Failed to update wiki item. Log ID: ${logId}`);
             }
-
             return;
         } else {
             setErrorMessage("");
@@ -259,5 +252,3 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
         </>
     );
 };
-
-export default WikiItemEdit;
