@@ -81,8 +81,7 @@ export const updateDbWebsiteData = async (
     const auditLog = {
         action: "update website data",
         content: {
-            before: JSON.stringify(beforeAndAfter.before),
-            after: JSON.stringify(beforeAndAfter.after),
+            ...(beforeAndAfter as object),
             actionType: "Edit",
         },
         websiteData: processedData.name,

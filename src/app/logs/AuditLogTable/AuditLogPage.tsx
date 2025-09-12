@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useEffect, useState } from "react";
-import AuditLogTable from "./AuditLogTable";
-import AuditLogModal from "./auditLogModal/AuditLogModal";
-import { Centerer } from "@/components/Modal/ModalFormStyles";
-import { CircularProgress } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import AuditLogTable from "./AuditLogTable";
 import AuditLogModal from "./auditLogModal/AuditLogModal";
 import { Centerer } from "@/components/Modal/ModalFormStyles";
 import { CircularProgress } from "@mui/material";
 import FloatingToast from "@/components/FloatingToast";
-import { AuditLogRow, AuditLogSortState } from "./types";
+import { AuditLogSortState } from "./types";
 import { mergeParamsIntoURL, parseQueryParams } from "@/common/urlQueryParams";
 import { logIdParam } from "./constants";
 import { useSearchParams } from "next/navigation";
@@ -75,11 +71,6 @@ const AuditLogPage: React.FC = () => {
 
     return (
         <>
-            {areFiltersLoadingForFirstTime ? (
-                <Centerer>
-                    <CircularProgress aria-label="table-initial-progress-bar" />
-                </Centerer>
-            ) : (
             {areFiltersLoadingForFirstTime ? (
                 <Centerer>
                     <CircularProgress aria-label="table-initial-progress-bar" />

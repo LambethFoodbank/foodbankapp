@@ -213,8 +213,7 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
         const auditLog = {
             action: "edit a parcel",
             content: {
-                before: JSON.stringify(beforeAndAfter.before),
-                after: JSON.stringify(beforeAndAfter.after),
+                ...(beforeAndAfter as object),
                 actionType: "Edit",
                 count: parcelDataAndCount?.[0].rows_updated,
             },

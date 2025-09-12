@@ -32,7 +32,7 @@ export const getFamilyMembersForDatabase = (
     return peopleToInsert.map((person) => personToFamilyRecordWithoutFamilyId(person));
 };
 
-export const formatClientRecord = (
+const formatClientRecord = (
     fields: ClientFields
 ): ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord => {
     return {
@@ -170,8 +170,7 @@ export const submitEditClientForm = async (
     const auditLog = {
         action: "edit a client",
         content: {
-            before: JSON.stringify(beforeAndAfter.before),
-            after: JSON.stringify(beforeAndAfter.after),
+            ...(beforeAndAfter as object),
             actionType: "Edit",
         },
         clientId: primaryKey,

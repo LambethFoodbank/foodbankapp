@@ -147,8 +147,7 @@ const EditModal: React.FC<Props> = ({ data, onClose, currentList }) => {
 
         const auditLog = {
             content: {
-                before: JSON.stringify(beforeAndAfter.before),
-                after: JSON.stringify(beforeAndAfter.after),
+                ...(beforeAndAfter as object),
                 actionType: "Edit",
             },
             action: "edit a list item",

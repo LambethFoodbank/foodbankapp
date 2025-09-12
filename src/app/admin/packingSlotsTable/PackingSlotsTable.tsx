@@ -91,8 +91,7 @@ function getBaseAuditLogForPackingSlotAction(
     return {
         action,
         content: {
-            before: JSON.stringify(beforeAndAfter.before),
-            after: JSON.stringify(beforeAndAfter.after),
+            ...(beforeAndAfter as object),
             actionType,
         },
         packingSlotId: packingSlotRow.id,

@@ -113,8 +113,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                     action: "edit a wiki item",
                     wikiId: rowData.wiki_key,
                     content: {
-                        before: JSON.stringify(beforeAndAfter.before),
-                        after: JSON.stringify(beforeAndAfter.after),
+                        ...(beforeAndAfter as object),
                         actionType: "Edit",
                         itemTitle: newTitle,
                         itemContent: newContent,

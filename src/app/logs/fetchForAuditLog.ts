@@ -258,6 +258,8 @@ const formatClientRecord = (
         signposting_call_reasons: rawData.signposting_call_reasons ?? [],
         last_updated: rawData.last_updated ?? "",
         notes: rawData.notes ?? "",
+        additional_phone_numbers: rawData.additional_phone_numbers ?? [],
+        flagged_for_attention: rawData.flagged_for_attention ?? false,
     };
 };
 
@@ -295,9 +297,7 @@ export const fetchClient = async (clientID: string): Promise<FetchClient> => {
             },
         };
     }
-    const mappedClient = formatClientRecord(clientData) as
-        | ClientDatabaseInsertRecord
-        | ClientDatabaseUpdateRecord;
+    const mappedClient = formatClientRecord(clientData);
     return {
         data: mappedClient,
         error: null,
@@ -340,9 +340,7 @@ export const fetchClientAndFamily = async (clientID: string): Promise<FetchClien
             },
         };
     }
-    const mappedClient = formatClientRecord(clientData) as
-        | ClientDatabaseInsertRecord
-        | ClientDatabaseUpdateRecord;
+    const mappedClient = formatClientRecord(clientData);
     const mappedFamily = familyData.map((person) => {
         return {
             gender: person.gender,
@@ -351,6 +349,7 @@ export const fetchClientAndFamily = async (clientID: string): Promise<FetchClien
             recorded_as_child: person.recorded_as_child,
         };
     }) as FamilyDatabaseInsertRecord[];
+    console.log(mappedFamily);
     return {
         data: {
             client: mappedClient,
@@ -520,6 +519,7 @@ export const getBeforeAndAfterClientAndFamily = (
     newClient: ClientDatabaseInsertRecord | ClientDatabaseUpdateRecord,
     newFamily: FamilyDatabaseInsertRecord[]
 ): { before: RowType; after: RowType } => {
+    console.log(oldFamily, newFamily);
     oldClient = formatClientRecord(oldClient);
     newClient = formatClientRecord(newClient);
     const clientComparison = diff(oldClient, newClient, {
@@ -535,11 +535,6 @@ export const getBeforeAndAfterClientAndFamily = (
         ],
     });
 
-    // const familyComparison = diff(
-    //     oldFamily,
-    //     newFamily,
-
-    // );
     const familyComparison = getStringArrayComparison(
         oldFamily.map((elem) => (elem ? elem.toString() : "")) ?? [],
         newFamily.map((elem) => (elem ? elem.toString() : "")) ?? [],
@@ -598,8 +593,6 @@ export const getBeforeAndAfterClientAndFamily = (
         ...(petFoodComparison?.after ?? {}),
         ...(signpostingCallReasonsComparison?.after ?? {}),
     };
-
-    console.log(clientComparison);
 
     return {
         before: { ...getBefore(clientComparison), ...familyComparison?.before, ...beforeArrays },
