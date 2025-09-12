@@ -9,7 +9,7 @@ import TableSurface from "@/components/Tables/TableSurface";
 import supabase from "@/supabaseClient";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState, Suspense, useRef, useCallback, useContext } from "react";
-import { useTheme } from "styled-components";
+import { useTheme, styled } from "styled-components";
 import getClientsDataAndCount from "./getClientsData";
 import { useSearchParams, useRouter } from "next/navigation";
 import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
@@ -34,6 +34,15 @@ import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
 import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
 import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
+import Alert from "@mui/material/Alert";
+
+const AlertBox = styled.div`
+    display: block;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+`;
+
+const errorMessageForOutsideDeliveryArea = "The client clicked is outside the delivery area.";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -50,6 +59,7 @@ const ClientsPage: React.FC = () => {
     );
     const [deleteClientErrorMessage, setDeleteClientErrorMessage] = useState<string | null>(null);
     const [isDeleteClientDialogOpen, setIsDeleteClientDialogOpen] = useState<boolean>(false);
+    const [modalError, setModalError] = useState<string | null>(null);
 
     const [perPage, setPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -176,8 +186,10 @@ const ClientsPage: React.FC = () => {
     const onRowClick = (row: Row<ClientsTableRow>): void => {
         if (roleCanAccessOutsideDeliveryAreaModal(role, row.data.addressPostcode.isDeliverable)) {
             router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
+            setModalError(null);
         } else {
             router.push("/clients");
+            setModalError(errorMessageForOutsideDeliveryArea);
         }
     };
 
@@ -200,6 +212,11 @@ const ClientsPage: React.FC = () => {
                         <LinkButton link="/clients/add">Add Client</LinkButton>
                     </Centerer>
                     <TableSurface>
+                        {modalError && (
+                            <AlertBox>
+                                <Alert severity="error">{modalError}</Alert>
+                            </AlertBox>
+                        )}
                         <ServerPaginatedTable<ClientsTableRow, DbClientRow, string>
                             dataPortion={clientsDataPortion}
                             paginationConfig={{
