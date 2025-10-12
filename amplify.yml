@@ -3,8 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - nvm use 18
-        - if [ "${AWS_BRANCH}" = "intern-dev" ]; then nvm use 20; fi
+        - nvm use 20
         - npm ci
     build:
       commands:
