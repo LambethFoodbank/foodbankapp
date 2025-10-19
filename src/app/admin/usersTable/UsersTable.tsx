@@ -40,6 +40,7 @@ const UsersTable: React.FC = () => {
     const endIndex = currentPage * userCountPerPage - 1;
 
     const usersTableFetchAbortController = useRef<AbortController | null>(null);
+    const latestFetchRequestId = useRef<number>(0);
 
     const [tableAlertOptions, setTableAlertOptions] = useState<AlertOptions>({
         success: undefined,
@@ -56,24 +57,26 @@ const UsersTable: React.FC = () => {
 
     const fetchAndDisplayUserData = useCallback(async () => {
         setIsLoading(true);
+
+        latestFetchRequestId.current += 1;
+        const currentFetchRequestId = latestFetchRequestId.current;
+
         if (usersTableFetchAbortController.current) {
             usersTableFetchAbortController.current.abort("stale request");
         }
-
         usersTableFetchAbortController.current = new AbortController();
 
-        if (usersTableFetchAbortController.current) {
-            setErrorMessage(null);
+        setErrorMessage(null);
+        const { data, error } = await getUsersDataAndCount(
+            supabase,
+            startIndex,
+            endIndex,
+            primaryFilters,
+            sortState,
+            usersTableFetchAbortController.current.signal
+        );
 
-            const { data, error } = await getUsersDataAndCount(
-                supabase,
-                startIndex,
-                endIndex,
-                primaryFilters,
-                sortState,
-                usersTableFetchAbortController.current.signal
-            );
-
+        if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
                 switch (error.type) {
                     case "abortedFetchingProfilesTable":
@@ -102,6 +105,7 @@ const UsersTable: React.FC = () => {
                 setCurrentUserId(currentUser.id);
             }
         }
+
         usersTableFetchAbortController.current = null;
         setIsLoading(false);
     }, [startIndex, endIndex, primaryFilters, sortState]);

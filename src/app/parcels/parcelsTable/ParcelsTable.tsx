@@ -69,26 +69,28 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const endPoint = currentPage * parcelCountPerPage - 1;
 
     const parcelsTableFetchAbortController = useRef<AbortController | null>(null);
+    const latestFetchRequestId = useRef<number>(0);
 
     const fetchAndDisplayParcelsData = useCallback(async (): Promise<void> => {
+        latestFetchRequestId.current += 1;
+        const currentFetchRequestId = latestFetchRequestId.current;
+
         if (parcelsTableFetchAbortController.current) {
             parcelsTableFetchAbortController.current.abort("stale request");
         }
-
         parcelsTableFetchAbortController.current = new AbortController();
 
-        if (parcelsTableFetchAbortController.current) {
-            setErrorMessage(null);
+        setErrorMessage(null);
+        const { data, error } = await getParcelsTableDataAndAllIds(
+            supabase,
+            appliedFilters,
+            sortState,
+            parcelsTableFetchAbortController.current.signal,
+            startPoint,
+            endPoint
+        );
 
-            const { data, error } = await getParcelsTableDataAndAllIds(
-                supabase,
-                appliedFilters,
-                sortState,
-                parcelsTableFetchAbortController.current.signal,
-                startPoint,
-                endPoint
-            );
-
+        if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
                 const newErrorMessage = getParcelDataErrorMessage(error.type);
                 if (newErrorMessage !== null) {
@@ -113,10 +115,10 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     );
                 }
             }
-
-            parcelsTableFetchAbortController.current = null;
-            setIsLoading(false);
         }
+
+        parcelsTableFetchAbortController.current = null;
+        setIsLoading(false);
     }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
 
     useEffect(() => {

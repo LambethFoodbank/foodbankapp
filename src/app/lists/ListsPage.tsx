@@ -108,6 +108,7 @@ const ListsPage: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const listsTableFetchAbortController = useRef<AbortController | null>(null);
     const [primaryFilters, setPrimaryFilters] = useState<ListFilter[]>(filters);
+    const latestFetchRequestId = useRef<number>(0);
 
     function handleSetError(error: string | null): void {
         setErrorMessage(error);
@@ -115,13 +116,19 @@ const ListsPage: React.FC = () => {
 
     const fetchAndSetData = useCallback(async (): Promise<void> => {
         setIsLoading(true);
+
+        latestFetchRequestId.current += 1;
+        const currentFetchRequestId = latestFetchRequestId.current;
+
         if (listsTableFetchAbortController.current) {
             listsTableFetchAbortController.current.abort("stale request");
         }
         listsTableFetchAbortController.current = new AbortController();
-        if (listsTableFetchAbortController.current) {
-            setErrorMessage(null);
-            const { data, error } = await fetchListsData();
+
+        setErrorMessage(null);
+        const { data, error } = await fetchListsData();
+
+        if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
                 setIsLoading(false);
                 setErrorMessage(getErrorMessage(error));
@@ -130,9 +137,10 @@ const ListsPage: React.FC = () => {
 
             setListData(formatListData(data.listsData));
             setComment(data.comment);
-            listsTableFetchAbortController.current = null;
-            setIsLoading(false);
         }
+
+        listsTableFetchAbortController.current = null;
+        setIsLoading(false);
     }, [setIsLoading, setErrorMessage, setListData, setComment]);
 
     useEffect(() => {
