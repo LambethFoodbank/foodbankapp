@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GeneralActionModal, {
     ActionModalProps,
     Heading,
@@ -84,18 +84,22 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
     const [displayModal, setDisplayModal] = useState<boolean>(true);
     const [warningMessage, setWarningMessage] = useState<string>("");
 
-    (async () => {
-        const { data: packingSlotsData, error: packingSlotsError } =
-            await fetchPackingSlotsInfo(supabase);
-        if (packingSlotsError) {
-            setErrorMessage(
-                `Failed to fetch packing slots data. Log Id: ${packingSlotsError.logId}`
-            );
-            setDisplayModal(false);
-            return;
-        }
-        setPackingSlots(packingSlotsData);
-    })();
+    useEffect(() => {
+        (async () => {
+            const { data: packingSlotsData, error: packingSlotsError } =
+                await fetchPackingSlotsInfo(supabase);
+
+            if (packingSlotsError) {
+                setErrorMessage(
+                    `Failed to fetch packing slots data. Log Id: ${packingSlotsError.logId}`
+                );
+                setDisplayModal(false);
+                return;
+            }
+
+            setPackingSlots(packingSlotsData);
+        })();
+    }, []);
 
     const onSlotSubmit = async (): Promise<void> => {
         if (slot === "") {
