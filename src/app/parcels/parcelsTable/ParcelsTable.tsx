@@ -77,17 +77,12 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         latestFetchRequestId.current += 1;
         const currentFetchRequestId = latestFetchRequestId.current;
 
-        console.log("QQ: Fetching parcels data with request ID:", currentFetchRequestId);
-
         if (parcelsTableFetchAbortController.current) {
-            console.log(`QQ: Aborting previous fetch request (${currentFetchRequestId - 1})`);
             parcelsTableFetchAbortController.current.abort("stale request");
         }
-
         parcelsTableFetchAbortController.current = new AbortController();
 
         setErrorMessage(null);
-
         const { data, error } = await getParcelsTableDataAndAllIds(
             supabase,
             appliedFilters,
@@ -99,18 +94,11 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
 
         if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
-                console.log(
-                    `QQ: Fetch request (${currentFetchRequestId}) encountered an error:`,
-                    error
-                );
-
                 const newErrorMessage = getParcelDataErrorMessage(error.type);
                 if (newErrorMessage !== null) {
                     setErrorMessage(`${newErrorMessage} Log ID: ${error.logId}`);
                 }
             } else {
-                console.log(`QQ: Fetch request (${currentFetchRequestId}) completed successfully`);
-
                 setParcelsDataPortion(data.parcelTableRows);
                 setFilteredParcelCount(data.allParcelIds.length);
                 setAllFilteredParcelIds(data.allParcelIds);
@@ -129,9 +117,6 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
                     );
                 }
             }
-        } else {
-            // QQ If this fetch was stale, we don't want to update the state
-            console.log(`QQ: Fetch request (${currentFetchRequestId}) was stale, ignoring results`);
         }
 
         parcelsTableFetchAbortController.current = null;

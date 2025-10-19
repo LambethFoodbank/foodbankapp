@@ -42,13 +42,14 @@ const ClientsPage: React.FC = () => {
     const [sortState, setSortState] = useState<ClientsSortState>({ sortEnabled: false });
     const [primaryFilters, setPrimaryFilters] = useState<ClientsFilter[]>(clientsFilters);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const clientTableFetchAbortController = useRef<AbortController | null>(null);
     const [isSelectedClientActive, setIsSelectedClientActive] = useState<boolean | null>(null);
     const [isClientActiveErrorMessage, setIsClientActiveErrorMessage] = useState<string | null>(
         null
     );
     const [deleteClientErrorMessage, setDeleteClientErrorMessage] = useState<string | null>(null);
     const [isDeleteClientDialogOpen, setIsDeleteClientDialogOpen] = useState<boolean>(false);
+    const clientTableFetchAbortController = useRef<AbortController | null>(null);
+    const latestFetchRequestId = useRef<number>(0);
 
     const [perPage, setPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -57,21 +58,26 @@ const ClientsPage: React.FC = () => {
 
     const fetchAndDisplayClientsData = useCallback(async () => {
         setIsLoading(true);
+
+        latestFetchRequestId.current += 1;
+        const currentFetchRequestId = latestFetchRequestId.current;
+
         if (clientTableFetchAbortController.current) {
             clientTableFetchAbortController.current.abort("stale request");
         }
         clientTableFetchAbortController.current = new AbortController();
-        if (clientTableFetchAbortController.current) {
-            setErrorMessage(null);
-            const { data, error } = await getClientsDataAndCount(
-                supabase,
-                startPoint,
-                endPoint,
-                primaryFilters,
-                sortState,
-                clientTableFetchAbortController.current.signal
-            );
 
+        setErrorMessage(null);
+        const { data, error } = await getClientsDataAndCount(
+            supabase,
+            startPoint,
+            endPoint,
+            primaryFilters,
+            sortState,
+            clientTableFetchAbortController.current.signal
+        );
+
+        if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
                 switch (error.type) {
                     case "abortedFetchingClientsTable":
@@ -87,10 +93,11 @@ const ClientsPage: React.FC = () => {
                 setClientsDataPortion(data.clientData);
                 setFilteredClientCount(data.count);
             }
-            clientTableFetchAbortController.current = null;
-            setIsLoading(false);
-            setIsLoadingForFirstTime(false);
         }
+
+        clientTableFetchAbortController.current = null;
+        setIsLoading(false);
+        setIsLoadingForFirstTime(false);
     }, [startPoint, endPoint, primaryFilters, sortState]);
 
     useEffect(() => {
