@@ -121,23 +121,3 @@ const startAddingNewDeliveryArea = (): void => {
         .find('[data-testid="AddIcon"]') // eslint-disable-line quotes
         .click();
 };
-
-const orderDeliveryAreas = (): void => {
-    cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
-        .find('[data-testid="ArrowUpwardIcon"]') // eslint-disable-line quotes
-        .click({ force: true });
-};
-
-function assertDeliveryAreaAtRow({
-    rowIndex,
-    deliveryAreaName,
-}: {
-    rowIndex: number;
-    deliveryAreaName: string;
-}): void {
-    cy.contains(editDeliveryAreaNameText, { matchCase: false })
-        .parents(".MuiPaper-root")
-        .find(`[data-rowindex="${rowIndex}"]`)
-        .find('[data-field="postcode"]') // eslint-disable-line quotes
-        .should("contain.text", deliveryAreaName);
-}
