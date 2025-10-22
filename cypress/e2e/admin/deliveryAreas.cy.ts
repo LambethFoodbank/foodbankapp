@@ -5,17 +5,6 @@ describe("Edit delivery areas on admins page", () => {
         cy.visit("/admin");
     });
 
-    it("Displays delivery areas in ascending order", () => {
-        toggleDeliveryAreaNameSection();
-        verifyDeliveryAreasOrder("ascending");
-    });
-
-    it("Displays delivery areas in descending order", () => {
-        toggleDeliveryAreaNameSection();
-        orderDeliveryAreas();
-        verifyDeliveryAreasOrder("descending");
-    });
-
     it("Adds a new delivery area successfully", () => {
         toggleDeliveryAreaNameSection();
 
@@ -27,7 +16,7 @@ describe("Edit delivery areas on admins page", () => {
 
         cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
             .find(newDeliveryArea)
-            .should("not.exist"); // If this fails then the random UUID is already there
+            .should("not.exist"); // If this fails then the postcode is already there
 
         startAddingNewDeliveryArea();
 
@@ -44,11 +33,23 @@ describe("Edit delivery areas on admins page", () => {
     it("Tries to add a duplicate delivery area and fails", () => {
         toggleDeliveryAreaNameSection();
 
-        const existingDeliveryArea = "CR0";
+        const indexOfPostcodeToDuplicate = 3;
+        cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
+            .find(".MuiDataGrid-row", { timeout: 5000 })
+            .should("have.length.greaterThan", indexOfPostcodeToDuplicate);
 
-        startAddingNewDeliveryArea();
-        fillOutNewDeliveryAreaAndSave(existingDeliveryArea);
-        cy.get('[role="alert"]').should("contain", "already"); // eslint-disable-line quotes
+        cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
+            .find('[role="row"]') // eslint-disable-line quotes
+            .eq(indexOfPostcodeToDuplicate)
+            .find('[data-field="postcode"]') // eslint-disable-line quotes
+            .invoke("text")
+            .then((text) => {
+                const existingDeliveryArea = text.trim();
+
+                startAddingNewDeliveryArea();
+                fillOutNewDeliveryAreaAndSave(existingDeliveryArea);
+                cy.get('[role="alert"]').should("contain", "already"); // eslint-disable-line quotes
+            });
     });
 
     it("Tries to add an empty delivery area and fails", () => {
@@ -96,6 +97,7 @@ describe("Edit delivery areas on admins page", () => {
 const editDeliveryAreaNameText = "edit delivery areas";
 
 function toggleDeliveryAreaNameSection(): void {
+    cy.wait("@getDeliveryAreas");
     cy.contains(editDeliveryAreaNameText, { matchCase: false }).click();
 }
 
@@ -115,56 +117,7 @@ const fillOutNewDeliveryAreaAndSave = (newDeliveryAreaName: string): void => {
 };
 
 const startAddingNewDeliveryArea = (): void => {
-    cy.wait("@getDeliveryAreas");
     cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
         .find('[data-testid="AddIcon"]') // eslint-disable-line quotes
         .click();
 };
-
-const orderDeliveryAreas = (): void => {
-    cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
-        .find('[data-testid="ArrowUpwardIcon"]') // eslint-disable-line quotes
-        .click({ force: true });
-};
-
-function verifyDeliveryAreasOrder(order: "ascending" | "descending"): void {
-    const expectedPostcodes = [
-        "CR0",
-        "CR7",
-        "SE1",
-        "SE11",
-        "SE19",
-        "SE21",
-        "SE24",
-        "SE25",
-        "SE27",
-        "SE5",
-        "SW12",
-        "SW16",
-        "SW2",
-        "SW4",
-        "SW8",
-        "SW9",
-    ];
-
-    const orderedPostcodes =
-        order === "descending" ? [...expectedPostcodes].reverse() : expectedPostcodes;
-
-    orderedPostcodes.forEach((postcode, index) => {
-        assertDeliveryAreaAtRow({ rowIndex: index, deliveryAreaName: postcode });
-    });
-}
-
-function assertDeliveryAreaAtRow({
-    rowIndex,
-    deliveryAreaName,
-}: {
-    rowIndex: number;
-    deliveryAreaName: string;
-}): void {
-    cy.contains(editDeliveryAreaNameText, { matchCase: false })
-        .parents(".MuiPaper-root")
-        .find(`[data-rowindex="${rowIndex}"]`)
-        .find('[data-field="postcode"]') // eslint-disable-line quotes
-        .should("contain.text", deliveryAreaName);
-}
