@@ -10,6 +10,7 @@ REPLACE_THIS_LINE
 - [ ] The ticket is up-to-date - Please document any deviations from the original approach if there is any.
 - [ ] I have documented the testing steps for QA
 - [ ] I have self-reviewed this PR
+- [ ] I have checked that any E2E tests do not assume that the database contains specific data, unless set by migration
 - [ ] Make sure you've verified it works via `npm run dev`
 - [ ] Make sure you've verified it works via `npm run build` and `npm run start`
 - [ ] Make sure you've fixed all linting problems with `npm run lint_fix`
