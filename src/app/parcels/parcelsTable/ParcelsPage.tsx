@@ -142,7 +142,7 @@ const ParcelsPage: React.FC = () => {
                 prevFilters.map((filter) =>
                     filter.key === pageViewTypeQueryParam
                         ? { ...filter, state: isPackingManager ? pageViewTypePackingManager : "" }
-                        : filter
+                        : { ...filter }
                 ) as ParcelsFilters
         );
         setIsPackingManagerView(isPackingManager);
