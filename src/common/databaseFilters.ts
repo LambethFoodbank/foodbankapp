@@ -50,7 +50,7 @@ export const postcodeSearch = <DbData extends DbClientRow | DbParcelRow>(
         if (displayPostcodeForHomelessClient.toLowerCase().includes(substring.toLowerCase())) {
             return `and(${clientIsActiveColumnLabel}.is.true, or(${postcodeColumnLabel}.ilike.%${substring}%, ${postcodeColumnLabel}.is.null))`;
         }
-        return `and(${clientIsActiveColumnLabel}.is.true, split_part(${postcodeColumnLabel}, ' ', 1).ilike.%${substring}%)`;
+        return `and(${clientIsActiveColumnLabel}.is.true, ${postcodeColumnLabel}.ilike.%${substring}%)`;
     });
 };
 
@@ -122,18 +122,18 @@ export function deliveryAreaFilter(
 
     const optionsSet = [
         {
-            key: "Inside",
+            key: "Inside Delivery Area",
             value: true,
         },
         {
-            key: "Outside",
+            key: "Outside Delivery Area",
             value: false,
         },
     ];
 
     return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
         key: deliverableColumnLabel,
-        filterLabel: "Delivery Area",
+        filterLabel: "Area",
         itemLabelsAndKeys: optionsSet.map((option) => [option.key, String(option.value)]),
         initialCheckedKeys: [],
         method: deliveryAreasSearch,

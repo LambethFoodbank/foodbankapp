@@ -42,6 +42,8 @@ interface ParcelsTableProps {
     setErrorMessage: (errorMessage: string | null) => void;
 }
 
+const errorMessageForOutsideDeliveryArea = "The client clicked is outside the delivery area.";
+
 const ParcelsTable: React.FC<ParcelsTableProps> = ({
     checkedParcelIds,
     setCheckedParcelIds,
@@ -56,6 +58,8 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
     const [parcelsDataPortion, setParcelsDataPortion] = useState<ParcelsTableRow[]>([]);
     const [filteredParcelCount, setFilteredParcelCount] = useState<number>(0);
     const [allFilteredParcelIds, setAllFilteredParcelIds] = useState<string[]>([]);
+    const [fetchErrorMessage, setFetchErrorMessage] = useState<string | null>(null);
+    const [rowClickErrorMessage, setRowClickErrorMessage] = useState<string | null>(null);
 
     const [parcelRowBreakPointConfig, setParcelRowBreakPointConfig] = useState<BreakPointConfig[]>(
         []
@@ -79,7 +83,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         parcelsTableFetchAbortController.current = new AbortController();
 
         if (parcelsTableFetchAbortController.current) {
-            setErrorMessage(null);
+            setFetchErrorMessage(null);
 
             const { data, error } = await getParcelsTableDataAndAllIds(
                 supabase,
@@ -93,7 +97,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             if (error) {
                 const newErrorMessage = getParcelDataErrorMessage(error.type);
                 if (newErrorMessage !== null) {
-                    setErrorMessage(`${newErrorMessage} Log ID: ${error.logId}`);
+                    setFetchErrorMessage(`${newErrorMessage} Log ID: ${error.logId}`);
                 }
             } else {
                 setParcelsDataPortion(data.parcelTableRows);
@@ -118,7 +122,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             parcelsTableFetchAbortController.current = null;
             setIsLoading(false);
         }
-    }, [appliedFilters, endPoint, sortState, startPoint, setErrorMessage]);
+    }, [appliedFilters, endPoint, sortState, startPoint, setFetchErrorMessage]);
 
     useEffect(() => {
         if (!areFiltersLoadingForFirstTime) {
@@ -167,9 +171,9 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             )
             .subscribe((status, err) => {
                 if (subscriptionStatusRequiresErrorMessage(status, err, "parcels and related")) {
-                    setErrorMessage("Error fetching data, please reload");
+                    setFetchErrorMessage("Error fetching data, please reload");
                 } else {
-                    setErrorMessage(null);
+                    setFetchErrorMessage(null);
                 }
             });
 
@@ -177,6 +181,16 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
             void supabase.removeChannel(subscriptionChannel);
         };
     });
+
+    useEffect(() => {
+        if (rowClickErrorMessage) {
+            setErrorMessage(rowClickErrorMessage);
+        } else if (fetchErrorMessage) {
+            setErrorMessage(fetchErrorMessage);
+        } else {
+            setErrorMessage(null);
+        }
+    }, [fetchErrorMessage, rowClickErrorMessage, setErrorMessage]);
 
     const selectOrDeselectRow = (parcelId: string): void => {
         const currentIndices = checkedParcelIds;
@@ -219,7 +233,10 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
 
     const onParcelTableRowClick = (row: Row<ParcelsTableRow>): void => {
         if (roleCanAccessOutsideDeliveryAreaModal(role, row.data.addressPostcode.isDeliverable)) {
+            setRowClickErrorMessage(null);
             openParcelModal(row.data.parcelId);
+        } else {
+            setRowClickErrorMessage(errorMessageForOutsideDeliveryArea);
         }
     };
 
