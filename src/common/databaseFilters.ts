@@ -122,18 +122,18 @@ export function deliveryAreaFilter(
 
     const optionsSet = [
         {
-            key: "Inside",
+            key: "Inside Delivery Area",
             value: true,
         },
         {
-            key: "Outside",
+            key: "Outside Delivery Area",
             value: false,
         },
     ];
 
     return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
         key: deliverableColumnLabel,
-        filterLabel: "Delivery Area",
+        filterLabel: "Area",
         itemLabelsAndKeys: optionsSet.map((option) => [option.key, String(option.value)]),
         initialCheckedKeys: [],
         method: deliveryAreasSearch,

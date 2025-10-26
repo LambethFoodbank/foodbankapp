@@ -35,6 +35,8 @@ import FloatingToast from "@/components/FloatingToast";
 import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
 import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
 
+const errorMessageForOutsideDeliveryArea = "The client clicked is outside the delivery area.";
+
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +44,8 @@ const ClientsPage: React.FC = () => {
     const [filteredClientCount, setFilteredClientCount] = useState<number>(0);
     const [sortState, setSortState] = useState<ClientsSortState>({ sortEnabled: false });
     const [primaryFilters, setPrimaryFilters] = useState<ClientsFilter[]>(clientsFilters);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [fetchErrorMessage, setFetchErrorMessage] = useState<string | null>(null);
+    const [rowClickErrorMessage, setRowClickErrorMessage] = useState<string | null>(null);
     const clientTableFetchAbortController = useRef<AbortController | null>(null);
     const [isSelectedClientActive, setIsSelectedClientActive] = useState<boolean | null>(null);
     const [isClientActiveErrorMessage, setIsClientActiveErrorMessage] = useState<string | null>(
@@ -63,7 +66,7 @@ const ClientsPage: React.FC = () => {
         }
         clientTableFetchAbortController.current = new AbortController();
         if (clientTableFetchAbortController.current) {
-            setErrorMessage(null);
+            setFetchErrorMessage(null);
             const { data, error } = await getClientsDataAndCount(
                 supabase,
                 startPoint,
@@ -80,7 +83,7 @@ const ClientsPage: React.FC = () => {
                         return;
                     case "failedToFetchClientsTable":
                     case "failedToFetchClientsTableCount":
-                        setErrorMessage(`Error occurred: ${error.type}, Log ID: 
+                        setFetchErrorMessage(`Error occurred: ${error.type}, Log ID:
                     ${error.logId}`);
                         break;
                 }
@@ -118,9 +121,9 @@ const ClientsPage: React.FC = () => {
             )
             .subscribe((status, err) => {
                 if (subscriptionStatusRequiresErrorMessage(status, err, "clients and related")) {
-                    setErrorMessage("Error fetching data, please reload");
+                    setFetchErrorMessage("Error fetching data, please reload");
                 } else {
-                    setErrorMessage(null);
+                    setFetchErrorMessage(null);
                 }
             });
 
@@ -175,9 +178,10 @@ const ClientsPage: React.FC = () => {
 
     const onRowClick = (row: Row<ClientsTableRow>): void => {
         if (roleCanAccessOutsideDeliveryAreaModal(role, row.data.addressPostcode.isDeliverable)) {
+            setRowClickErrorMessage(null);
             router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
         } else {
-            router.push("/clients");
+            setRowClickErrorMessage(errorMessageForOutsideDeliveryArea);
         }
     };
 
@@ -189,13 +193,20 @@ const ClientsPage: React.FC = () => {
                 </Centerer>
             ) : (
                 <>
-                    {errorMessage && (
+                    {(rowClickErrorMessage && (
                         <FloatingToast
-                            message={errorMessage}
+                            message={rowClickErrorMessage}
                             severity="warning"
                             variant="filled"
                         ></FloatingToast>
-                    )}
+                    )) ||
+                        (fetchErrorMessage && (
+                            <FloatingToast
+                                message={fetchErrorMessage}
+                                severity="warning"
+                                variant="filled"
+                            ></FloatingToast>
+                        ))}
                     <Centerer>
                         <LinkButton link="/clients/add">Add Client</LinkButton>
                     </Centerer>

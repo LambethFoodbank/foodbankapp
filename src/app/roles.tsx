@@ -54,7 +54,7 @@ export const roleCanAccessOutsideDeliveryAreaModal = (
     role: UserRole | null,
     isDeliverable: boolean | null
 ): boolean => {
-    return isDeliverable || (role !== null && role !== "volunteer");
+    return isDeliverable || (role !== null && organisationRoles.includes(role));
 };
 
 export interface RoleUpdateContextType {
