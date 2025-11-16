@@ -146,6 +146,7 @@ const main = async (): Promise<never> => {
     await seed.parcels(
         (generate) =>
             generate(7500, (ctx) => {
+                const callRequired = copycat.bool(ctx.seed);
                 const agency = copycat.bool(ctx.seed)
                     ? copycat.oneOf(ctx.seed, possibleReferralAgency)
                     : "";
@@ -166,13 +167,15 @@ const main = async (): Promise<never> => {
                         ),
                     list_type: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
                     flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
-                    signposting_call_required: (ctx) => copycat.bool(ctx.seed),
+                    signposting_call_required: () => callRequired,
                     signposting_call_reasons: (ctx) =>
-                        copycat.someOf(
-                            ctx.seed,
-                            [0, possibleSignpostingCallReasons.length],
-                            possibleSignpostingCallReasons
-                        ),
+                        callRequired
+                            ? copycat.someOf(
+                                  ctx.seed,
+                                  [0, possibleSignpostingCallReasons.length],
+                                  possibleSignpostingCallReasons
+                              )
+                            : [],
                     extra_information: () => copycat.oneOf(ctx.seed, defaultExtraInformation),
                     referral_agency: () => agency,
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
