@@ -1,6 +1,5 @@
 export const toggleCollectionCentreSectionOpen = (): void => {
-    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .should("not.exist");
+    cy.wait("@getCollectionCentres");
 
     cy.get('[aria-label="Section: Collection Centres"]').click(); // eslint-disable-line quotes
 
