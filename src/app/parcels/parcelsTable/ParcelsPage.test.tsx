@@ -38,8 +38,6 @@ const sampleProcessingData: DbParcelRow[] = [
         client_address_postcode: "SW1A 2AA",
         client_phone_number: "08642 123",
         client_additional_phone_numbers_text: "",
-        client_flagged_for_attention: false,
-        client_signposting_call_required: true,
         family_count: 3,
         is_delivery: false,
         last_status_event_name: "LAST_EVENT",

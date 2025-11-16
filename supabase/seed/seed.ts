@@ -62,8 +62,6 @@ const main = async (): Promise<never> => {
 
     await seed.clients((generate) =>
         generate(750, (ctx) => {
-            const callRequired = copycat.bool(ctx.seed);
-
             return {
                 full_name: () => copycat.fullName(ctx.seed),
                 phone_number: () => copycat.phoneNumber(ctx.seed),
@@ -110,17 +108,6 @@ const main = async (): Promise<never> => {
                     ),
                 other_items: () =>
                     copycat.someOf(ctx.seed, [0, possibleOtherItems.length], possibleOtherItems),
-                extra_information: () => copycat.oneOf(ctx.seed, defaultExtraInformation),
-                flagged_for_attention: () => copycat.bool(ctx.seed),
-                signposting_call_required: () => callRequired,
-                signposting_call_reasons: () =>
-                    callRequired
-                        ? copycat.someOf(
-                              ctx.seed,
-                              [1, Math.min(3, possibleSignpostingCallReasons.length)],
-                              possibleSignpostingCallReasons
-                          )
-                        : [],
                 is_active: () => copycat.oneOf(ctx.seed, booleansWeightedToTrue),
                 families: (generateFamily) =>
                     generateFamily(
@@ -159,6 +146,7 @@ const main = async (): Promise<never> => {
     await seed.parcels(
         (generate) =>
             generate(7500, (ctx) => {
+                const callRequired = copycat.bool(ctx.seed);
                 const agency = copycat.bool(ctx.seed)
                     ? copycat.oneOf(ctx.seed, possibleReferralAgency)
                     : "";
@@ -179,13 +167,15 @@ const main = async (): Promise<never> => {
                         ),
                     list_type: () => copycat.oneOf(ctx.seed, possibleListTypesWeighted),
                     flagged_for_attention: (ctx) => copycat.bool(ctx.seed),
-                    signposting_call_required: (ctx) => copycat.bool(ctx.seed),
+                    signposting_call_required: () => callRequired,
                     signposting_call_reasons: (ctx) =>
-                        copycat.someOf(
-                            ctx.seed,
-                            [0, possibleSignpostingCallReasons.length],
-                            possibleSignpostingCallReasons
-                        ),
+                        callRequired
+                            ? copycat.someOf(
+                                  ctx.seed,
+                                  [0, possibleSignpostingCallReasons.length],
+                                  possibleSignpostingCallReasons
+                              )
+                            : [],
                     extra_information: () => copycat.oneOf(ctx.seed, defaultExtraInformation),
                     referral_agency: () => agency,
                     referrer_name: () => (agency ? copycat.fullName(ctx.seed) : ""),
