@@ -1,5 +1,11 @@
-export const toggleCollectionCentreSection = (): void => {
+export const toggleCollectionCentreSectionOpen = (): void => {
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .should("not.exist");
+
     cy.get('[aria-label="Section: Collection Centres"]').click(); // eslint-disable-line quotes
+
+    cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
+        .should("be.visible");
 };
 
 export const startAddingNewCollectionCentre = (): void => {
@@ -113,7 +119,7 @@ export const saveAvailableDaysForCentre = (collectionCentreName: string): void =
 };
 
 export const addNewCollectionCentre = (newCollectionCentreName: string): void => {
-    toggleCollectionCentreSection();
+    toggleCollectionCentreSectionOpen();
 
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
         .find(".MuiDataGrid-row", { timeout: 5000 })
