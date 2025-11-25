@@ -4,7 +4,13 @@ import { checkboxGroupToArray, onChangeCheckboxInGroup } from "@/components/Form
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
 
-export const otherRequirementOptions: string[] = ["Hot Water Bottle", "Blanket"];
+export const otherRequirementOptions: string[] = [
+    "Plantain",
+    "Yam",
+    "Cassava",
+    "Okra",
+    "Scotch Bonnet",
+];
 
 export const otherItemsLabelsAndKeys: [string, string][] = otherRequirementOptions.map(
     (optionName) => [optionName, optionName]
