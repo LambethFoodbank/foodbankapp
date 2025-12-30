@@ -77,7 +77,7 @@ const Statuses: React.FC<Props> = ({
         void getParcelStatuses();
     }, [setModalError]);
 
-    const submitStatus = async (date: Dayjs): Promise<void> => {
+    const submitStatus = async (date?: Dayjs): Promise<void> => {
         setServerErrorMessage(null);
         if (selectedStatus === null) {
             setServerErrorMessage("Chosen status was not found.");

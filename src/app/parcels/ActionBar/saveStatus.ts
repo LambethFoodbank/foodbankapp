@@ -1,6 +1,6 @@
-"use client";
+"use server";
 
-import supabase from "@/supabaseClient";
+import { getSupabaseServerComponentClient } from "@/supabaseServer";
 import dayjs, { Dayjs } from "dayjs";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { sendAuditLog } from "@/server/auditLog";
@@ -25,7 +25,8 @@ export const saveParcelStatus = async (
     action?: string,
     date?: Dayjs
 ): Promise<SaveParcelStatusResult> => {
-    const timestamp = (date ?? dayjs()).toISOString();
+    // This is server-side, so put the date through dayjs to ensure it's a Dayjs object
+    const timestamp = (date ? dayjs(date) : dayjs()).toISOString();
     const eventsToInsert = parcelIds
         .map((parcelId: string) => {
             return {
@@ -43,6 +44,7 @@ export const saveParcelStatus = async (
         parcelId: eventToInsert.parcel_id,
     }));
 
+    const supabase = getSupabaseServerComponentClient();
     const { data, error } = await supabase
         .from("events")
         .insert(eventsToInsert)

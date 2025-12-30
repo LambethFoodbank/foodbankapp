@@ -74,4 +74,5 @@ export const RoleManager: React.FC<Props> = ({ children }) => {
 
 export const allRoles: UserRole[] = ["volunteer", "staff", "manager", "admin"];
 export const organisationRoles: UserRole[] = ["staff", "manager", "admin"];
+export const managerOrAboveRoles: UserRole[] = ["manager", "admin"];
 export const adminRoles: UserRole[] = ["admin"];
