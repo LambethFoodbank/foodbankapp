@@ -89,7 +89,8 @@ describe("Parcels page url params", () => {
     it.skip("URL params are updated when a parcel is opened", () => {
         cy.get("[id='cell-fullName-0']").click();
 
-        cy.get("[id='expandedParcelDetailsModal']").should("be.visible");
+        cy.get('div[data-testid="ParcelDetailsModal"]') // eslint-disable-line quotes
+            .should("be.visible");
 
         // This should have the parcel ID
         cy.url().should("include", "parcelId=");

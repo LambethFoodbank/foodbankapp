@@ -23,10 +23,11 @@ export const saveParcelStatus = async (
     statusName: StatusType,
     statusEventData?: string | null,
     action?: string,
-    date?: Dayjs
+    date?: string | Dayjs
 ): Promise<SaveParcelStatusResult> => {
     // This is server-side, so put the date through dayjs to ensure it's a Dayjs object
     const timestamp = (date ? dayjs(date) : dayjs()).toISOString();
+
     const eventsToInsert = parcelIds
         .map((parcelId: string) => {
             return {
@@ -74,7 +75,7 @@ export const saveParcelTableRowsStatus = async (
     statusName: StatusType,
     statusEventData?: string | null,
     action?: string,
-    date?: Dayjs
+    date?: string | Dayjs
 ): Promise<SaveParcelStatusResult> => {
     return saveParcelStatus(
         parcelRows.map((parcelRow) => parcelRow.parcelId),

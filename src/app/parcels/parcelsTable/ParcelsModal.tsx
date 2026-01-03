@@ -78,7 +78,8 @@ const ParcelsModal: React.FC<ParcelsModalProps> = ({
                 onClose={() => {
                     closeParcelModal();
                 }}
-                headerId="expandedParcelDetailsModal"
+                headerId="ParcelDetailsModal"
+                testId="ParcelDetailsModal"
                 footer={
                     <Centerer>
                         <ConfirmButtons>

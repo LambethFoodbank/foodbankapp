@@ -158,6 +158,7 @@ export type BreakPointConfig = {
 interface Props<Data, DbData extends Record<string, unknown>, PaginationType, FilterState> {
     dataPortion: Data[];
     headerKeysAndLabels: TableHeaders<Data>;
+    testId?: string;
     isLoading?: boolean;
     checkboxConfig: CheckboxConfig<Data>;
     paginationConfig: PaginationConfig;
@@ -228,6 +229,7 @@ const Table = <
 >({
     dataPortion,
     headerKeysAndLabels,
+    testId = undefined,
     isLoading = false,
     defaultShownHeaders,
     toggleableHeaders = [],
@@ -447,7 +449,7 @@ const Table = <
     ];
 
     return (
-        <div aria-live="polite">
+        <div aria-live="polite" data-testid={testId}>
             {(filterConfig.primaryFiltersShown || filterConfig.additionalFiltersShown) && (
                 <TableFiltersBar<
                     Data,

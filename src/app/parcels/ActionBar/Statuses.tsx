@@ -83,12 +83,13 @@ const Statuses: React.FC<Props> = ({
             setServerErrorMessage("Chosen status was not found.");
             return;
         }
+
         const { error } = await saveParcelTableRowsStatus(
             selectedParcels,
             selectedStatus,
             null,
             undefined,
-            date
+            date?.toISOString()
         );
         if (error) {
             setServerErrorMessage(`${getStatusErrorMessage(error)} Log ID: ${error.logId}`);

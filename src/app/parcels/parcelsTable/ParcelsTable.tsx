@@ -224,6 +224,7 @@ const ParcelsTable: React.FC<ParcelsTableProps> = ({
         <TableSurface>
             <ServerPaginatedTable<ParcelsTableRow, DbParcelRow, string | DateRangeState | string[]>
                 dataPortion={parcelsDataPortion}
+                testId="ParcelsTable"
                 isLoading={isLoading}
                 paginationConfig={{
                     enablePagination: true,

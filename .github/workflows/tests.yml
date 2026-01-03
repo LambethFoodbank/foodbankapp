@@ -10,6 +10,10 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{secrets.SUPABASE_LOCAL_ANON_KEY}}
       NEXT_PUBLIC_CYPRESS_TEST_USER: admin@example.com
       NEXT_PUBLIC_CYPRESS_TEST_PASS: admin123
+      NEXT_PUBLIC_CYPRESS_TEST_ADMIN_USER: admin@example.com
+      NEXT_PUBLIC_CYPRESS_TEST_ADMIN_PASS: admin123
+      NEXT_PUBLIC_CYPRESS_TEST_STAFF_USER: staff@example.com
+      NEXT_PUBLIC_CYPRESS_TEST_STAFF_PASS: staff123
       NEXT_PUBLIC_ENVIRONMENT: test
     steps:
       - name: Checkout this repo

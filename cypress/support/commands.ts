@@ -20,6 +20,8 @@ declare global {
         /* eslint-disable no-unused-vars */
         interface Chainable {
             login: () => void;
+            loginAsAdmin: () => void;
+            loginAsStaff: () => void;
             checkAccessibility: (options?: object) => void;
         }
 
@@ -47,10 +49,7 @@ const loginWithRetry = (iteration = 0): void => {
     });
 };
 
-Cypress.Commands.add("login", () => {
-    const email: string = Cypress.env("TEST_USER");
-    const password: string = Cypress.env("TEST_PASS");
-
+const beginSessionAndLogin = (email: string, password: string): void => {
     cy.session(email, () => {
         cy.visit("/");
 
@@ -64,6 +63,27 @@ Cypress.Commands.add("login", () => {
     });
     // If session cache is used, it only restores cookies/storage and NOT page!
     // Remember to cy.visit(url) as the first action after a login :)
+};
+
+Cypress.Commands.add("login", () => {
+    const email: string = Cypress.env("TEST_USER");
+    const password: string = Cypress.env("TEST_PASS");
+
+    beginSessionAndLogin(email, password);
+});
+
+Cypress.Commands.add("loginAsAdmin", () => {
+    const email: string = Cypress.env("TEST_ADMIN_USER");
+    const password: string = Cypress.env("TEST_ADMIN_PASS");
+
+    beginSessionAndLogin(email, password);
+});
+
+Cypress.Commands.add("loginAsStaff", () => {
+    const email: string = Cypress.env("TEST_STAFF_USER");
+    const password: string = Cypress.env("TEST_STAFF_PASS");
+
+    beginSessionAndLogin(email, password);
 });
 
 Cypress.Commands.add("checkAccessibility", (options?) => {
