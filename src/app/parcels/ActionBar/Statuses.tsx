@@ -77,18 +77,19 @@ const Statuses: React.FC<Props> = ({
         void getParcelStatuses();
     }, [setModalError]);
 
-    const submitStatus = async (date: Dayjs): Promise<void> => {
+    const submitStatus = async (date?: Dayjs): Promise<void> => {
         setServerErrorMessage(null);
         if (selectedStatus === null) {
             setServerErrorMessage("Chosen status was not found.");
             return;
         }
+
         const { error } = await saveParcelTableRowsStatus(
             selectedParcels,
             selectedStatus,
             null,
             undefined,
-            date
+            date?.toISOString()
         );
         if (error) {
             setServerErrorMessage(`${getStatusErrorMessage(error)} Log ID: ${error.logId}`);

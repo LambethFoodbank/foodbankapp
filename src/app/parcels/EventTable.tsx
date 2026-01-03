@@ -35,6 +35,7 @@ const EventTable: React.FC<EventTableProps> = (props) => {
                 <ClientPaginatedTable
                     dataPortion={props.tableData}
                     headerKeysAndLabels={eventsTableHeaderKeysAndLabels}
+                    testId="EventTable"
                     columnDisplayFunctions={eventsTableColumnDisplayFunctions}
                     defaultShownHeaders={defaultShownHeaders}
                     checkboxConfig={{ displayed: false }}

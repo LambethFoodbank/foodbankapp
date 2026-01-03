@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "@mui/material/Button";
+import { managerOrAboveRoles, RoleUpdateContext } from "@/app/roles";
+import { Checkbox, Button, FormControlLabel } from "@mui/material";
 import Modal from "@/components/Modal/Modal";
-import { DatePicker, TimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { ParcelsTableRow } from "../parcelsTable/types";
 import SelectedParcelsOverview from "./SelectedParcelsOverview";
@@ -11,7 +12,7 @@ import { Centerer } from "@/components/Modal/ModalFormStyles";
 
 interface StatusesModalProps extends React.ComponentProps<typeof Modal> {
     selectedParcels: ParcelsTableRow[];
-    onSubmit: (date: Dayjs) => void;
+    onSubmit: (date?: Dayjs) => void;
     errorText: string | null;
 }
 
@@ -29,52 +30,78 @@ const ModalInner = styled.div`
 `;
 
 const StatusesModal: React.FC<StatusesModalProps> = (props) => {
-    const [date, setDate] = useState(dayjs(new Date()));
+    const [dateTimeIsOverridden, setDateTimeIsOverridden] = useState<boolean>(false);
+    const [dateTime, setDateTime] = useState(dayjs(new Date()));
+
+    const { role } = useContext(RoleUpdateContext);
+    const userCanOverrideDateTime = role && managerOrAboveRoles.includes(role);
 
     useEffect(() => {
-        setDate(dayjs(new Date()));
+        setDateTimeIsOverridden(false);
     }, [props.isOpen]);
 
-    const onDateChange = (newDate: Dayjs | null): void =>
-        setDate((date) =>
-            date
-                .set("year", newDate?.year() ?? date.year())
-                .set("month", newDate?.month() ?? date.month())
-                .set("date", newDate?.date() ?? date.date())
-        );
+    useEffect(() => {
+        setDateTime(dayjs(new Date()));
+    }, [props.isOpen, dateTimeIsOverridden]);
 
-    const onTimeChange = (newDate: Dayjs | null): void =>
-        setDate((date) =>
-            date
-                .set("hour", newDate?.hour() ?? date.hour())
-                .set("minute", newDate?.minute() ?? date.minute())
+    const onDateTimeChange = (newDateTime: Dayjs | null): void => {
+        setDateTime((dateTime) =>
+            dayjs()
+                .set("year", newDateTime?.year() ?? dateTime.year())
+                .set("month", newDateTime?.month() ?? dateTime.month())
+                .set("date", newDateTime?.date() ?? dateTime.date())
+                .set("hour", newDateTime?.hour() ?? dateTime.hour())
+                .set("minute", newDateTime?.minute() ?? dateTime.minute())
+                .set("second", 0)
         );
+    };
+
+    const handleOverrideCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setDateTimeIsOverridden(event.target.checked);
+    };
 
     const maxParcelsToShow = 5;
 
     return (
-        <Modal {...props}>
+        <Modal {...props} testId="StatusesModal">
             <ModalInner>
                 {props.errorText && <ErrorSecondaryText>{props.errorText}</ErrorSecondaryText>}
-                <Centerer>
-                    <Row>
-                        Date:
-                        <DatePicker
-                            value={date}
-                            defaultValue={date}
-                            onChange={onDateChange}
-                            disableFuture
-                        />
-                        Time:
-                        <TimePicker value={date} onChange={onTimeChange} disableFuture />
-                    </Row>
-                </Centerer>
+                {userCanOverrideDateTime && (
+                    <>
+                        <Row>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={dateTimeIsOverridden}
+                                        onChange={handleOverrideCheckbox}
+                                        data-testid="OverrideDateTimeCheckbox"
+                                    />
+                                }
+                                label="Override status timestamp"
+                            />
+                            {dateTimeIsOverridden && (
+                                <DateTimePicker
+                                    label="Date and Time"
+                                    aria-label="Date and Time"
+                                    value={dateTime}
+                                    onChange={onDateTimeChange}
+                                    disabled={!dateTimeIsOverridden}
+                                    disableFuture
+                                />
+                            )}
+                        </Row>
+                    </>
+                )}
                 <SelectedParcelsOverview
                     parcels={props.selectedParcels}
                     maxParcelsToShow={maxParcelsToShow}
                 />
                 <Centerer>
-                    <Button type="button" variant="contained" onClick={() => props.onSubmit(date)}>
+                    <Button
+                        type="button"
+                        variant="contained"
+                        onClick={() => props.onSubmit(dateTimeIsOverridden ? dateTime : undefined)}
+                    >
                         Submit
                     </Button>
                 </Centerer>

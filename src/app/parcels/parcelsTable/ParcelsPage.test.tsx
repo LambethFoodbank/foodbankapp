@@ -299,14 +299,14 @@ describe("Parcels Page", () => {
                         gender: "female",
                     },
                     {
-                        birth_year: 2009,
+                        birth_year: 2012,
                         birth_month: null,
                         recorded_as_child: null,
                         gender: null,
                     },
                 ])
             ).toEqual(
-                `${currentYear - 2019}-years-old male, ${currentYear - 2020}-years-old female, ${currentYear - 2009}-years-old unknown gender`
+                `${currentYear - 2019}-years-old male, ${currentYear - 2020}-years-old female, ${currentYear - 2012}-years-old unknown gender`
             );
 
             expect(
@@ -318,13 +318,13 @@ describe("Parcels Page", () => {
                         gender: "female",
                     },
                     {
-                        birth_year: 2009,
+                        birth_year: 2011,
                         birth_month: null,
                         recorded_as_child: null,
                         gender: "female",
                     },
                 ])
-            ).toEqual(`${currentYear - 2009}-years-old female`);
+            ).toEqual(`${currentYear - 2011}-years-old female`);
 
             expect(
                 formatBreakdownOfChildrenFromFamilyDetails([
