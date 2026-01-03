@@ -31,7 +31,7 @@ const ModalInner = styled.div`
 
 const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     const [dateTimeIsOverridden, setDateTimeIsOverridden] = useState<boolean>(false);
-    const [dateTime, setDate] = useState(dayjs(new Date()));
+    const [dateTime, setDateTime] = useState(dayjs(new Date()));
 
     const { role } = useContext(RoleUpdateContext);
     const userCanOverrideDateTime = role && managerOrAboveRoles.includes(role);
@@ -41,11 +41,11 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
     }, [props.isOpen]);
 
     useEffect(() => {
-        setDate(dayjs(new Date()));
+        setDateTime(dayjs(new Date()));
     }, [props.isOpen, dateTimeIsOverridden]);
 
     const onDateTimeChange = (newDateTime: Dayjs | null): void => {
-        setDate((dateTime) =>
+        setDateTime((dateTime) =>
             dayjs()
                 .set("year", newDateTime?.year() ?? dateTime.year())
                 .set("month", newDateTime?.month() ?? dateTime.month())
