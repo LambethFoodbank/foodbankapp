@@ -21,7 +21,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CollectionCentresTable from "@/app/admin/collectionCentresTable/CollectionCentresTable";
 import PackingSlotsTable from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import WebsiteDataTable from "./websiteDataTable/WebsiteDataTable";
-import AuditLogTable from "./auditLogTable/AuditLogTable";
 import DeliveryAreasTable from "@/app/admin/deliveryAreasTable/DeliveryAreasTable";
 import { faBowlFood } from "@fortawesome/free-solid-svg-icons/faBowlFood";
 import DietaryRequirementsTable from "@/app/admin/dietaryRequirementsTable/DietaryRequirementsTable";
@@ -39,8 +38,6 @@ interface Panel {
 const PanelIcon = styled(FontAwesomeIcon)`
     padding-right: 0.9rem;
 `;
-
-export const auditLogIcon = faRectangleList;
 
 const AdminPage: React.FC = () => {
     const adminPanels: Panel[] = [
@@ -74,11 +71,6 @@ const AdminPage: React.FC = () => {
             panelTitle: "Edit Website Data",
             panelIcon: faServer,
             panelContent: <WebsiteDataTable />,
-        },
-        {
-            panelTitle: "View Audit Logs",
-            panelIcon: auditLogIcon,
-            panelContent: <AuditLogTable />,
         },
     ];
 

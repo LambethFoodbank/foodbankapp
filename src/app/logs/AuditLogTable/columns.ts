@@ -6,5 +6,5 @@ export const auditLogTableHeaderKeysAndLabels: TableHeaders<AuditLogRow> = [
     ["createdAt", "Time"],
     ["actorName", "User"],
     ["wasSuccess", "Success"],
-    ["logId", "Error Log ID"],
+    ["auditLogId", "Error Log ID"],
 ];

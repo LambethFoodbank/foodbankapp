@@ -24,7 +24,7 @@ const pathsShownToAllAuthenticatedUsers = [
 
 const pathsOnlyShownToStaffAndAbove = ["/lists", "/reports"] as const;
 
-const pathsOnlyShownToAdmin = ["/admin"] as const;
+const pathsOnlyShownToAdmin = ["/admin", "/logs"] as const;
 
 const getShownPagesByRole = (role: UserRole | null): readonly string[] => {
     if (role) {

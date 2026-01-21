@@ -1,5 +1,6 @@
-import { SortOptions } from "@/components/Tables/Table";
+import { DefaultSortConfig, SortOptions } from "@/components/Tables/Table";
 import { AuditLogRow, AuditLogSortMethod } from "./types";
+import { SortOrder } from "react-data-table-component";
 
 export const auditLogTableSortableColumns: SortOptions<AuditLogRow, AuditLogSortMethod>[] = [
     {
@@ -28,3 +29,15 @@ export const auditLogTableSortableColumns: SortOptions<AuditLogRow, AuditLogSort
             query.order("log_id", { ascending: sortDirection === "asc" }),
     },
 ];
+
+export const defaultAuditLogSortConfig: DefaultSortConfig = {
+    defaultColumnHeaderKey: "created_at",
+    defaultSortDirection: "desc" as SortOrder,
+};
+
+export const defaultAuditLogSort: AuditLogSortMethod =
+    auditLogTableSortableColumns.find(
+        (column) => column.key === defaultAuditLogSortConfig.defaultColumnHeaderKey
+    )?.sortMethod ?? ((_, query) => query);
+
+export default auditLogTableSortableColumns;

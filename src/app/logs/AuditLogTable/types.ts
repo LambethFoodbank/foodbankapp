@@ -7,9 +7,27 @@ import { DbAuditLogRow } from "@/databaseUtils";
 export type AuditLogSortMethod = ServerSideSortMethod<DbAuditLogRow>;
 export type AuditLogSortState = SortState<AuditLogRow, AuditLogSortMethod>;
 
-export type AuditLogResponse =
+export type GetAuditLogDataResult =
     | {
-          data: DbAuditLogRow[];
+          logs: DbAuditLogRow[];
+          error: null;
+      }
+    | {
+          logs: null;
+          error: {
+              type: GetDbAuditLogDataErrorType;
+              logId: string;
+          };
+      };
+
+export type GetDbAuditLogDataErrorType = "abortedFetch" | "failedToFetchAuditLogTable";
+
+export type GetAuditLogDataAndIdsResult =
+    | {
+          data: {
+              auditLogTableRows: AuditLogRow[];
+              allAuditLogIds: string[];
+          };
           error: null;
       }
     | {
@@ -27,8 +45,10 @@ export type AuditLogCountResponse =
           error: AuditLogCountError;
       };
 
+export type AuditLogErrorType = "abortedFetch" | "failedAuditLogFetch";
+
 export interface AuditLogError {
-    type: "failedAuditLogFetch";
+    type: AuditLogErrorType;
     logId: string;
 }
 export interface AuditLogCountError {
@@ -53,13 +73,16 @@ export interface AuditLogRow {
     statusOrder: string;
     wasSuccess: boolean | null;
     websiteData: string;
-    dietaryRequirement: string;
 }
 
 export const convertAuditLogPlusRowsToAuditLogRows = (
     auditLogResponse: DbAuditLogRow[]
-): AuditLogRow[] =>
-    auditLogResponse.map((auditLogPlusRow) => ({
+): AuditLogRow[] => auditLogResponse.map(convertSingleAuditLogPlusRowsToAuditLogRow);
+
+export const convertSingleAuditLogPlusRowsToAuditLogRow = (
+    auditLogPlusRow: DbAuditLogRow
+): AuditLogRow => {
+    return {
         auditLogId: auditLogPlusRow.primary_key ?? "",
         action: auditLogPlusRow.action ?? "",
         actorName:
@@ -79,5 +102,5 @@ export const convertAuditLogPlusRowsToAuditLogRows = (
         statusOrder: auditLogPlusRow.status_order ?? "",
         wasSuccess: auditLogPlusRow.wasSuccess ?? null,
         websiteData: auditLogPlusRow.website_data ?? "",
-        dietaryRequirement: auditLogPlusRow.dietary_requirement ?? "",
-    }));
+    };
+};
