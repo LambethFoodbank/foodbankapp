@@ -20,7 +20,8 @@ interface ContentProps {
     setDate: (date: Dayjs) => void;
     selectedParcels: ParcelsTableRow[];
     maxParcelsToShow: number;
-    warningMessage: string;
+    warningMessage: string | null;
+    setWarningMessage: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const DateChangeInput = React.forwardRef<HTMLInputElement, DateInputProps>(
@@ -28,7 +29,11 @@ const DateChangeInput = React.forwardRef<HTMLInputElement, DateInputProps>(
         return (
             <>
                 <Heading>What date would you like to change to?</Heading>
-                <SingleDateInput setDate={props.setDate} ref={dateChangeInputRef} />
+                <SingleDateInput
+                    setDate={props.setDate}
+                    setWarningMessage={props.setWarningMessage}
+                    ref={dateChangeInputRef}
+                />
             </>
         );
     }
@@ -43,6 +48,7 @@ const DateChangeModalContent: React.FC<ContentProps> = ({
     selectedParcels,
     maxParcelsToShow,
     warningMessage,
+    setWarningMessage,
 }) => {
     const dateChangeInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,20 +58,24 @@ const DateChangeModalContent: React.FC<ContentProps> = ({
 
     return (
         <form onSubmit={(event) => onDateSubmit(event)}>
-            <DateChangeInput setDate={setDate} ref={dateChangeInputRef} />
+            <DateChangeInput
+                setDate={setDate}
+                setWarningMessage={setWarningMessage}
+                ref={dateChangeInputRef}
+            />
             <SelectedParcelsOverview
                 parcels={selectedParcels}
                 maxParcelsToShow={maxParcelsToShow}
             />
-            <WarningMessage>{warningMessage}</WarningMessage>
             <ConfirmButtons>
                 <Button variant="outlined" onClick={onClose}>
                     Cancel
                 </Button>
-                <Button variant="contained" type="submit">
+                <Button variant="contained" type="submit" disabled={!!warningMessage}>
                     Change
                 </Button>
             </ConfirmButtons>
+            <WarningMessage>{warningMessage}</WarningMessage>
         </form>
     );
 };
@@ -76,7 +86,7 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const [date, setDate] = useState<Dayjs>();
-    const [warningMessage, setWarningMessage] = useState<string>("");
+    const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
     const onDateSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
@@ -134,6 +144,7 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
                     selectedParcels={props.selectedParcels}
                     maxParcelsToShow={maxParcelsToShow}
                     warningMessage={warningMessage}
+                    setWarningMessage={setWarningMessage}
                 />
             )}
         </GeneralActionModal>

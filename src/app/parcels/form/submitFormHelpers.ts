@@ -53,13 +53,23 @@ export function switchErrorForCollectionDate(
         return Errors.initial;
     }
 
+    // The selected date should be valid
+    const firstRegisteredDate = dayjs("2000-01-01");
+    if (
+        !fields.collectionDate ||
+        !dayjs(fields.collectionDate).isValid() ||
+        dayjs(fields.collectionDate).isBefore(firstRegisteredDate)
+    ) {
+        return Errors.invalid;
+    }
+
     // The collection centre should be available on the selected day
     if (
         (availableDaysForCentre.length > 0 &&
             !availableDaysForCentre[collectionDateDayIndex].is_active) ||
         !collectionCentreIsActive
     ) {
-        return Errors.invalidCollectionDate;
+        return Errors.unavailableCollectionDate;
     }
 
     return Errors.none;
@@ -84,7 +94,7 @@ export function switchErrorForCollectionSlot(
         ) ||
         !availableDaysForCentre.some((day) => day.is_active)
     ) {
-        return Errors.invalidCollectionSlot;
+        return Errors.unavailableCollectionSlot;
     }
 
     return Errors.none;

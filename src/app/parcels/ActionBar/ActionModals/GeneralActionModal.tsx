@@ -40,7 +40,7 @@ export const ModalInner = styled.div`
 export const WarningMessage = styled.div`
     display: flex;
     justify-content: center;
-    color: red;
+    color: ${(props) => props.theme.error};
 `;
 
 export const GeneralActionModal: React.FC<GeneralActionModalProps> = ({
