@@ -1,6 +1,6 @@
 {
-  "name": "norwood-and-brixton-foodbank",
-  "version": "0.1.0",
+  "name": "foodbankapp",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
