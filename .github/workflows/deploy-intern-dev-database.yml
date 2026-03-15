@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
+        with:
+          node-version: 24
 
       - name: Link to the project
         run: npx supabase link --project-ref $SUPABASE_INTERN_DEV_PROJECT_ID
