@@ -149,7 +149,8 @@
     "supabase": "^2.9.6",
     "text-encoding": "^0.7.0",
     "ts-jest": "^29.2.2",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "ws": "^8.18.0"
   },
   "@snaplet/seed": {
     "config": "supabase/seed/seed.config.ts"
