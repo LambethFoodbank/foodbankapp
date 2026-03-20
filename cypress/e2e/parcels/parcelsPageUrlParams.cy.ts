@@ -58,8 +58,8 @@ describe("Parcels page url params", () => {
 
     it("URL params are updated when going into packing manager view", () => {
         // Wait until table has loaded data
-        cy.get("[role='table']").should("be.visible");
-        cy.get("[aria-label='table-progress-bar']").should("not.exist");
+        cy.get("tr").should("be.visible");
+        cy.get("[aria-label='Loading']").should("not.exist");
 
         cy.get("[data-testid='packing-manager-view-button']").click();
         cy.url().should("include", "view=Packing%20Manager");
@@ -75,8 +75,8 @@ describe("Parcels page url params", () => {
         cy.visit("/parcels?view=Packing%20Manager");
 
         // Wait until table has loaded data
-        cy.get("[role='table']").should("be.visible");
-        cy.get("[aria-label='table-progress-bar']").should("not.exist");
+        cy.get("tr").should("be.visible");
+        cy.get("[aria-label='Loading']").should("not.exist");
 
         cy.get("[data-testid='packing-manager-view-button']").should(
             "have.class",

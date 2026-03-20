@@ -32,6 +32,7 @@ export const muiTablePaperProps = {
 };
 
 export const muiTableProps = {
+    tabIndex: 0,
     sx: {
         tableLayout: "fixed",
         width: "100%",
@@ -70,18 +71,30 @@ export const muiTableBodyCellProps = {
     },
 };
 
-export const displayColumnDefOptions = {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const displayColumnDefOptions = (theme: DefaultTheme) => ({
     "mrt-row-drag": {
-        header: "",
         size: 0,
+        align: "right",
         enableSorting: false,
+        muiTableHeadCellProps: {
+            sx: {
+                ...muiTableHeadCellProps(theme).sx,
+                color: "rgb(255, 255, 255, 0)",
+            },
+        },
     },
     "mrt-row-actions": {
-        header: "",
         minSize: 80,
+        muiTableHeadCellProps: {
+            sx: {
+                ...muiTableHeadCellProps(theme).sx,
+                color: "rgb(255, 255, 255, 0)",
+            },
+        },
     },
     "mrt-row-select": {
         size: 2,
         enableSorting: false,
     },
-};
+});

@@ -199,7 +199,7 @@ const MaterialTable = <
         columns,
         data: data,
         getRowId: (row, index) => `row-${index}-${pagination.pageIndex}`,
-        state: { isLoading, columnVisibility, pagination, sorting },
+        state: { isLoading, columnVisibility, pagination, sorting, showProgressBars: isLoading },
         enableColumnFilters: false,
         enableColumnActions: false,
         /* The or-condition is only necessary for the WrappedTable component used inside Jest tests;
@@ -319,7 +319,7 @@ const MaterialTable = <
                 }
             },
         }),
-        displayColumnDefOptions: displayColumnDefOptions,
+        displayColumnDefOptions: displayColumnDefOptions(theme),
         onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: setPagination,
         onSortingChange: setSorting,

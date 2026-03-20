@@ -13,7 +13,7 @@ describe("Client details modal", () => {
 function openClientModal(): void {
     cy.contains("name", { matchCase: false })
         .parents(".MuiPaper-root")
-        .find('[id="row-0"]') // eslint-disable-line quotes
+        .find('table tr[data-index="0"]') // eslint-disable-line quotes
         .click();
 }
 
