@@ -47,7 +47,6 @@ interface QuantityAndNotes {
 interface ListDataViewProps {
     listOfIngredients: ListRow[];
     setListOfIngredients: React.Dispatch<React.SetStateAction<ListRow[]>>;
-    comment: string;
     errorMessage: string | null;
     setErrorMessage: (error: string | null) => void;
     primaryFilters: ListFilter[];
@@ -123,7 +122,6 @@ const listsColumnStyleOptions: ColumnStyles<ListRow> = {
 const ListsDataView: React.FC<ListDataViewProps> = ({
     listOfIngredients,
     setListOfIngredients,
-    comment,
     errorMessage,
     setErrorMessage,
     primaryFilters,
@@ -293,7 +291,7 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
             </Snackbar>
 
             <TableSurface>
-                <CommentBox originalComment={comment} />
+                <CommentBox />
                 <ClientPaginatedMaterialTable<ListRow, string>
                     data={listData}
                     setData={setListData}
