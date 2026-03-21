@@ -144,14 +144,12 @@ const ListsPage: React.FC = () => {
         };
     }, [fetchAndSetData]);
 
-    return isLoading ? (
-        <></>
-    ) : errorMessage ? (
+    return errorMessage ? (
         <ErrorSecondaryText>{errorMessage}</ErrorSecondaryText>
     ) : (
         <ListsDataView
-            listOfIngredients={listData}
-            setListOfIngredients={setListData}
+            listOfItems={listData}
+            isLoading={isLoading}
             errorMessage={errorMessage}
             setErrorMessage={handleSetError}
             primaryFilters={primaryFilters}
