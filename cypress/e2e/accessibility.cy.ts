@@ -1,11 +1,13 @@
+const waitForTableToLoad = (): void => {
+    cy.get("table", { timeout: 5000 }).should("exist");
+    cy.get('[aria-label="Loading"]', { timeout: 5000 }).should("not.exist"); // eslint-disable-line quotes
+};
+
 describe("Accessibility tests in light mode", () => {
     it("Checks clients page", () => {
         cy.login();
         cy.visit("/clients");
-
-        // Ensure data table has loaded and then that content has loaded
-        cy.get("table", { timeout: 5000 }).should("exist");
-        cy.get('[aria-label="Loading"]', { timeout: 5000 }).should("not.exist"); // eslint-disable-line quotes
+        waitForTableToLoad();
 
         cy.checkAccessibility();
     });
@@ -20,10 +22,7 @@ describe("Accessibility tests in light mode", () => {
     it("Checks parcels page", () => {
         cy.login();
         cy.visit("/parcels");
-
-        // Ensure data table has loaded and then that content has loaded
-        cy.get("table", { timeout: 5000 }).should("exist");
-        cy.get('[aria-label="Loading"]', { timeout: 5000 }).should("not.exist"); // eslint-disable-line quotes
+        waitForTableToLoad();
 
         cy.checkAccessibility({
             rules: {
@@ -65,10 +64,8 @@ describe("Accessibility tests in dark mode", () => {
     it("Checks clients page", () => {
         cy.login();
         cy.visit("/clients");
+        waitForTableToLoad();
 
-        // Ensure data table has loaded and then that content has loaded
-        cy.get("table", { timeout: 5000 }).should("exist");
-        cy.get('[aria-label="Loading"]', { timeout: 5000 }).should("not.exist"); // eslint-disable-line quotes
         cy.get("label[aria-label='Theme Switch']").click();
 
         cy.checkAccessibility();
@@ -85,10 +82,8 @@ describe("Accessibility tests in dark mode", () => {
     it("Checks parcels page", () => {
         cy.login();
         cy.visit("/parcels");
+        waitForTableToLoad();
 
-        // Ensure data table has loaded and then that content has loaded
-        cy.get("table", { timeout: 5000 }).should("exist");
-        cy.get('[aria-label="Loading"]', { timeout: 5000 }).should("not.exist"); // eslint-disable-line quotes
         cy.get("label[aria-label='Theme Switch']").click();
 
         cy.checkAccessibility({
