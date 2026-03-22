@@ -216,6 +216,7 @@ const MaterialTable = <
                 : undefined,
         },
         rowCount: paginationConfig.enablePagination ? paginationConfig.filteredCount : undefined,
+        enableTopToolbar: false,
         renderToolbarInternalActions: () => <Box></Box>,
         enableRowActions: rowActionsConfig.editable,
         positionActionsColumn: "first",
