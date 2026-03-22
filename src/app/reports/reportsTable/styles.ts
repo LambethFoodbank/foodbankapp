@@ -1,24 +1,20 @@
-const defaultColumnStyleOptions = { minWidth: "1rem", maxWidth: "5rem" };
+const styleOptionsForValueColumns = { minWidth: "1.5rem", maxWidth: "5rem" };
 
-const columnKeys = [
-    "weekCommencing",
-    "familySize1",
-    "familySize2",
-    "familySize3",
-    "familySize4",
-    "familySize5",
-    "familySize6",
-    "familySize7",
-    "familySize8",
-    "familySize9",
-    "familySize10Plus",
-    "total",
-    "cat",
-    "dog",
-    "catAndDog",
-    "totalWithPets",
-] as const;
-
-export const reportsTableColumnStyleOptions = Object.fromEntries(
-    columnKeys.map((key) => [key, defaultColumnStyleOptions])
-);
+export const reportsTableColumnStyleOptions = {
+    weekCommencing: { minWidth: "1.5rem" },
+    familySize1: styleOptionsForValueColumns,
+    familySize2: styleOptionsForValueColumns,
+    familySize3: styleOptionsForValueColumns,
+    familySize4: styleOptionsForValueColumns,
+    familySize5: styleOptionsForValueColumns,
+    familySize6: styleOptionsForValueColumns,
+    familySize7: styleOptionsForValueColumns,
+    familySize8: styleOptionsForValueColumns,
+    familySize9: styleOptionsForValueColumns,
+    familySize10Plus: styleOptionsForValueColumns,
+    total: styleOptionsForValueColumns,
+    cat: styleOptionsForValueColumns,
+    dog: styleOptionsForValueColumns,
+    catAndDog: styleOptionsForValueColumns,
+    totalWithPets: styleOptionsForValueColumns,
+};

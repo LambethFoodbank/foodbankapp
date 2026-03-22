@@ -44,12 +44,19 @@ export const muiTableHeadCellProps = (theme: DefaultTheme): TableCellProps => ({
     sx: {
         backgroundColor: theme.main.background[2],
         color: theme.main.foreground[2],
+        padding: "0.5rem",
         fontSize: "1rem",
         fontWeight: "bold",
         borderColor: theme.main.border,
         whiteSpace: "normal",
-        wordBreak: "break-word",
-        overflowWrap: "anywhere",
+        wordBreak: "normal",
+        overflowWrap: "normal",
+
+        "& .Mui-TableHeadCell-Content-Wrapper": {
+            whiteSpace: "normal",
+            textOverflow: "clip",
+            overflow: "visible",
+        },
     },
 });
 
@@ -66,6 +73,9 @@ export const muiTableBodyProps = (theme: DefaultTheme): TableBodyProps => ({
 
 export const muiTableBodyCellProps = {
     sx: {
+        padding: "0.5rem",
+        fontSize: "1rem",
+        lineHeight: "normal",
         whiteSpace: "normal",
         wordBreak: "break-word",
     },
@@ -80,7 +90,7 @@ export const displayColumnDefOptions = (theme: DefaultTheme) => ({
         muiTableHeadCellProps: {
             sx: {
                 ...muiTableHeadCellProps(theme).sx,
-                color: "rgb(255, 255, 255, 0)",
+                color: "rgb(0, 0, 0, 0)", // tranparent header text
             },
         },
     },
@@ -89,12 +99,20 @@ export const displayColumnDefOptions = (theme: DefaultTheme) => ({
         muiTableHeadCellProps: {
             sx: {
                 ...muiTableHeadCellProps(theme).sx,
-                color: "rgb(255, 255, 255, 0)",
+                color: "rgb(0, 0, 0, 0)", // tranparent header text
             },
         },
     },
     "mrt-row-select": {
-        size: 2,
+        size: 40,
+        shrink: 0,
         enableSorting: false,
+        muiTableHeadCellProps: {
+            sx: {
+                ...muiTableHeadCellProps(theme).sx,
+                width: "2rem",
+                minWidth: "1.5rem",
+            },
+        },
     },
 });

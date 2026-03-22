@@ -1,6 +1,6 @@
 export const parcelTableColumnStyleOptions = {
     iconsColumn: {
-        maxWidth: "4rem",
+        maxWidth: "2rem",
         minWidth: "0.7rem",
         grow: 0.5,
     },
@@ -66,7 +66,7 @@ export const parcelTableColumnStyleOptions = {
         hide: 800,
         grow: 0.7,
         maxWidth: "7rem",
-        minWidth: "5rem",
+        minWidth: "7rem",
     },
     packingSlot: {
         hide: 800,

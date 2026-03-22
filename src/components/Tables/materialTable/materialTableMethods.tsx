@@ -7,14 +7,15 @@ import {
     SortOptions,
     TableHeaders,
 } from "@/components/Tables/materialTable/tableTypes";
-
 import React from "react";
+
+const assumedDocFontSizeInPx = 16;
 
 const remToPx = (rem: string | undefined): number | undefined => {
     if (!rem) {
         return undefined;
     }
-    return parseFloat(rem) * 16;
+    return parseFloat(rem) * assumedDocFontSizeInPx;
 };
 
 const mapColumnStyle = (columnStyleOptions: ColumnStyleOptions): object => {
