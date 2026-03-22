@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { ClientPaginatedTable, TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import TableSurface from "@/components/Tables/TableSurface";
 import { useRouter } from "next/navigation";
+import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 export interface ClientParcelTableRow {
     parcelId: string;
@@ -26,19 +27,18 @@ const ClientParcelsTable: React.FC<ClientParcelTableProps> = (props) => {
     const router = useRouter();
     return (
         <TableSurface>
-            <ClientPaginatedTable
-                dataPortion={props.parcelsData}
+            <ClientPaginatedMaterialTable
+                data={props.parcelsData}
                 headerKeysAndLabels={headers}
+                checkboxConfig={{ displayed: false }}
                 paginationConfig={{ enablePagination: false }}
                 sortConfig={{ sortPossible: false }}
                 filterConfig={{
                     primaryFiltersShown: false,
                     additionalFiltersShown: false,
                 }}
-                onRowClick={(row) => router.push(`/parcels?parcelId=${row.data.parcelId}`)}
-                checkboxConfig={{ displayed: false }}
-                editableConfig={{ editable: false }}
-                pointerOnHover={true}
+                onRowClick={(row) => router.push(`/parcels?parcelId=${row.original.parcelId}`)}
+                rowActionsConfig={{ editable: false }}
             />
         </TableSurface>
     );

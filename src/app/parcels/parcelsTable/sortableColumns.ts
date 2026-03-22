@@ -1,4 +1,4 @@
-import { DefaultSortConfig, SortOptions } from "@/components/Tables/Table";
+import { DefaultSortConfig, SortOptions } from "@/components/Tables/materialTable/tableTypes";
 import { ParcelsTableRow, ParcelsSortMethod } from "./types";
 import { SortOrder } from "react-data-table-component";
 

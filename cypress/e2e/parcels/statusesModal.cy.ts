@@ -16,7 +16,7 @@ describe("Apply status modal for parcels", () => {
 
         // Add status to the first parcel in the table
         cy.get("div[data-testid='ParcelsTable']")
-            .find("#row-0")
+            .find('tr[data-index="0"]') // eslint-disable-line quotes
             .find('input[type="checkbox"]')
             .first()
             .check();
@@ -38,11 +38,11 @@ describe("Apply status modal for parcels", () => {
         cy.get('div[data-testid="StatusesModal"]').should("not.exist");
 
         // Open the details modal for the first parcel and look for overridden status timestamp
-        cy.get("div[data-testid='ParcelsTable']").find("#row-0").click();
+        cy.get("div[data-testid='ParcelsTable']").find('tr[data-index="0"]').click(); // eslint-disable-line quotes
         cy.get('div[data-testid="ParcelDetailsModal"]')
             .should("be.visible")
             .within(() => {
-                cy.get("div[data-testid='EventTable'] [role='row']")
+                cy.get("div[data-testid='EventTable'] tr")
                     .filter(`:contains('${statusToApply}')`)
                     .filter(`:contains('${expectedEventDateTime}')`)
                     .should("have.length.of.at.least", 1);
@@ -57,7 +57,7 @@ describe("Apply status modal for parcels", () => {
 
         // Add status to the second parcel in the table
         cy.get("div[data-testid='ParcelsTable']")
-            .find("#row-1")
+            .find('tr[data-index="1"]') // eslint-disable-line quotes
             .find('input[type="checkbox"]')
             .first()
             .check();
@@ -77,11 +77,11 @@ describe("Apply status modal for parcels", () => {
         cy.get('div[data-testid="StatusesModal"]').should("not.exist");
 
         // Open the details modal for the second parcel and look for current timestamp
-        cy.get("div[data-testid='ParcelsTable']").find("#row-1").click();
+        cy.get("div[data-testid='ParcelsTable']").find('tr[data-index="1"]').click(); // eslint-disable-line quotes
         cy.get('div[data-testid="ParcelDetailsModal"]')
             .should("be.visible")
             .within(() => {
-                cy.get("div[data-testid='EventTable'] [role='row']")
+                cy.get("div[data-testid='EventTable'] tr")
                     .filter(`:contains('${statusToApply}')`)
                     .filter(`:contains('${expectedEventDateTime}')`)
                     .should("have.length.of.at.least", 1);
@@ -96,7 +96,7 @@ describe("Apply status modal for parcels", () => {
 
         // Add status to the second parcel in the table
         cy.get("div[data-testid='ParcelsTable']")
-            .find("#row-2")
+            .find('tr[data-index="2"]') // eslint-disable-line quotes
             .find('input[type="checkbox"]')
             .first()
             .check();
@@ -116,11 +116,11 @@ describe("Apply status modal for parcels", () => {
         cy.get('div[data-testid="StatusesModal"]').should("not.exist");
 
         // Open the details modal for the second parcel and look for current timestamp
-        cy.get("div[data-testid='ParcelsTable']").find("#row-2").click();
+        cy.get("div[data-testid='ParcelsTable']").find('tr[data-index="2"]').click(); // eslint-disable-line quotes
         cy.get('div[data-testid="ParcelDetailsModal"]')
             .should("be.visible")
             .within(() => {
-                cy.get("div[data-testid='EventTable'] [role='row']")
+                cy.get("div[data-testid='EventTable'] tr")
                     .filter(`:contains('${statusToApply}')`)
                     .filter(`:contains('${expectedEventDateTime}')`)
                     .should("have.length.of.at.least", 1);

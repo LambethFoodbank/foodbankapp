@@ -1,6 +1,6 @@
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
-import { SortState } from "@/components/Tables/Table";
+import { SortState } from "@/components/Tables/materialTable/tableTypes";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { DbParcelRow, ParcelStatus, Schema } from "@/databaseUtils";
 import { ListType } from "@/common/databaseListTypes";

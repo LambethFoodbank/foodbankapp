@@ -1,4 +1,4 @@
-import { TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import { AuditLogRow } from "./types";
 
 export const auditLogTableHeaderKeysAndLabels: TableHeaders<AuditLogRow> = [

@@ -3,12 +3,7 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
-import {
-    FetchListsCommentError,
-    FetchListsError,
-    fetchListsComment,
-    fetchLists,
-} from "@/common/fetch";
+import { FetchListsError, fetchLists } from "@/common/fetch";
 import { LIST_TYPES_ARRAY } from "@/common/databaseListTypes";
 import ListsDataView, {
     ListRow,
@@ -22,7 +17,6 @@ import { buildClientSideTextFilter, filterRowByText } from "@/components/Tables/
 
 interface FetchedListsData {
     listsData: Schema["lists"][];
-    comment: string;
 }
 
 type FetchListsDataResponse =
@@ -32,7 +26,7 @@ type FetchListsDataResponse =
       }
     | {
           data: null;
-          error: FetchListsError | FetchListsCommentError;
+          error: FetchListsError;
       };
 
 const fetchListsData = async (): Promise<FetchListsDataResponse> => {
@@ -40,24 +34,11 @@ const fetchListsData = async (): Promise<FetchListsDataResponse> => {
     if (listsError) {
         return { data: null, error: listsError };
     }
-    const { data: listsCommentData, error: listsCommentError } = await fetchListsComment(supabase);
-    if (listsCommentError) {
-        return { data: null, error: listsCommentError };
-    }
-    return { data: { listsData: listsData, comment: listsCommentData }, error: null };
+    return { data: { listsData: listsData }, error: null };
 };
 
-const getErrorMessage = (error: FetchListsError | FetchListsCommentError): string => {
-    let errorMessage: string;
-    switch (error.type) {
-        case "listsFetchFailed":
-            errorMessage = "Failed to fetch lists data.";
-            break;
-        case "listsCommentFetchFailed":
-            errorMessage = "Failed to fetch lists comment.";
-            break;
-    }
-    return `${errorMessage} Log ID: ${error.logId}`;
+const getFetchErrorMessage = (error: FetchListsError): string => {
+    return `Failed to fetch lists data. Log ID: ${error.logId}`;
 };
 
 const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
@@ -104,7 +85,6 @@ const filters: ListFilter[] = [
 const ListsPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [listData, setListData] = useState<ListRow[]>([]);
-    const [comment, setComment] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const listsTableFetchAbortController = useRef<AbortController | null>(null);
     const [primaryFilters, setPrimaryFilters] = useState<ListFilter[]>(filters);
@@ -131,17 +111,16 @@ const ListsPage: React.FC = () => {
         if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
                 setIsLoading(false);
-                setErrorMessage(getErrorMessage(error));
+                setErrorMessage(getFetchErrorMessage(error));
                 return;
             }
 
             setListData(formatListData(data.listsData));
-            setComment(data.comment);
         }
 
         listsTableFetchAbortController.current = null;
         setIsLoading(false);
-    }, [setIsLoading, setErrorMessage, setListData, setComment]);
+    }, [setIsLoading, setErrorMessage, setListData]);
 
     useEffect(() => {
         fetchAndSetData();
@@ -165,15 +144,12 @@ const ListsPage: React.FC = () => {
         };
     }, [fetchAndSetData]);
 
-    return isLoading ? (
-        <></>
-    ) : errorMessage ? (
+    return errorMessage ? (
         <ErrorSecondaryText>{errorMessage}</ErrorSecondaryText>
     ) : (
         <ListsDataView
-            listOfIngredients={listData}
-            setListOfIngredients={setListData}
-            comment={comment}
+            listOfItems={listData}
+            isLoading={isLoading}
             errorMessage={errorMessage}
             setErrorMessage={handleSetError}
             primaryFilters={primaryFilters}

@@ -1,10 +1,6 @@
 "use client";
 
-import {
-    ClientPaginatedTable,
-    ColumnDisplayFunctions,
-    ColumnStyles,
-} from "@/components/Tables/Table";
+import { ColumnDisplayFunctions, ColumnStyles } from "@/components/Tables/materialTable/tableTypes";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import EditModal, { EditModalState } from "@/app/lists/EditModal";
@@ -22,6 +18,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { ClientSideFilter } from "@/components/Tables/Filters";
 import { ListType } from "@/common/databaseListTypes";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
+import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 export type ListFilter = ClientSideFilter<ListRow, string>;
 
@@ -48,9 +45,8 @@ interface QuantityAndNotes {
 }
 
 interface ListDataViewProps {
-    listOfIngredients: ListRow[];
-    setListOfIngredients: React.Dispatch<React.SetStateAction<ListRow[]>>;
-    comment: string;
+    listOfItems: ListRow[];
+    isLoading: boolean;
     errorMessage: string | null;
     setErrorMessage: (error: string | null) => void;
     primaryFilters: ListFilter[];
@@ -124,9 +120,8 @@ const listsColumnStyleOptions: ColumnStyles<ListRow> = {
 };
 
 const ListsDataView: React.FC<ListDataViewProps> = ({
-    listOfIngredients,
-    setListOfIngredients,
-    comment,
+    listOfItems,
+    isLoading,
     errorMessage,
     setErrorMessage,
     primaryFilters,
@@ -138,10 +133,10 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
     const [toDeleteModalOpen, setToDeleteModalOpen] = useState<boolean>(false);
     const [isDeleteConfirmationDialogueOpen, setIsDeleteConfirmationDialogueOpen] =
         useState<boolean>(false);
-    const [listData, setListData] = useState<ListRow[]>(listOfIngredients);
+    const [listData, setListData] = useState<ListRow[]>(listOfItems);
 
-    if (listOfIngredients === null) {
-        void logInfoReturnLogId("No ingredients found @ app/lists/ListDataView.tsx");
+    if (listOfItems === null) {
+        void logInfoReturnLogId("No shopping list data found.");
         throw new Error("No data found");
     }
 
@@ -150,75 +145,6 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
     const onEdit = (index: number): void => {
         setModal(listRowToListDB(listData[index]));
     };
-
-    const reorderRows = (row1: ListRow, row2: ListRow): void => {
-        const primaryKeys = listOfIngredients.map(
-            (listOfIngredients) => listOfIngredients.primaryKey
-        );
-
-        const row1Index = primaryKeys.indexOf(row1.primaryKey);
-        const row2Index = primaryKeys.indexOf(row2.primaryKey);
-
-        const row1Item = listOfIngredients[row1Index];
-        const row1Order = row1Item.rowOrder;
-
-        const row2Item = listOfIngredients[row2Index];
-        const row2Order = row2Item.rowOrder;
-
-        row1Item.rowOrder = row2Order;
-        row2Item.rowOrder = row1Order;
-
-        const newListOfIngredients = [...listOfIngredients];
-
-        newListOfIngredients[row1Index] = row2Item;
-        newListOfIngredients[row2Index] = row1Item;
-
-        setListOfIngredients(newListOfIngredients);
-    };
-
-    const onSwapRows = async (row1: ListRow, row2: ListRow): Promise<void> => {
-        const { error } = await supabase.from("lists").upsert([
-            {
-                primary_key: row1.primaryKey,
-                row_order: row2.rowOrder,
-            },
-            {
-                primary_key: row2.primaryKey,
-                row_order: row1.rowOrder,
-            },
-        ]);
-
-        const auditLog = {
-            action: `move a list item ${row1.rowOrder <= row2.rowOrder ? "down" : "up"}`,
-            listId: row1.primaryKey,
-            content: {
-                itemName: row1.itemName,
-                oldRowOrder: row1.rowOrder,
-            },
-        } as const satisfies Partial<AuditLog>;
-
-        if (error) {
-            const logId = await logErrorReturnLogId("Error with upsert: List row item order", {
-                error: error,
-            });
-            setErrorMessage(`Failed to swap rows. Log ID: ${logId}`);
-            void sendAuditLog({
-                ...auditLog,
-                wasSuccess: false,
-                logId: logId,
-            });
-            return;
-        } else {
-            void sendAuditLog({
-                ...auditLog,
-                wasSuccess: true,
-                content: { ...auditLog.content, newRowOrder: row2.rowOrder },
-            });
-        }
-
-        reorderRows(row1, row2);
-    };
-
     const onDeleteButtonClick = (index: number): void => {
         setToDelete(index);
         setToDeleteModalOpen(true);
@@ -262,15 +188,73 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
         }
     };
 
+    const updateListRowOrderValues = (): void => {
+        listOfItems.forEach((item, index) => {
+            item.rowOrder = index;
+        });
+    };
+
+    const onRowReorder = async (draggedRow: ListRow, hoveredRow: ListRow): Promise<void> => {
+        // Insert the row being dragged just before the row being hovered over, and update row_order values accordingly
+        const draggedItem = listOfItems.splice(
+            listOfItems.findIndex((row) => row.primaryKey === draggedRow.primaryKey),
+            1
+        )[0];
+
+        listOfItems.splice(
+            listOfItems.findIndex((row) => row.primaryKey === hoveredRow.primaryKey),
+            0,
+            draggedItem
+        );
+
+        updateListRowOrderValues();
+
+        const { error } = await supabase.from("lists").upsert(
+            listOfItems.map((item) => ({
+                primary_key: item.primaryKey,
+                row_order: item.rowOrder,
+            })),
+            { onConflict: "primary_key" }
+        );
+
+        const auditLog = {
+            action: `list item position change (dragged ${draggedRow.rowOrder <= hoveredRow.rowOrder ? "down" : "up"})`,
+            listId: draggedRow.primaryKey,
+            content: {
+                itemName: draggedRow.itemName,
+                oldRowOrder: draggedRow.rowOrder,
+            },
+        } as const satisfies Partial<AuditLog>;
+
+        if (error) {
+            const logId = await logErrorReturnLogId("Error with upsert: List row item order", {
+                error: error,
+            });
+            setErrorMessage(`Failed to reorder rows. Log ID: ${logId}`);
+            void sendAuditLog({
+                ...auditLog,
+                wasSuccess: false,
+                logId: logId,
+            });
+            return;
+        } else {
+            void sendAuditLog({
+                ...auditLog,
+                wasSuccess: true,
+                content: { ...auditLog.content, newRowOrder: hoveredRow.rowOrder },
+            });
+        }
+    };
+
     useEffect(() => {
         setListData(
-            listOfIngredients.filter((row) => {
+            listOfItems.filter((row) => {
                 return primaryFilters.every((filter) => {
                     return filter.method(row, filter.state, filter.rowKey);
                 });
             })
         );
-    }, [primaryFilters, listOfIngredients]);
+    }, [primaryFilters, listOfItems]);
 
     return (
         <>
@@ -302,29 +286,31 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
             </Snackbar>
 
             <TableSurface>
-                <CommentBox originalComment={comment} />
-                <ClientPaginatedTable<ListRow, string>
-                    headerKeysAndLabels={listsHeaderKeysAndLabels}
-                    toggleableHeaders={toggleableHeaders}
-                    dataPortion={listData}
+                <CommentBox />
+                <ClientPaginatedMaterialTable<ListRow, string>
+                    data={listData}
+                    setData={setListData}
                     columnDisplayFunctions={listDataViewColumnDisplayFunctions}
                     columnStyleOptions={listsColumnStyleOptions}
+                    headerKeysAndLabels={listsHeaderKeysAndLabels}
+                    toggleableHeaders={toggleableHeaders}
+                    isLoading={isLoading}
                     checkboxConfig={{ displayed: false }}
                     paginationConfig={{ enablePagination: false }}
                     sortConfig={{ sortPossible: false }}
-                    editableConfig={{
-                        editable: true,
-                        onEdit: onEdit,
-                        onDelete: onDeleteButtonClick,
-                        onSwapRows: onSwapRows,
-                        setDataPortion: setListData,
-                    }}
                     filterConfig={{
                         primaryFiltersShown: true,
                         primaryFilters: primaryFilters,
                         setPrimaryFilters: setPrimaryFilters,
                         additionalFiltersShown: false,
                     }}
+                    rowActionsConfig={{
+                        editable: true,
+                        onEdit: onEdit,
+                        onDelete: onDeleteButtonClick,
+                    }}
+                    enableRowOrdering={true}
+                    onRowReorder={onRowReorder}
                 />
                 <EditModal
                     onClose={() => setModal(undefined)}
