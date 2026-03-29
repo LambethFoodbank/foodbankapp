@@ -196,10 +196,10 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
 
     const onRowReorder = async (draggedRow: ListRow, hoveredRow: ListRow): Promise<void> => {
         // Insert the row being dragged just before the row being hovered over, and update row_order values accordingly
-        const draggedItem = listOfItems.splice(
-            listOfItems.findIndex((row) => row.primaryKey === draggedRow.primaryKey),
-            1
-        )[0];
+        const draggedRowIndex = listOfItems.findIndex(
+            (row) => row.primaryKey === draggedRow.primaryKey
+        );
+        const draggedItem = listOfItems.splice(draggedRowIndex, 1)[0];
 
         listOfItems.splice(
             listOfItems.findIndex((row) => row.primaryKey === hoveredRow.primaryKey),
@@ -218,11 +218,11 @@ const ListsDataView: React.FC<ListDataViewProps> = ({
         );
 
         const auditLog = {
-            action: `list item position change (dragged ${draggedRow.rowOrder <= hoveredRow.rowOrder ? "down" : "up"})`,
+            action: "list item position change",
             listId: draggedRow.primaryKey,
             content: {
                 itemName: draggedRow.itemName,
-                oldRowOrder: draggedRow.rowOrder,
+                oldRowOrder: draggedRowIndex,
             },
         } as const satisfies Partial<AuditLog>;
 
