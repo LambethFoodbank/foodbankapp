@@ -4,7 +4,6 @@ import LinkButton from "@/components/Buttons/LinkButton";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { ButtonsDiv, Centerer, ContentDiv, OutsideDiv } from "@/components/Modal/ModalFormStyles";
-import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import TableSurface from "@/components/Tables/TableSurface";
 import supabase from "@/supabaseClient";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -34,6 +33,8 @@ import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
 import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
 import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
+import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
+import { MRT_Row } from "material-react-table";
 
 const errorMessageForOutsideDeliveryArea = "The client clicked is outside the delivery area.";
 
@@ -53,29 +54,35 @@ const ClientsPage: React.FC = () => {
     );
     const [deleteClientErrorMessage, setDeleteClientErrorMessage] = useState<string | null>(null);
     const [isDeleteClientDialogOpen, setIsDeleteClientDialogOpen] = useState<boolean>(false);
+    const latestFetchRequestId = useRef<number>(0);
 
     const [perPage, setPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-    const startPoint = (currentPage - 1) * perPage;
-    const endPoint = currentPage * perPage - 1;
+    const [currentPage, setCurrentPage] = useState(0);
+    const startPoint = currentPage * perPage;
+    const endPoint = startPoint + perPage - 1;
 
     const fetchAndDisplayClientsData = useCallback(async () => {
         setIsLoading(true);
+
+        latestFetchRequestId.current += 1;
+        const currentFetchRequestId = latestFetchRequestId.current;
+
         if (clientTableFetchAbortController.current) {
             clientTableFetchAbortController.current.abort("stale request");
         }
         clientTableFetchAbortController.current = new AbortController();
-        if (clientTableFetchAbortController.current) {
-            setFetchErrorMessage(null);
-            const { data, error } = await getClientsDataAndCount(
-                supabase,
-                startPoint,
-                endPoint,
-                primaryFilters,
-                sortState,
-                clientTableFetchAbortController.current.signal
-            );
 
+        setFetchErrorMessage(null);
+        const { data, error } = await getClientsDataAndCount(
+            supabase,
+            startPoint,
+            endPoint,
+            primaryFilters,
+            sortState,
+            clientTableFetchAbortController.current.signal
+        );
+
+        if (currentFetchRequestId === latestFetchRequestId.current) {
             if (error) {
                 switch (error.type) {
                     case "abortedFetchingClientsTable":
@@ -91,10 +98,11 @@ const ClientsPage: React.FC = () => {
                 setClientsDataPortion(data.clientData);
                 setFilteredClientCount(data.count);
             }
-            clientTableFetchAbortController.current = null;
-            setIsLoading(false);
-            setIsLoadingForFirstTime(false);
         }
+
+        clientTableFetchAbortController.current = null;
+        setIsLoading(false);
+        setIsLoadingForFirstTime(false);
     }, [startPoint, endPoint, primaryFilters, sortState]);
 
     useEffect(() => {
@@ -176,10 +184,12 @@ const ClientsPage: React.FC = () => {
 
     const { role } = useContext(RoleUpdateContext);
 
-    const onRowClick = (row: Row<ClientsTableRow>): void => {
-        if (roleCanAccessOutsideDeliveryAreaModal(role, row.data.addressPostcode.isDeliverable)) {
+    const onRowClick = (row: MRT_Row<ClientsTableRow>): void => {
+        if (
+            roleCanAccessOutsideDeliveryAreaModal(role, row.original.addressPostcode.isDeliverable)
+        ) {
             setRowClickErrorMessage(null);
-            router.push(`/clients?${clientIdParam}=${row.data.clientId}`);
+            router.push(`/clients?${clientIdParam}=${row.original.clientId}`);
         } else {
             setRowClickErrorMessage(errorMessageForOutsideDeliveryArea);
         }
@@ -211,8 +221,12 @@ const ClientsPage: React.FC = () => {
                         <LinkButton link="/clients/add">Add Client</LinkButton>
                     </Centerer>
                     <TableSurface>
-                        <ServerPaginatedTable<ClientsTableRow, DbClientRow, string>
-                            dataPortion={clientsDataPortion}
+                        <ServerPaginatedMaterialTable<ClientsTableRow, DbClientRow, string>
+                            data={clientsDataPortion}
+                            setData={setClientsDataPortion}
+                            isLoading={isLoading}
+                            headerKeysAndLabels={clientsHeaders}
+                            checkboxConfig={{ displayed: false }}
                             paginationConfig={{
                                 enablePagination: true,
                                 filteredCount: filteredClientCount,
@@ -224,7 +238,6 @@ const ClientsPage: React.FC = () => {
                                 sortableColumns: clientsSortableColumns,
                                 setSortState: setSortState,
                             }}
-                            headerKeysAndLabels={clientsHeaders}
                             onRowClick={onRowClick}
                             filterConfig={{
                                 primaryFiltersShown: true,
@@ -232,11 +245,8 @@ const ClientsPage: React.FC = () => {
                                 setPrimaryFilters: setPrimaryFilters,
                                 additionalFiltersShown: false,
                             }}
-                            checkboxConfig={{ displayed: false }}
-                            editableConfig={{ editable: false }}
-                            isLoading={isLoading}
-                            pointerOnHover={true}
                             columnDisplayFunctions={{ addressPostcode: rowToAddressColumn }}
+                            rowActionsConfig={{ editable: false }}
                         />
                     </TableSurface>
 

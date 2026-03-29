@@ -1,4 +1,4 @@
-import { SortState } from "@/components/Tables/Table";
+import { SortState } from "@/components/Tables/materialTable/tableTypes";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
 import { DbReportRow } from "@/databaseUtils";
 

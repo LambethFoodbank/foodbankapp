@@ -41,7 +41,7 @@ have been delivered to clients.
 
             ```
             net stop winnat
-            netsh int ipv4 add excludedportrange protocol=tcp startport=554322 numberofports=1
+            netsh int ipv4 add excludedportrange protocol=tcp startport=54322 numberofports=1
             net start winnat
             ```
             then re-run `npm run post_checkout`

@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { ClientPaginatedTable, TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import TableSurface from "@/components/Tables/TableSurface";
+import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 export interface EventTableRow {
     eventInfo: string;
@@ -32,19 +33,20 @@ const EventTable: React.FC<EventTableProps> = (props) => {
     return (
         <>
             <TableSurface>
-                <ClientPaginatedTable
-                    dataPortion={props.tableData}
+                <ClientPaginatedMaterialTable
+                    data={props.tableData}
                     headerKeysAndLabels={eventsTableHeaderKeysAndLabels}
+                    testId="EventTable"
                     columnDisplayFunctions={eventsTableColumnDisplayFunctions}
                     defaultShownHeaders={defaultShownHeaders}
                     checkboxConfig={{ displayed: false }}
+                    paginationConfig={{ enablePagination: false }}
+                    sortConfig={{ sortPossible: false }}
                     filterConfig={{
                         primaryFiltersShown: false,
                         additionalFiltersShown: false,
                     }}
-                    sortConfig={{ sortPossible: false }}
-                    paginationConfig={{ enablePagination: false }}
-                    editableConfig={{ editable: false }}
+                    rowActionsConfig={{ editable: false }}
                 />
             </TableSurface>
         </>

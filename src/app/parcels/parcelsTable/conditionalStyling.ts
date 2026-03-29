@@ -1,6 +1,6 @@
 import { DefaultTheme } from "styled-components";
 import { ParcelsTableRow } from "./types";
-import { BreakPointConfig } from "@/components/Tables/Table";
+import { BreakPointConfig } from "@/components/Tables/materialTable/tableTypes";
 
 export type DividingLineStyleOptions = {
     dateAndSlotPrimary: DividingLineStyle;
@@ -52,14 +52,14 @@ export const searchForBreakPoints = (
         case "packingDate": {
             return [
                 {
-                    name: "packingSlot",
-                    breakPoints: searchForPackingSlotBreakPoints(parcelsTableRows),
-                    dividingLineStyle: "dateAndSlotSecondary",
-                },
-                {
                     name: "packingDate",
                     breakPoints: searchForPackingDateBreakPoints(parcelsTableRows),
                     dividingLineStyle: "dateAndSlotPrimary",
+                },
+                {
+                    name: "packingSlot",
+                    breakPoints: searchForPackingSlotBreakPoints(parcelsTableRows),
+                    dividingLineStyle: "dateAndSlotSecondary",
                 },
             ];
         }

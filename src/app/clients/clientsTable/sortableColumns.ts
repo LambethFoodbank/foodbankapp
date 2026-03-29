@@ -1,5 +1,6 @@
-import { SortOptions } from "@/components/Tables/Table";
+import { SortOptions } from "@/components/Tables/materialTable/tableTypes";
 import { ClientsSortMethod, ClientsTableRow } from "./types";
+
 const clientsSortableColumns: SortOptions<ClientsTableRow, ClientsSortMethod>[] = [
     {
         key: "fullName",

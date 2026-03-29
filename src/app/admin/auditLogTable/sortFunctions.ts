@@ -1,4 +1,4 @@
-import { SortOptions } from "@/components/Tables/Table";
+import { SortOptions } from "@/components/Tables/materialTable/tableTypes";
 import { AuditLogRow, AuditLogSortMethod } from "./types";
 
 export const auditLogTableSortableColumns: SortOptions<AuditLogRow, AuditLogSortMethod>[] = [

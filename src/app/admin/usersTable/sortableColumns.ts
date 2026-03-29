@@ -1,4 +1,4 @@
-import { SortOptions } from "@/components/Tables/Table";
+import { SortOptions } from "@/components/Tables/materialTable/tableTypes";
 import { UserRow, UsersSortMethod } from "./types";
 
 export const usersSortableColumns: SortOptions<UserRow, UsersSortMethod>[] = [

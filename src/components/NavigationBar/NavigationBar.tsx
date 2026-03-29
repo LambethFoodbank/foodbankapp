@@ -250,7 +250,7 @@ const NavigationBar: React.FC<Props> = ({ children }) => {
                     onClose={() => {
                         setIslogOutModalOpen(false);
                     }}
-                    headerId="expandedParcelDetailsModal"
+                    headerId="LogoutModal"
                     maxWidth="xs"
                 >
                     <CenteredDiv>

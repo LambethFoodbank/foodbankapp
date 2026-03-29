@@ -1,4 +1,4 @@
-import { TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import { UserRow } from "./types";
 
 export const usersTableHeaderKeysAndLabels: TableHeaders<UserRow> = [

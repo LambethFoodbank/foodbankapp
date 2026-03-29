@@ -1,34 +1,34 @@
 import React from "react";
 import "@testing-library/jest-dom/jest-globals";
 import { render, screen, fireEvent, within, act } from "@testing-library/react";
-import { ClientPaginatedTable } from "@/components/Tables/Table";
 import StyleManager from "@/app/themes";
 import {
     fakeData,
     fakeSmallerData,
     fakeMidData,
     fakeDataHeaders,
-    TestData,
     fullNameTextFilterTest,
     typeButtonFilterTest,
 } from "./testHelpers";
 import { expect, it } from "@jest/globals";
 import WrappedTableForTest from "./WrappedTable";
 import userEvent from "@testing-library/user-event";
+import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
+import { MRT_RowData } from "material-react-table";
 
 describe("Generic Table component", () => {
     describe("Table without features", () => {
         beforeEach(() => {
             render(
                 <StyleManager>
-                    <ClientPaginatedTable<TestData, string>
-                        dataPortion={fakeData}
+                    <ClientPaginatedMaterialTable<MRT_RowData, string>
+                        data={fakeData}
                         headerKeysAndLabels={fakeDataHeaders}
                         checkboxConfig={{ displayed: false }}
                         paginationConfig={{ enablePagination: false }}
                         sortConfig={{ sortPossible: false }}
                         filterConfig={{ primaryFiltersShown: false, additionalFiltersShown: false }}
-                        editableConfig={{ editable: false }}
+                        rowActionsConfig={{ editable: false }}
                     />
                 </StyleManager>
             );
@@ -59,15 +59,17 @@ describe("Generic Table component", () => {
         });
 
         it("should render the table without pagination", () => {
-            expect(screen.queryByLabelText("Rows per page:")).toBeNull();
-            expect(screen.queryByLabelText("First Page")).toBeNull();
-            expect(screen.queryByLabelText("Previous Page")).toBeNull();
-            expect(screen.queryByLabelText("Next Page")).toBeNull();
-            expect(screen.queryByLabelText("Last Page")).toBeNull();
+            expect(screen.queryByLabelText("Rows per page")).toBeNull();
+            expect(screen.queryByLabelText("Go to first page")).toBeNull();
+            expect(screen.queryByLabelText("Go to previous page")).toBeNull();
+            expect(screen.queryByLabelText("Go to next page")).toBeNull();
+            expect(screen.queryByLabelText("Go to last page")).toBeNull();
         });
 
-        it("should have no action on row click", () => {
-            fireEvent.click(screen.getByText("Tom"));
+        it("should have no action on row click", async () => {
+            await act(async () => {
+                fireEvent.click(screen.getByText("Tom"));
+            });
             expect(screen.queryByText("row clicked Tom")).toBeNull();
         });
 
@@ -110,50 +112,67 @@ describe("Generic Table component", () => {
             }
         });
 
-        it("should allow checkboxes to be toggled on and off and have no impact on other checkboxes", () => {
-            fakeMidData.forEach((_, index) => {
+        it("should allow checkboxes to be toggled on and off and have no impact on other checkboxes", async () => {
+            for (let index = 0; index < fakeMidData.length; index++) {
                 const checkbox = screen.getByLabelText(`Select row ${index}`);
-                fireEvent.click(checkbox);
+
+                await act(async () => {
+                    fireEvent.click(checkbox);
+                });
                 expect(checkbox).toBeChecked();
+
                 if (index > 0) {
                     expect(screen.getByLabelText(`Select row ${index - 1}`)).not.toBeChecked();
                 }
-                fireEvent.click(checkbox);
+
+                await act(async () => {
+                    fireEvent.click(checkbox);
+                });
                 expect(checkbox).not.toBeChecked();
-            });
+            }
         });
 
-        it("should have checkall box that toggles every checkbox", () => {
+        it("should have checkall box that toggles every checkbox", async () => {
             const selectAllCheckbox = screen.getByLabelText("Select all rows");
 
-            fireEvent.click(selectAllCheckbox);
+            await act(async () => {
+                fireEvent.click(selectAllCheckbox);
+            });
             for (let index = 0; index < fakeMidData.length; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).toBeChecked();
             }
 
-            fireEvent.click(selectAllCheckbox);
+            await act(async () => {
+                fireEvent.click(selectAllCheckbox);
+            });
             fakeMidData.forEach((_, index) => {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
             });
         });
 
-        it("should have checkall box triggered when all rows checkboxes are checked", () => {
+        it("should have checkall box triggered when all rows checkboxes are checked", async () => {
             for (let index = 0; index < fakeMidData.length; index++) {
-                fireEvent.click(screen.getByLabelText(`Select row ${index}`));
+                await act(async () => {
+                    fireEvent.click(screen.getByLabelText(`Select row ${index}`));
+                });
             }
             expect(screen.getByLabelText("Select all rows")).toBeChecked();
         });
 
-        it("should have checkall box unchecked when one row is unchecked", () => {
+        it("should have checkall box unchecked when one row is unchecked", async () => {
             const selectAllCheckbox = screen.getByLabelText("Select all rows");
 
-            fireEvent.click(selectAllCheckbox);
+            await act(async () => {
+                fireEvent.click(selectAllCheckbox);
+            });
             expect(selectAllCheckbox).toBeChecked();
 
             const row1Checkbox = screen.getByLabelText("Select row 0");
             expect(row1Checkbox).toBeChecked();
 
-            fireEvent.click(row1Checkbox);
+            await act(async () => {
+                fireEvent.click(row1Checkbox);
+            });
             expect(row1Checkbox).not.toBeChecked();
             expect(selectAllCheckbox).not.toBeChecked();
         });
@@ -199,14 +218,18 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should have button filter correctly select table rows by type", () => {
-            fireEvent.click(screen.getByText("Hotel"));
+        it("should have button filter correctly select table rows by type", async () => {
+            await act(async () => {
+                fireEvent.click(screen.getByText("Hotel"));
+            });
             fakeMidData.forEach((data) => {
                 data.type === "regular"
                     ? expect(screen.queryByText(data.full_name)).toBeNull()
                     : expect(screen.getByText(data.full_name)).toBeInTheDocument();
             });
-            fireEvent.click(screen.getByText("Regular"));
+            await act(async () => {
+                fireEvent.click(screen.getByText("Regular"));
+            });
             fakeMidData.forEach((data) => {
                 data.type === "regular"
                     ? expect(screen.getByText(data.full_name)).toBeInTheDocument()
@@ -214,18 +237,26 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should have clear button remove all filters except those that specify to persist", () => {
+        it("should have clear button remove all filters except those that specify to persist", async () => {
             const nameInput = screen.getByLabelText("Name");
             const clearButton = screen.getByText("Clear");
             const hotelButton = screen.getByText("Hotel");
-            fireEvent.click(hotelButton);
-            fireEvent.change(nameInput, { target: { value: "Sam" } });
+            await act(async () => {
+                fireEvent.click(hotelButton);
+            });
+
+            await act(async () => {
+                fireEvent.change(nameInput, { target: { value: "Sam" } });
+            });
+
             fakeMidData.forEach((data) => {
                 data.full_name === "Sam"
                     ? expect(screen.getByText(data.full_name)).toBeInTheDocument()
                     : expect(screen.queryByText(data.full_name)).toBeNull();
             });
-            fireEvent.click(clearButton);
+            await act(async () => {
+                fireEvent.click(clearButton);
+            });
             fakeMidData.forEach((data) => {
                 data.type === "regular"
                     ? expect(screen.queryByText(data.full_name)).toBeNull()
@@ -256,13 +287,17 @@ describe("Generic Table component", () => {
             expect(screen.getByText("More")).toBeInTheDocument();
         });
 
-        it("should have more filters button toggle additional filters on and off", () => {
+        it("should have more filters button toggle additional filters on and off", async () => {
             const moreButton = screen.getByText("More");
             expect(screen.queryByText("Regular")).toBeNull();
-            fireEvent.click(moreButton);
+            await act(async () => {
+                fireEvent.click(moreButton);
+            });
             expect(screen.getByText("Regular")).toBeInTheDocument();
             expect(screen.getByText("Less")).toBeInTheDocument();
-            fireEvent.click(moreButton);
+            await act(async () => {
+                fireEvent.click(moreButton);
+            });
             expect(screen.queryByText("Regular")).toBeNull();
         });
     });
@@ -286,17 +321,23 @@ describe("Generic Table component", () => {
             );
         });
 
-        it("should have checkboxes unaffected by filtering", () => {
+        it("should have checkboxes unaffected by filtering", async () => {
             for (let index = 0; index < fakeMidData.length; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
             }
             const checkbox = screen.getByLabelText("Select row 0");
-            fireEvent.click(checkbox);
+            await act(async () => {
+                fireEvent.click(checkbox);
+            });
             expect(screen.getByLabelText("Select row 0")).toBeChecked();
             const nameInput = screen.getByLabelText("Name");
-            fireEvent.change(nameInput, { target: { value: "Sam" } });
+            await act(async () => {
+                fireEvent.change(nameInput, { target: { value: "Sam" } });
+            });
             const clearButton = screen.getByText("Clear");
-            fireEvent.click(clearButton);
+            await act(async () => {
+                fireEvent.click(clearButton);
+            });
             expect(screen.getByLabelText("Select row 0")).toBeChecked();
             for (let index = 1; index < fakeMidData.length; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
@@ -326,9 +367,12 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should move to next page to view next set of rows", () => {
-            const nextButton = screen.getByLabelText("Next Page");
-            fireEvent.click(nextButton);
+        it("should move to next page to view next set of rows", async () => {
+            const nextButton = screen.getByLabelText("Go to next page", { selector: "button" });
+            await act(async () => {
+                fireEvent.click(nextButton);
+            });
+
             fakeData.slice(7, 14).forEach((data) => {
                 expect(screen.getByText(data.full_name)).toBeInTheDocument();
             });
@@ -340,11 +384,19 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should move to previous page to view previous set of rows", () => {
-            const nextButton = screen.getByLabelText("Next Page");
-            const previousButton = screen.getByLabelText("Previous Page");
-            fireEvent.click(nextButton);
-            fireEvent.click(previousButton);
+        it("should move to previous page to view previous set of rows", async () => {
+            const nextButton = screen.getByLabelText("Go to next page", { selector: "button" });
+            const previousButton = screen.getByLabelText("Go to previous page", {
+                selector: "button",
+            });
+            await act(async () => {
+                fireEvent.click(nextButton);
+            });
+
+            await act(async () => {
+                fireEvent.click(previousButton);
+            });
+
             fakeData.slice(0, 7).forEach((data) => {
                 expect(screen.getByText(data.full_name)).toBeInTheDocument();
             });
@@ -353,15 +405,35 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should allow change in number of rows per page", () => {
-            fireEvent.change(screen.getByLabelText("Rows per page:"), { target: { value: 5 } });
+        it("should allow change in number of rows per page", async () => {
+            await act(async () => {
+                fireEvent.mouseDown(screen.getByRole("combobox", { name: "Rows per page" }));
+            });
+
+            // wait for listbox to show
+            let listbox = await screen.findByRole("listbox");
+
+            // click the option
+            await act(async () => {
+                fireEvent.click(within(listbox).getByRole("option", { name: "5" }));
+            });
             fakeData.slice(0, 5).forEach((data) => {
                 expect(screen.getByText(data.full_name)).toBeInTheDocument();
             });
             fakeData.slice(5).forEach((data) => {
                 expect(screen.queryByText(data.full_name)).toBeNull();
             });
-            fireEvent.change(screen.getByLabelText("Rows per page:"), { target: { value: 7 } });
+            await act(async () => {
+                fireEvent.mouseDown(screen.getByRole("combobox", { name: "Rows per page" }));
+            });
+
+            // wait for listbox to show
+            listbox = await screen.findByRole("listbox");
+
+            // click the option
+            await act(async () => {
+                fireEvent.click(within(listbox).getByRole("option", { name: "7" }));
+            });
             fakeData.slice(0, 7).forEach((data) => {
                 expect(screen.getByText(data.full_name)).toBeInTheDocument();
             });
@@ -370,16 +442,34 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should move to final page when last page button is clicked and first page when first page button is clicked", () => {
-            fireEvent.change(screen.getByLabelText("Rows per page:"), { target: { value: 5 } });
-            fireEvent.click(screen.getByLabelText("Last Page"));
+        it("should move to final page when last page button is clicked and first page when first page button is clicked", async () => {
+            await act(async () => {
+                fireEvent.mouseDown(screen.getByRole("combobox", { name: "Rows per page" }));
+            });
+
+            // wait for listbox to show
+            const listbox = await screen.findByRole("listbox");
+
+            // click the option
+            await act(async () => {
+                fireEvent.click(within(listbox).getByRole("option", { name: "5" }));
+            });
+
+            await act(async () => {
+                fireEvent.click(screen.getByLabelText("Go to last page", { selector: "button" }));
+            });
+
+            await screen.findByText(fakeData[fakeData.length - 2].full_name);
+
             fakeData.slice(fakeData.length - 5).forEach((data) => {
                 expect(screen.getByText(data.full_name)).toBeInTheDocument();
             });
             fakeData.slice(0, fakeData.length - 5).forEach((data) => {
                 expect(screen.queryByText(data.full_name)).toBeNull();
             });
-            fireEvent.click(screen.getByLabelText("First Page"));
+            await act(async () => {
+                fireEvent.click(screen.getByLabelText("Go to first page", { selector: "button" }));
+            });
             fakeData.slice(0, 5).forEach((data) => {
                 expect(screen.getByText(data.full_name)).toBeInTheDocument();
             });
@@ -402,22 +492,28 @@ describe("Generic Table component", () => {
             );
         });
 
-        it("should have checkboxes unaffected by pagination", () => {
+        it("should have checkboxes unaffected by pagination", async () => {
             for (let index = 0; index < 7; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
             }
             const checkbox = screen.getByLabelText("Select row 0");
-            fireEvent.click(checkbox);
+            await act(async () => {
+                fireEvent.click(checkbox);
+            });
             expect(screen.getByLabelText("Select row 0")).toBeChecked();
 
-            const nextButton = screen.getByLabelText("Next Page");
-            fireEvent.click(nextButton);
+            const nextButton = screen.getByLabelText("Go to next page", { selector: "button" });
+            await act(async () => {
+                fireEvent.click(nextButton);
+            });
             for (let index = 0; index < 7; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
             }
 
-            const prevButton = screen.getByLabelText("Previous Page");
-            fireEvent.click(prevButton);
+            const prevButton = screen.getByLabelText("Go to previous page", { selector: "button" });
+            await act(async () => {
+                fireEvent.click(prevButton);
+            });
             expect(screen.getByLabelText("Select row 0")).toBeChecked();
 
             for (let index = 1; index < 7; index++) {
@@ -425,9 +521,14 @@ describe("Generic Table component", () => {
             }
         });
 
-        it("should have checkboxes unaffected by change in rows per page", () => {
-            fireEvent.click(screen.getByLabelText("Select row 0"));
-            fireEvent.click(screen.getByLabelText("Select row 6"));
+        it("should have checkboxes unaffected by change in rows per page", async () => {
+            await act(async () => {
+                fireEvent.click(screen.getByLabelText("Select row 0"));
+            });
+
+            await act(async () => {
+                fireEvent.click(screen.getByLabelText("Select row 6"));
+            });
 
             for (let index = 1; index < 6; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
@@ -435,14 +536,34 @@ describe("Generic Table component", () => {
             expect(screen.getByLabelText("Select row 0")).toBeChecked();
             expect(screen.getByLabelText("Select row 6")).toBeChecked();
 
-            fireEvent.change(screen.getByLabelText("Rows per page:"), { target: { value: 5 } });
+            await act(async () => {
+                fireEvent.mouseDown(screen.getByRole("combobox", { name: "Rows per page" }));
+            });
+
+            // wait for listbox to show
+            let listbox = await screen.findByRole("listbox");
+
+            // click the option
+            await act(async () => {
+                fireEvent.click(within(listbox).getByRole("option", { name: "5" }));
+            });
 
             expect(screen.getByLabelText("Select row 0")).toBeChecked();
             for (let index = 1; index < 5; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
             }
 
-            fireEvent.change(screen.getByLabelText("Rows per page:"), { target: { value: 7 } });
+            await act(async () => {
+                fireEvent.mouseDown(screen.getByRole("combobox", { name: "Rows per page" }));
+            });
+
+            // wait for listbox to show
+            listbox = await screen.findByRole("listbox");
+
+            // click the option
+            await act(async () => {
+                fireEvent.click(within(listbox).getByRole("option", { name: "7" }));
+            });
 
             for (let index = 1; index < 6; index++) {
                 expect(screen.getByLabelText(`Select row ${index}`)).not.toBeChecked();
@@ -469,7 +590,7 @@ describe("Generic Table component", () => {
             expect(screen.getByTestId("select-columns-button")).toBeInTheDocument();
         });
 
-        it("should render with only default shown headers", () => {
+        it("should render with only default shown headers", async () => {
             fakeDataHeaders.forEach((header, index) => {
                 index < fakeDataHeaders.length - 1
                     ? expect(screen.getByText(header[1])).toBeInTheDocument()
@@ -477,7 +598,9 @@ describe("Generic Table component", () => {
             });
 
             const selectColumnsButton = screen.getByTestId("select-columns-button");
-            fireEvent.click(selectColumnsButton);
+            await act(async () => {
+                fireEvent.click(selectColumnsButton);
+            });
 
             fakeDataHeaders.forEach((header, index) => {
                 switch (index) {
@@ -497,9 +620,11 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should only have toggleable headers in the select columns dropdown", () => {
+        it("should only have toggleable headers in the select columns dropdown", async () => {
             const selectColumnsButton = screen.getByTestId("select-columns-button");
-            fireEvent.click(selectColumnsButton);
+            await act(async () => {
+                fireEvent.click(selectColumnsButton);
+            });
             fakeDataHeaders.forEach((header, index) => {
                 index === 0
                     ? expect(screen.queryByTestId(`option-${header[0]}`)).toBeNull()
@@ -514,14 +639,18 @@ describe("Generic Table component", () => {
             expect(screen.queryByTestId("checkbox-group-popup")).toBeFalsy();
 
             const selectColumnsButton = screen.getByTestId("select-columns-button");
-            fireEvent.click(selectColumnsButton);
+            await act(async () => {
+                fireEvent.click(selectColumnsButton);
+            });
             expect(screen.queryByTestId("checkbox-group-popup")).toBeTruthy();
 
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).not.toBeChecked();
 
-            fireEvent.click(screen.getByTestId(`option-${last_header[0]}`));
+            await act(async () => {
+                fireEvent.click(screen.getByTestId(`option-${last_header[0]}`));
+            });
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).toBeChecked();
@@ -531,12 +660,16 @@ describe("Generic Table component", () => {
 
             expect(screen.getByText(last_header[1])).toBeInTheDocument();
 
-            fireEvent.click(selectColumnsButton);
+            await act(async () => {
+                fireEvent.click(selectColumnsButton);
+            });
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).toBeChecked();
 
-            fireEvent.click(screen.getByTestId(`option-${last_header[0]}`));
+            await act(async () => {
+                fireEvent.click(screen.getByTestId(`option-${last_header[0]}`));
+            });
             expect(
                 within(screen.getByTestId(`option-${last_header[0]}`)).getByRole("checkbox")
             ).not.toBeChecked();
@@ -560,18 +693,24 @@ describe("Generic Table component", () => {
             );
         });
 
-        it("should complete row click action when clicked", () => {
+        it("should complete row click action when clicked", async () => {
             expect(screen.queryByText(`row clicked ${fakeMidData[0].full_name}`)).toBeNull();
-            fireEvent.click(screen.getByText(fakeMidData[0].full_name));
+            await act(async () => {
+                fireEvent.click(screen.getByText(fakeMidData[0].full_name));
+            });
             expect(screen.getByText(`row clicked ${fakeMidData[0].full_name}`)).toBeInTheDocument();
         });
 
-        it("should have every row be clickable", () => {
-            fakeMidData.forEach((data) => {
+        it("should have every row be clickable", async () => {
+            for (const data of fakeMidData) {
                 expect(screen.queryByText(`row clicked ${data.full_name}`)).toBeNull();
-                fireEvent.click(screen.getByText(data.full_name));
+
+                await act(async () => {
+                    fireEvent.click(screen.getByText(data.full_name));
+                });
+
                 expect(screen.getByText(`row clicked ${data.full_name}`)).toBeInTheDocument();
-            });
+            }
         });
     });
 
@@ -602,13 +741,6 @@ describe("Generic Table component", () => {
             });
         });
 
-        it("should render up and down reorder buttons on every row", () => {
-            fakeMidData.forEach((_, index) => {
-                expect(screen.getByTestId(`button-move-row-up-${index}`)).toBeInTheDocument();
-                expect(screen.getByTestId(`button-move-row-down-${index}`)).toBeInTheDocument();
-            });
-        });
-
         it("should have edit button perform edit action", () => {
             expect(screen.queryByText("Edit clicked: 0")).toBeNull();
             expect(screen.queryByText("Edit clicked: 1")).toBeNull();
@@ -629,24 +761,6 @@ describe("Generic Table component", () => {
             act(() => fireEvent.click(screen.getByTestId("button-delete-row-2")));
             expect(screen.getByText("Delete clicked: 2")).toBeInTheDocument();
             expect(screen.queryByText("Delete clicked: 1")).toBeNull();
-        });
-
-        it("should swap rows when row swap buttons are clicked", async () => {
-            expect(screen.queryByText(fakeMidData[0].full_name)).toHaveProperty("id", "cell-2-0");
-            expect(screen.queryByText(fakeMidData[1].full_name)).toHaveProperty("id", "cell-2-1");
-            await act(async () => {
-                fireEvent.click(screen.getByTestId("button-move-row-up-1"));
-            });
-            expect(screen.queryByText(fakeMidData[0].full_name)).toHaveProperty("id", "cell-2-1");
-            expect(screen.queryByText(fakeMidData[1].full_name)).toHaveProperty("id", "cell-2-0");
-        });
-
-        it("should swap rows without affecting deletable status", async () => {
-            await act(async () => {
-                fireEvent.click(screen.getByTestId("button-move-row-up-1"));
-            });
-            expect(screen.queryByTestId("button-delete-row-1")).toBeNull();
-            expect(screen.getByTestId("button-delete-row-0")).toBeInTheDocument();
         });
     });
 
@@ -682,7 +796,6 @@ describe("Generic Table component", () => {
                         testableContent={{
                             sortingFlags: {
                                 isSortingOptionsIncluded: true,
-                                isDefaultSortIncluded: false,
                                 sortMethod: mockSortMethod,
                             },
                         }}
@@ -691,43 +804,21 @@ describe("Generic Table component", () => {
             );
         });
 
-        it("should not trigger sort function when sorting a disable sort column", () => {
-            fireEvent.click(screen.getByText(fakeDataHeaders[1][1]));
+        it("should not trigger sort function when sorting a disable sort column", async () => {
+            await act(async () => {
+                fireEvent.click(screen.getByText(fakeDataHeaders[1][1]));
+            });
             expect(mockSortMethod).not.toHaveBeenCalled();
         });
 
-        it("should trigger sort function with correct asc or desc argument", () => {
-            fireEvent.click(screen.getByText(fakeDataHeaders[0][1]));
+        it("should trigger sort function with correct asc or desc argument", async () => {
+            await act(async () => {
+                fireEvent.click(screen.getByText(fakeDataHeaders[0][1]));
+            });
             expect(mockSortMethod).toHaveBeenCalledWith("asc");
-            fireEvent.click(screen.getByText("Name"));
-            expect(mockSortMethod).toHaveBeenCalledWith("desc");
-        });
-    });
-
-    describe("Table with default sort", () => {
-        const mockSortMethod = jest.fn();
-
-        beforeEach(() => {
-            render(
-                <StyleManager>
-                    <WrappedTableForTest
-                        mockData={fakeMidData}
-                        mockHeaders={fakeDataHeaders}
-                        testableContent={{
-                            sortingFlags: {
-                                isSortingOptionsIncluded: true,
-                                isDefaultSortIncluded: true,
-                                sortMethod: mockSortMethod,
-                            },
-                        }}
-                    />
-                </StyleManager>
-            );
-        });
-
-        it("should show sorted when loads", () => {
-            //if it is already sorted by ascending then clicking the header again should sort by descending
-            fireEvent.click(screen.getByText(fakeDataHeaders[0][1]));
+            await act(async () => {
+                fireEvent.click(screen.getByText("Name"));
+            });
             expect(mockSortMethod).toHaveBeenCalledWith("desc");
         });
     });

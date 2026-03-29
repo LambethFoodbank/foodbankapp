@@ -173,7 +173,7 @@ const DriverOverviewModal: React.FC<ActionModalProps> = (props) => {
             "Out for Delivery",
             `with ${driverName ?? displayNameForNullDriverName}`,
             undefined,
-            date
+            date.toISOString()
         );
         if (error) {
             setErrorMessage(getStatusErrorMessageWithLogId(error));
