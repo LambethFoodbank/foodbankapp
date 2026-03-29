@@ -42,6 +42,7 @@ interface EditToolbarProps {
 export interface DeliveryAreasRow {
     id: string;
     postcode: string;
+    postcodeSortKey: string;
     isNew: boolean;
 }
 
@@ -291,10 +292,11 @@ const DeliveryAreasTable: React.FC = () => {
                     aria-label="Delivery Areas Table"
                     initialState={{
                         sorting: {
-                            sortModel: [{ field: "postcode", sort: "asc" }],
+                            sortModel: [{ field: "postcodeSortKey", sort: "asc" }],
                         },
                     }}
                     sortingOrder={["asc", "desc"]}
+                    // QQ: Needs sortConfig to sort by postcodeSortKey
                     columns={deliveryAreasColumns}
                     editMode="row"
                     onCellDoubleClick={(params, event) => {
