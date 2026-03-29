@@ -9,6 +9,11 @@ describe("Parcels page url params", () => {
         return today.toISOString().split("T")[0];
     };
 
+    const waitForTableToLoad = (): void => {
+        cy.get("table").should("be.visible");
+        cy.get("[aria-label='Loading']").should("not.exist");
+    };
+
     it("Initial URL params are set to be the current date", () => {
         const formattedDate = formatTodaysDateAsYYYYMMDD();
         const expectedUrl = `/parcels?packingDate[]=${formattedDate}&packingDate[]=${formattedDate}`;
@@ -57,9 +62,7 @@ describe("Parcels page url params", () => {
     });
 
     it("URL params are updated when going into packing manager view", () => {
-        // Wait until table has loaded data
-        cy.get("[role='table']").should("be.visible");
-        cy.get("[aria-label='table-progress-bar']").should("not.exist");
+        waitForTableToLoad();
 
         cy.get("[data-testid='packing-manager-view-button']").click();
         cy.url().should("include", "view=Packing%20Manager");
@@ -74,9 +77,7 @@ describe("Parcels page url params", () => {
     it("Packing manager view enabled when URL param is set", () => {
         cy.visit("/parcels?view=Packing%20Manager");
 
-        // Wait until table has loaded data
-        cy.get("[role='table']").should("be.visible");
-        cy.get("[aria-label='table-progress-bar']").should("not.exist");
+        waitForTableToLoad();
 
         cy.get("[data-testid='packing-manager-view-button']").should(
             "have.class",
@@ -89,7 +90,8 @@ describe("Parcels page url params", () => {
     it.skip("URL params are updated when a parcel is opened", () => {
         cy.get("[id='cell-fullName-0']").click();
 
-        cy.get("[id='expandedParcelDetailsModal']").should("be.visible");
+        cy.get('div[data-testid="ParcelDetailsModal"]') // eslint-disable-line quotes
+            .should("be.visible");
 
         // This should have the parcel ID
         cy.url().should("include", "parcelId=");

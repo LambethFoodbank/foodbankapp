@@ -137,11 +137,14 @@ const ParcelsPage: React.FC = () => {
     };
 
     const setIsPackingManagerViewInternal = (isPackingManager: boolean): void => {
-        const viewFilter = primaryFilters.find((filter) => filter.key === pageViewTypeQueryParam);
-        if (viewFilter) {
-            viewFilter.state = isPackingManager ? pageViewTypePackingManager : "";
-        }
-
+        setPrimaryFilters(
+            (prevFilters) =>
+                prevFilters.map((filter) =>
+                    filter.key === pageViewTypeQueryParam
+                        ? { ...filter, state: isPackingManager ? pageViewTypePackingManager : "" }
+                        : { ...filter }
+                ) as ParcelsFilters
+        );
         setIsPackingManagerView(isPackingManager);
     };
 

@@ -10,13 +10,19 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{secrets.SUPABASE_LOCAL_ANON_KEY}}
       NEXT_PUBLIC_CYPRESS_TEST_USER: admin@example.com
       NEXT_PUBLIC_CYPRESS_TEST_PASS: admin123
+      NEXT_PUBLIC_CYPRESS_TEST_ADMIN_USER: admin@example.com
+      NEXT_PUBLIC_CYPRESS_TEST_ADMIN_PASS: admin123
+      NEXT_PUBLIC_CYPRESS_TEST_STAFF_USER: staff@example.com
+      NEXT_PUBLIC_CYPRESS_TEST_STAFF_PASS: staff123
       NEXT_PUBLIC_ENVIRONMENT: test
     steps:
       - name: Checkout this repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install npm
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
 
       - name: Install dependencies
         run: npm ci
@@ -61,10 +67,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout this repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install npm
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
 
       - name: Install dependencies
         run: npm ci

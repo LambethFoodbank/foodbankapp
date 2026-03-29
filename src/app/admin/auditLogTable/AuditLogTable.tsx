@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Row, ServerPaginatedTable } from "@/components/Tables/Table";
 import supabase from "@/supabaseClient";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { fetchAuditLog, fetchAuditLogCount } from "./fetchAuditLogData";
@@ -16,6 +15,8 @@ import { auditLogTableSortableColumns } from "./sortFunctions";
 import AuditLogModal from "./auditLogModal/AuditLogModal";
 import { DbAuditLogRow } from "@/databaseUtils";
 import FloatingToast from "@/components/FloatingToast";
+import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
+import { MRT_Row } from "material-react-table";
 
 const AuditLogTable: React.FC = () => {
     const [auditLogDataPortion, setAuditLogDataPortion] = useState<AuditLogRow[]>([]);
@@ -25,9 +26,9 @@ const AuditLogTable: React.FC = () => {
     const [auditLogCountPerPage, setAuditLogCountPerPage] = useState(
         defaultNumberOfAuditLogRowsPerPage
     );
-    const [currentPage, setCurrentPage] = useState(1);
-    const startPoint = (currentPage - 1) * auditLogCountPerPage;
-    const endPoint = currentPage * auditLogCountPerPage - 1;
+    const [currentPage, setCurrentPage] = useState(0);
+    const startPoint = currentPage * auditLogCountPerPage;
+    const endPoint = startPoint + auditLogCountPerPage - 1;
     const [selectedAuditLogRow, setSelectedAuditLogRow] = useState<AuditLogRow | null>(null);
 
     const fetchAndDisplayAuditLog = useCallback(async () => {
@@ -74,8 +75,8 @@ const AuditLogTable: React.FC = () => {
         };
     }, [fetchAndDisplayAuditLog]);
 
-    const onRowClick = (row: Row<AuditLogRow>): void => {
-        setSelectedAuditLogRow(row.data);
+    const onRowClick = (row: MRT_Row<AuditLogRow>): void => {
+        setSelectedAuditLogRow(row.original);
     };
 
     return (
@@ -87,8 +88,8 @@ const AuditLogTable: React.FC = () => {
                     variant="filled"
                 ></FloatingToast>
             )}
-            <ServerPaginatedTable<AuditLogRow, DbAuditLogRow, never>
-                dataPortion={auditLogDataPortion}
+            <ServerPaginatedMaterialTable<AuditLogRow, DbAuditLogRow, never>
+                data={auditLogDataPortion}
                 headerKeysAndLabels={auditLogTableHeaderKeysAndLabels}
                 defaultShownHeaders={[
                     "action",
@@ -113,7 +114,7 @@ const AuditLogTable: React.FC = () => {
                     sortableColumns: auditLogTableSortableColumns,
                     setSortState: setSortState,
                 }}
-                editableConfig={{
+                rowActionsConfig={{
                     editable: false,
                 }}
                 filterConfig={{

@@ -1,8 +1,8 @@
 import { ListType } from "@/common/databaseListTypes";
 import { DateRangeState } from "@/components/DateInputs/DateRangeInputs";
 import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
+import { SortState } from "@/components/Tables/materialTable/tableTypes";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
-import { SortState } from "@/components/Tables/Table";
 import { DbParcelRow, ParcelStatus, Schema } from "@/databaseUtils";
 
 export interface ParcelsTableRow {

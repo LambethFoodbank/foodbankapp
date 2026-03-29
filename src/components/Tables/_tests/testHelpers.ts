@@ -3,17 +3,17 @@ import { clientSideButtonGroupFilter, filterRowbyButton } from "../ButtonFilter"
 import { buildClientSideTextFilter, filterRowByText } from "../TextFilter";
 import { ClientSideFilter } from "../Filters";
 import { SortOrder } from "react-data-table-component/dist/DataTable/types";
+import { MRT_RowData } from "material-react-table";
 
 export interface TestTableWrapperConfig {
     isCheckboxIncluded?: boolean;
     filters?: {
-        primaryFilters: ClientSideFilter<TestData, string>[];
-        additionalFilters: ClientSideFilter<TestData, string>[];
+        primaryFilters: ClientSideFilter<MRT_RowData, string>[];
+        additionalFilters: ClientSideFilter<MRT_RowData, string>[];
     };
     isPaginationIncluded?: boolean;
     sortingFlags?: {
         isSortingOptionsIncluded: boolean;
-        isDefaultSortIncluded: boolean;
         sortMethod: (sortOrder: SortOrder) => void;
     };
     isRowEditableIncluded?: boolean;
@@ -22,14 +22,7 @@ export interface TestTableWrapperConfig {
     isRowClickIncluded?: boolean;
 }
 
-export interface TestData {
-    full_name: string;
-    phone_number: string;
-    type: "hotel" | "regular";
-    id: string;
-}
-
-export const fakeData: TestData[] = [
+export const fakeData: MRT_RowData[] = [
     {
         full_name: "Tom",
         phone_number: "123456",
@@ -132,14 +125,14 @@ export const fakeDataHeaders = [
     ["type", "Type"],
 ] as const;
 
-export const fullNameTextFilterTest = buildClientSideTextFilter<TestData>({
+export const fullNameTextFilterTest = buildClientSideTextFilter<MRT_RowData>({
     key: "fullName",
     rowKey: "full_name",
     label: "Name",
     method: filterRowByText,
 });
 
-export const typeButtonFilterTest = clientSideButtonGroupFilter<TestData>({
+export const typeButtonFilterTest = clientSideButtonGroupFilter<MRT_RowData>({
     key: "typeFilter",
     rowKey: "type",
     filterLabel: "",

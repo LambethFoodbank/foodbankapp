@@ -77,7 +77,10 @@ const Statuses: React.FC<Props> = ({
         void getParcelStatuses();
     }, [setModalError]);
 
-    const submitStatus = async (date: Dayjs, callNoResponseStatuses: string[]): Promise<void> => {
+    const submitStatus = async (
+        date: Dayjs | undefined,
+        callNoResponseStatuses: string[]
+    ): Promise<void> => {
         setServerErrorMessage(null);
         if (selectedStatus === null) {
             setServerErrorMessage("Chosen status was not found.");
@@ -91,7 +94,7 @@ const Statuses: React.FC<Props> = ({
             selectedStatus,
             callNoResponseStatusesList,
             undefined,
-            date
+            date?.toISOString()
         );
         if (error) {
             setServerErrorMessage(`${getStatusErrorMessage(error)} Log ID: ${error.logId}`);

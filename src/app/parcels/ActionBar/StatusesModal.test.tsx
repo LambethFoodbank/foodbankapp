@@ -3,10 +3,18 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { expect, it } from "@jest/globals";
 import "@testing-library/jest-dom/jest-globals";
 import StatusesModal from "@/app/parcels/ActionBar/StatusesModal";
-import dayjs from "dayjs";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
+import { UserRole } from "@/databaseUtils";
 import StyleManager from "@/app/themes";
 import Localization from "@/app/Localization";
+import { RoleUpdateContext } from "@/app/roles";
+
+const managerAndAboveRoles: { [role: string]: UserRole }[] = [
+    { role: "admin" },
+    { role: "manager" },
+];
+const otherRoles: { [role: string]: UserRole }[] = [{ role: "staff" }, { role: "volunteer" }];
+const allRoles = [...managerAndAboveRoles, ...otherRoles];
 
 const mockData: ParcelsTableRow[] = [
     {
@@ -96,14 +104,9 @@ const mockSelectedParcels: ParcelsTableRow[] = mockData;
 const mockOnClose: jest.Mock = jest.fn();
 const mockOnSubmit: jest.Mock = jest.fn();
 
-describe("StatusesModal component", () => {
-    beforeEach(() => {
-        cleanup();
-        jest.useFakeTimers();
-        jest.setSystemTime(new Date("2024-01-01T12:00:00"));
-        jest.clearAllMocks();
-
-        render(
+const renderModalWithRole = (role: UserRole): void => {
+    render(
+        <RoleUpdateContext.Provider value={{ role: role, setRole: jest.fn() }}>
             <Localization>
                 <StyleManager>
                     <StatusesModal
@@ -119,23 +122,28 @@ describe("StatusesModal component", () => {
                     </StatusesModal>
                 </StyleManager>
             </Localization>
-        );
+        </RoleUpdateContext.Provider>
+    );
+};
+
+describe("StatusesModal component", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    it("renders without crashing", () => {
+    afterEach(() => {
+        cleanup();
+    });
+
+    it.each(allRoles)("renders without crashing", ({ role }) => {
+        renderModalWithRole(role);
         expect(screen.getByText("Submit")).toBeInTheDocument();
     });
 
-    it("closes the modal when the close button is clicked", () => {
+    it.each(allRoles)("closes the modal when the close button is clicked", ({ role }) => {
+        renderModalWithRole(role);
         fireEvent.click(screen.getByLabelText("Close Button"));
         expect(mockOnClose).toHaveBeenCalledTimes(1);
-    });
-
-    it("submits the selected valid date when the submit button is clicked", () => {
-        const mockDate = dayjs("2024-01-01 12:00:00");
-        fireEvent.click(screen.getByText("Submit"));
-
-        expect(mockOnSubmit).toHaveBeenCalledWith(mockDate, []);
     });
 
     it("saves the checked extra question fields when 'Called and No Response' status is selected", () => {
@@ -176,8 +184,36 @@ describe("StatusesModal component", () => {
 
         fireEvent.click(screen.getByText("Submit"));
 
-        const mockDate = dayjs("2024-01-01 12:00:00");
-
-        expect(mockOnSubmit).toHaveBeenCalledWith(mockDate, ["Voicemail", "Email"]);
+        expect(mockOnSubmit).toHaveBeenCalledWith(undefined, ["Voicemail", "Email"]);
     });
+
+    it.each(managerAndAboveRoles)("shows the date override option for role: %o", ({ role }) => {
+        renderModalWithRole(role);
+        expect(screen.getByLabelText("Override status timestamp")).toBeInTheDocument();
+        expect(screen.getByLabelText("Override status timestamp")).not.toBeChecked();
+    });
+
+    it.each(otherRoles)("does not show the date override option for role: %o", ({ role }) => {
+        renderModalWithRole(role);
+        expect(screen.queryByText("Override status timestamp")).not.toBeInTheDocument();
+    });
+
+    it.each(managerAndAboveRoles)(
+        "the date override option shows and hides the date/time pickers for role: %o",
+        ({ role }) => {
+            renderModalWithRole(role);
+            const overrideCheckbox = screen.getByLabelText("Override status timestamp");
+
+            expect(overrideCheckbox).not.toBeChecked();
+            expect(screen.queryByLabelText("Date and Time")).not.toBeInTheDocument();
+
+            fireEvent.click(overrideCheckbox);
+            expect(overrideCheckbox).toBeChecked();
+            expect(screen.getByLabelText("Date and Time")).toBeInTheDocument();
+
+            fireEvent.click(overrideCheckbox);
+            expect(overrideCheckbox).not.toBeChecked();
+            expect(screen.queryByLabelText("Date and Time")).not.toBeInTheDocument();
+        }
+    );
 });

@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { ClientPaginatedTable, TableHeaders } from "@/components/Tables/Table";
+import { TableHeaders } from "@/components/Tables/materialTable/tableTypes";
 import TableSurface from "@/components/Tables/TableSurface";
+import { ClientPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 
 export interface ClientParcelStatsRow {
     totalParcels: number;
@@ -23,18 +24,17 @@ export interface ClientParcelStatsProps {
 const ClientParcelStats: React.FC<ClientParcelStatsProps> = (props) => {
     return (
         <TableSurface>
-            <ClientPaginatedTable
-                dataPortion={props.parcelsData}
+            <ClientPaginatedMaterialTable
+                data={props.parcelsData}
                 headerKeysAndLabels={headers}
+                checkboxConfig={{ displayed: false }}
                 paginationConfig={{ enablePagination: false }}
                 sortConfig={{ sortPossible: false }}
                 filterConfig={{
                     primaryFiltersShown: false,
                     additionalFiltersShown: false,
                 }}
-                checkboxConfig={{ displayed: false }}
-                editableConfig={{ editable: false }}
-                pointerOnHover={true}
+                rowActionsConfig={{ editable: false }}
             />
         </TableSurface>
     );
