@@ -11,6 +11,7 @@ import {
     GridRowModes,
     GridRowModesModel,
     GridRowsProp,
+    GridSortModel,
     GridToolbarContainer,
 } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
@@ -86,6 +87,9 @@ function getBaseAuditLogForDeliveryAreasAction(
 const DeliveryAreasTable: React.FC = () => {
     const [rows, setRows] = useState<DeliveryAreasRow[]>([]);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+    const [sortModel, setSortModel] = React.useState<GridSortModel>([
+        { field: "postcodeSortKey", sort: "asc" },
+    ]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -220,6 +224,14 @@ const DeliveryAreasTable: React.FC = () => {
         }));
     };
 
+    const handleSortModelChange = (newModel: GridSortModel): void => {
+        if (newModel.length > 0 && newModel[0].field === "postcode") {
+            setSortModel([
+                { field: "postcodeSortKey", sort: sortModel[0].sort === "asc" ? "desc" : "asc" },
+            ]);
+        }
+    };
+
     const deliveryAreasColumns: GridColDef[] = [
         {
             field: "postcode",
@@ -227,9 +239,14 @@ const DeliveryAreasTable: React.FC = () => {
             headerAlign: "center",
             flex: 1,
             editable: true,
+            sortable: true,
             align: "center",
             renderHeader: (params) => <Header {...params} />,
             disableColumnMenu: true,
+        },
+        {
+            field: "postcodeSortKey",
+            headerName: "Postcode Sort Key",
         },
         {
             field: "actions",
@@ -290,14 +307,17 @@ const DeliveryAreasTable: React.FC = () => {
                 <StyledDataGrid
                     rows={rows}
                     aria-label="Delivery Areas Table"
+                    columns={deliveryAreasColumns}
                     initialState={{
-                        sorting: {
-                            sortModel: [{ field: "postcodeSortKey", sort: "asc" }],
+                        columns: {
+                            columnVisibilityModel: {
+                                postcodeSortKey: false,
+                            },
                         },
                     }}
+                    sortModel={sortModel}
+                    onSortModelChange={handleSortModelChange}
                     sortingOrder={["asc", "desc"]}
-                    // QQ: Needs sortConfig to sort by postcodeSortKey
-                    columns={deliveryAreasColumns}
                     editMode="row"
                     onCellDoubleClick={(params, event) => {
                         event.defaultMuiPrevented = true;
