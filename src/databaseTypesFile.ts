@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           delivery_areas_id: string | null
           dietary_requirement: string | null
+          emergency_bag_id: string | null
           event_id: string | null
           list_id: string | null
           log_id: string | null
@@ -40,6 +41,7 @@ export type Database = {
           created_at?: string
           delivery_areas_id?: string | null
           dietary_requirement?: string | null
+          emergency_bag_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -61,6 +63,7 @@ export type Database = {
           created_at?: string
           delivery_areas_id?: string | null
           dietary_requirement?: string | null
+          emergency_bag_id?: string | null
           event_id?: string | null
           list_id?: string | null
           log_id?: string | null
@@ -107,6 +110,13 @@ export type Database = {
             columns: ["delivery_areas_id"]
             isOneToOne: false
             referencedRelation: "delivery_areas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_emergency_bag_id_fkey"
+            columns: ["emergency_bag_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_bags"
             referencedColumns: ["id"]
           },
           {
@@ -415,6 +425,44 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "lists"
+            referencedColumns: ["primary_key"]
+          },
+        ]
+      }
+      emergency_bags: {
+        Row: {
+          amount: number
+          collection_centre: string
+          created_at: string
+          id: string
+          last_updated: string
+          packing_date: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          collection_centre: string
+          created_at?: string
+          id?: string
+          last_updated?: string
+          packing_date: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          collection_centre?: string
+          created_at?: string
+          id?: string
+          last_updated?: string
+          packing_date?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_bags_collection_centre_fkey"
+            columns: ["collection_centre"]
+            isOneToOne: false
+            referencedRelation: "collection_centres"
             referencedColumns: ["primary_key"]
           },
         ]

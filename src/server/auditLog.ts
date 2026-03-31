@@ -19,6 +19,7 @@ export interface AuditLog {
     listId?: string;
     packingSlotId?: string;
     parcelId?: string;
+    emergencyBagId?: string;
     profileId?: string;
     websiteData?: string;
     wikiId?: string;
@@ -43,6 +44,7 @@ export async function sendAuditLog(auditLogProps: AuditLog): Promise<void> {
         list_id: auditLogProps.listId,
         packing_slot_id: auditLogProps.packingSlotId,
         parcel_id: auditLogProps.parcelId,
+        emergency_bag_id: auditLogProps.emergencyBagId,
         profile_id: auditLogProps.profileId,
         content: auditLogProps.content,
         wasSuccess: auditLogProps.wasSuccess,
