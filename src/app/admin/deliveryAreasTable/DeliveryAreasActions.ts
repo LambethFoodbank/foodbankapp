@@ -6,7 +6,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 
 export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
-    const { data, error } = await supabase.from("delivery_areas").select();
+    const { data, error } = await supabase.from("delivery_areas_plus").select();
 
     if (error) {
         const logId = await logErrorReturnLogId("Error with fetch: Delivery areas", error);
@@ -15,8 +15,9 @@ export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
 
     return data.map(
         (row): DeliveryAreasRow => ({
-            id: row.id,
-            postcode: row.postcode,
+            id: row.delivery_area_id ?? "",
+            postcode: row.postcode ?? "",
+            postcodeSortKey: row.postcode_sort_key ?? "",
             isNew: false,
         })
     );
