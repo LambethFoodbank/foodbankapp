@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { returnPathQueryParam } from "@/common/constants";
 import { stringifyQueryParams } from "@/common/urlQueryParams";
@@ -127,38 +127,6 @@ const ClientForm: React.FC<Props> = ({
     const [submitError, setSubmitError] = useState(Errors.none);
     const [submitErrorMessage, setSubmitErrorMessage] = useState("");
     const [submitDisabled, setSubmitDisabled] = useState(false);
-
-    useEffect(() => {
-        if (fields.numberOfChildren <= fields.children.length) {
-            fieldSetter({ children: fields.children.slice(0, fields.numberOfChildren) });
-            return;
-        }
-
-        const extraChildren: Person[] = Array(fields.numberOfChildren - fields.children.length)
-            .fill(0)
-            .map((_item) => {
-                return {
-                    recordedAsChild: true,
-                };
-            });
-        fieldSetter({ children: [...fields.children, ...extraChildren] });
-    }, [fields.numberOfChildren]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(() => {
-        if (fields.numberOfAdults <= fields.adults.length) {
-            fieldSetter({ adults: fields.adults.slice(0, fields.numberOfAdults) });
-            return;
-        }
-
-        const extraAdults: Person[] = Array(fields.numberOfAdults - fields.adults.length)
-            .fill(0)
-            .map((_item) => {
-                return {
-                    recordedAsChild: false,
-                };
-            });
-        fieldSetter({ adults: [...fields.adults, ...extraAdults] });
-    }, [fields.numberOfAdults]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fieldSetter = createSetter(setFields, fields);
     const errorSetter = createSetter(setFormErrors, formErrors);

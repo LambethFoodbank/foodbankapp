@@ -13,7 +13,7 @@ export type WriteParcelToDatabaseErrors = InsertParcelErrorType | UpdateParcelEr
 export type ParcelDatabaseInsertRecord = InsertSchema["parcels"];
 type ParcelDatabaseUpdateRecord = UpdateSchema["parcels"];
 
-type InsertParcelErrorType = "failedToInsertParcel" | "failedToUpdateDeliveryInstructions";
+type InsertParcelErrorType = "failedToInsertParcel";
 export type InsertParcelReturnType = {
     error: { type: InsertParcelErrorType; logId: string } | null;
     parcelId: string | null;
@@ -128,10 +128,7 @@ export const insertParcel: InsertParcel = async (parcelRecord, deliveryInstructi
     return { parcelId: parcel_primary_key, error: null };
 };
 
-type UpdateParcelErrorType =
-    | "failedToUpdateParcel"
-    | "failedToUpdateDeliveryInstructions"
-    | "concurrentUpdateConflict";
+type UpdateParcelErrorType = "failedToUpdateParcel" | "concurrentUpdateConflict";
 export type UpdateParcelError = { type: UpdateParcelErrorType; logId: string };
 type UpdateParcelReturnType = {
     error: UpdateParcelError | null;

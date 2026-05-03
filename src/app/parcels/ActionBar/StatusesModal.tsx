@@ -66,6 +66,9 @@ const StatusesModal: React.FC<StatusesModalProps> = (props) => {
                 .set("hour", newDateTime?.hour() ?? dateTime.hour())
                 .set("minute", newDateTime?.minute() ?? dateTime.minute())
                 .set("second", 0)
+        );
+    };
+
     const handleOverrideCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setDateTimeIsOverridden(event.target.checked);
     };

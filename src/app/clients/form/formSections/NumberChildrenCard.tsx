@@ -63,7 +63,7 @@ const NumberChildrenCard: React.FC<ClientCardProps> = ({
     fields,
 }) => {
     useEffect(() => {
-        const resized = resizePersonsArray(fields.children, fields.numberOfChildren);
+        const resized = resizePersonsArray(fields.children, fields.numberOfChildren, true);
         if (resized !== fields.children) {
             fieldSetter({ children: resized });
         }

@@ -28,14 +28,23 @@ const numberOfAdultsRange = (value: string): boolean => {
     );
 };
 
-export const resizePersonsArray = (current: Person[], target: number): Person[] => {
-    if (current.length === target) {
-        return current;
+export const resizePersonsArray = (
+    currentArray: Person[],
+    targetLength: number,
+    isChildArray: boolean
+): Person[] => {
+    if (currentArray.length === targetLength) {
+        return currentArray;
     }
 
-    return current.length < target
-        ? [...current, ...Array(target - current.length).fill({} as Person)]
-        : current.slice(0, target);
+    return currentArray.length < targetLength
+        ? [
+              ...currentArray,
+              ...Array(targetLength - currentArray.length).fill({
+                  recordedAsChild: isChildArray,
+              } as Person),
+          ]
+        : currentArray.slice(0, targetLength);
 };
 
 const setAdultsFields = (
@@ -67,7 +76,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
     fields,
 }) => {
     useEffect(() => {
-        const resized = resizePersonsArray(fields.adults, fields.numberOfAdults);
+        const resized = resizePersonsArray(fields.adults, fields.numberOfAdults, false);
         if (resized !== fields.adults) {
             fieldSetter({ adults: resized });
         }

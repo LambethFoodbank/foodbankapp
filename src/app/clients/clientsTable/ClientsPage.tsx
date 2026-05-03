@@ -224,7 +224,6 @@ const ClientsPage: React.FC = () => {
                         <ServerPaginatedMaterialTable<ClientsTableRow, DbClientRow, string>
                             data={clientsDataPortion}
                             setData={setClientsDataPortion}
-                            columnDisplayFunctions={{ addressPostcode: formatNullPostcode }}
                             isLoading={isLoading}
                             headerKeysAndLabels={clientsHeaders}
                             checkboxConfig={{ displayed: false }}
