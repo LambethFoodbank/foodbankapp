@@ -16,10 +16,10 @@ type FetchWebsiteDataErrorReturn =
           data: WebsiteDataRow[];
           error: null;
       };
-type UpdateWebsiteDataErrors = "failedToUpdateWebsiteData";
+type UpdateWebsiteDataErrors = "failedToUpdateWebsiteData" | "concurrentEditWebsiteData";
 type UpdateWebsiteDataErrorReturn =
     | {
-          error: { type: UpdateWebsiteDataErrors; logId: string };
+          error: { type: UpdateWebsiteDataErrors; logId: string | null };
       }
     | { error: null };
 
@@ -37,6 +37,7 @@ export const fetchWebsiteData = async (): Promise<FetchWebsiteDataErrorReturn> =
             readableName: getReadableWebsiteDataName(row.name),
             value: row.value,
             id: row.name,
+            lastUpdated: row.last_updated,
         })
     );
 
@@ -44,19 +45,25 @@ export const fetchWebsiteData = async (): Promise<FetchWebsiteDataErrorReturn> =
 };
 
 export const updateDbWebsiteData = async (
-    row: WebsiteDataRow
+    newRow: WebsiteDataRow,
+    originalTimestamp: string | undefined
 ): Promise<UpdateWebsiteDataErrorReturn> => {
     const processedData: DbWebsiteData = {
-        name: row.dbName,
-        value: row.value,
+        name: newRow.dbName,
+        value: newRow.value,
+        last_updated: newRow.lastUpdated,
     };
 
-    const { data: updatedWebsiteData, error } = await supabase
+    const {
+        data: updatedWebsiteData,
+        error,
+        count,
+    } = await supabase
         .from("website_data")
-        .update(processedData)
+        .update({ value: processedData.value }, { count: "exact" })
         .eq("name", processedData.name)
-        .select()
-        .single();
+        .eq("last_updated", originalTimestamp)
+        .select();
 
     const auditLog = {
         action: "update website data",
@@ -69,6 +76,11 @@ export const updateDbWebsiteData = async (
         void sendAuditLog({ ...auditLog, wasSuccess: false, logId });
         return { error: { type: "failedToUpdateWebsiteData", logId } };
     }
+
+    if (count === 0) {
+        return { error: { type: "concurrentEditWebsiteData", logId: null } };
+    }
+
     void sendAuditLog({ ...auditLog, wasSuccess: true, content: updatedWebsiteData });
     return { error: null };
 };

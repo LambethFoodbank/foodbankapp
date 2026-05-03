@@ -49,25 +49,20 @@ export const formatClientRecord = (
             fields.dietaryRequirements !== null
                 ? checkboxGroupToArray(fields.dietaryRequirements)
                 : null,
-        hygiene_tampons: fields.hygieneProductsTampons,
-        hygiene_pads: fields.hygieneProductsPads,
+        hygiene_tampons:
+            fields.hygieneProductsTampons !== null ? fields.hygieneProductsTampons : "",
+        hygiene_pads: fields.hygieneProductsPads !== null ? fields.hygieneProductsPads : "",
         hygiene_other_items: checkboxGroupToArray(fields.hygieneOtherItems),
-        baby_food: fields.babyFood,
-        baby_formula: fields.babyFormula,
-        baby_nappies: fields.babyNappies,
+        baby_food: fields.babyFood !== null ? fields.babyFood : "",
+        baby_formula: fields.babyFormula !== null ? fields.babyFormula : "",
+        baby_nappies: fields.babyNappies !== null ? fields.babyNappies : "",
         baby_other_items: checkboxGroupToArray(fields.babyOtherItems),
         pet_food: checkboxGroupToArray(fields.petFood),
         other_items: checkboxGroupToArray(fields.otherItems),
         delivery_instructions: fields.deliveryInstructions,
-        extra_information: fields.extraInformation,
-        signposting_call_required: fields.signpostingCall,
-        signposting_call_reasons:
-            fields.signpostingCall && fields.signpostingCallReasons !== null
-                ? checkboxGroupToArray(fields.signpostingCallReasons)
-                : null,
-        flagged_for_attention: fields.attentionFlag,
         last_updated: fields.lastUpdated,
         notes: fields.notes,
+        additional_phone_numbers: fields.additionalPhoneNumbers,
     };
 };
 

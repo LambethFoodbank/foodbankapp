@@ -1,6 +1,7 @@
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
+    Errors,
     getErrorText,
     onChangeTextDeferredError,
 } from "@/components/Form/formFunctions";
@@ -26,8 +27,8 @@ const UserDetailsCard: React.FC<UserFormProps> = ({
             <FreeFormTextInput
                 id="new-user-first-name"
                 label="First Name"
-                error={errorExists(formErrors.firstName)}
-                helperText={getErrorText(formErrors.firstName)}
+                error={errorExists(formErrors.firstName as Errors)}
+                helperText={getErrorText(formErrors.firstName as Errors)}
                 value={fields.firstName}
                 onChange={onChangeTextDeferredError(
                     fieldSetter,
@@ -41,8 +42,8 @@ const UserDetailsCard: React.FC<UserFormProps> = ({
             <FreeFormTextInput
                 id="new-user-last-name"
                 label="Last Name"
-                error={errorExists(formErrors.lastName)}
-                helperText={getErrorText(formErrors.lastName)}
+                error={errorExists(formErrors.lastName as Errors)}
+                helperText={getErrorText(formErrors.lastName as Errors)}
                 value={fields.lastName}
                 onChange={onChangeTextDeferredError(
                     fieldSetter,
@@ -56,8 +57,8 @@ const UserDetailsCard: React.FC<UserFormProps> = ({
             <FreeFormTextInput
                 id="new-user-phone-number"
                 label="Phone Number"
-                error={errorExists(formErrors.telephoneNumber)}
-                helperText={getErrorText(formErrors.telephoneNumber)}
+                error={errorExists(formErrors.telephoneNumber as Errors)}
+                helperText={getErrorText(formErrors.telephoneNumber as Errors)}
                 value={fields.telephoneNumber}
                 onChange={onChangeTextDeferredError(
                     fieldSetter,

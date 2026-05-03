@@ -10,12 +10,14 @@ REPLACE_THIS_LINE
 - [ ] The ticket is up-to-date - Please document any deviations from the original approach if there is any.
 - [ ] I have documented the testing steps for QA
 - [ ] I have self-reviewed this PR
+- [ ] I have checked that any E2E tests do not assume that the database contains specific data, unless set by migration
 - [ ] Make sure you've verified it works via `npm run dev`
 - [ ] Make sure you've verified it works via `npm run build` and `npm run start`
 - [ ] Make sure you've fixed all linting problems with `npm run lint_fix`
 - [ ] Make sure you've tested via `npm run test`
 
 If you have made any changes to the database...
+  - [ ] I have checked that no concurrency issues can occur, and all situations where they might arise (e.g. modifying the same value in multiple places simultaneously) have been properly handled.
   - [ ] The migration files are up-to-date with my final set up (`npx supabase db diff -f <name_of_migration>` should create nothing at this point)
   - [ ] I have updated the typescript definitions for the database with `npm run generate_types:local`
   - [ ] I have modified the seed in `supabase/seed/seed.ts` if appropriate

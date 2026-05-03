@@ -1,8 +1,8 @@
-import { DbWikiRow, Schema } from "@/databaseUtils";
-import { Supabase } from "@/supabaseUtils";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
 import { formatTimeStringToHoursAndMinutes } from "@/common/format";
+import { DbWikiRow, Schema } from "@/databaseUtils";
+import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { Supabase } from "@/supabaseUtils";
 import { ListType } from "./databaseListTypes";
 
 type CollectionCentre = Pick<
@@ -11,6 +11,8 @@ type CollectionCentre = Pick<
 >;
 
 type PackingSlot = Pick<Schema["packing_slots"], "primary_key" | "is_shown" | "name">;
+
+type ClientWithDeliveryInstructions = Pick<Schema["clients"], "delivery_instructions">;
 
 type DatabaseProfile = Pick<
     Schema["profiles"],
@@ -37,11 +39,16 @@ export interface ParcelWithCollectionCentreAndPackingSlot {
     primary_key: string;
     voucher_number: string | null;
     last_updated: string | undefined;
+    clientWithDeliveryInstructions: ClientWithDeliveryInstructions | null;
     referral_agency: string | null;
     referrer_name: string | null;
     referrer_email: string | null;
     referrer_phone: string | null;
     notes: string | null;
+    flagged_for_attention: boolean | null;
+    signposting_call_required: boolean | null;
+    signposting_call_reasons: string[] | null;
+    extra_information: string | null;
 }
 
 export type FetchParcelResponse =
@@ -49,6 +56,7 @@ export type FetchParcelResponse =
     | { data: null; error: FetchParcelError };
 
 export type FetchParcelErrorType = "failedToFetchParcel" | "noMatchingParcels";
+
 export interface FetchParcelError extends Record<string, string> {
     type: FetchParcelErrorType;
     logId: string;
@@ -68,10 +76,13 @@ export const fetchParcel = async (
                 primary_key,
                 is_shown
             ),
-            packing_slot: packing_slots (
+            packing_slot:packing_slots (
                 name,
                 primary_key,
                 is_shown
+            ),
+            clientWithDeliveryInstructions:clients (
+                delivery_instructions
             )`
         )
         .eq("primary_key", parcelID)
@@ -86,6 +97,7 @@ export const fetchParcel = async (
         );
         return { data: null, error: { type: "noMatchingParcels", logId: logId } };
     }
+
     return { data: data, error: null };
 };
 
@@ -166,6 +178,30 @@ type DbCollectionTimeSlotType = {
     is_active: boolean;
 };
 
+type FetchCollectionAvailableDaysResponse =
+    | {
+          data: DbCollectionCentreWithAvailableDaysType[];
+          error: null;
+      }
+    | {
+          data: null;
+          error: FetchCollectionAvailableDaysError;
+      };
+
+type FetchCollectionAvailableDaysErrorType = "collectionAvailableDaysFetchFailed";
+
+export type FetchCollectionAvailableDaysError = {
+    type: FetchCollectionAvailableDaysErrorType;
+    logId: string;
+};
+
+export type DbAvailableDaysType = Schema["collection_centres"]["available_days"];
+
+export type DbCollectionCentreWithAvailableDaysType = {
+    available_days: DbAvailableDaysType;
+    primary_key: Schema["collection_centres"]["primary_key"];
+} | null;
+
 export const getActiveTimeSlotsForCollectionCentre = async (
     collectionCentrePrimaryKey: string,
     supabase: Supabase
@@ -200,6 +236,29 @@ export const getActiveTimeSlotsForCollectionCentre = async (
         ]);
 
     return { data: activeTimeSlots, error: null };
+};
+
+export const getAvailableDaysForCollectionCentres = async (
+    supabase: Supabase
+): Promise<FetchCollectionAvailableDaysResponse> => {
+    const { data, error } = await supabase
+        .from("collection_centres")
+        .select("available_days, primary_key")
+        .eq("is_delivery", false);
+
+    if (error) {
+        const logId = await logErrorReturnLogId(
+            "Error with fetch: Collection available days data",
+            error
+        );
+        return { data: null, error: { type: "collectionAvailableDaysFetchFailed", logId: logId } };
+    }
+
+    if (!data) {
+        return { data: [], error: null };
+    }
+
+    return { data, error: null };
 };
 
 export type FetchClientError = { type: FetchClientErrorType; logId: string };
@@ -332,6 +391,7 @@ type PackingSlotsResponse =
           error: PackingSlotsError;
       };
 type PackingSlotsErrorType = "packingSlotsFetchFailed";
+
 export interface PackingSlotsError {
     type: PackingSlotsErrorType;
     logId: string;
@@ -379,6 +439,7 @@ interface WikiRowsQuerySuccessType {
     data: DbWikiRow[];
     error: null;
 }
+
 interface WikiRowsQueryFailureType {
     data: null;
     error: PostgrestError;

@@ -105,7 +105,10 @@ const AddParcels = ({ clientId }: AddParcelProps): React.ReactElement => {
                 setIsLoading(false);
                 return;
             }
+
             initialParcelFields.listType = clientData.default_list;
+            initialParcelFields.deliveryInstructions = clientData.delivery_instructions;
+
             setListTypeLabelsAndValues(
                 LIST_TYPES_ARRAY.map((listType) =>
                     clientData.default_list === listType

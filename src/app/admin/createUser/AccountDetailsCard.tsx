@@ -2,6 +2,7 @@ import { emailRegex } from "@/common/format";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
+    Errors,
     getErrorText,
     onChangeTextDeferredError,
 } from "@/components/Form/formFunctions";
@@ -26,8 +27,8 @@ const AccountDetailsCard: React.FC<UserFormProps> = ({
             <FreeFormTextInput
                 id="new-user-email-address"
                 label="Email"
-                error={errorExists(formErrors.email)}
-                helperText={getErrorText(formErrors.email)}
+                error={errorExists(formErrors.email as Errors)}
+                helperText={getErrorText(formErrors.email as Errors)}
                 value={fields.email}
                 onChange={onChangeTextDeferredError(
                     fieldSetter,

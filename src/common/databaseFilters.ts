@@ -1,11 +1,13 @@
-import { ServerSideFilterMethod } from "@/components/Tables/Filters";
+import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
 import { displayPostcodeForHomelessClient } from "./format";
 import { DbClientRow, DbParcelRow } from "@/databaseUtils";
 import { parcelsPageDeletedClientDisplayName } from "@/app/parcels/parcelsTable/format";
+import { ParcelsFilterMethod, ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
+import { serverSideChecklistFilter } from "@/components/Tables/ChecklistFilter";
 
 const textFilterDelimiter = ",";
 const defaultQueryFilterRegex = /[^a-zA-Z0-9 '\-+?]/g;
-const emailQueryFilterRegex = /[^a-zA-Z0-9 '\-@.+?]/g;
+const emailQueryFilterRegex = /[^a-zA-Z0-9+-~!#$&`./=^'{}|@]/g;
 
 export const dbFilterWithSubstringQueries = <DbData extends DbClientRow | DbParcelRow>(
     substringToSubqueryMap: (value: string) => string,
@@ -54,13 +56,19 @@ export const postcodeSearch = <DbData extends DbClientRow | DbParcelRow>(
 
 export const phoneSearch = <DbData extends DbClientRow | DbParcelRow>(
     phoneColumnLabel: Extract<keyof DbData, "phone_number" | "client_phone_number">,
+    additionalPhoneColumnLabel: Extract<
+        keyof DbData,
+        "additional_phone_numbers_text" | "client_additional_phone_numbers_text"
+    >,
     clientIsActiveColumnLabel: Extract<keyof DbData, "is_active" | "client_is_active">
 ): ServerSideFilterMethod<DbData, string> => {
     return dbFilterWithSubstringQueries((substring) => {
-        if ("-".includes(substring.toLowerCase())) {
+        if (substring === "-") {
             return `or(${clientIsActiveColumnLabel}.is.false, ${phoneColumnLabel}.ilike.%${substring}%)`;
         }
-        return `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
+        const phoneColumnQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${phoneColumnLabel}.ilike.%${substring}%)`;
+        const additionalPhoneQueryActiveClient = `and(${clientIsActiveColumnLabel}.is.true, ${additionalPhoneColumnLabel}.ilike.%${substring}%)`;
+        return `or(${phoneColumnQueryActiveClient}, ${additionalPhoneQueryActiveClient})`;
     });
 };
 
@@ -101,3 +109,34 @@ export const familySearch = <DbData extends DbClientRow | DbParcelRow>(
         return `and(${clientIsActiveColumnLabel}.is.true, ${familyCountColumnLabel}.eq.${substringAsNumber})`;
     });
 };
+
+export function deliveryAreaFilter(
+    deliverableColumnLabel: string
+): ServerSideFilter<ParcelsTableRow, string[], DbParcelRow> {
+    const deliveryAreasSearch: ParcelsFilterMethod<string[]> = (query, state) => {
+        if (state.length === 0) {
+            return query;
+        }
+        return query.in(deliverableColumnLabel, state);
+    };
+
+    const optionsSet = [
+        {
+            key: "Inside Delivery Area",
+            value: true,
+        },
+        {
+            key: "Outside Delivery Area",
+            value: false,
+        },
+    ];
+
+    return serverSideChecklistFilter<ParcelsTableRow, DbParcelRow>({
+        key: deliverableColumnLabel,
+        filterLabel: "Area",
+        itemLabelsAndKeys: optionsSet.map((option) => [option.key, String(option.value)]),
+        initialCheckedKeys: [],
+        method: deliveryAreasSearch,
+        isRadio: true,
+    });
+}

@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
     CollectionCentresTableRow,
     fetchCollectionCentresForTable,
+    FormattedAvailableDaysWithPrimaryKey,
     FormattedTimeSlotsWithPrimaryKey,
     InsertCollectionCentreResult,
     insertNewCollectionCentre,
@@ -33,6 +34,7 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
+import CollectionCentreAvailableDaysModal from "./CollectionCentreAvailableDaysModal";
 
 function getBaseAuditLogForCollectionCentreAction(
     action: string,
@@ -61,7 +63,12 @@ const CollectionCentresTable: React.FC = () => {
     const [timeSlotModalIsOpen, setTimeSlotModalIsOpen] = useState<boolean>(false);
     const [selectedRowForTimeSlotEdit, setSelectedRowForTimeSlotEdit] =
         useState<CollectionCentresTableRow | null>(null);
+    const [availableDaysModalIsOpen, setAvailableDaysModalIsOpen] = useState<boolean>(false);
+    const [selectedRowForAvailableDaysEdit, setSelectedRowForAvailableDaysEdit] =
+        useState<CollectionCentresTableRow | null>(null);
     const originalTimestampsRef = React.useRef<Record<string, string>>({});
+    const [blockedSaveRows, setBlockedSaveRows] = useState<Set<GridRowId>>(new Set());
+    const [rowErrors, setRowErrors] = useState<{ [id: string]: string }>({});
 
     const getCollectionCentresForTable = useCallback(async () => {
         setErrorMessage(null);
@@ -187,6 +194,7 @@ const CollectionCentresTable: React.FC = () => {
             isShown: latestRow.is_shown,
             lastUpdated: latestRow.last_updated,
             timeSlots: latestRow.time_slots,
+            availableDays: latestRow.available_days,
             isNew: false,
         };
 
@@ -222,11 +230,28 @@ const CollectionCentresTable: React.FC = () => {
                         message =
                             "Record has been edited recently - please refresh the page." +
                             `Log ID: ${updateCollectionCentreError.logId}`;
+                        setBlockedSaveRows((prev) => new Set(prev).add(newRow.id));
                     }
+
+                    setRowErrors((prev) => ({ ...prev, [newRow.id]: message }));
                     setErrorMessage(message);
                     throw new Error(message);
                 }
             }
+
+            // Clear any previous errors for this row
+            setRowErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[newRow.id];
+                return newErrors;
+            });
+
+            setBlockedSaveRows((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(newRow.id);
+                return newSet;
+            });
+
             return newRow;
         } finally {
             setIsLoading(false);
@@ -259,6 +284,18 @@ const CollectionCentresTable: React.FC = () => {
     };
 
     const handleCancelClick = (id: GridRowId) => async () => {
+        setRowErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[id];
+            return newErrors;
+        });
+
+        setBlockedSaveRows((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(id);
+            return newSet;
+        });
+
         setRowModesModel((currentValue) => ({
             ...currentValue,
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -332,6 +369,37 @@ const CollectionCentresTable: React.FC = () => {
             },
         },
         {
+            field: "collectionDays",
+            type: "actions",
+            headerName: "Collection Days",
+            flex: 1,
+            renderHeader: (params) => <Header {...params} />,
+            renderCell: (params) => {
+                const handleEditCollectionCentreAvailableDays = (): void => {
+                    const row = params.row as CollectionCentresTableRow;
+                    handleEditClick(row.id)();
+                    setRowModesModel((currentValue) => ({
+                        ...currentValue,
+                        [row.id]: { mode: GridRowModes.Edit },
+                    }));
+                    setSelectedRowForAvailableDaysEdit(row);
+                    setAvailableDaysModalIsOpen(true);
+                };
+
+                return (
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleEditCollectionCentreAvailableDays}
+                        disabled={params.row.isNew || params.row.isDelivery}
+                        aria-label={`Edit available collection days for ${params.row.name}`}
+                    >
+                        Edit Collection Days
+                    </Button>
+                );
+            },
+        },
+        {
             field: "actions",
             type: "actions",
             headerName: "Actions",
@@ -340,6 +408,8 @@ const CollectionCentresTable: React.FC = () => {
             renderHeader: (params) => <Header {...params} />,
             getActions: ({ id }) => {
                 const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+                const isBlocked = blockedSaveRows.has(id);
+                const rowError = rowErrors[id];
 
                 if (isInEditMode) {
                     return [
@@ -349,7 +419,13 @@ const CollectionCentresTable: React.FC = () => {
                             sx={{
                                 color: "primary.main",
                             }}
-                            onClick={handleSaveClick(id)}
+                            onClick={() => {
+                                if (isBlocked && rowErrors) {
+                                    setErrorMessage(rowError);
+                                } else {
+                                    handleSaveClick(id)();
+                                }
+                            }}
                             key="Save"
                         />,
                         <GridActionsCellItem
@@ -454,6 +530,33 @@ const CollectionCentresTable: React.FC = () => {
                         );
                     }}
                 ></CollectionCentreTimeSlotsModal>
+            )}
+            {availableDaysModalIsOpen && (
+                <CollectionCentreAvailableDaysModal
+                    selectedCollectionCentreInfo={selectedRowForAvailableDaysEdit}
+                    isOpen={availableDaysModalIsOpen}
+                    onClose={() => {
+                        setAvailableDaysModalIsOpen(false);
+                    }}
+                    onSave={async (payload: FormattedAvailableDaysWithPrimaryKey) => {
+                        if (!selectedRowForAvailableDaysEdit) {
+                            return;
+                        }
+
+                        const updatedRow: CollectionCentresTableRow = {
+                            ...selectedRowForAvailableDaysEdit,
+                            availableDays: payload.availableDays.map((availableDayObject) => ({
+                                day: availableDayObject.day,
+                                is_active: availableDayObject.isActive,
+                            })),
+                        };
+                        setRows((prevRows) =>
+                            prevRows.map((row) =>
+                                row.id === updatedRow.id ? { ...row, ...updatedRow } : row
+                            )
+                        );
+                    }}
+                ></CollectionCentreAvailableDaysModal>
             )}
         </>
     );

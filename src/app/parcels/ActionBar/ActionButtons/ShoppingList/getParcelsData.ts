@@ -2,6 +2,7 @@ import { FetchParcelError, fetchParcel } from "@/common/fetch";
 import { ListType } from "@/common/databaseListTypes";
 import supabase from "@/supabaseClient";
 import { formatDateStringAsDate } from "@/common/format";
+import { formatExtraInformation } from "@/app/parcels/getExpandedParcelDetails";
 
 export interface ParcelInfo {
     voucherNumber: string;
@@ -10,6 +11,7 @@ export interface ParcelInfo {
     collectionDate: string;
     collectionSite: string;
     listType: ListType;
+    extraInformation: string;
 }
 
 interface ParcelInfoAndClientId {
@@ -54,6 +56,7 @@ export const prepareParcelInfo = async (
         collectionDate: formatDateToDateTime(data.collection_datetime),
         collectionSite: data.collection_centre?.name ?? "",
         listType: data.list_type,
+        extraInformation: formatExtraInformation(data.extra_information),
     };
     if (parcelInfo.collectionSite === "Delivery") {
         parcelInfo.collectionSite = "N/A - Delivery";

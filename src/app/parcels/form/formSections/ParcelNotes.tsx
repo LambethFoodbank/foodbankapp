@@ -1,8 +1,13 @@
 import React from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
-import { getDefaultTextValue, onChangeText } from "@/components/Form/formFunctions";
+import {
+    FormErrors,
+    getDefaultTextValue,
+    onChangeText,
+    Setter,
+} from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ParcelCardProps } from "../ParcelForm";
+import { ParcelCardProps, ParcelFields } from "../ParcelForm";
 
 const ParcelNotesCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter, fields }) => {
     return (
@@ -14,7 +19,11 @@ const ParcelNotesCard: React.FC<ParcelCardProps> = ({ errorSetter, fieldSetter, 
             <FreeFormTextInput
                 label="For example, fragile items included."
                 defaultValue={getDefaultTextValue(fields, "notes")}
-                onChange={onChangeText(fieldSetter, errorSetter, "notes")}
+                onChange={onChangeText(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ParcelFields>>,
+                    "notes"
+                )}
                 minRows={5}
                 multiline={true}
             />

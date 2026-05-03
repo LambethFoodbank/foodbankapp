@@ -54,6 +54,7 @@ export interface AuditLogRow {
     statusOrder: string;
     wasSuccess: boolean | null;
     websiteData: string;
+    dietaryRequirement: string;
 }
 
 export const convertAuditLogPlusRowsToAuditLogRows = (
@@ -79,4 +80,5 @@ export const convertAuditLogPlusRowsToAuditLogRows = (
         statusOrder: auditLogPlusRow.status_order ?? "",
         wasSuccess: auditLogPlusRow.wasSuccess ?? null,
         websiteData: auditLogPlusRow.website_data ?? "",
+        dietaryRequirement: auditLogPlusRow.dietary_requirement ?? "",
     }));

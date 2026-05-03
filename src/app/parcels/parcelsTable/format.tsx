@@ -1,22 +1,18 @@
 import React from "react";
-import {
-    displayNameForDeletedClient,
-    formatDateTime,
-    formatDatetimeAsDate,
-    displayPostcodeForHomelessClient,
-} from "@/common/format";
+import { useTheme } from "styled-components";
+import { displayNameForDeletedClient, formatDateTime, formatDatetimeAsDate } from "@/common/format";
+import CollectionIcon from "@/components/Icons/CollectionIcon";
+import CongestionChargeAppliesIcon from "@/components/Icons/CongestionChargeAppliesIcon";
+import DeliveryIcon from "@/components/Icons/DeliveryIcon";
+import FlaggedForAttentionIcon from "@/components/Icons/FlaggedForAttentionIcon";
+import HotelIcon from "@/components/Icons/HotelIcon";
+import PhoneIcon from "@/components/Icons/PhoneIcon";
 import {
     FetchClientIdAndIsActiveError,
     GetParcelDataAndCountErrorType,
     ParcelsTableRow,
 } from "./types";
-import CongestionChargeAppliesIcon from "@/components/Icons/CongestionChargeAppliesIcon";
-import DeliveryIcon from "@/components/Icons/DeliveryIcon";
-import FlaggedForAttentionIcon from "@/components/Icons/FlaggedForAttentionIcon";
-import PhoneIcon from "@/components/Icons/PhoneIcon";
-import CollectionIcon from "@/components/Icons/CollectionIcon";
-import { useTheme } from "styled-components";
-import HotelIcon from "@/components/Icons/HotelIcon";
+import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
 
 const RowToIconsColumn = ({
     flaggedForAttention,
@@ -79,16 +75,12 @@ const rowToLastStatusColumn = (data: ParcelsTableRow["lastStatus"] | null): stri
     );
 };
 
-const formatNullPostcode = (postcodeData: ParcelsTableRow["addressPostcode"]): string => {
-    return postcodeData ?? displayPostcodeForHomelessClient;
-};
-
 export const parcelTableColumnDisplayFunctions = {
     iconsColumn: RowToIconsColumn,
     deliveryCollection: RowToDeliveryCollectionColumn,
     packingDate: formatDatetimeAsDate,
     lastStatus: rowToLastStatusColumn,
-    addressPostcode: formatNullPostcode,
+    addressPostcode: rowToAddressColumn,
     createdAt: formatDateTime,
 };
 

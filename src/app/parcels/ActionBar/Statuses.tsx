@@ -77,17 +77,22 @@ const Statuses: React.FC<Props> = ({
         void getParcelStatuses();
     }, [setModalError]);
 
-    const submitStatus = async (date?: Dayjs): Promise<void> => {
+    const submitStatus = async (
+        date: Dayjs | undefined,
+        callNoResponseStatuses: string[]
+    ): Promise<void> => {
         setServerErrorMessage(null);
         if (selectedStatus === null) {
             setServerErrorMessage("Chosen status was not found.");
             return;
         }
 
+        const callNoResponseStatusesList: string = callNoResponseStatuses.join(" / ");
+
         const { error } = await saveParcelTableRowsStatus(
             selectedParcels,
             selectedStatus,
-            null,
+            callNoResponseStatusesList,
             undefined,
             date?.toISOString()
         );
@@ -134,6 +139,7 @@ const Statuses: React.FC<Props> = ({
                 headerId="status-modal-header"
                 onSubmit={submitStatus}
                 errorText={serverErrorMessage}
+                selectedStatus={selectedStatus}
             >
                 <></>
             </StatusesModal>

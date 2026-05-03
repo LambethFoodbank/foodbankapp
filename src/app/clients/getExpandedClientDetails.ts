@@ -2,7 +2,7 @@ import { Schema } from "@/databaseUtils";
 import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
 import { logErrorReturnLogId } from "@/logger/logger";
-import { formatAddress } from "@/common/format";
+import { formatAddress, formatAdditionalPhoneNumbers } from "@/common/format";
 import {
     getAdultAgeStringUsingBirthYear,
     getChildAgeStringUsingBirthYearAndMonth,
@@ -16,7 +16,6 @@ import { sortArrayByCanonicalOrder } from "@/components/Form/formFunctions";
 import { otherRequirementOptions } from "./form/formSections/OtherItemsCard";
 import { petFoodOptions } from "./form/formSections/PetFoodCard";
 import { cookingFacilitiesOptions } from "./form/formSections/CookingFacilitiesCard";
-import { signpostingCallOptions } from "./form/formSections/SignpostingCallCard";
 import { hygieneOtherItemsOptions } from "./form/formSections/HygieneProductsCard";
 import { babyOtherItemsOptions } from "./form/formSections/BabyProductsCard";
 
@@ -37,6 +36,7 @@ const getRawClientDetails = async (clientId: string) => {
             full_name,
             phone_number,
             email,
+            additional_phone_numbers,
             delivery_instructions,
             address_1,
             address_2,
@@ -62,10 +62,7 @@ const getRawClientDetails = async (clientId: string) => {
             baby_other_items,
             pet_food,
             other_items,
-            extra_information,
-            signposting_call_required,
             last_updated,
-            signposting_call_reasons,
             notes,
             is_active,
             default_list
@@ -82,7 +79,11 @@ const getRawClientDetails = async (clientId: string) => {
 };
 
 export const familyCountToFamilyCategory = (count: number): string => {
-    if (count <= 1) {
+    if (count === 0) {
+        return "No Family";
+    }
+
+    if (count === 1) {
         return "Single";
     }
 
@@ -108,10 +109,7 @@ export interface ExpandedClientData {
     babyProducts: string;
     petFood: string;
     otherRequirements: string;
-    extraInformation: string;
-    signpostingCallRequired: boolean;
     lastUpdated: string;
-    signpostingCallReasons: string;
     notes: string | null;
     isActive: boolean;
     defaultList: ListType;
@@ -122,7 +120,10 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
         fullName: client.full_name ?? "",
         address: formatAddressFromClientDetails(client),
         deliveryInstructions: client.delivery_instructions ?? "",
-        phoneNumber: client.phone_number ?? "",
+        phoneNumber: formatAdditionalPhoneNumbers(
+            client.phone_number,
+            client.additional_phone_numbers
+        ),
         email: client.email ?? "",
         defaultList: client.default_list,
         household: formatHouseholdFromFamilyDetails(client.family),
@@ -152,16 +153,7 @@ export const rawDataToExpandedClientDetails = (client: RawClientDetails): Expand
             client.other_items,
             otherRequirementOptions
         ),
-        extraInformation: formatExtraInformation(client.extra_information),
-        signpostingCallRequired: client.signposting_call_required ?? false,
         lastUpdated: client.last_updated,
-        signpostingCallReasons:
-            client.signposting_call_required === true
-                ? formatRequirementsByCanonicalOrder(
-                      client.signposting_call_reasons,
-                      signpostingCallOptions
-                  )
-                : "",
         notes: client.notes,
         isActive: client.is_active,
     };
@@ -181,10 +173,6 @@ export const formatAddressFromClientDetails = (
         client.address_postcode,
         false
     );
-};
-
-export const formatExtraInformation = (extraInformation: string | null): string => {
-    return extraInformation ? extraInformation.replace(/[\r\n]+/g, "\n") : "";
 };
 
 export const formatHouseholdFromFamilyDetails = (
@@ -215,9 +203,15 @@ export const formatHouseholdFromFamilyDetails = (
     }
 
     const familyCategory = familyCountToFamilyCategory(family.length);
-    const occupantDisplay = `Occupant${adultCount + childCount > 1 ? "s" : ""}`;
+    const totalFamilyMembers = adultCount + childCount;
+    const occupantDisplay =
+        totalFamilyMembers === 0 ? "" : `Occupant${totalFamilyMembers > 1 ? "s" : ""}`;
+    const breakdownString = adultChildBreakdown.join(", ");
 
-    return `${familyCategory} ${occupantDisplay} (${adultChildBreakdown.join(", ")})`;
+    if (breakdownString.length === 0) {
+        return familyCategory;
+    }
+    return `${familyCategory} ${occupantDisplay} (${breakdownString})`;
 };
 
 export const formatBreakdownOfAdultsFromFamilyDetails = (
@@ -333,6 +327,7 @@ export const formatBabyProducts = (
 };
 
 type IsClientActiveErrorType = "failedClientIsActiveFetch";
+
 export interface IsClientActiveError {
     type: IsClientActiveErrorType;
     logId: string;

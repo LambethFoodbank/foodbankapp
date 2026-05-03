@@ -19,8 +19,11 @@ const allRoles = [...managerAndAboveRoles, ...otherRoles];
 const mockData: ParcelsTableRow[] = [
     {
         clientId: "primaryKey1",
-        addressPostcode: "AB1 2CD",
         phoneNumber: "0987 654321",
+        addressPostcode: {
+            postcode: "AB1 2CD",
+            isDeliverable: false,
+        },
         deliveryCollection: {
             collectionCentreName: "Centre 1",
             collectionCentreAcronym: "C1",
@@ -56,8 +59,11 @@ const mockData: ParcelsTableRow[] = [
     },
     {
         clientId: "primaryKey2",
-        addressPostcode: "AB1 aaaa2CD",
         phoneNumber: "+1 234 567",
+        addressPostcode: {
+            postcode: "AB1 aaaa2CD",
+            isDeliverable: false,
+        },
         deliveryCollection: {
             collectionCentreName: "Centraaaae 1",
             collectionCentreAcronym: "C2",
@@ -138,6 +144,47 @@ describe("StatusesModal component", () => {
         renderModalWithRole(role);
         fireEvent.click(screen.getByLabelText("Close Button"));
         expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("saves the checked extra question fields when 'Called and No Response' status is selected", () => {
+        cleanup();
+        render(
+            <Localization>
+                <StyleManager>
+                    <StatusesModal
+                        isOpen={true}
+                        onClose={mockOnClose}
+                        selectedParcels={mockSelectedParcels}
+                        onSubmit={mockOnSubmit}
+                        errorText={null}
+                        headerId="status-modal-header"
+                        header="Apply Status: Called and No Response"
+                        selectedStatus="Called and No Response"
+                    >
+                        children={null}
+                    </StatusesModal>
+                </StyleManager>
+            </Localization>
+        );
+
+        const voicemailCheckbox = screen.getByLabelText("Voicemail");
+        const textCheckbox = screen.getByLabelText("Text");
+        const emailCheckbox = screen.getByLabelText("Email");
+
+        expect(voicemailCheckbox).not.toBeChecked();
+        expect(textCheckbox).not.toBeChecked();
+        expect(emailCheckbox).not.toBeChecked();
+
+        fireEvent.click(voicemailCheckbox);
+        fireEvent.click(emailCheckbox);
+
+        expect(voicemailCheckbox).toBeChecked();
+        expect(textCheckbox).not.toBeChecked();
+        expect(emailCheckbox).toBeChecked();
+
+        fireEvent.click(screen.getByText("Submit"));
+
+        expect(mockOnSubmit).toHaveBeenCalledWith(undefined, ["Voicemail", "Email"]);
     });
 
     it.each(managerAndAboveRoles)("shows the date override option for role: %o", ({ role }) => {

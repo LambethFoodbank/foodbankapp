@@ -7,7 +7,7 @@ import { ButtonsDiv, Centerer, ContentDiv, OutsideDiv } from "@/components/Modal
 import TableSurface from "@/components/Tables/TableSurface";
 import supabase from "@/supabaseClient";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import React, { useEffect, useState, Suspense, useRef, useCallback } from "react";
+import React, { useEffect, useState, Suspense, useRef, useCallback, useContext } from "react";
 import { useTheme } from "styled-components";
 import getClientsDataAndCount from "./getClientsData";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -16,7 +16,6 @@ import ExpandedClientDetailsFallback from "@/app/clients/ExpandedClientDetailsFa
 import { CircularProgress } from "@mui/material";
 import { ErrorSecondaryText } from "../../errorStylingandMessages";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
-import { displayPostcodeForHomelessClient } from "@/common/format";
 import DeleteConfirmationDialog from "@/components/Modal/DeleteConfirmationDialog";
 import DeleteButton from "@/components/Buttons/DeleteButton";
 import deleteClient from "../deleteClient";
@@ -32,7 +31,12 @@ import { getClientParcelsDetails } from "../getClientParcelsData";
 import { saveParcelStatus } from "@/app/parcels/ActionBar/saveStatus";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 import FloatingToast from "@/components/FloatingToast";
+import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
+import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
 import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
+import { MRT_Row } from "material-react-table";
+
+const errorMessageForOutsideDeliveryArea = "The client clicked is outside the delivery area.";
 
 const ClientsPage: React.FC = () => {
     const [isLoadingForFirstTime, setIsLoadingForFirstTime] = useState(true);
@@ -41,7 +45,8 @@ const ClientsPage: React.FC = () => {
     const [filteredClientCount, setFilteredClientCount] = useState<number>(0);
     const [sortState, setSortState] = useState<ClientsSortState>({ sortEnabled: false });
     const [primaryFilters, setPrimaryFilters] = useState<ClientsFilter[]>(clientsFilters);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [fetchErrorMessage, setFetchErrorMessage] = useState<string | null>(null);
+    const [rowClickErrorMessage, setRowClickErrorMessage] = useState<string | null>(null);
     const [isSelectedClientActive, setIsSelectedClientActive] = useState<boolean | null>(null);
     const [isClientActiveErrorMessage, setIsClientActiveErrorMessage] = useState<string | null>(
         null
@@ -67,7 +72,7 @@ const ClientsPage: React.FC = () => {
         }
         clientTableFetchAbortController.current = new AbortController();
 
-        setErrorMessage(null);
+        setFetchErrorMessage(null);
         const { data, error } = await getClientsDataAndCount(
             supabase,
             startPoint,
@@ -85,7 +90,7 @@ const ClientsPage: React.FC = () => {
                         return;
                     case "failedToFetchClientsTable":
                     case "failedToFetchClientsTableCount":
-                        setErrorMessage(`Error occurred: ${error.type}, Log ID: 
+                        setFetchErrorMessage(`Error occurred: ${error.type}, Log ID:
                     ${error.logId}`);
                         break;
                 }
@@ -124,9 +129,9 @@ const ClientsPage: React.FC = () => {
             )
             .subscribe((status, err) => {
                 if (subscriptionStatusRequiresErrorMessage(status, err, "clients and related")) {
-                    setErrorMessage("Error fetching data, please reload");
+                    setFetchErrorMessage("Error fetching data, please reload");
                 } else {
-                    setErrorMessage(null);
+                    setFetchErrorMessage(null);
                 }
             });
 
@@ -155,10 +160,6 @@ const ClientsPage: React.FC = () => {
         })();
     }, [clientId]);
 
-    const formatNullPostcode = (postcodeData: ClientsTableRow["addressPostcode"]): string => {
-        return postcodeData ?? displayPostcodeForHomelessClient;
-    };
-
     const onDeleteClient = async (): Promise<void> => {
         if (clientId) {
             const deletedClientsParcels = await getClientParcelsDetails(clientId);
@@ -181,6 +182,19 @@ const ClientsPage: React.FC = () => {
         }
     };
 
+    const { role } = useContext(RoleUpdateContext);
+
+    const onRowClick = (row: MRT_Row<ClientsTableRow>): void => {
+        if (
+            roleCanAccessOutsideDeliveryAreaModal(role, row.original.addressPostcode.isDeliverable)
+        ) {
+            setRowClickErrorMessage(null);
+            router.push(`/clients?${clientIdParam}=${row.original.clientId}`);
+        } else {
+            setRowClickErrorMessage(errorMessageForOutsideDeliveryArea);
+        }
+    };
+
     return (
         <>
             {isLoadingForFirstTime ? (
@@ -189,13 +203,20 @@ const ClientsPage: React.FC = () => {
                 </Centerer>
             ) : (
                 <>
-                    {errorMessage && (
+                    {(rowClickErrorMessage && (
                         <FloatingToast
-                            message={errorMessage}
+                            message={rowClickErrorMessage}
                             severity="warning"
                             variant="filled"
                         ></FloatingToast>
-                    )}
+                    )) ||
+                        (fetchErrorMessage && (
+                            <FloatingToast
+                                message={fetchErrorMessage}
+                                severity="warning"
+                                variant="filled"
+                            ></FloatingToast>
+                        ))}
                     <Centerer>
                         <LinkButton link="/clients/add">Add Client</LinkButton>
                     </Centerer>
@@ -218,15 +239,14 @@ const ClientsPage: React.FC = () => {
                                 sortableColumns: clientsSortableColumns,
                                 setSortState: setSortState,
                             }}
+                            onRowClick={onRowClick}
                             filterConfig={{
                                 primaryFiltersShown: true,
                                 primaryFilters: primaryFilters,
                                 setPrimaryFilters: setPrimaryFilters,
                                 additionalFiltersShown: false,
                             }}
-                            onRowClick={(row) => {
-                                router.push(`/clients?${clientIdParam}=${row.original.clientId}`);
-                            }}
+                            columnDisplayFunctions={{ addressPostcode: rowToAddressColumn }}
                             rowActionsConfig={{ editable: false }}
                         />
                     </TableSurface>

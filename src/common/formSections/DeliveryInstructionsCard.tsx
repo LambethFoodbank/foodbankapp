@@ -1,17 +1,20 @@
 import React from "react";
+import { CommonCardProps } from "@/app/parcels/form/ParcelForm";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
     getErrorText,
     getDefaultTextValue,
     onChangeText,
+    Setter,
+    FormErrors,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "@/app/clients/form/ClientForm";
+import { ClientFields } from "@/app/clients/form/ClientForm";
 
 export const MAX_CHARACTERS = 380;
 
-const DeliveryInstructionsCard: React.FC<ClientCardProps> = ({
+const DeliveryInstructionsCard: React.FC<CommonCardProps> = ({
     formErrors,
     errorSetter,
     fieldSetter,
@@ -28,9 +31,14 @@ const DeliveryInstructionsCard: React.FC<ClientCardProps> = ({
                 defaultValue={getDefaultTextValue(fields, "deliveryInstructions")}
                 error={errorExists(formErrors.deliveryInstructions)}
                 helperText={getErrorText(formErrors.deliveryInstructions, MAX_CHARACTERS)}
-                onChange={onChangeText(fieldSetter, errorSetter, "deliveryInstructions", {
-                    maxCharacters: MAX_CHARACTERS,
-                })}
+                onChange={onChangeText(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ClientFields>>,
+                    "deliveryInstructions",
+                    {
+                        maxCharacters: MAX_CHARACTERS,
+                    }
+                )}
                 multiline
             />
         </GenericFormCard>
