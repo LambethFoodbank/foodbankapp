@@ -11,7 +11,7 @@ import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { TextValueContainer } from "@/app/admin/auditLogTable/auditLogModal/AuditLogModalRow";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
-import { reorderTwoItemsInWikiTable } from "@/app/info/supabaseHelpers";
+import { fetchWikiRow, reorderTwoItemsInWikiTable } from "@/app/info/supabaseHelpers";
 
 interface WikiItemsProps {
     rows: DbWikiRow[];
@@ -23,6 +23,8 @@ interface WikiItemProps {
     removeRow: (row: DbWikiRow) => number;
     swapRows: (row1: DbWikiRow, direction: DirectionString) => void;
     setErrorMessage: (errorMessage: string | null) => void;
+    rowsInEditMode: Set<string>;
+    setRowsInEditMode: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 interface ContentPart {
@@ -65,6 +67,8 @@ const WikiItem: React.FC<WikiItemProps> = ({
     removeRow,
     swapRows,
     setErrorMessage,
+    rowsInEditMode,
+    setRowsInEditMode,
 }) => {
     return (
         <WikiItemPositioner>
@@ -74,6 +78,8 @@ const WikiItem: React.FC<WikiItemProps> = ({
                 removeRow={removeRow}
                 swapRows={swapRows}
                 setErrorMessage={setErrorMessage}
+                rowsInEditMode={rowsInEditMode}
+                setRowsInEditMode={setRowsInEditMode}
             />
         </WikiItemPositioner>
     );
@@ -108,6 +114,7 @@ const swapTwoRowsInDisplayRows = (
 
 const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+    const [rowsInEditMode, setRowsInEditMode] = React.useState<Set<string>>(new Set());
 
     const sortedRows: DbWikiRow[] = rows.slice().sort((r1: DbWikiRow, r2: DbWikiRow) => {
         return r1.row_order > r2.row_order ? 1 : -1;
@@ -150,6 +157,13 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
             temp.splice(indexToRemove, 1);
             return temp;
         });
+
+        setRowsInEditMode((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(row.wiki_key);
+            return newSet;
+        });
+
         return indexToRemove;
     };
 
@@ -166,6 +180,14 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
         const row2 = displayRows[rowIndex2];
 
         const reorderError = await reorderTwoItemsInWikiTable(row1.wiki_key, row2.wiki_key);
+
+        const updatedRow1WithLastUpdated = await fetchWikiRow(row1.wiki_key);
+        const lastUpdatedRow1 = updatedRow1WithLastUpdated.last_updated;
+        const updatedRow2WithLastUpdated = await fetchWikiRow(row2.wiki_key);
+        const lastUpdatedRow2 = updatedRow2WithLastUpdated.last_updated;
+
+        row1.last_updated = lastUpdatedRow1;
+        row2.last_updated = lastUpdatedRow2;
 
         const auditLog = {
             action: `move a wiki item ${row1.row_order <= row2.row_order ? "down" : "up"}`,
@@ -232,6 +254,8 @@ const WikiItems: React.FC<WikiItemsProps> = ({ rows }) => {
                         swapRows={swapRows}
                         key={row.wiki_key}
                         setErrorMessage={setErrorMessage}
+                        rowsInEditMode={rowsInEditMode}
+                        setRowsInEditMode={setRowsInEditMode}
                     />
                 );
             })}

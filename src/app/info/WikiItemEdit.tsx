@@ -17,7 +17,11 @@ import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { DirectionString } from "@/app/info/WikiItems";
-import { deleteItemInWikiTable, updateItemInWikiTable } from "@/app/info/supabaseHelpers";
+import {
+    deleteItemInWikiTable,
+    fetchWikiRow,
+    updateItemInWikiTable,
+} from "@/app/info/supabaseHelpers";
 import { useTheme } from "styled-components";
 
 interface WikiItemEditProps {
@@ -28,9 +32,10 @@ interface WikiItemEditProps {
     removeRow: (row: DbWikiRow) => number;
     swapRows: (row1: DbWikiRow, direction: DirectionString) => void;
     setErrorMessage: (error: string | null) => void;
+    isAnyInEditMode?: boolean;
 }
 
-const WikiItemEdit: React.FC<WikiItemEditProps> = ({
+export const WikiItemEdit: React.FC<WikiItemEditProps> = ({
     rowData,
     setRowData,
     setIsInEditMode,
@@ -38,6 +43,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
     removeRow,
     swapRows,
     setErrorMessage,
+    isAnyInEditMode = false,
 }) => {
     const [titleValue, setTitleValue] = React.useState(rowData.title);
     const [contentValue, setContentValue] = React.useState(rowData.content);
@@ -73,8 +79,18 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
         }
     };
 
-    const cancelWikiItemEdit = (): void => {
+    const cancelWikiItemEdit = async (): Promise<void> => {
+        setErrorMessage("");
         !rowData.title && !rowData.content ? deleteWikiItem() : setIsInEditMode(false);
+
+        try {
+            const existingRow = await fetchWikiRow(rowData.wiki_key);
+            setRowData(existingRow);
+            setTitleValue(existingRow.title);
+            setContentValue(existingRow.content);
+        } catch (err) {
+            setErrorMessage((err as Error).message);
+        }
     };
 
     const updateWikiItem = async (newTitle: string, newContent: string): Promise<void> => {
@@ -85,55 +101,62 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
             if (deleteUpdateConfirmation) {
                 deleteWikiItem();
             }
-        } else {
-            const updateConfirmation: boolean = confirm("Confirm update of this item?");
-            if (updateConfirmation) {
-                const updateError = await updateItemInWikiTable(
-                    newTitle,
-                    newContent,
-                    rowData.wiki_key
-                );
-
-                const auditLog = {
-                    action: "edit a wiki item",
-                    wikiId: rowData.wiki_key,
-                    content: {
-                        itemTitle: newTitle,
-                        itemContent: newContent,
-                        rowOrder: rowData.row_order,
-                    },
-                } as const satisfies Partial<AuditLog>;
-                if (updateError) {
-                    const logId = await logErrorReturnLogId(
-                        "error updating wiki row item",
-                        updateError
-                    );
-                    setErrorMessage(`Failed to update wiki item. Log ID: ${logId}`);
-                    void sendAuditLog({
-                        ...auditLog,
-                        wasSuccess: false,
-                        logId: logId,
-                    });
-                } else {
-                    const updatedRow: DbWikiRow = {
-                        title: newTitle,
-                        content: newContent,
-                        row_order: rowData.row_order,
-                        wiki_key: rowData.wiki_key,
-                    };
-                    const index: number = removeRow(rowData);
-                    setRowData(updatedRow);
-                    appendNewRow(updatedRow, index);
-                    void sendAuditLog({
-                        ...auditLog,
-                        wasSuccess: true,
-                    });
-                }
-            }
-            setIsInEditMode(false);
+            return;
         }
-    };
 
+        const updateConfirmation: boolean = confirm("Confirm update of this item?");
+        if (!updateConfirmation) {
+            setIsInEditMode(false);
+            return;
+        }
+
+        const auditLog = {
+            action: "edit a wiki item",
+            wikiId: rowData.wiki_key,
+            content: {
+                itemTitle: newTitle,
+                itemContent: newContent,
+                rowOrder: rowData.row_order,
+                lastUpdated: rowData.last_updated,
+            },
+        } as const satisfies Partial<AuditLog>;
+
+        const updateError = await updateItemInWikiTable(
+            newTitle,
+            newContent,
+            rowData.wiki_key,
+            rowData.last_updated
+        );
+
+        if (updateError) {
+            if (updateError.message.includes("edited recently")) {
+                setErrorMessage(updateError.message);
+                return;
+            }
+            return;
+        } else {
+            setErrorMessage("");
+            const updatedRowWithLastUpdated = await fetchWikiRow(rowData.wiki_key);
+            const lastUpdated = updatedRowWithLastUpdated.last_updated;
+            const updatedRow: DbWikiRow = {
+                title: newTitle,
+                content: newContent,
+                row_order: rowData.row_order,
+                wiki_key: rowData.wiki_key,
+                last_updated: lastUpdated,
+            };
+            const index: number = removeRow(rowData);
+            setRowData(updatedRow);
+            appendNewRow(updatedRow, index);
+
+            void sendAuditLog({
+                ...auditLog,
+                wasSuccess: true,
+            });
+        }
+
+        setIsInEditMode(false);
+    };
     const deleteWikiItemWithConfirmation = async (): Promise<void> => {
         if (!rowData.title && !rowData.content) {
             const confirmation: boolean = confirm("Confirm discard of this item?");
@@ -155,7 +178,6 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
     const handleContentChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setContentValue(event.target.value);
     };
-
     return (
         <>
             <ReorderArrowDiv>
@@ -163,6 +185,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                     onClick={() => {
                         swapRows(rowData, "up");
                     }}
+                    disabled={isAnyInEditMode}
                     data-testid={`#swap-up-${rowData.row_order}`}
                 >
                     <KeyboardDoubleArrowUpIcon />
@@ -171,6 +194,7 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                     onClick={() => {
                         swapRows(rowData, "down");
                     }}
+                    disabled={isAnyInEditMode}
                     data-testid={`#swap-down-${rowData.row_order}`}
                 >
                     <KeyboardDoubleArrowDownIcon />
@@ -204,7 +228,6 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
                     fullWidth={true}
                     inputProps={{ "data-testid": `#content-${rowData.row_order}` }}
                 />
-
                 <WikiEditModeButton
                     onClick={() => {
                         const title_input = document.getElementById(
@@ -229,5 +252,3 @@ const WikiItemEdit: React.FC<WikiItemEditProps> = ({
         </>
     );
 };
-
-export default WikiItemEdit;

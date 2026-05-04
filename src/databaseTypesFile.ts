@@ -806,18 +806,21 @@ export type Database = {
       wiki: {
         Row: {
           content: string
+          last_updated: string
           row_order: number
           title: string
           wiki_key: string
         }
         Insert: {
           content?: string
+          last_updated?: string
           row_order?: number
           title?: string
           wiki_key?: string
         }
         Update: {
           content?: string
+          last_updated?: string
           row_order?: number
           title?: string
           wiki_key?: string
