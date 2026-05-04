@@ -1,8 +1,8 @@
-import { CongestionChargeDetails, ParcelsTableRow } from "./types";
 import { familyCountToFamilyCategory } from "@/app/clients/getExpandedClientDetails";
-import { logErrorReturnLogId } from "@/logger/logger";
 import { DbParcelRow, ViewSchema } from "@/databaseUtils";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { parcelsPageDeletedClientDisplayName } from "./format";
+import { CongestionChargeDetails, ParcelsTableRow } from "./types";
 
 export type ProcessParcelDataResult =
     | {
@@ -34,7 +34,6 @@ const convertParcelDbtoParcelRow = async (
             },
         };
     }
-
     return {
         parcelTableRows: processingData.map((parcel, index) => {
             const clientActive = parcel.client_is_active;
@@ -47,8 +46,15 @@ const convertParcelDbtoParcelRow = async (
                 familyCategory: clientActive
                     ? familyCountToFamilyCategory(parcel.family_count ?? 0)
                     : "-",
-                addressPostcode: clientActive ? parcel.client_address_postcode : "-",
-                phoneNumber: clientActive ? parcel.client_phone_number ?? "" : "-",
+                addressPostcode: {
+                    postcode: clientActive ? parcel.client_address_postcode : "-",
+                    isDeliverable: parcel.is_deliverable,
+                },
+                phoneNumber: clientActive
+                    ? [parcel.client_phone_number, parcel.client_additional_phone_numbers_text]
+                          .filter((phone) => phone && phone.length > 0)
+                          .join(", ")
+                    : "-",
                 email: clientActive ? parcel.client_email ?? "" : "-",
                 deliveryCollection: {
                     collectionCentreName: parcel.collection_centre_name ?? "-",
@@ -70,12 +76,8 @@ const convertParcelDbtoParcelRow = async (
                 referrerPhone: parcel.referrer_phone,
                 packingDate: parcel.packing_date ? new Date(parcel.packing_date) : null,
                 iconsColumn: {
-                    flaggedForAttention: parcel.client_is_active
-                        ? parcel.client_flagged_for_attention ?? false
-                        : false,
-                    requiresFollowUpPhoneCall: parcel.client_is_active
-                        ? parcel.client_signposting_call_required ?? false
-                        : false,
+                    flaggedForAttention: parcel.flagged_for_attention ?? false,
+                    requiresFollowUpPhoneCall: parcel.signposting_call_required ?? false,
                 },
                 createdAt: parcel.created_at ? new Date(parcel.created_at) : null,
                 clientIsActive: parcel.client_is_active ?? false,

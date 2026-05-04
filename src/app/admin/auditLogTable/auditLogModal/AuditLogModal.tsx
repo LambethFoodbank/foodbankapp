@@ -1,5 +1,6 @@
 "use client";
 
+import DietaryRequirementAuditLogModalRow from "@/app/admin/auditLogTable/auditLogModal/auditLogModalRows/DietaryRequirement";
 import React from "react";
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
@@ -83,6 +84,11 @@ const AuditLogModal: React.FC<AuditLogModalProps> = ({ selectedAuditLogRow, onCl
                     {selectedAuditLogRow.websiteData && (
                         <WebsiteDataAuditLogModalRow
                             websiteDataName={selectedAuditLogRow.websiteData}
+                        />
+                    )}
+                    {selectedAuditLogRow.dietaryRequirement && (
+                        <DietaryRequirementAuditLogModalRow
+                            dietaryRequirement={selectedAuditLogRow.dietaryRequirement}
                         />
                     )}
                     <AuditLogModalItem>

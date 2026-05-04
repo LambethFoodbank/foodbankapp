@@ -5,9 +5,11 @@ import {
     getErrorText,
     getDefaultTextValue,
     onChangeText,
+    Setter,
+    FormErrors,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
-import { ClientCardProps } from "../ClientForm";
+import { ClientCardProps, ClientFields } from "../ClientForm";
 import { emailRegex, formatEmail } from "@/common/format";
 
 const emailIsRequired = false;
@@ -21,11 +23,16 @@ const EmailCard: React.FC<ClientCardProps> = ({ formErrors, errorSetter, fieldSe
                 defaultValue={getDefaultTextValue(fields, "email")}
                 error={errorExists(formErrors.email)}
                 helperText={getErrorText(formErrors.email)}
-                onChange={onChangeText(fieldSetter, errorSetter, "email", {
-                    required: emailIsRequired,
-                    regex: emailRegex,
-                    formattingFunction: formatEmail,
-                })}
+                onChange={onChangeText(
+                    fieldSetter,
+                    errorSetter as Setter<FormErrors<ClientFields>>,
+                    "email",
+                    {
+                        required: emailIsRequired,
+                        regex: emailRegex,
+                        formattingFunction: formatEmail,
+                    }
+                )}
             />
         </GenericFormCard>
     );

@@ -6,10 +6,10 @@ import {
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import RadioGroupInput from "@/components/DataInput/RadioGroupInput";
-import { ClientCardProps } from "../ClientForm";
 import { FormElementWithSpacing } from "@/components/Form/formStyling";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
 import { Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
+import { ParcelCardProps } from "@/app/parcels/form/ParcelForm";
 
 export const signpostingCallOptions: string[] = [
     "Benefits",
@@ -24,7 +24,7 @@ export const signpostingCallLabelsAndKeys: [string, string][] = signpostingCallO
     (optionName) => [optionName, optionName]
 );
 
-const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields }) => {
+const SignpostingCallCard: React.FC<ParcelCardProps> = ({ fieldSetter, fields }) => {
     const [unknownSignpostingReasons, setUnknownSignpostingReasons] = useState(
         fields["signpostingCallReasons"] === null
     );
@@ -51,7 +51,7 @@ const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields })
             ></RadioGroupInput>
 
             <FormElementWithSpacing>
-                <FormControl disabled={fields["signpostingCall"] !== true}>
+                <FormControl disabled={!fields["signpostingCall"]}>
                     <FormLabel>What do they need help with?</FormLabel>
                     <FormGroup>
                         <FormControlLabel
@@ -59,7 +59,7 @@ const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields })
                                 <Checkbox
                                     checked={unknownSignpostingReasons}
                                     onChange={handleCheckCheckboxForUnknown}
-                                    disabled={fields["signpostingCall"] !== true}
+                                    disabled={!fields["signpostingCall"]}
                                 />
                             }
                             label="Don't Know"
@@ -82,7 +82,7 @@ const SignpostingCallCard: React.FC<ClientCardProps> = ({ fieldSetter, fields })
                             ? checkboxGroupToArray(fields.signpostingCallReasons)
                             : []
                     }
-                    disabled={unknownSignpostingReasons || fields["signpostingCall"] !== true}
+                    disabled={unknownSignpostingReasons || !fields["signpostingCall"]}
                 />
             </FormElementWithSpacing>
         </GenericFormCard>

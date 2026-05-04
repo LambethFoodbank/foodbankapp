@@ -112,8 +112,8 @@ const EditUserForm: React.FC<Props> = (props) => {
                     id="edit-user-first-name"
                     label="First Name"
                     defaultValue={fields.firstName}
-                    error={errorExists(formErrors.firstName)}
-                    helperText={getErrorText(formErrors.firstName)}
+                    error={errorExists(formErrors.firstName as Errors)}
+                    helperText={getErrorText(formErrors.firstName as Errors)}
                     onChange={onChangeText(fieldSetter, errorSetter, "firstName", {
                         required: true,
                     })}
@@ -126,8 +126,8 @@ const EditUserForm: React.FC<Props> = (props) => {
                     id="edit-user-last-name"
                     label="Last Name"
                     defaultValue={fields.lastName}
-                    error={errorExists(formErrors.lastName)}
-                    helperText={getErrorText(formErrors.lastName)}
+                    error={errorExists(formErrors.lastName as Errors)}
+                    helperText={getErrorText(formErrors.lastName as Errors)}
                     onChange={onChangeText(fieldSetter, errorSetter, "lastName", {
                         required: true,
                     })}
@@ -140,8 +140,8 @@ const EditUserForm: React.FC<Props> = (props) => {
                     id="edit-user-phone-number"
                     label="Phone Number"
                     defaultValue={fields.telephoneNumber}
-                    error={errorExists(formErrors.telephoneNumber)}
-                    helperText={getErrorText(formErrors.telephoneNumber)}
+                    error={errorExists(formErrors.telephoneNumber as Errors)}
+                    helperText={getErrorText(formErrors.telephoneNumber as Errors)}
                     onChange={onChangeText(fieldSetter, errorSetter, "telephoneNumber", {
                         required: true,
                         regex: phoneNumberRegex,

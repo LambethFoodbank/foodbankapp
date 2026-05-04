@@ -38,7 +38,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: 2.9.6
+          version: 2.84.2
 
       - name: Start Supabase local development setup
         run: supabase start

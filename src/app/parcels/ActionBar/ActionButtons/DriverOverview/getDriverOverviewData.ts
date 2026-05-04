@@ -3,6 +3,7 @@ import supabase from "@/supabaseClient";
 import { logErrorReturnLogId } from "@/logger/logger";
 import {
     displayNameForDeletedClient,
+    formatAdditionalPhoneNumbers,
     formatAddress,
     formatDateStringAsDate,
 } from "@/common/format";
@@ -138,7 +139,13 @@ const transformRowToDriverOverviewTableData = (
             client?.address_postcode,
             false
         ),
-        contact: clientIsActive ? client?.phone_number ?? "" : "-",
+        contact: clientIsActive
+            ? formatAdditionalPhoneNumbers(
+                  client.phone_number,
+                  client.additional_phone_numbers,
+                  "DriverOverview"
+              )
+            : "-",
         packingDate: formatDateStringAsDate(parcel.packing_date) ?? null,
         instructions: clientIsActive ? client?.delivery_instructions ?? "" : "-",
         clientIsActive: clientIsActive,

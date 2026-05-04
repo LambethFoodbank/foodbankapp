@@ -1,7 +1,7 @@
 import { ServerSideFilter, ServerSideFilterMethod } from "@/components/Tables/Filters";
 import { SortState } from "@/components/Tables/materialTable/tableTypes";
 import { ServerSideSortMethod } from "@/components/Tables/sortMethods";
-import { DbClientRow } from "@/databaseUtils";
+import { DbClientRow, Schema } from "@/databaseUtils";
 
 export type ClientsFilterMethod = ServerSideFilterMethod<DbClientRow, string>;
 export type ClientsFilter = ServerSideFilter<ClientsTableRow, string, DbClientRow>;
@@ -38,10 +38,13 @@ export type GetClientsCountReturnType =
       };
 
 export interface ClientsTableRow {
-    clientId: string;
-    fullName: string;
+    clientId: Schema["clients"]["primary_key"];
+    fullName: Schema["clients"]["full_name"];
     familyCategory: string;
-    addressPostcode: string | null;
-    phoneNumber: string | null;
+    addressPostcode: {
+        postcode: Schema["clients"]["address_postcode"];
+        isDeliverable: boolean | null;
+    };
+    phoneNumber: Schema["clients"]["phone_number"];
     email: string | null;
 }

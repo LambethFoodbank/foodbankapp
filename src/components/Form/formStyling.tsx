@@ -108,3 +108,17 @@ export const GappedDiv = styled.div`
     flex-direction: column;
     gap: 1em;
 `;
+
+export const GappedRowDiv = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+
+    > :first-child {
+        flex: 1;
+    }
+
+    > :not(:first-child) {
+        flex: 0 0 auto;
+    }
+`;

@@ -15,7 +15,9 @@ const clientsSortableColumns: SortOptions<ClientsTableRow, ClientsSortMethod>[] 
     {
         key: "addressPostcode",
         sortMethod: (sortDirection, query) =>
-            query.order("address_postcode", { ascending: sortDirection === "asc" }),
+            query.order("sorted_address_postcode", {
+                ascending: sortDirection === "asc",
+            }),
     },
     {
         key: "phoneNumber",

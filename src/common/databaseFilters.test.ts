@@ -237,7 +237,11 @@ describe("test for phone number filter", () => {
         mockDbQuery = {} as DbQuery<DbParcelRow>;
         mockDbQuery.or = mockOr;
 
-        phoneFilter = phoneSearch<DbParcelRow>("client_phone_number", "client_is_active");
+        phoneFilter = phoneSearch<DbParcelRow>(
+            "client_phone_number",
+            "client_additional_phone_numbers_text",
+            "client_is_active"
+        );
     });
 
     it("should leave the query unchanged when phone input is empty", () => {
@@ -265,7 +269,7 @@ describe("test for phone number filter", () => {
         // Assert
         expect(result).toBe(mockQueryWithOrAppended);
         expect(mockOr).toHaveBeenCalledWith(
-            "and(client_is_active.is.true, client_phone_number.ilike.%input to be trimmed%)"
+            "or(and(client_is_active.is.true, client_phone_number.ilike.%input to be trimmed%), and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%input to be trimmed%))"
         );
     });
 
@@ -276,10 +280,10 @@ describe("test for phone number filter", () => {
         // Assert
         expect(result).toBe(mockQueryWithOrAppended);
         expect(mockOr).toHaveBeenCalledWith(
-            "and(client_is_active.is.true, client_phone_number.ilike.%substring1%)," +
-                "and(client_is_active.is.true, client_phone_number.ilike.%sub string2%)," +
-                "and(client_is_active.is.true, client_phone_number.ilike.%sub-string3%)," +
-                "and(client_is_active.is.true, client_phone_number.ilike.%substring4%)"
+            "or(and(client_is_active.is.true, client_phone_number.ilike.%substring1%), and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%substring1%))," +
+                "or(and(client_is_active.is.true, client_phone_number.ilike.%sub string2%), and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%sub string2%))," +
+                "or(and(client_is_active.is.true, client_phone_number.ilike.%sub-string3%), and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%sub-string3%))," +
+                "or(and(client_is_active.is.true, client_phone_number.ilike.%substring4%), and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%substring4%))"
         );
     });
 
@@ -301,10 +305,10 @@ describe("test for phone number filter", () => {
         // Assert
         expect(result).toBe(mockQueryWithOrAppended);
         expect(mockOr).toHaveBeenCalledWith(
-            "and(client_is_active.is.true, client_phone_number.ilike.%substring1%)," +
-                "or(client_is_active.is.false, client_phone_number.ilike.%-%)," +
-                "and(client_is_active.is.true, client_phone_number.ilike.%sub string2%)," +
-                "and(client_is_active.is.true, client_phone_number.ilike.%sub  string3%)"
+            "or(and(client_is_active.is.true, client_phone_number.ilike.%substring1%), and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%substring1%))," +
+                "or(client_is_active.is.false, client_phone_number.ilike.%-%),or(and(client_is_active.is.true, client_phone_number.ilike.%sub string2%), " +
+                "and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%sub string2%)),or(and(client_is_active.is.true, client_phone_number.ilike.%sub  string3%), " +
+                "and(client_is_active.is.true, client_additional_phone_numbers_text.ilike.%sub  string3%))"
         );
     });
 });

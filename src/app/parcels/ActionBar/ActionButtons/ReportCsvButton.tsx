@@ -15,12 +15,12 @@ import {
     formatHygieneProducts,
     formatRequirementsByCanonicalOrder,
 } from "@/app/clients/getExpandedClientDetails";
-import { formatDatetimeAsDate } from "@/common/format";
+import { formatAdditionalPhoneNumbers, formatDatetimeAsDate } from "@/common/format";
 import { FileGenerationDataFetchResponse } from "@/components/FileGenerationButtons/common";
 import CsvButton, {
     formatNumberAsStringForCsv,
 } from "@/components/FileGenerationButtons/CsvButton";
-import { signpostingCallOptions } from "@/app/clients/form/formSections/SignpostingCallCard";
+import { signpostingCallOptions } from "@/app/parcels/form/formSections/SignpostingCallCard";
 import { ParcelsTableRow } from "../../parcelsTable/types";
 
 export type FetchReportResult =
@@ -99,16 +99,17 @@ export interface rawParcel {
         is_shown: boolean;
     } | null;
     list_type: "regular" | "hotel";
+    flagged_for_attention: boolean | null;
+    signposting_call_required: boolean | null;
+    signposting_call_reasons: string[] | null;
+    extra_information: string | null;
     client: {
         full_name: string | null;
         is_active: boolean;
-        signposting_call_required: boolean | null;
-        flagged_for_attention: boolean | null;
         phone_number: string | null;
+        additional_phone_numbers: string[] | null;
         email: string | null;
-        signposting_call_reasons: string[] | null;
         delivery_instructions: string | null;
-        extra_information: string | null;
         notes: string | null;
         address_1: string | null;
         address_2: string | null;
@@ -151,16 +152,17 @@ export const getRawParcelListQuery = `
             is_shown
         ),
         list_type,
+        flagged_for_attention,
+        signposting_call_required,
+        signposting_call_reasons,
+        extra_information,
         client:clients(
             full_name,
             is_active,
-            signposting_call_required,
-            flagged_for_attention,
             phone_number,
+            additional_phone_numbers,
             email,
-            signposting_call_reasons,
             delivery_instructions,
-            extra_information,
             notes,
             address_1,
             address_2,
@@ -201,14 +203,20 @@ export const convertRawParcelListToReportResult = (
                     voucherNumber: rawParcel.voucher_number ?? "",
                     packingDate: formatDatetimeAsDate(rawParcel.packing_date),
                     fullName: rawParcel.client?.full_name ?? "(error)",
-                    signpostingCallRequired: rawParcel.client?.signposting_call_required ?? false,
-                    flaggedForAttention: rawParcel.client?.flagged_for_attention ?? false,
+                    signpostingCallRequired: rawParcel.signposting_call_required ?? false,
+                    flaggedForAttention: rawParcel.flagged_for_attention ?? false,
                     phoneNumber: rawParcel.client
-                        ? formatNumberAsStringForCsv(rawParcel.client.phone_number)
+                        ? formatNumberAsStringForCsv(
+                              formatAdditionalPhoneNumbers(
+                                  rawParcel.client.phone_number,
+                                  rawParcel.client.additional_phone_numbers,
+                                  "Report"
+                              )
+                          )
                         : "",
                     email: rawParcel.client?.email ?? "",
                     signpostingCallReasons: formatRequirementsByCanonicalOrder(
-                        rawParcel.client?.signposting_call_reasons ?? null,
+                        rawParcel.signposting_call_reasons ?? null,
                         signpostingCallOptions
                     ),
                     address: rawParcel.client
@@ -223,7 +231,7 @@ export const convertRawParcelListToReportResult = (
                         : `${rawParcel.collection_centre?.name} (inactive)`,
                     deliveryCollectionDate: formatDatetimeAsDate(rawParcel.collection_datetime),
                     deliveryInstructions: rawParcel.client?.delivery_instructions ?? "",
-                    extraInformation: rawParcel.client?.extra_information ?? "",
+                    extraInformation: rawParcel.extra_information ?? "",
                     parcelNotes: rawParcel?.notes ?? "",
                     clientNotes: rawParcel.client?.notes ?? "",
                     cookingFacilities: formatRequirementsByCanonicalOrder(

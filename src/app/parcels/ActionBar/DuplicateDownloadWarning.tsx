@@ -9,7 +9,7 @@ export interface DuplicateDownloadWarningProps {
     postcodes: (string | null)[];
 }
 
-const StyledAlert = styled(Alert)`
+export const StyledAlert = styled(Alert)`
     border-radius: 4px;
 `;
 

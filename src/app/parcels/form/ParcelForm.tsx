@@ -5,35 +5,9 @@ import InfoIcon from "@mui/icons-material/Info";
 import { Button, IconButton } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { useTheme } from "styled-components";
-import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
-import getExpandedClientDetails, {
-    ExpandedClientData,
-} from "@/app/clients/getExpandedClientDetails";
-import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
-import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
-import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
-import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
-import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
-import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
-import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
-import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
-import {
-    WriteParcelToDatabaseErrors,
-    WriteParcelToDatabaseFunction,
-} from "@/app/parcels/form/submitFormHelpers";
-import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
-import {
-    CollectionCentresLabelsAndValues,
-    CollectionTimeSlotsLabelsAndValues,
-    getActiveTimeSlotsForCollectionCentre,
-    PackingSlotsLabelsAndValues,
-} from "@/common/fetch";
-import { getDbDate } from "@/common/format";
 import {
     CardProps,
+    checkboxGroupToArray,
     checkErrorOnSubmit,
     createSetter,
     Errors,
@@ -49,12 +23,52 @@ import {
 import Icon from "@/components/Icons/Icon";
 import Modal from "@/components/Modal/Modal";
 import { Schema } from "@/databaseUtils";
+
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useTheme } from "styled-components";
+import ExpandedClientDetails from "@/app/clients/ExpandedClientDetails";
+import { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
+import getExpandedClientDetails, {
+    ExpandedClientData,
+} from "@/app/clients/getExpandedClientDetails";
+import CollectionCentreCard from "@/app/parcels/form/formSections/CollectionCentreCard";
+import CollectionDateCard from "@/app/parcels/form/formSections/CollectionDateCard";
+import CollectionSlotCard from "@/app/parcels/form/formSections/CollectionSlotCard";
+import DeliveryInstructionsCard from "@/common/formSections/DeliveryInstructionsCard";
+import PackingDateCard from "@/app/parcels/form/formSections/PackingDateCard";
+import PackingSlotsCard from "@/app/parcels/form/formSections/PackingSlotsCard";
+import ShippingMethodCard from "@/app/parcels/form/formSections/ShippingMethodCard";
+import VoucherNumberCard from "@/app/parcels/form/formSections/VoucherNumberCard";
+import {
+    switchErrorForCollectionCentre,
+    switchErrorForCollectionDate,
+    switchErrorForCollectionSlot,
+    WriteParcelToDatabaseErrors,
+    WriteParcelToDatabaseFunction,
+} from "@/app/parcels/form/submitFormHelpers";
+import { ListType, ListTypeLabelsAndValues } from "@/common/databaseListTypes";
+import {
+    CollectionCentresLabelsAndValues,
+    CollectionTimeSlotsLabelsAndValues,
+    getActiveTimeSlotsForCollectionCentre,
+    PackingSlotsLabelsAndValues,
+    DbAvailableDaysType,
+    DbCollectionCentreWithAvailableDaysType,
+    getAvailableDaysForCollectionCentres,
+} from "@/common/fetch";
+import { getDbDate } from "@/common/format";
 import supabase from "@/supabaseClient";
 import ListTypeCard from "./formSections/ListTypeCard";
+import ParcelNotesCard from "@/app/parcels/form/formSections/ParcelNotes";
+import AttentionFlagCard from "@/app/parcels/form/formSections/AttentionFlagCard";
+import { BooleanGroup } from "@/components/DataInput/inputHandlerFactories";
+import SignpostingCallCard from "@/app/parcels/form/formSections/SignpostingCallCard";
+import ExtraInformationCard from "@/app/parcels/form/formSections/ExtraInformationCard";
 
 export interface ParcelFields extends Fields {
     clientId: string | null;
-    listType?: ListType;
+    listType: ListType | null;
     voucherNumber: string | undefined;
     referralAgency: string | undefined;
     referrerName: string | undefined;
@@ -67,7 +81,12 @@ export interface ParcelFields extends Fields {
     collectionSlot: string | null;
     collectionCentre: string | null;
     lastUpdated: string | undefined;
+    deliveryInstructions: string | null;
     notes: string | null;
+    attentionFlag: boolean | null;
+    signpostingCall: boolean | null;
+    signpostingCallReasons: BooleanGroup | null;
+    extraInformation: string | null;
 }
 
 export interface ParcelErrors extends FormErrors<ParcelFields> {
@@ -79,15 +98,20 @@ export interface ParcelErrors extends FormErrors<ParcelFields> {
     collectionDate: Errors;
     collectionSlot: Errors;
     collectionCentre: Errors;
+    deliveryInstructions: Errors;
     referrerEmail: Errors;
     referrerPhone: Errors;
 }
 
+export type CommonFields = ParcelFields | ClientFields;
+export type CommonErrors = ParcelErrors | ClientErrors;
+
 export type ParcelCardProps = CardProps<ParcelFields, ParcelErrors>;
+export type CommonCardProps = CardProps<CommonFields, CommonErrors>;
 
 export const initialParcelFields: ParcelFields = {
     clientId: null,
-    listType: undefined,
+    listType: "regular",
     voucherNumber: "",
     referralAgency: "",
     referrerName: "",
@@ -100,7 +124,12 @@ export const initialParcelFields: ParcelFields = {
     collectionSlot: null,
     collectionCentre: null,
     lastUpdated: undefined,
+    deliveryInstructions: null,
     notes: null,
+    attentionFlag: null,
+    signpostingCall: null,
+    signpostingCallReasons: null,
+    extraInformation: "",
 };
 
 export const initialParcelFormErrors: ParcelErrors = {
@@ -112,6 +141,7 @@ export const initialParcelFormErrors: ParcelErrors = {
     collectionDate: Errors.initial,
     collectionSlot: Errors.initial,
     collectionCentre: Errors.initial,
+    deliveryInstructions: Errors.none,
     referralAgency: Errors.none,
     referrerName: Errors.none,
     referrerEmail: Errors.none,
@@ -139,6 +169,9 @@ const withCollectionFormSections = [
     CollectionCentreCard,
     CollectionDateCard,
     CollectionSlotCard,
+    AttentionFlagCard,
+    SignpostingCallCard,
+    ExtraInformationCard,
     ParcelNotesCard,
 ];
 
@@ -148,6 +181,10 @@ const noCollectionFormSections = [
     PackingDateCard,
     PackingSlotsCard,
     ShippingMethodCard,
+    AttentionFlagCard,
+    SignpostingCallCard,
+    ExtraInformationCard,
+    DeliveryInstructionsCard,
     ParcelNotesCard,
 ];
 
@@ -194,6 +231,11 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     const [clientDetails, setClientDetails] = useState<ExpandedClientData | null>(null);
     const [collectionSlotsLabelsAndValues, setCollectionSlotsLabelsAndValues] =
         useState<CollectionTimeSlotsLabelsAndValues>([]);
+    const [collectionCentreIsActive, setCollectionCentreIsActive] = useState<boolean>(true);
+    const [collectionAvailableDays, setAvailableDays] = useState<
+        DbCollectionCentreWithAvailableDaysType[]
+    >([]);
+    const [availableDaysForCentre, setAvailableDaysForCentre] = useState<DbAvailableDaysType>([]);
     const theme = useTheme();
     const clientIdForFetch = initialFields.clientId ? initialFields.clientId : clientId;
 
@@ -208,6 +250,13 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 });
         }
     }, [clientDetails, clientIdForFetch]);
+
+    useEffect(() => {
+        const centreIsActive = collectionCentresLabelsAndValues.some(
+            (centre) => centre[1] === fields.collectionCentre
+        );
+        setCollectionCentreIsActive(centreIsActive);
+    }, [collectionCentresLabelsAndValues, fields.collectionCentre]);
 
     useEffect(() => {
         const getTimeSlots = async (): Promise<void> => {
@@ -236,24 +285,73 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
     }, [fields.collectionCentre, initialFormErrors]);
 
     useEffect(() => {
+        const getAvailableDaysForCentre = async (
+            collectionCentre: string | null
+        ): Promise<void> => {
+            if (fields.collectionCentre) {
+                const availableDays = collectionAvailableDays.find(
+                    (centre) => centre?.primary_key == collectionCentre
+                )?.available_days;
+
+                if (availableDays) {
+                    setAvailableDaysForCentre(availableDays);
+                }
+            }
+        };
+
+        void getAvailableDaysForCentre(fields.collectionCentre);
+    }, [collectionAvailableDays, fields.collectionCentre]);
+
+    useEffect(() => {
+        const getAvailableDays = async (): Promise<void> => {
+            const { data, error } = await getAvailableDaysForCollectionCentres(supabase);
+
+            if (error) {
+                const errorMessages = {
+                    collectionAvailableDaysFetchFailed:
+                        "Failed to fetch collection centre available days",
+                };
+
+                const errorMessage = errorMessages[error.type] || "An unexpected error occurred";
+                setSubmitErrorMessage(`${errorMessage}. Log ID: ${error.logId}`);
+                return;
+            }
+
+            setAvailableDays(data);
+        };
+
+        void getAvailableDays();
+    }, []);
+
+    useEffect(() => {
         // If the Shipping Method changes, errors for collection date and slot should be reset
         if (fields.shippingMethod == "Collection") {
-            // The collection centre fields initially have 'Delivery' default values
             setFormErrors((prevErrors) => ({
                 ...prevErrors,
-                collectionCentre:
-                    fields.collectionCentre == null || fields.collectionCentre == deliveryPrimaryKey
-                        ? Errors.initial
-                        : Errors.none,
-                collectionDate: fields.collectionDate == null ? Errors.initial : Errors.none,
-                collectionSlot:
-                    fields.collectionSlot == null || fields.collectionSlot == "-"
-                        ? Errors.initial
-                        : Errors.none,
+                collectionCentre: switchErrorForCollectionCentre(
+                    fields,
+                    collectionCentreIsActive,
+                    deliveryPrimaryKey
+                ),
+                collectionDate: switchErrorForCollectionDate(
+                    fields,
+                    collectionCentreIsActive,
+                    availableDaysForCentre
+                ),
+                collectionSlot: switchErrorForCollectionSlot(
+                    fields,
+                    collectionCentreIsActive,
+                    collectionSlotsLabelsAndValues,
+                    availableDaysForCentre
+                ),
             }));
         }
     }, [
+        availableDaysForCentre,
+        collectionCentreIsActive,
+        collectionSlotsLabelsAndValues,
         deliveryPrimaryKey,
+        fields,
         fields.collectionCentre,
         fields.collectionDate,
         fields.collectionSlot,
@@ -308,21 +406,32 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
 
         const parcelRecord = {
             client_id: clientId || fields.clientId || "",
-            list_type: fields.listType,
+            list_type: fields.listType ?? undefined,
             packing_date: packingDate,
             packing_slot: fields.packingSlot,
             voucher_number: fields.voucherNumber,
             collection_centre: isDelivery ? deliveryPrimaryKey : fields.collectionCentre,
             collection_datetime: collectionDateTime,
             last_updated: fields.lastUpdated,
+            delivery_instructions: fields.delivery_instructions,
             referral_agency: fields.referralAgency,
             referrer_name: fields.referrerName,
             referrer_email: fields.referrerEmail,
             referrer_phone: fields.referrerPhone,
             notes: fields.notes,
+            flagged_for_attention: fields.attentionFlag ?? false,
+            signposting_call_required: fields.signpostingCall ?? false,
+            signposting_call_reasons:
+                fields.signpostingCall && fields.signpostingCallReasons !== null
+                    ? checkboxGroupToArray(fields.signpostingCallReasons)
+                    : [],
+            extra_information: fields.extraInformation ?? "",
         };
 
-        const { parcelId, error } = await writeParcelInfoToDatabase(parcelRecord);
+        const { parcelId, error } = await writeParcelInfoToDatabase(
+            parcelRecord,
+            fields.deliveryInstructions == null ? "" : fields.deliveryInstructions
+        );
 
         if (parcelId) {
             if (returnPath) {
@@ -367,9 +476,13 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                             errorSetter={errorSetter}
                             fieldSetter={fieldSetter}
                             fields={fields}
+                            deliveryPrimaryKey={deliveryPrimaryKey}
+                            collectionCentreIsActive={collectionCentreIsActive}
                             collectionCentresLabelsAndValues={collectionCentresLabelsAndValues}
                             packingSlotsLabelsAndValues={packingSlotsLabelsAndValues}
                             collectionTimeSlotsLabelsAndValues={collectionSlotsLabelsAndValues}
+                            collectionAvailableDays={collectionAvailableDays}
+                            availableDaysForSelectedCentre={availableDaysForCentre}
                             listTypeLabelsAndValues={listTypeLabelsAndValues}
                         />
                     );

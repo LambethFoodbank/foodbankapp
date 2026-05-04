@@ -50,6 +50,9 @@ const getPdfErrorMessage = (error: ShoppingListPdfError): string => {
         case "inactiveClient":
             errorMessage = "One or more selected parcels belong to inactive clients.";
             break;
+        case "failedToFetchDietaryRequirements":
+            errorMessage = "Failed to fetch dietary requirement(s) data.";
+            break;
     }
     return `${errorMessage} LogId: ${error.logId}`;
 };

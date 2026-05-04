@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FreeFormTextInput from "@/components/DataInput/FreeFormTextInput";
 import {
     errorExists,
@@ -7,11 +7,13 @@ import {
     Person,
     Gender,
     onChangeText,
+    Setter,
+    FormErrors,
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { SelectChangeEventHandler } from "@/components/DataInput/inputHandlerFactories";
 import { FormText, StyledCard } from "@/components/Form/formStyling";
-import { ClientCardProps, ClientSetter } from "@/app/clients/form/ClientForm";
+import { ClientCardProps, ClientFields, ClientSetter } from "@/app/clients/form/ClientForm";
 import { ControlledSelect } from "@/components/DataInput/DropDownSelect";
 import { getAdultBirthYears } from "@/app/clients/form/birthYearDropdown";
 import { MAXIMUM_NUMBER_OF_ADULTS, MINIMUM_NUMBER_OF_ADULTS } from "@/app/clients/form/bounds";
@@ -24,6 +26,25 @@ const numberOfAdultsRange = (value: string): boolean => {
     return (
         parseInt(value) <= MAXIMUM_NUMBER_OF_ADULTS && parseInt(value) >= MINIMUM_NUMBER_OF_ADULTS
     );
+};
+
+export const resizePersonsArray = (
+    currentArray: Person[],
+    targetLength: number,
+    isChildArray: boolean
+): Person[] => {
+    if (currentArray.length === targetLength) {
+        return currentArray;
+    }
+
+    return currentArray.length < targetLength
+        ? [
+              ...currentArray,
+              ...Array(targetLength - currentArray.length).fill({
+                  recordedAsChild: isChildArray,
+              } as Person),
+          ]
+        : currentArray.slice(0, targetLength);
 };
 
 const setAdultsFields = (
@@ -54,6 +75,13 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
     fieldSetter,
     fields,
 }) => {
+    useEffect(() => {
+        const resized = resizePersonsArray(fields.adults, fields.numberOfAdults, false);
+        if (resized !== fields.adults) {
+            fieldSetter({ adults: resized });
+        }
+    }, [fields.numberOfAdults, fields.adults, fieldSetter]);
+
     return (
         <GenericFormCard
             title="Number of Adults"
@@ -69,15 +97,21 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                     }
                     error={errorExists(formErrors.numberOfAdults)}
                     helperText={getErrorText(formErrors.numberOfAdults)}
-                    onChange={onChangeText(fieldSetter, errorSetter, "numberOfAdults", {
-                        required: true,
-                        regex: numberRegex,
-                        formattingFunction: parseInt,
-                        additionalCondition: numberOfAdultsRange,
-                    })}
+                    onChange={onChangeText(
+                        fieldSetter,
+                        errorSetter as Setter<FormErrors<ClientFields>>,
+                        "numberOfAdults",
+                        {
+                            required: true,
+                            regex: numberRegex,
+                            formattingFunction: parseInt,
+                            additionalCondition: numberOfAdultsRange,
+                        }
+                    )}
                 />
-                {fields.adults.map((adult: Person, index: number) => {
-                    return (
+                {fields.adults
+                    .slice(0, fields.numberOfAdults)
+                    .map((adult: Person, index: number) => (
                         <StyledCard key={adult.primaryKey ?? `new-adult-${index}`}>
                             <FormText>Adult {index + 1}</FormText>
                             <ControlledSelect
@@ -108,8 +142,7 @@ const NumberAdultsCard: React.FC<ClientCardProps> = ({
                                 )}
                             />
                         </StyledCard>
-                    );
-                })}
+                    ))}
             </>
         </GenericFormCard>
     );

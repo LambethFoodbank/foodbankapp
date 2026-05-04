@@ -50,6 +50,13 @@ export const roleCanAccessPage = (role: UserRole | null, url: string): boolean =
     return accessList.some((page) => url.startsWith(page));
 };
 
+export const roleCanAccessOutsideDeliveryAreaModal = (
+    role: UserRole | null,
+    isDeliverable: boolean | null
+): boolean => {
+    return isDeliverable || (role !== null && organisationRoles.includes(role));
+};
+
 export interface RoleUpdateContextType {
     role: UserRole | null;
     setRole: (_role: UserRole | null) => void;

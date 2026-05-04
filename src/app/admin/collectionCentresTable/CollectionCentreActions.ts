@@ -1,8 +1,10 @@
 import { PostgrestError } from "@supabase/supabase-js";
 import { Tables } from "@/databaseTypesFile";
 import { Schema } from "@/databaseUtils";
+import { DaysOfWeekType } from "@/common/databaseDaysOfWeek";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
+import { DbAvailableDaysType } from "@/common/fetch";
 
 export interface CollectionCentresTableRow {
     acronym: Schema["collection_centres"]["acronym"];
@@ -11,6 +13,7 @@ export interface CollectionCentresTableRow {
     isDelivery: Schema["collection_centres"]["is_delivery"];
     isShown: Schema["collection_centres"]["is_shown"];
     timeSlots: Schema["collection_centres"]["time_slots"];
+    availableDays: Schema["collection_centres"]["available_days"];
     isNew: boolean;
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
@@ -25,9 +28,20 @@ export interface FormattedTimeSlot {
     isActive: boolean;
 }
 
+export interface FormattedAvailableDayType {
+    day: DaysOfWeekType;
+    isActive: boolean;
+}
+
 export interface FormattedTimeSlotsWithPrimaryKey {
     primaryKey: Schema["collection_centres"]["primary_key"];
     timeSlots: FormattedTimeSlot[];
+    lastUpdated: Schema["collection_centres"]["last_updated"];
+}
+
+export interface FormattedAvailableDaysWithPrimaryKey {
+    primaryKey: Schema["collection_centres"]["primary_key"];
+    availableDays: FormattedAvailableDayType[];
     lastUpdated: Schema["collection_centres"]["last_updated"];
 }
 
@@ -44,6 +58,37 @@ type FetchCollectionCentresResult =
           error: { type: "failedToFetchCollectionCentres"; logId: string };
       };
 
+export const initialCollectionAvailableDays: DbAvailableDaysType = [
+    {
+        day: "Monday",
+        is_active: true,
+    },
+    {
+        day: "Tuesday",
+        is_active: true,
+    },
+    {
+        day: "Wednesday",
+        is_active: true,
+    },
+    {
+        day: "Thursday",
+        is_active: true,
+    },
+    {
+        day: "Friday",
+        is_active: true,
+    },
+    {
+        day: "Saturday",
+        is_active: true,
+    },
+    {
+        day: "Sunday",
+        is_active: true,
+    },
+];
+
 export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionCentresResult> => {
     const { data, error } = await supabase.from("collection_centres").select().order("name");
     if (error) {
@@ -59,6 +104,7 @@ export const fetchCollectionCentresForTable = async (): Promise<FetchCollectionC
             isShown: row.is_shown,
             isDelivery: row.is_delivery,
             timeSlots: row.time_slots,
+            availableDays: row.available_days,
             isNew: false,
             lastUpdated: row.last_updated,
         })
@@ -77,6 +123,7 @@ const formatExistingRowToDBCollectionCentre = (
         is_shown: row.isShown,
         is_delivery: row.isDelivery,
         time_slots: row.timeSlots,
+        available_days: row.availableDays,
     };
 };
 
@@ -89,6 +136,7 @@ const formatNewRowToDBCollectionCentre = (
         is_shown: newRow.isShown,
         is_delivery: newRow.isDelivery,
         time_slots: newRow.timeSlots,
+        available_days: initialCollectionAvailableDays,
     };
 };
 
