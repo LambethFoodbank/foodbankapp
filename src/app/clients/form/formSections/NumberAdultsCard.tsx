@@ -40,9 +40,14 @@ export const resizePersonsArray = (
     return currentArray.length < targetLength
         ? [
               ...currentArray,
-              ...Array(targetLength - currentArray.length).fill({
-                  recordedAsChild: isChildArray,
-              } as Person),
+              ...Array(targetLength - currentArray.length)
+                  .fill(0)
+                  .map(
+                      () =>
+                          ({
+                              recordedAsChild: isChildArray,
+                          }) as Person
+                  ),
           ]
         : currentArray.slice(0, targetLength);
 };
