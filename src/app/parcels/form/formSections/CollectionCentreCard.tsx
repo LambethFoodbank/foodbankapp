@@ -16,7 +16,6 @@ import {
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ParcelCardProps, ParcelFields } from "../ParcelForm";
 import { StyledAlert } from "../../ActionBar/DuplicateDownloadWarning";
-import { switchErrorForCollectionCentre } from "@/app/parcels/form/submitFormHelpers";
 
 interface CollectionCentreCardProps extends ParcelCardProps {
     collectionCentresLabelsAndValues: CollectionCentresLabelsAndValues;
@@ -36,8 +35,6 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
     errorSetter,
     formErrors,
     fields,
-    deliveryPrimaryKey,
-    collectionCentreIsActive,
     collectionCentresLabelsAndValues,
     collectionAvailableDays,
     availableDaysForSelectedCentre,
@@ -79,8 +76,8 @@ const CollectionCentreCard: React.FC<CollectionCentreCardProps> = ({
 
     const isUnavailableCentre = (): boolean => {
         return (
-            switchErrorForCollectionCentre(fields, collectionCentreIsActive, deliveryPrimaryKey) ===
-                Errors.none &&
+            fields.collectionCentre !== null &&
+            formErrors.collectionCentre === Errors.none &&
             availableDaysForSelectedCentre &&
             !availableDaysForSelectedCentre.some((day) => day.is_active)
         );
