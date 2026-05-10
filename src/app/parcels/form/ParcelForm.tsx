@@ -331,6 +331,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 collectionCentre: switchErrorForCollectionCentre(
                     fields,
                     collectionCentreIsActive,
+                    initialFields.collectionCentre !== null,
                     deliveryPrimaryKey
                 ),
                 collectionDate: switchErrorForCollectionDate(
@@ -356,6 +357,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
         fields.collectionDate,
         fields.collectionSlot,
         fields.shippingMethod,
+        initialFields.collectionCentre,
     ]);
 
     const formSections =

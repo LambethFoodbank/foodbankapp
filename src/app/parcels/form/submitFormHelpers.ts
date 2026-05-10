@@ -27,9 +27,10 @@ type InsertParcel = (
 export function switchErrorForCollectionCentre(
     fields: ParcelFields,
     collectionCentreIsActive: boolean,
+    formHasInitialCollectionCentre: boolean,
     deliveryPrimaryKey: string
 ): Errors {
-    if (!collectionCentreIsActive) {
+    if (formHasInitialCollectionCentre && !collectionCentreIsActive) {
         return Errors.invalidCollectionCentre;
     }
 
