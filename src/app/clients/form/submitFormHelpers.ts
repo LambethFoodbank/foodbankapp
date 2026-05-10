@@ -49,13 +49,12 @@ export const formatClientRecord = (
             fields.dietaryRequirements !== null
                 ? checkboxGroupToArray(fields.dietaryRequirements)
                 : null,
-        hygiene_tampons:
-            fields.hygieneProductsTampons !== null ? fields.hygieneProductsTampons : "",
-        hygiene_pads: fields.hygieneProductsPads !== null ? fields.hygieneProductsPads : "",
+        hygiene_tampons: fields.hygieneProductsTampons,
+        hygiene_pads: fields.hygieneProductsPads,
         hygiene_other_items: checkboxGroupToArray(fields.hygieneOtherItems),
-        baby_food: fields.babyFood !== null ? fields.babyFood : "",
-        baby_formula: fields.babyFormula !== null ? fields.babyFormula : "",
-        baby_nappies: fields.babyNappies !== null ? fields.babyNappies : "",
+        baby_food: fields.babyFood,
+        baby_formula: fields.babyFormula,
+        baby_nappies: fields.babyNappies,
         baby_other_items: checkboxGroupToArray(fields.babyOtherItems),
         pet_food: checkboxGroupToArray(fields.petFood),
         other_items: checkboxGroupToArray(fields.otherItems),
