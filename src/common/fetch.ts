@@ -321,6 +321,44 @@ export const fetchFamily = async (
     return { data: data, error: null };
 };
 
+type FetchLatestParcelIdForClientResponse =
+    | {
+          data: string | null;
+          error: null;
+      }
+    | {
+          data: null;
+          error: { type: FetchLatestParcelIdForClientErrorType; logId: string };
+      };
+
+export type FetchLatestParcelIdForClientErrorType = "failedToFetchLatestParcelIdForClient";
+
+export const fetchLatestParcelIdForClient = async (
+    clientID: string,
+    supabase: Supabase
+): Promise<FetchLatestParcelIdForClientResponse> => {
+    const { data, error } = await supabase
+        .from("parcels")
+        .select("primary_key")
+        .eq("client_id", clientID)
+        .order("packing_date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+        const logId = await logErrorReturnLogId(
+            "Error with fetch: Latest parcel ID for client",
+            error
+        );
+        return {
+            data: null,
+            error: { type: "failedToFetchLatestParcelIdForClient", logId: logId },
+        };
+    }
+
+    return { data: data?.primary_key ?? null, error: null };
+};
+
 type FetchListsReponse =
     | {
           data: Schema["lists"][];

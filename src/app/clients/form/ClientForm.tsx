@@ -48,7 +48,9 @@ interface Props {
     returnPath?: string | null;
 }
 
-type EditConfig = { editMode: true; clientID: string } | { editMode: false };
+type EditConfig =
+    | { editMode: true; clientID: string; latestParcelId: string | null }
+    | { editMode: false };
 
 export interface ClientFields extends Fields {
     fullName: string;
@@ -131,6 +133,11 @@ const ClientForm: React.FC<Props> = ({
     const fieldSetter = createSetter(setFields, fields);
     const errorSetter = createSetter(setFormErrors, formErrors);
 
+    const submitLabel =
+        editConfig.editMode && editConfig.latestParcelId
+            ? "Submit and Edit Latest Parcel"
+            : "Submit and Add Parcel";
+
     const submitForm = async (): Promise<void> => {
         setSubmitDisabled(true);
 
@@ -163,10 +170,10 @@ const ClientForm: React.FC<Props> = ({
                 return;
             }
 
-            if (returnPath) {
-                router.push(decodeURIComponent(returnPath));
+            if (editConfig.latestParcelId) {
+                router.push(appendReturnPathToUrl(`/parcels/edit/${editConfig.latestParcelId}`));
             } else {
-                router.push(`/clients?clientId=${clientId}`);
+                router.push(appendReturnPathToUrl(`/parcels/add/${clientId}`));
             }
         } else {
             const { clientId, error: addClientError } = await submitAddClientForm(fields);
@@ -182,14 +189,17 @@ const ClientForm: React.FC<Props> = ({
                 return;
             }
 
-            let targetUrl = `/parcels/add/${clientId}`;
-            if (returnPath) {
-                const paramsRecord: Record<string, string> = {};
-                paramsRecord[returnPathQueryParam] = returnPath;
-                targetUrl += `?${stringifyQueryParams(paramsRecord)}`;
-            }
-            router.push(targetUrl);
+            router.push(appendReturnPathToUrl(`/parcels/add/${clientId}`));
         }
+    };
+
+    const appendReturnPathToUrl = (url: string): string => {
+        if (returnPath) {
+            const paramsRecord: Record<string, string> = {};
+            paramsRecord[returnPathQueryParam] = returnPath;
+            return (url += `?${stringifyQueryParams(paramsRecord)}`);
+        }
+        return url;
     };
 
     return (
@@ -213,7 +223,7 @@ const ClientForm: React.FC<Props> = ({
                 })}
                 <CenterComponent>
                     <Button variant="contained" onClick={submitForm} disabled={submitDisabled}>
-                        Submit
+                        {submitLabel}
                     </Button>
                 </CenterComponent>
                 <FormErrorText>{submitErrorMessage || submitError}</FormErrorText>

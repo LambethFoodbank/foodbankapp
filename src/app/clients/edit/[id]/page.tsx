@@ -8,7 +8,7 @@ import { returnPathQueryParam } from "@/common/constants";
 import ClientForm, { ClientErrors } from "@/app/clients/form/ClientForm";
 import { Errors } from "@/components/Form/formFunctions";
 import autofill from "@/app/clients/edit/[id]/autofill";
-import { fetchClient, fetchFamily } from "@/common/fetch";
+import { fetchClient, fetchFamily, fetchLatestParcelIdForClient } from "@/common/fetch";
 import { Schema } from "@/databaseUtils";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 
@@ -23,6 +23,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
 
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);
     const [familyData, setFamilyData] = useState<Schema["families"][] | null>(null);
+    const [latestParcelId, setLatestParcelId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>();
     const [returnPath, setReturnPath] = useState<string | null>(null);
 
@@ -66,6 +67,20 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                 return;
             }
             setFamilyData(familyData);
+
+            const { data: latestParcelId, error: latestParcelIdError } =
+                await fetchLatestParcelIdForClient(params.id, supabase);
+            if (latestParcelIdError) {
+                switch (latestParcelIdError.type) {
+                    case "failedToFetchLatestParcelIdForClient":
+                        setError(
+                            `Unable to fetch latest parcel ID for client. Log ID: ${latestParcelIdError.logId}`
+                        );
+                        break;
+                }
+                return;
+            }
+            setLatestParcelId(latestParcelId);
         })();
     }, [params.id, searchParams]);
 
@@ -93,7 +108,11 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                     <ClientForm
                         initialFields={initialFields}
                         initialFormErrors={initialFormErrors}
-                        editConfig={{ clientID: params.id, editMode: true }}
+                        editConfig={{
+                            clientID: params.id,
+                            editMode: true,
+                            latestParcelId: latestParcelId,
+                        }}
                         returnPath={returnPath}
                     />
                 )
