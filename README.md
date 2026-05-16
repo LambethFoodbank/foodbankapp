@@ -51,6 +51,9 @@ have been delivered to clients.
     sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
     ```
 
+-   Run `npx @snaplet/seed sync` to synchronise the seed files with the local database - otherwise doing a local production
+    build will fail
+
 ### Running locally
 
 -   Run website locally (`npm run dev`) and log in with one of the dev user credentials
