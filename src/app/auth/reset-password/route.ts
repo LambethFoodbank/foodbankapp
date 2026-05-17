@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { cookies, UnsafeUnwrappedCookies } from "next/headers";
 
 export async function GET(request: Request): Promise<Response> {
     const { searchParams } = new URL(request.url);
@@ -17,7 +17,7 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     try {
-        const supabase = createRouteHandlerClient({ cookies });
+        const supabase = createRouteHandlerClient({ cookies: () => cookies() as unknown as UnsafeUnwrappedCookies });
 
         const { error } = await supabase.auth.exchangeCodeForSession(authCode);
 
