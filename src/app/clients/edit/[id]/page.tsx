@@ -12,13 +12,11 @@ import { fetchClient, fetchFamily, fetchLatestParcelIdForClient } from "@/common
 import { Schema } from "@/databaseUtils";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 
-interface EditClientsParameters {
-    params: { id: string };
+interface EditClientFormProps {
+    clientId: string;
 }
 
-const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = ({
-    params,
-}: EditClientsParameters) => {
+const EditClientForm = ({ clientId }: EditClientFormProps): React.ReactElement => {
     const searchParams = useSearchParams();
 
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);
@@ -29,7 +27,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
 
     useEffect(() => {
         (async () => {
-            if (!params.id) {
+            if (!clientId) {
                 return;
             }
 
@@ -39,7 +37,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             }
 
             setError(null);
-            const { data: clientData, error: clientError } = await fetchClient(params.id, supabase);
+            const { data: clientData, error: clientError } = await fetchClient(clientId, supabase);
             if (clientError) {
                 switch (clientError.type) {
                     case "clientFetchFailed":
@@ -69,7 +67,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             setFamilyData(familyData);
 
             const { data: latestParcelId, error: latestParcelIdError } =
-                await fetchLatestParcelIdForClient(params.id, supabase);
+                await fetchLatestParcelIdForClient(clientId, supabase);
             if (latestParcelIdError) {
                 switch (latestParcelIdError.type) {
                     case "failedToFetchLatestParcelIdForClient":
@@ -82,7 +80,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             }
             setLatestParcelId(latestParcelId);
         })();
-    }, [params.id, searchParams]);
+    }, [clientId, searchParams]);
 
     const initialFields = clientData && familyData ? autofill(clientData, familyData) : null;
 
@@ -109,7 +107,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                         initialFields={initialFields}
                         initialFormErrors={initialFormErrors}
                         editConfig={{
-                            clientID: params.id,
+                            clientID: clientId,
                             editMode: true,
                             latestParcelId: latestParcelId,
                         }}
@@ -121,4 +119,4 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
     );
 };
 
-export default EditClients;
+export default EditClientForm;
