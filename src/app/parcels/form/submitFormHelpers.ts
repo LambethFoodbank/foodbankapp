@@ -1,6 +1,6 @@
 import supabase from "@/supabaseClient";
 import { InsertSchema, UpdateSchema } from "@/databaseUtils";
-import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import { Errors } from "@/components/Form/formFunctions";
 import { ParcelFields } from "@/app/parcels/form/ParcelForm";
@@ -132,7 +132,7 @@ type UpdateParcelErrorType =
     | "failedToUpdateParcel"
     | "failedToUpdateDeliveryInstructions"
     | "concurrentUpdateConflict";
-export type UpdateParcelError = { type: UpdateParcelErrorType; logId: string };
+export type UpdateParcelError = { type: UpdateParcelErrorType; logId: string | null };
 type UpdateParcelReturnType = {
     error: UpdateParcelError | null;
     parcelId: string | null;
@@ -181,9 +181,7 @@ export const updateParcel: UpdateParcelWithPrimaryKey =
         const { rows_updated } = parcelDataAndCount[0];
 
         if (rows_updated === 0) {
-            const logId = await logWarningReturnLogId("Concurrent editing of parcel");
-            await sendAuditLog({ ...auditLog, wasSuccess: false, logId });
-            return { parcelId: null, error: { type: "concurrentUpdateConflict", logId } };
+            return { parcelId: null, error: { type: "concurrentUpdateConflict", logId: null } };
         }
 
         await sendAuditLog({ ...auditLog, wasSuccess: true });

@@ -10,7 +10,11 @@ import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import supabase from "@/supabaseClient";
 import { PackingSlotsLabelsAndValues, fetchPackingSlotsInfo } from "@/common/fetch";
 import { UncontrolledSelect } from "@/components/DataInput/DropDownSelect";
-import { getUpdateErrorMessage, packingDateOrSlotUpdate } from "./CommonDateAndSlot";
+import {
+    getUpdateErrorMessage,
+    hasConcurrencyConflict,
+    packingDateOrSlotUpdate,
+} from "./CommonDateAndSlot";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 
@@ -106,9 +110,20 @@ const SlotChangeModal: React.FC<ActionModalProps> = (props) => {
             setWarningMessage("Please choose a valid packing slot.");
             return;
         }
+
+        const concurrencyChecks = await Promise.all(
+            props.selectedParcels.map((parcel) => hasConcurrencyConflict(parcel, "packingSlot"))
+        );
+
+        if (!concurrencyChecks.every(Boolean)) {
+            setErrorMessage("Record has been edited recently - please refresh the page.");
+            setActionCompleted(true);
+            return;
+        }
+
         const packingSlotUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingSlot", slot, parcel);
+                return packingDateOrSlotUpdate("packingSlot", "Change Packing Slot", slot, parcel);
             })
         );
 

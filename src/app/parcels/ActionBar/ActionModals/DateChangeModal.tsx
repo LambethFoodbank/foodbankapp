@@ -10,7 +10,11 @@ import SelectedParcelsOverview from "../SelectedParcelsOverview";
 import SingleDateInput, { DateInputProps } from "@/components/DateInputs/SingleDateInput";
 import dayjs, { Dayjs } from "dayjs";
 import { getDbDate } from "@/common/format";
-import { getUpdateErrorMessage, packingDateOrSlotUpdate } from "./CommonDateAndSlot";
+import {
+    getUpdateErrorMessage,
+    hasConcurrencyConflict,
+    packingDateOrSlotUpdate,
+} from "./CommonDateAndSlot";
 import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { ConfirmButtons } from "@/components/Buttons/GeneralButtonParts";
 
@@ -86,9 +90,24 @@ const DateChangeModal: React.FC<ActionModalProps> = (props) => {
         }
         const newPackingDate = getDbDate(dayjs(date));
 
+        const concurrencyChecks = await Promise.all(
+            props.selectedParcels.map((parcel) => hasConcurrencyConflict(parcel, "packingDate"))
+        );
+
+        if (!concurrencyChecks.every(Boolean)) {
+            setErrorMessage("Record has been edited recently - please refresh the page.");
+            setActionCompleted(true);
+            return;
+        }
+
         const packingDateUpdateErrors = await Promise.all(
             props.selectedParcels.map((parcel) => {
-                return packingDateOrSlotUpdate("packingDate", newPackingDate, parcel);
+                return packingDateOrSlotUpdate(
+                    "packingDate",
+                    "Change Packing Date",
+                    newPackingDate,
+                    parcel
+                );
             })
         );
 

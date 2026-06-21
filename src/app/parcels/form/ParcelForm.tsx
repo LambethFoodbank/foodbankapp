@@ -448,7 +448,7 @@ const ParcelForm: React.FC<ParcelFormProps> = ({
                 setSubmitDisabled(false);
             }
 
-            setSubmitErrorMessage(databaseErrorMessageFromErrorType(error.type, error.logId));
+            setSubmitErrorMessage(databaseErrorMessageFromErrorType(error.type, error.logId ?? ""));
         }
     };
 

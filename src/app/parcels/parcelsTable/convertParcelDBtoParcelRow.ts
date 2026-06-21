@@ -81,6 +81,7 @@ const convertParcelDbtoParcelRow = async (
                 },
                 createdAt: parcel.created_at ? new Date(parcel.created_at) : null,
                 clientIsActive: parcel.client_is_active ?? false,
+                lastUpdated: parcel.last_updated ?? null,
             };
         }),
         error: null,
