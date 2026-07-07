@@ -217,9 +217,9 @@ const DisplayItemsList: React.FC<DisplayItemsListProps> = ({ itemsList }) => {
     );
 };
 
-const DisplayAsBlockNoBorder: React.FC<BlockProps> = (props: BlockProps) => {
+const DisplayAsBlock: React.FC<BlockProps> = (props: BlockProps) => {
     return (
-        <View style={styles.infoCellNoBorder}>
+        <View style={styles.infoCell}>
             {Object.entries(props.data)
                 .filter(([propKey, propValue]) =>
                     shouldDisplay(formatCamelCaseKey(propKey), propValue)
@@ -236,13 +236,12 @@ const DisplayAsBlockNoBorder: React.FC<BlockProps> = (props: BlockProps) => {
     );
 };
 
-const DisplayAsBlock: React.FC<BlockProps> = (props: BlockProps) => {
+const DisplayParcelHeadlines: React.FC<BlockProps> = (props: BlockProps) => {
+    const parcelFieldsToSuppress = ["extraInformation"];
     return (
-        <View style={styles.infoCell}>
+        <View style={styles.infoCellNoBorder}>
             {Object.entries(props.data)
-                .filter(([propKey, propValue]) =>
-                    shouldDisplay(formatCamelCaseKey(propKey), propValue)
-                )
+                .filter(([propKey]) => !parcelFieldsToSuppress.includes(propKey))
                 .map(([propKey, propValue]) => (
                     <OneLine
                         key={propKey}
@@ -313,7 +312,7 @@ const SingleShoppingList: React.FC<SingleShoppingListProps> = ({ parcelData }) =
                                 </Text>
                             </View>
                         </View>
-                        <DisplayAsBlockNoBorder data={parcelData.parcelInfo} noWrap={true} />
+                        <DisplayParcelHeadlines data={parcelData.parcelInfo} noWrap={true} />
                     </View>
                     {/* eslint-disable-next-line jsx-a11y/alt-text -- React-PDF Image doesn't  have alt text property*/}
                     <Image src="/logo.png" style={[styles.flexRow, styles.logoStyling]} />
