@@ -139,7 +139,7 @@ interface Props {
 const getActionModal = (
     actionName: ActionName,
     actionModalProps: ActionModalProps
-): React.ReactElement => {
+): React.ReactElement<any> => {
     const elementKey = `${actionName}_modal`;
     switch (actionName) {
         case "Change Packing Date":

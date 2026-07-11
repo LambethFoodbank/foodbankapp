@@ -45,7 +45,7 @@ const ExpandedParcelDetailsView = ({
     setParcelClientId,
     setIsClientActive,
     refreshCallback,
-}: Props): ReactElement => {
+}: Props): ReactElement<any> => {
     const [parcelDetails, setParcelDetails] = useState<ExpandedParcelDetails | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);

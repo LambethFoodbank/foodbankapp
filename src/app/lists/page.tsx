@@ -3,7 +3,7 @@ import React from "react";
 import Title from "@/components/Title/Title";
 import ListsPage from "./ListsPage";
 
-const Lists: () => Promise<React.ReactElement> = async () => {
+const Lists: () => Promise<React.ReactElement<any>> = async () => {
     return (
         <main>
             <Title>Lists</Title>

@@ -50,7 +50,7 @@ const getErrorMessage = (
     return `${errorMessage} Log ID: ${error.logId}`;
 };
 
-const AddParcels = ({ clientId }: AddParcelProps): React.ReactElement => {
+const AddParcels = ({ clientId }: AddParcelProps): React.ReactElement<any> => {
     const searchParams = useSearchParams();
 
     const [deliveryPrimaryKey, setDeliveryPrimaryKey] = useState<string | null>(null);

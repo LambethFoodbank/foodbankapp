@@ -30,8 +30,8 @@ const renderMRTCell = <Data extends object, K extends keyof Data>(
     value: Data[K],
     key: K,
     renderer?: ColumnDisplayFunctions<Data>[K]
-): React.ReactElement => {
-    const element: React.ReactElement = <>{renderer ? renderer(value) : value}</>;
+): React.ReactElement<any> => {
+    const element: React.ReactElement<any> = <>{renderer ? renderer(value) : value}</>;
 
     if (!React.isValidElement(element)) {
         throw new Error(

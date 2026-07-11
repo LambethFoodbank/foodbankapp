@@ -8,7 +8,7 @@ export interface AddParcelParameters {
     };
 }
 
-const AddParcel = async ({ params }: AddParcelParameters): Promise<React.ReactElement> => {
+const AddParcel = async ({ params }: AddParcelParameters): Promise<React.ReactElement<any>> => {
     return (
         <main>
             <AddParcelForm clientId={params.clientId} />

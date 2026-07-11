@@ -3,7 +3,7 @@ import React from "react";
 
 const Header = <Data extends GridValidRowModel>({
     colDef,
-}: GridColumnHeaderParams<Data>): React.ReactElement => {
+}: GridColumnHeaderParams<Data>): React.ReactElement<any> => {
     return colDef.headerName ? (
         <p style={{ fontWeight: "bold" }}>
             {`${colDef.headerName[0].toUpperCase()}${colDef.headerName.slice(1)}`}

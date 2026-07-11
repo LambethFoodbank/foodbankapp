@@ -17,7 +17,7 @@ import { rowToAddressColumn } from "@/components/Tables/AddressColumnFormatter";
 const RowToIconsColumn = ({
     flaggedForAttention,
     requiresFollowUpPhoneCall,
-}: ParcelsTableRow["iconsColumn"]): React.ReactElement => {
+}: ParcelsTableRow["iconsColumn"]): React.ReactElement<any> => {
     const theme = useTheme();
     return (
         <>
@@ -29,7 +29,7 @@ const RowToIconsColumn = ({
 
 const RowToDeliveryCollectionColumn = (
     collectionData: ParcelsTableRow["deliveryCollection"]
-): React.ReactElement => {
+): React.ReactElement<any> => {
     const theme = useTheme();
     const { collectionCentreName, collectionCentreAcronym, congestionChargeApplies, listType } =
         collectionData;

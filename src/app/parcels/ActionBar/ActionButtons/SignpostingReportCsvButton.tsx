@@ -123,7 +123,7 @@ const SignpostingReportCsvButton = ({
     onFileCreationCompleted,
     onFileCreationFailed,
     disabled,
-}: ButtonProps): React.ReactElement => {
+}: ButtonProps): React.ReactElement<any> => {
     const props: ButtonProps = {
         fromDate: fromDate,
         toDate: toDate,

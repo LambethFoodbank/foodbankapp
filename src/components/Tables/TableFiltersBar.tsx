@@ -76,7 +76,7 @@ export function filtersToComponents<Data, Filter extends FilterBase<Data, State>
 
 function TableFiltersBar<Data, Filter extends FilterBase<Data, State>, State>(
     props: TableFiltersBarProps<Data, Filter, State>
-): React.ReactElement {
+): React.ReactElement<any> {
     const handleClear = (): void => {
         if (props.setPrimaryFilters && props.primaryFilters) {
             props.setPrimaryFilters(

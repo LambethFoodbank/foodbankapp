@@ -31,7 +31,7 @@ const PanelTitle = styled.h2`
 interface Panel {
     panelTitle: string;
     panelIcon: IconDefinition;
-    panelContent: ReactElement;
+    panelContent: ReactElement<any>;
 }
 
 const PanelIcon = styled(FontAwesomeIcon)`

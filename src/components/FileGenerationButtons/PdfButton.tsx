@@ -25,7 +25,7 @@ const PdfButton = <Data, ErrorType extends string>({
     disabled = false,
     focusOnButton = false,
     formSubmitButton = false,
-}: PdfButtonProps<Data, ErrorType>): React.ReactElement => {
+}: PdfButtonProps<Data, ErrorType>): React.ReactElement<any> => {
     const pdfBlobGenerator = async (data: Data): Promise<Blob> => {
         return pdf(<PdfComponent data={data} />).toBlob();
     };

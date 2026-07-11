@@ -7,7 +7,7 @@ interface EditParcelsParameters {
     params: { id: string };
 }
 
-const EditParcels = async ({ params }: EditParcelsParameters): Promise<React.ReactElement> => {
+const EditParcels = async ({ params }: EditParcelsParameters): Promise<React.ReactElement<any>> => {
     return (
         <main>
             <EditParcelForm parcelId={params.id} />

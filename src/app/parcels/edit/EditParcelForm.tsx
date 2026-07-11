@@ -92,7 +92,7 @@ const getErrorMessage = (
     return `${errorMessage} Log Id: ${error.logId}`;
 };
 
-const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement => {
+const EditParcelForm = ({ parcelId }: EditParcelFormProps): React.ReactElement<any> => {
     const searchParams = useSearchParams();
 
     const [isLoading, setIsLoading] = useState(true);

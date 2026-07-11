@@ -15,7 +15,7 @@ interface Props {
     onChange: SelectChangeEventHandler<UserRole>;
 }
 
-const UserRoleSelect = (props: Props): React.ReactElement => {
+const UserRoleSelect = (props: Props): React.ReactElement<any> => {
     return (
         <ControlledSelect
             selectLabelId="user-role-select-label"

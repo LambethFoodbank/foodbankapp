@@ -121,7 +121,7 @@ const MaterialTable = <
     manualPagination,
     manualSorting,
     rowBreakPointConfigs,
-}: MRTTableProps<PaginationType, FilterState, Data, DbData>): React.ReactElement => {
+}: MRTTableProps<PaginationType, FilterState, Data, DbData>): React.ReactElement<any> => {
     const theme = useTheme();
     const dividingLineStyleOptions = getDividingLineStyleOptions(theme);
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
@@ -382,7 +382,7 @@ export const ClientPaginatedMaterialTable = <Data extends MRT_RowData, FilterSta
         MRTTableProps<PaginationTypeEnum.Client, FilterState, Data, Record<string, never>>,
         "manualPagination" | "manualSorting"
     >
-): React.ReactElement => (
+): React.ReactElement<any> => (
     <MaterialTable<PaginationTypeEnum.Client, FilterState, Data>
         {...props}
         manualPagination={false}
@@ -400,7 +400,7 @@ export const ServerPaginatedMaterialTable = <
         MRTTableProps<PaginationTypeEnum.Server, FilterState, Data, DbData>,
         "manualPagination" | "manualSorting"
     >
-): React.ReactElement => (
+): React.ReactElement<any> => (
     <MaterialTable<PaginationTypeEnum.Server, FilterState, Data, DbData>
         {...props}
         manualPagination={true}

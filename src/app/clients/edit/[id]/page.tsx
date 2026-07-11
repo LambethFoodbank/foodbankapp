@@ -16,7 +16,7 @@ interface EditClientFormProps {
     clientId: string;
 }
 
-const EditClientForm = ({ clientId }: EditClientFormProps): React.ReactElement => {
+const EditClientForm = ({ clientId }: EditClientFormProps): React.ReactElement<any> => {
     const searchParams = useSearchParams();
 
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);

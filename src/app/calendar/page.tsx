@@ -51,7 +51,7 @@ const getParcelsWithCollectionDate = async (): Promise<ParcelsWithExtraFields[]>
     return data;
 };
 
-const CalendarPage = async (): Promise<React.ReactElement> => {
+const CalendarPage = async (): Promise<React.ReactElement<any>> => {
     const parcelsWithCollectionDate = await getParcelsWithCollectionDate();
     const collectionCentres = await getCollectionCentres();
 

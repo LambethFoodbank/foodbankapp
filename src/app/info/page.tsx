@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import InfoPage from "@/app/info/InfoPage";
 import Title from "@/components/Title/Title";
 
-const Info = async (): Promise<ReactElement> => {
+const Info = async (): Promise<ReactElement<any>> => {
     return (
         <main>
             <Title>Info Page</Title>

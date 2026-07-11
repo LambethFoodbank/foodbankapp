@@ -94,7 +94,7 @@ export const listRowToListDB = (listRow: ListRow): Schema["lists"] => ({
     list_type: listRow.listType,
 });
 
-const displayQuantityAndNotes = (data: QuantityAndNotes): React.ReactElement => {
+const displayQuantityAndNotes = (data: QuantityAndNotes): React.ReactElement<any> => {
     return <TooltipCell cellValue={data.quantity} tooltipValue={data.notes ?? ""} />;
 };
 

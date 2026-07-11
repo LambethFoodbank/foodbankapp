@@ -166,7 +166,7 @@ const ShippingLabelsPdfButton = ({
     onPdfCreationCompleted,
     disabled,
     onPdfCreationFailed,
-}: Props): React.ReactElement => {
+}: Props): React.ReactElement<any> => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<ShippingLabelData[], ShippingLabelErrorType>
     > => {

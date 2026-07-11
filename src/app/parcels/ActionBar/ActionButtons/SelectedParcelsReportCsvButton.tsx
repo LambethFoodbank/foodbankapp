@@ -115,7 +115,7 @@ const SelectedParcelsReportCsvButton = ({
     onFileCreationCompleted,
     onFileCreationFailed,
     parcels,
-}: ButtonProps): React.ReactElement => {
+}: ButtonProps): React.ReactElement<any> => {
     const props: ButtonProps = {
         fromDate: null,
         toDate: null,

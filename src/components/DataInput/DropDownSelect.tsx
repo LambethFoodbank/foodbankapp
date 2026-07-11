@@ -45,7 +45,7 @@ interface UncontrolledProps<ValueType> {
     focusOnDropdown?: boolean;
 }
 
-const GenericSelect = <ValueType,>(props: GenericProps<ValueType>): React.ReactElement => {
+const GenericSelect = <ValueType,>(props: GenericProps<ValueType>): React.ReactElement<any> => {
     const dropdownInputFocusRef = React.useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -79,7 +79,7 @@ const GenericSelect = <ValueType,>(props: GenericProps<ValueType>): React.ReactE
 
 export const ControlledSelect = <ValueType,>(
     props: ControlledProps<ValueType>
-): React.ReactElement => {
+): React.ReactElement<any> => {
     return (
         <GenericSelect
             selectLabelId={props.selectLabelId}
@@ -96,7 +96,7 @@ export const ControlledSelect = <ValueType,>(
 
 export const UncontrolledSelect = <ValueType,>(
     props: UncontrolledProps<ValueType>
-): React.ReactElement => {
+): React.ReactElement<any> => {
     return (
         <GenericSelect
             selectLabelId={props.selectLabelId}
