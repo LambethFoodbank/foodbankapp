@@ -6,7 +6,7 @@ import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import CancelIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { LinearProgress } from "@mui/material";
+//import { LinearProgress } from "@mui/material"; //QQ
 import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
@@ -533,10 +533,12 @@ const PackingSlotsTable: React.FC = () => {
                     processRowUpdate={processRowUpdate}
                     slots={{
                         toolbar: EditToolbar,
-                        loadingOverlay: LinearProgress,
                     }}
                     slotProps={{
                         toolbar: { setRows, setRowModesModel, rows },
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                        },
                     }}
                     loading={isLoading}
                     getRowClassName={(params) =>

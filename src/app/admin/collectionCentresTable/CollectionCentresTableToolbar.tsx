@@ -3,19 +3,38 @@ import {
     GridRowModesModel,
     GridRowsProp,
     GridToolbarContainer,
+    GridToolbarProps,
+    ToolbarPropsOverrides,
 } from "@mui/x-data-grid";
 import React from "react";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import { CollectionCentresTableRow } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 
-interface EditToolbarProps {
-    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-    setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-    rows: CollectionCentresTableRow[];
+// interface EditToolbarProps {
+// setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
+// setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
+// rows: CollectionCentresTableRow[];
+// }
+
+declare module "@mui/x-data-grid" {
+    interface ToolbarPropsOverrides {
+        setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
+        //        setRows: React.Dispatch<React.SetStateAction<CollectionCentresTableRow[]>>;
+
+        setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
+        rows: CollectionCentresTableRow[];
+    }
 }
 
-export function EditToolbar(props: EditToolbarProps): React.JSX.Element {
+// type EditToolbarProps = GridToolbarProps &
+//     ToolbarPropsOverrides & {
+//         setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
+//         setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
+//         rows: CollectionCentresTableRow[];
+//     };
+
+export function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): React.JSX.Element {
     const { setRows, setRowModesModel, rows } = props;
 
     const handleClick = (): void => {

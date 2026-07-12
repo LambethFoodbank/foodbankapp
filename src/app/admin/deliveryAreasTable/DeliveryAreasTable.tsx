@@ -24,7 +24,7 @@ import {
     fetchDeliveryAreas,
     deleteDbDeliveryAreas,
 } from "@/app/admin/deliveryAreasTable/DeliveryAreasActions";
-import { LinearProgress } from "@mui/material";
+//import { LinearProgress } from "@mui/material"; '//QQ
 import { logErrorReturnLogId } from "@/logger/logger";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import Header from "../websiteDataTable/Header";
@@ -327,12 +327,16 @@ const DeliveryAreasTable: React.FC = () => {
                     onRowModesModelChange={setRowModesModel}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
-                    slots={{
-                        toolbar: EditToolbar,
-                        loadingOverlay: LinearProgress,
-                    }}
+                    slots={
+                        {
+                            //toolbar: EditToolbar,
+                        }
+                    }
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows, setErrorMessage },
+                        //toolbar: { setRows, setRowModesModel, rows, setErrorMessage },
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                        },
                     }}
                     loading={isLoading}
                     getRowClassName={(params) =>

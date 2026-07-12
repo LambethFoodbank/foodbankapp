@@ -15,7 +15,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import { LinearProgress } from "@mui/material";
+//import { LinearProgress } from "@mui/material";
 import { fetchWebsiteData, updateDbWebsiteData } from "./fetchWebsiteData";
 import EditableTextAreaForDataGrid from "./EditableTextAreaForDataGrid";
 import { logErrorReturnLogId } from "@/logger/logger";
@@ -322,11 +322,16 @@ const WebsiteDataTable: React.FC = () => {
                         handleEditClick(params.id)();
                     }}
                     processRowUpdate={processRowUpdate}
-                    slots={{
-                        loadingOverlay: LinearProgress,
-                    }}
+                    slots={
+                        {
+                            //loadingOverlay: LinearProgress,
+                        }
+                    }
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows },
+                        //toolbar: { setRows, setRowModesModel, rows },
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                        },
                     }}
                     loading={isLoading}
                     getRowHeight={() => 150}

@@ -3,7 +3,7 @@
 import CancelIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { LinearProgress } from "@mui/material";
+//import { LinearProgress } from "@mui/material"; //QQ
 import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
@@ -488,10 +488,13 @@ const CollectionCentresTable: React.FC = () => {
                     processRowUpdate={processRowUpdate}
                     slots={{
                         toolbar: EditToolbar,
-                        loadingOverlay: LinearProgress,
+                        //         loadingOverlay: LinearProgress,
                     }}
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows },
+                        //       toolbar: { setRows, setRowModesModel, rows },
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                        },
                     }}
                     loading={isLoading}
                     getRowClassName={(params) =>
