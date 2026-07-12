@@ -4,10 +4,11 @@ import React from "react";
 import EditParcelForm from "../EditParcelForm";
 
 interface EditParcelsParameters {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
-const EditParcels = async ({ params }: EditParcelsParameters): Promise<React.ReactElement<any>> => {
+const EditParcels = async (props: EditParcelsParameters): Promise<React.ReactElement<any>> => {
+    const params = await props.params;
     return (
         <main>
             <EditParcelForm parcelId={params.id} />

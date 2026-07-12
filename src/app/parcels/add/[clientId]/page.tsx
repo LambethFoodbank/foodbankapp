@@ -3,12 +3,13 @@ import React from "react";
 import AddParcelForm from "../AddParcelForm";
 
 export interface AddParcelParameters {
-    params: {
+    params: Promise<{
         clientId: string;
-    };
+    }>;
 }
 
-const AddParcel = async ({ params }: AddParcelParameters): Promise<React.ReactElement<any>> => {
+const AddParcel = async (props: AddParcelParameters): Promise<React.ReactElement<any>> => {
+    const params = await props.params;
     return (
         <main>
             <AddParcelForm clientId={params.clientId} />
