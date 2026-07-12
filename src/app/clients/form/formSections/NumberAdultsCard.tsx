@@ -44,9 +44,9 @@ export const resizePersonsArray = (
                   .fill(0)
                   .map(
                       () =>
-                          ({
-                              recordedAsChild: isChildArray,
-                          }) as Person
+                          (({
+                              recordedAsChild: isChildArray
+                          }) as Person)
                   ),
           ]
         : currentArray.slice(0, targetLength);

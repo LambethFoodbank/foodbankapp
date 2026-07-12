@@ -211,7 +211,7 @@ const DisplayItemsList: React.FC<DisplayItemsListProps> = ({ itemsList }) => {
     return (
         <View>
             {itemsList.map((item, index) => (
-                <ItemToRow {...item} key={index} /> // eslint-disable-line react/no-array-index-key
+                (<ItemToRow {...item} key={index} />) // eslint-disable-line react/no-array-index-key
             ))}
         </View>
     );
