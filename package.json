@@ -75,8 +75,8 @@
     "@types/file-saver": "^2.0.7",
     "@types/node": "20.3.1",
     "@types/pdf-parse": "^1.1.1",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
     "@types/react-fontawesome": "^1.6.8",
     "@types/react-modal": "^3.16.3",
     "@types/uuid": "^9.0.8",
@@ -86,13 +86,13 @@
     "export-to-csv": "^1.4.0",
     "file-saver": "^2.0.5",
     "material-react-table": "^3.2.1",
-    "next": "^15.5.18",
+    "next": "15.5.20",
     "nyc": "^15.1.0",
     "pdf-parse": "^1.1.1",
     "query-string": "^6.14.1",
-    "react": "^19.2.6",
+    "react": "19.2.7",
     "react-data-table-component": "^7.5.4",
-    "react-dom": "^19.2.6",
+    "react-dom": "19.2.7",
     "react-modal": "^3.16.3",
     "start-server-and-test": "^2.0.0",
     "styled-components": "^6.0.4",
@@ -110,7 +110,7 @@
     "@babel/types": "^7.28.5",
     "@cypress/code-coverage": "^3.11.0",
     "@jest/globals": "^29.7.0",
-    "@next/bundle-analyzer": "^14.2.5",
+    "@next/bundle-analyzer": "15.5.20",
     "@snaplet/copycat": "^6.0.0",
     "@snaplet/seed": "^0.98.0",
     "@testing-library/dom": "^10.4.0",
@@ -131,7 +131,7 @@
     "cypress": "^15.12.0",
     "cypress-axe": "^1.7.0",
     "eslint": "^8.43.0",
-    "eslint-config-next": "^15.5.18",
+    "eslint-config-next": "15.5.20",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-cypress": "^2.13.3",
     "eslint-plugin-import": "^2.28.1",
@@ -155,5 +155,9 @@
   },
   "@snaplet/seed": {
     "config": "supabase/seed/seed.config.ts"
+  },
+  "overrides": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3"
   }
 }
