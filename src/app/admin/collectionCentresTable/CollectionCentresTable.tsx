@@ -491,7 +491,11 @@ const CollectionCentresTable: React.FC = () => {
                         //         loadingOverlay: LinearProgress,
                     }}
                     slotProps={{
-                        //       toolbar: { setRows, setRowModesModel, rows },
+                        toolbar: {
+                            setCollectionCentreRows: setRows,
+                            setCollectionCentreRowModesModel: setRowModesModel,
+                            collectionCentreRows: rows,
+                        },
                         loadingOverlay: {
                             variant: "linear-progress",
                         },

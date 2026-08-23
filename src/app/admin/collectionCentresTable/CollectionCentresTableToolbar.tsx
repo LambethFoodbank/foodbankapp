@@ -1,7 +1,6 @@
 import {
     GridRowModes,
     GridRowModesModel,
-    GridRowsProp,
     GridToolbarContainer,
     GridToolbarProps,
     ToolbarPropsOverrides,
@@ -9,7 +8,10 @@ import {
 import React from "react";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import { CollectionCentresTableRow } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
+import {
+    CollectionCentresTableRow,
+    initialCollectionAvailableDays,
+} from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 
 // interface EditToolbarProps {
 // setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -19,11 +21,11 @@ import { CollectionCentresTableRow } from "@/app/admin/collectionCentresTable/Co
 
 declare module "@mui/x-data-grid" {
     interface ToolbarPropsOverrides {
-        setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-        //        setRows: React.Dispatch<React.SetStateAction<CollectionCentresTableRow[]>>;
-
-        setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-        rows: CollectionCentresTableRow[];
+        setCollectionCentreRows: React.Dispatch<React.SetStateAction<CollectionCentresTableRow[]>>;
+        setCollectionCentreRowModesModel: (
+            newModel: (oldModel: GridRowModesModel) => GridRowModesModel
+        ) => void;
+        collectionCentreRows: CollectionCentresTableRow[];
     }
 }
 
@@ -35,12 +37,26 @@ declare module "@mui/x-data-grid" {
 //     };
 
 export function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): React.JSX.Element {
-    const { setRows, setRowModesModel, rows } = props;
+    const { setCollectionCentreRows, setCollectionCentreRowModesModel, collectionCentreRows } =
+        props;
 
     const handleClick = (): void => {
-        const id = rows.length + 1;
-        setRows((oldRows) => [...oldRows, { id, name: "", isShown: false, isNew: true }]);
-        setRowModesModel((oldModel) => ({
+        const id = String(collectionCentreRows.length + 1);
+        setCollectionCentreRows((oldRows) => [
+            ...oldRows,
+            {
+                id,
+                name: "",
+                acronym: "",
+                isShown: false,
+                isDelivery: false,
+                timeSlots: [],
+                availableDays: initialCollectionAvailableDays,
+                isNew: true,
+                lastUpdated: "",
+            },
+        ]);
+        setCollectionCentreRowModesModel((oldModel) => ({
             ...oldModel,
             [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
         }));

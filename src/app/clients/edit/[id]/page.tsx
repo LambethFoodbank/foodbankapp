@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import supabase from "@/supabaseClient";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { parseQueryParams } from "@/common/urlQueryParams";
 import { returnPathQueryParam } from "@/common/constants";
 import ClientForm, { ClientErrors } from "@/app/clients/form/ClientForm";
@@ -12,11 +12,8 @@ import { fetchClient, fetchFamily, fetchLatestParcelIdForClient } from "@/common
 import { Schema } from "@/databaseUtils";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 
-interface EditClientFormProps {
-    clientId: string;
-}
-
-const EditClientForm = ({ clientId }: EditClientFormProps): React.ReactElement<any> => {
+const EditClientForm = (): React.ReactElement<any> => {
+    const { id: clientId } = useParams<{ id: string }>();
     const searchParams = useSearchParams();
 
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);

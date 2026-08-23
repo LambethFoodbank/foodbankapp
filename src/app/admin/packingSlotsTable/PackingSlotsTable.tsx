@@ -16,8 +16,9 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel,
-    GridRowsProp,
     GridToolbarContainer,
+    GridToolbarProps,
+    ToolbarPropsOverrides,
 } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import {
@@ -34,10 +35,14 @@ import supabase from "@/supabaseClient";
 import StyledDataGrid from "../common/StyledDataGrid";
 import Header from "../websiteDataTable/Header";
 
-interface EditToolbarProps {
-    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-    setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-    rows: PackingSlotRow[];
+declare module "@mui/x-data-grid" {
+    interface ToolbarPropsOverrides {
+        setPackingSlotRows: React.Dispatch<React.SetStateAction<PackingSlotRow[]>>;
+        setPackingSlotRowModesModel: (
+            newModel: (oldModel: GridRowModesModel) => GridRowModesModel
+        ) => void;
+        packingSlotRows: PackingSlotRow[];
+    }
 }
 
 export interface PackingSlotRow {
@@ -53,16 +58,16 @@ export interface PackingSlotRowWithOriginalLastUpdated extends PackingSlotRow {
     originalLastUpdated: string;
 }
 
-function EditToolbar(props: EditToolbarProps): React.JSX.Element {
-    const { setRows, setRowModesModel, rows } = props;
+function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): React.JSX.Element {
+    const { setPackingSlotRows, setPackingSlotRowModesModel, packingSlotRows } = props;
 
     const handleClick = (): void => {
-        const id = rows.length + 1;
-        setRows((oldRows) => [
+        const id = String(packingSlotRows.length + 1);
+        setPackingSlotRows((oldRows) => [
             ...oldRows,
-            { id, name: "", isShown: false, order: id, isNew: true },
+            { id, name: "", isShown: false, order: Number(id), isNew: true, lastUpdated: "" },
         ]);
-        setRowModesModel((oldModel) => ({
+        setPackingSlotRowModesModel((oldModel) => ({
             ...oldModel,
             [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
         }));
@@ -535,7 +540,11 @@ const PackingSlotsTable: React.FC = () => {
                         toolbar: EditToolbar,
                     }}
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows },
+                        toolbar: {
+                            setPackingSlotRows: setRows,
+                            setPackingSlotRowModesModel: setRowModesModel,
+                            packingSlotRows: rows,
+                        },
                         loadingOverlay: {
                             variant: "linear-progress",
                         },
