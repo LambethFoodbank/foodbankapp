@@ -4,7 +4,7 @@ import React from "react";
 import NavigationBar from "@/components/NavigationBar/NavigationBar";
 import { AuthRouting } from "@/app/auth";
 import Localization from "@/app/Localization";
-import { RoleManager } from "@/app/roles";
+import { RoleManager } from "@/app/roleManager";
 
 interface Props {
     children: React.ReactNode;

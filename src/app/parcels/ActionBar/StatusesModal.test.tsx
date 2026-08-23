@@ -7,7 +7,7 @@ import { ParcelsTableRow } from "@/app/parcels/parcelsTable/types";
 import { UserRole } from "@/databaseUtils";
 import StyleManager from "@/app/themes";
 import Localization from "@/app/Localization";
-import { RoleUpdateContext } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roleManager";
 
 const managerAndAboveRoles: { [role: string]: UserRole }[] = [
     { role: "admin" },

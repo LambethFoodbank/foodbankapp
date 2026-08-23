@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import { managerOrAboveRoles, RoleUpdateContext } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roleManager";
+import { managerOrAboveRoles } from "@/app/roles";
 import { Checkbox, Button, FormControlLabel } from "@mui/material";
 import Modal from "@/components/Modal/Modal";
 import { DateTimePicker } from "@mui/x-date-pickers";

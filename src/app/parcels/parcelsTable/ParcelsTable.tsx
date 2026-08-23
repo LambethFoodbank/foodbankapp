@@ -28,7 +28,8 @@ import { searchForBreakPoints } from "@/app/parcels/parcelsTable/conditionalStyl
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import { ServerPaginatedMaterialTable } from "@/components/Tables/MaterialTable";
 import { MRT_Row } from "material-react-table";
-import { RoleUpdateContext, roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roleManager";
+import { roleCanAccessOutsideDeliveryAreaModal } from "@/app/roles";
 
 interface ParcelsTableProps {
     checkedParcelIds: string[];

@@ -2,7 +2,8 @@
 
 import React, { useContext } from "react";
 import { UserRole } from "@/databaseUtils";
-import { organisationRoles, RoleUpdateContext } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roleManager";
+import { organisationRoles } from "../roles";
 
 interface RoleProps {
     children?: React.ReactNode;

@@ -5,7 +5,7 @@ import WikiItems from "@/app/info/WikiItems";
 import { DbWikiRow, UserRole } from "@/databaseUtils";
 import { expect, it } from "@jest/globals";
 import "@testing-library/jest-dom/jest-globals";
-import { RoleUpdateContext } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roleManager";
 import userEvent from "@testing-library/user-event";
 
 const adminManagerAndStaffRoles: { [role: string]: UserRole }[] = [
