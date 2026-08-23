@@ -44,7 +44,7 @@ const getFetchErrorMessage = (error: FetchListsError): string => {
 const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
     return listsData.map(
         (row) =>
-            (({
+            ({
                 primaryKey: row.primary_key,
                 listType: row.list_type,
                 rowOrder: row.row_order,
@@ -60,8 +60,8 @@ const formatListData = (listsData: Schema["lists"][]): ListRow[] => {
                                 notes: row[`notes_for_${key}` as keyof Schema["lists"]],
                             },
                         ])
-                )
-            }) as ListRow) // this cast is needed here as the type system can't infer what Object.fromEntries will return
+                ),
+            }) as ListRow // this cast is needed here as the type system can't infer what Object.fromEntries will return
     );
 };
 

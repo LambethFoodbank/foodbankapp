@@ -7,7 +7,9 @@ import { getDisplayPostcode } from "@/common/format";
 export const rowToAddressColumn = ({
     postcode,
     isDeliverable,
-}: ClientsTableRow["addressPostcode"] | ParcelsTableRow["addressPostcode"]): React.ReactElement<any> => {
+}:
+    | ClientsTableRow["addressPostcode"]
+    | ParcelsTableRow["addressPostcode"]): React.ReactElement<any> => {
     const postcodeRow: React.ReactNode[] = [];
     postcodeRow.push(getDisplayPostcode(postcode));
     if (!isDeliverable && postcode !== "-") {

@@ -10,12 +10,12 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel,
-    GridRowsProp,
+    // GridRowsProp,
     GridSortModel,
-    GridToolbarContainer,
+    // GridToolbarContainer,
 } from "@mui/x-data-grid";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
+// import Button from "@mui/material/Button";
+// import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -33,12 +33,13 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
 import { prefixPostcodeRegex } from "@/common/format";
 
-interface EditToolbarProps {
-    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-    setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-    rows: DeliveryAreasRow[];
-    setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
-}
+// QQ Temp
+// interface EditToolbarProps {
+//     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
+//     setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
+//     rows: DeliveryAreasRow[];
+//     setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
+// }
 
 export interface DeliveryAreasRow {
     id: string;
@@ -49,27 +50,28 @@ export interface DeliveryAreasRow {
 
 const isValidPostcode = (value: string): boolean => prefixPostcodeRegex.test(value);
 
-function EditToolbar(props: EditToolbarProps): React.JSX.Element {
-    const { setRows, setRowModesModel, setErrorMessage } = props;
-    // The id was initialized as `number of rows+1`, which raised some issues and now it is generated randomly below
-    const handleClick = (): void => {
-        const id = `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        setErrorMessage(null);
-        setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
-        setRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "postcode", editable: true },
-        }));
-    };
+// QQ Temp
+// function EditToolbar(props: EditToolbarProps): React.JSX.Element {
+//     const { setRows, setRowModesModel, setErrorMessage } = props;
+//     // The id was initialized as `number of rows+1`, which raised some issues and now it is generated randomly below
+//     const handleClick = (): void => {
+//         const id = `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+//         setErrorMessage(null);
+//         setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
+//         setRowModesModel((oldModel) => ({
+//             ...oldModel,
+//             [id]: { mode: GridRowModes.Edit, fieldToFocus: "postcode", editable: true },
+//         }));
+//     };
 
-    return (
-        <GridToolbarContainer>
-            <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                Add new area
-            </Button>
-        </GridToolbarContainer>
-    );
-}
+//     return (
+//         <GridToolbarContainer>
+//             <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+//                 Add new area
+//             </Button>
+//         </GridToolbarContainer>
+//     );
+// }
 
 function getBaseAuditLogForDeliveryAreasAction(
     action: string,
