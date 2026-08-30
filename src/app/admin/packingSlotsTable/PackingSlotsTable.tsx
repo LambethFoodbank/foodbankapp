@@ -1,13 +1,10 @@
 "use client";
 
-import AddIcon from "@mui/icons-material/Add";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import CancelIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-//import { LinearProgress } from "@mui/material"; //QQ
-import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
     GridColDef,
@@ -16,14 +13,12 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel,
-    GridToolbarContainer,
-    GridToolbarProps,
-    ToolbarPropsOverrides,
 } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import {
     fetchPackingSlots,
     insertNewPackingSlot,
+    PackingSlotRow,
     swapRows,
     updateDbPackingSlot,
 } from "@/app/admin/packingSlotsTable/PackingSlotActions";
@@ -34,53 +29,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import StyledDataGrid from "../common/StyledDataGrid";
 import Header from "../websiteDataTable/Header";
-
-declare module "@mui/x-data-grid" {
-    interface ToolbarPropsOverrides {
-        setPackingSlotRows: React.Dispatch<React.SetStateAction<PackingSlotRow[]>>;
-        setPackingSlotRowModesModel: (
-            newModel: (oldModel: GridRowModesModel) => GridRowModesModel
-        ) => void;
-        packingSlotRows: PackingSlotRow[];
-    }
-}
-
-export interface PackingSlotRow {
-    id: string;
-    name: string;
-    isShown: boolean;
-    order: number;
-    isNew: boolean;
-    lastUpdated: string;
-}
-
-export interface PackingSlotRowWithOriginalLastUpdated extends PackingSlotRow {
-    originalLastUpdated: string;
-}
-
-function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): React.JSX.Element {
-    const { setPackingSlotRows, setPackingSlotRowModesModel, packingSlotRows } = props;
-
-    const handleClick = (): void => {
-        const id = String(packingSlotRows.length + 1);
-        setPackingSlotRows((oldRows) => [
-            ...oldRows,
-            { id, name: "", isShown: false, order: Number(id), isNew: true, lastUpdated: "" },
-        ]);
-        setPackingSlotRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
-        }));
-    };
-
-    return (
-        <GridToolbarContainer>
-            <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                Add new slot
-            </Button>
-        </GridToolbarContainer>
-    );
-}
+import { EditToolbar } from "./PackingSlotsToolbar";
 
 function getBaseAuditLogForPackingSlotAction(
     action: string,
@@ -515,6 +464,7 @@ const PackingSlotsTable: React.FC = () => {
             )}
             {rows && (
                 <StyledDataGrid
+                    aria-label="Packing Slots Table"
                     rows={rows}
                     columns={packingSlotsColumns}
                     editMode="row"
