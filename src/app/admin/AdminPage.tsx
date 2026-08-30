@@ -80,7 +80,7 @@ const AdminPage: React.FC = () => {
             {adminPanels.map(({ panelTitle, panelIcon, panelContent }) => {
                 return (
                     <TableSurface key={panelTitle}>
-                        <Accordion elevation={0}>
+                        <Accordion elevation={0} slots={{ heading: "h2" }}>
                             <AccordionSummary
                                 expandIcon={<ExpandMore />}
                                 aria-label={`Section: ${panelTitle}`}

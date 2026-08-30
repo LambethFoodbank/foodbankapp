@@ -431,7 +431,7 @@ const CollectionCentresTable: React.FC = () => {
                             icon={<CancelIcon />}
                             label="Cancel"
                             className="textPrimary"
-                            onClick={handleCancelClick(id)}
+                            onClick={() => handleCancelClick(id)()}
                             color="inherit"
                             key="Cancel"
                         />,
@@ -443,7 +443,7 @@ const CollectionCentresTable: React.FC = () => {
                         icon={<EditIcon />}
                         label="Edit"
                         className="textPrimary"
-                        onClick={handleEditClick(id)}
+                        onClick={() => handleEditClick(id)()}
                         color="inherit"
                         key="Edit"
                     />,
