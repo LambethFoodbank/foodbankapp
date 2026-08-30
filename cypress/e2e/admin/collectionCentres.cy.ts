@@ -41,7 +41,7 @@ describe("Edit a collection centre on admins page", () => {
 
         checkIsShownInRowBeingEditedAndSave("@rowBeingEdited");
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-            .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
+            .contains(".MuiDataGrid-cell", newCollectionCentreName, { timeout: 5000 })
             .should("exist");
 
         // Check the cc row appears as 'not shown'

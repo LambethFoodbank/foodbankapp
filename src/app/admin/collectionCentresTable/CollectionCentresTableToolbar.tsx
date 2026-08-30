@@ -13,12 +13,6 @@ import {
     initialCollectionAvailableDays,
 } from "@/app/admin/collectionCentresTable/CollectionCentreActions";
 
-// interface EditToolbarProps {
-// setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-// setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-// rows: CollectionCentresTableRow[];
-// }
-
 declare module "@mui/x-data-grid" {
     interface ToolbarPropsOverrides {
         setCollectionCentreRows: React.Dispatch<React.SetStateAction<CollectionCentresTableRow[]>>;
@@ -28,13 +22,6 @@ declare module "@mui/x-data-grid" {
         collectionCentreRows: CollectionCentresTableRow[];
     }
 }
-
-// type EditToolbarProps = GridToolbarProps &
-//     ToolbarPropsOverrides & {
-//         setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-//         setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-//         rows: CollectionCentresTableRow[];
-//     };
 
 export function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): React.JSX.Element {
     const { setCollectionCentreRows, setCollectionCentreRowModesModel, collectionCentreRows } =

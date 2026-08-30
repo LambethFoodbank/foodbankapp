@@ -166,7 +166,7 @@ export const insertNewCollectionCentre = async (
     if (error) {
         const logId = await logErrorReturnLogId("Failed to add a collection centre", {
             error,
-            newCollectionCentre: data,
+            newCollectionCentreData: data,
         });
         return { data: null, error: { dbError: error, logId } };
     }
@@ -196,7 +196,7 @@ export const updateDbCollectionCentre = async (
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update collection centre", {
             error,
-            newCollectionCentreData: processedData,
+            collectionCentreData: processedData,
         });
 
         return { error: { type: "UpdateCollectionCentreFailed", logId } };

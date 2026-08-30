@@ -137,7 +137,7 @@ export const addNewCollectionCentre = (newCollectionCentreName: string): void =>
 
     // Wait for the data to reload and ensure the new item appears with proper data
     cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-        .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
+        .contains(".MuiDataGrid-cell", newCollectionCentreName, { timeout: 5000 })
         .should("be.visible");
 
     // Give a moment for the database subscription to refresh the data with proper timestamps
