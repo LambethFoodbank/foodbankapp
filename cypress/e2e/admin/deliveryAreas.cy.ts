@@ -2,6 +2,7 @@ describe("Edit delivery areas on admins page", () => {
     beforeEach(() => {
         cy.login();
         cy.intercept({ method: "GET", url: "**/rest/v1/delivery_areas*" }).as("getDeliveryAreas");
+        cy.intercept({ method: "POST", url: "**/rest/v1/delivery_areas*" }).as("saveDeliveryArea");
         cy.visit("/admin");
     });
 
@@ -25,8 +26,10 @@ describe("Edit delivery areas on admins page", () => {
             .should("exist");
 
         fillOutNewDeliveryAreaAndSave(newDeliveryArea);
+        cy.wait("@saveDeliveryArea");
+
         cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
-            .contains(".MuiDataGrid-cellContent", newDeliveryArea, { timeout: 5000 })
+            .contains(".MuiDataGrid-cell", newDeliveryArea, { timeout: 5000 })
             .should("be.visible");
     });
 
@@ -48,7 +51,9 @@ describe("Edit delivery areas on admins page", () => {
 
                 startAddingNewDeliveryArea();
                 fillOutNewDeliveryAreaAndSave(existingDeliveryArea);
-                cy.get('[role="alert"]').should("contain", "already"); // eslint-disable-line quotes
+                cy.wait("@saveDeliveryArea");
+
+                cy.get('[role="alert"]').should("contain", "already exists"); // eslint-disable-line quotes
             });
     });
 
@@ -84,7 +89,7 @@ describe("Edit delivery areas on admins page", () => {
             .should("be.visible");
 
         cy.get('div[aria-label="Delivery Areas Table"]') // eslint-disable-line quotes
-            .contains(".MuiDataGrid-cellContent", deletedDeliveryArea, { timeout: 5000 })
+            .contains(".MuiDataGrid-cell", deletedDeliveryArea, { timeout: 5000 })
             .should("exist")
             .closest('[role="row"]') // eslint-disable-line quotes
             .within(() => {

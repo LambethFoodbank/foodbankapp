@@ -28,7 +28,8 @@ export function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): Re
         props;
 
     const handleClick = (): void => {
-        const id = String(collectionCentreRows.length + 1);
+        // Include timestamp in the ID to ensure uniqueness, especially if rows are deleted and added quickly
+        const id = String(collectionCentreRows.length + 1) + "_" + Date.now();
         setCollectionCentreRows((oldRows) => [
             ...oldRows,
             {

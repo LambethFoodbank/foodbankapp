@@ -1,9 +1,15 @@
 import supabase from "@/supabaseClient";
 import { DatabaseError } from "@/app/errorClasses";
-import { DeliveryAreasRow } from "@/app/admin/deliveryAreasTable/DeliveryAreasTable";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { PostgrestError } from "@supabase/supabase-js";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
+
+export interface DeliveryAreasRow {
+    id: string;
+    postcode: string;
+    postcodeSortKey: string;
+    isNew: boolean;
+}
 
 export const fetchDeliveryAreas = async (): Promise<DeliveryAreasRow[]> => {
     const { data, error } = await supabase.from("delivery_areas_plus").select();

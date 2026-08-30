@@ -469,9 +469,6 @@ const PackingSlotsTable: React.FC = () => {
                     columns={packingSlotsColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
-                    onProcessRowUpdateError={(error) => {
-                        setErrorMessage(error.message);
-                    }}
                     onRowModesModelChange={(newModel) => {
                         setRowModesModel(newModel);
 
@@ -486,6 +483,9 @@ const PackingSlotsTable: React.FC = () => {
                     onRowEditStart={handleRowEditStart}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
+                    onProcessRowUpdateError={(error) => {
+                        setErrorMessage(error.message);
+                    }}
                     slots={{
                         toolbar: EditToolbar,
                     }}

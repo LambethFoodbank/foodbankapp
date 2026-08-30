@@ -8,38 +8,38 @@ import {
 import React from "react";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import { PackingSlotRow } from "./PackingSlotActions";
+import { DeliveryAreasRow } from "./DeliveryAreasActions";
 
 declare module "@mui/x-data-grid" {
     interface ToolbarPropsOverrides {
-        setPackingSlotRows: React.Dispatch<React.SetStateAction<PackingSlotRow[]>>;
-        setPackingSlotRowModesModel: (
+        setDeliveryAreasRows: React.Dispatch<React.SetStateAction<DeliveryAreasRow[]>>;
+        setDeliveryAreasRowModesModel: (
             newModel: (oldModel: GridRowModesModel) => GridRowModesModel
         ) => void;
-        packingSlotRows: PackingSlotRow[];
+        deliveryAreasRows: DeliveryAreasRow[];
     }
 }
 
 export function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): React.JSX.Element {
-    const { setPackingSlotRows, setPackingSlotRowModesModel, packingSlotRows } = props;
+    const { setDeliveryAreasRows, setDeliveryAreasRowModesModel, deliveryAreasRows } = props;
 
     const handleClick = (): void => {
         // Include timestamp in the ID to ensure uniqueness, especially if rows are deleted and added quickly
-        const id = String(packingSlotRows.length + 1) + "_" + Date.now();
-        setPackingSlotRows((oldRows) => [
+        const id = String(deliveryAreasRows.length + 1) + "_" + Date.now();
+        setDeliveryAreasRows((oldRows) => [
             ...oldRows,
-            { id, name: "", isShown: false, order: Number(id), isNew: true, lastUpdated: "" },
+            { id, postcode: "", postcodeSortKey: "", isNew: true },
         ]);
-        setPackingSlotRowModesModel((oldModel) => ({
+        setDeliveryAreasRowModesModel((oldModel) => ({
             ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: "postcode" },
         }));
     };
 
     return (
         <GridToolbarContainer>
             <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                Add new slot
+                Add new area
             </Button>
         </GridToolbarContainer>
     );
