@@ -28,7 +28,7 @@ interface Props {
 const formatCollectionCentreAvailableDaysDbData = (
     row: CollectionCentresTableRow
 ): FormattedAvailableDaysWithPrimaryKey => {
-    if (row.availableDays === undefined) {
+    if (row.availableDays === undefined || row.availableDays === null) {
         return {
             primaryKey: row.id,
             availableDays: [],

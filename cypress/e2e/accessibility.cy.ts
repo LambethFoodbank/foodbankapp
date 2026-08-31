@@ -3,6 +3,10 @@ const waitForTableToLoad = (): void => {
     cy.get('[aria-label="Loading"]', { timeout: 5000 }).should("not.exist"); // eslint-disable-line quotes
 };
 
+const waitForHeadingToLoad = (): void => {
+    cy.get("h1", { timeout: 5000 }).should("exist");
+};
+
 describe("Accessibility tests in light mode", () => {
     it("Checks clients page", () => {
         cy.login();
@@ -15,6 +19,7 @@ describe("Accessibility tests in light mode", () => {
     it("Checks clients/add page", () => {
         cy.login();
         cy.visit("/clients/add");
+        waitForHeadingToLoad();
 
         cy.checkAccessibility();
     });
@@ -34,6 +39,7 @@ describe("Accessibility tests in light mode", () => {
     it("Checks parcels/add/[id] page", () => {
         cy.login();
         cy.visit("/parcels/add/1");
+        waitForHeadingToLoad();
 
         cy.checkAccessibility();
     });
@@ -41,6 +47,7 @@ describe("Accessibility tests in light mode", () => {
     it("Checks lists page", () => {
         cy.login();
         cy.visit("/lists");
+        waitForHeadingToLoad();
 
         cy.checkAccessibility();
     });
@@ -48,13 +55,14 @@ describe("Accessibility tests in light mode", () => {
     it("Checks admin page", () => {
         cy.login();
         cy.visit("/admin");
-        cy.get("h1").should("exist");
+        waitForHeadingToLoad();
 
         cy.checkAccessibility();
     });
 
     it("Checks login page", () => {
         cy.visit("/login");
+        waitForHeadingToLoad();
 
         cy.checkAccessibility();
     });
@@ -74,6 +82,8 @@ describe("Accessibility tests in dark mode", () => {
     it("Checks clients/add page", () => {
         cy.login();
         cy.visit("/clients/add");
+        waitForHeadingToLoad();
+
         cy.get("label[aria-label='Theme Switch']").click();
 
         cy.checkAccessibility();
@@ -96,6 +106,8 @@ describe("Accessibility tests in dark mode", () => {
     it("Checks parcels/add/[id] page", () => {
         cy.login();
         cy.visit("/parcels/add/1");
+        waitForHeadingToLoad();
+
         cy.get("label[aria-label='Theme Switch']").click();
 
         cy.checkAccessibility();
@@ -104,6 +116,8 @@ describe("Accessibility tests in dark mode", () => {
     it("Checks lists page", () => {
         cy.login();
         cy.visit("/lists");
+        waitForHeadingToLoad();
+
         cy.get("label[aria-label='Theme Switch']").click();
 
         cy.checkAccessibility();
@@ -112,7 +126,8 @@ describe("Accessibility tests in dark mode", () => {
     it("Checks admin page", () => {
         cy.login();
         cy.visit("/admin");
-        cy.get("h1", { timeout: 5000 }).should("exist");
+        waitForHeadingToLoad();
+
         cy.get("label[aria-label='Theme Switch']").click();
 
         cy.checkAccessibility();
@@ -120,6 +135,7 @@ describe("Accessibility tests in dark mode", () => {
 
     it("Checks login page", () => {
         cy.visit("/login");
+        waitForHeadingToLoad();
 
         cy.get("label[aria-label='Theme Switch']").click();
 
