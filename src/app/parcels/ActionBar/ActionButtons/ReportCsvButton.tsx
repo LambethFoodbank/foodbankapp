@@ -306,7 +306,7 @@ const ReportCsvButton = ({
     parcels,
     getReportDataByDate,
     getReportDataByList,
-}: ButtonProps): React.ReactElement => {
+}: ButtonProps): React.ReactElement<any> => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<ReportRow[], FetchReportErrorType>
     > => {

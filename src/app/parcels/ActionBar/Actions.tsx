@@ -5,7 +5,8 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { ParcelsTableRow } from "../parcelsTable/types";
 import { ActionModalProps } from "./ActionModals/GeneralActionModal";
-import { allRoles, organisationRoles, RoleUpdateContext } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roleManager";
+import { allRoles, organisationRoles } from "@/app/roles";
 import { UserRole } from "@/databaseUtils";
 import DayOverviewModal from "./ActionModals/DayOverviewModal";
 import DeleteParcelModal from "./ActionModals/DeleteParcelModal";
@@ -139,7 +140,7 @@ interface Props {
 const getActionModal = (
     actionName: ActionName,
     actionModalProps: ActionModalProps
-): React.ReactElement => {
+): React.ReactElement<any> => {
     const elementKey = `${actionName}_modal`;
     switch (actionName) {
         case "Change Packing Date":

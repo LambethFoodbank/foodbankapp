@@ -9,7 +9,7 @@ const logger = getLogger();
 
 type LogEvent = (message: string, meta?: Record<string, unknown>, error?: Error) => Promise<string>;
 
-export const logErrorReturnLogId: LogEvent = (message, meta, error) => {
+export const logErrorReturnLogId: LogEvent = async (message, meta, error) => {
     const logId = uuid();
     logger.error(message, {
         ...meta,
@@ -19,13 +19,13 @@ export const logErrorReturnLogId: LogEvent = (message, meta, error) => {
     return Promise.resolve(logId);
 };
 
-export const logWarningReturnLogId: LogEvent = (message, meta) => {
+export const logWarningReturnLogId: LogEvent = async (message, meta) => {
     const logId = uuid();
     logger.warn(message, { ...meta, logId });
     return Promise.resolve(logId);
 };
 
-export const logInfoReturnLogId: LogEvent = (message, meta) => {
+export const logInfoReturnLogId: LogEvent = async (message, meta) => {
     const logId = uuid();
     logger.info(message, { ...meta, logId });
     return Promise.resolve(logId);

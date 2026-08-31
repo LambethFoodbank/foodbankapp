@@ -3,7 +3,6 @@
 import CancelIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { LinearProgress } from "@mui/material";
 import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
@@ -377,6 +376,7 @@ const CollectionCentresTable: React.FC = () => {
             renderCell: (params) => {
                 const handleEditCollectionCentreAvailableDays = (): void => {
                     const row = params.row as CollectionCentresTableRow;
+
                     handleEditClick(row.id)();
                     setRowModesModel((currentValue) => ({
                         ...currentValue,
@@ -432,7 +432,7 @@ const CollectionCentresTable: React.FC = () => {
                             icon={<CancelIcon />}
                             label="Cancel"
                             className="textPrimary"
-                            onClick={handleCancelClick(id)}
+                            onClick={() => handleCancelClick(id)()}
                             color="inherit"
                             key="Cancel"
                         />,
@@ -444,7 +444,7 @@ const CollectionCentresTable: React.FC = () => {
                         icon={<EditIcon />}
                         label="Edit"
                         className="textPrimary"
-                        onClick={handleEditClick(id)}
+                        onClick={() => handleEditClick(id)()}
                         color="inherit"
                         key="Edit"
                     />,
@@ -473,9 +473,10 @@ const CollectionCentresTable: React.FC = () => {
                         setErrorMessage(error.message);
                     }}
                     onRowModesModelChange={(newModel) => {
-                        setRowModesModel(newModel);
+                        const nextModel = newModel ?? {};
+                        setRowModesModel(nextModel);
 
-                        const isEditing = Object.values(newModel).some(
+                        const isEditing = Object.values(nextModel).some(
                             (mode) => mode.mode === GridRowModes.Edit
                         );
 
@@ -488,10 +489,16 @@ const CollectionCentresTable: React.FC = () => {
                     processRowUpdate={processRowUpdate}
                     slots={{
                         toolbar: EditToolbar,
-                        loadingOverlay: LinearProgress,
                     }}
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows },
+                        toolbar: {
+                            setCollectionCentreRows: setRows,
+                            setCollectionCentreRowModesModel: setRowModesModel,
+                            collectionCentreRows: rows,
+                        },
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                        },
                     }}
                     loading={isLoading}
                     getRowClassName={(params) =>

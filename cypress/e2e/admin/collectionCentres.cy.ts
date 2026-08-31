@@ -41,7 +41,7 @@ describe("Edit a collection centre on admins page", () => {
 
         checkIsShownInRowBeingEditedAndSave("@rowBeingEdited");
         cy.get('div[aria-label="Collection Centres Table"]') // eslint-disable-line quotes
-            .contains(".MuiDataGrid-cellContent", newCollectionCentreName, { timeout: 5000 })
+            .contains(".MuiDataGrid-cell", newCollectionCentreName, { timeout: 5000 })
             .should("exist");
 
         // Check the cc row appears as 'not shown'
@@ -159,6 +159,12 @@ describe("Edit a collection centre on admins page", () => {
 
             // Save to close modal
             saveTimeSlotsForCentre();
+
+            // Wait for patch request to complete and table subscription to refresh before reopening the modal
+            cy.wait("@updateCollectionCentre", { timeout: 5000 });
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(500);
+
             // Open modal for same collection centre
             clickEditButtonForCentre(
                 "Edit collection slots for",
@@ -198,6 +204,11 @@ describe("Edit a collection centre on admins page", () => {
 
             // Save to close modal
             saveAvailableDaysForCentre(newCollectionCentreName);
+
+            // Wait for patch request to complete and table subscription to refresh before reopening the modal
+            cy.wait("@updateCollectionCentre", { timeout: 5000 });
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(500);
 
             // Open modal for the same collection centre
             clickEditButtonForCentre(

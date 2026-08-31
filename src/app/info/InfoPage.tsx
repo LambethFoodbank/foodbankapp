@@ -8,7 +8,7 @@ import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adap
 import { WikiRowsQueryType } from "@/common/fetch";
 
 async function getWikiRows(): Promise<WikiRowsQueryType> {
-    const cookieStore: ReadonlyRequestCookies = cookies();
+    const cookieStore: ReadonlyRequestCookies = await cookies();
     const supabase = createServerComponentClient<Database>({ cookies: () => cookieStore });
     const query = (await supabase.from("wiki").select("*")) as WikiRowsQueryType;
     return query;

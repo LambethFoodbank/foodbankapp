@@ -1,13 +1,10 @@
 "use client";
 
-import AddIcon from "@mui/icons-material/Add";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import CancelIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { LinearProgress } from "@mui/material";
-import Button from "@mui/material/Button";
 import {
     GridActionsCellItem,
     GridColDef,
@@ -16,13 +13,12 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel,
-    GridRowsProp,
-    GridToolbarContainer,
 } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import {
     fetchPackingSlots,
     insertNewPackingSlot,
+    PackingSlotRow,
     swapRows,
     updateDbPackingSlot,
 } from "@/app/admin/packingSlotsTable/PackingSlotActions";
@@ -33,49 +29,7 @@ import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import StyledDataGrid from "../common/StyledDataGrid";
 import Header from "../websiteDataTable/Header";
-
-interface EditToolbarProps {
-    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-    setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-    rows: PackingSlotRow[];
-}
-
-export interface PackingSlotRow {
-    id: string;
-    name: string;
-    isShown: boolean;
-    order: number;
-    isNew: boolean;
-    lastUpdated: string;
-}
-
-export interface PackingSlotRowWithOriginalLastUpdated extends PackingSlotRow {
-    originalLastUpdated: string;
-}
-
-function EditToolbar(props: EditToolbarProps): React.JSX.Element {
-    const { setRows, setRowModesModel, rows } = props;
-
-    const handleClick = (): void => {
-        const id = rows.length + 1;
-        setRows((oldRows) => [
-            ...oldRows,
-            { id, name: "", isShown: false, order: id, isNew: true },
-        ]);
-        setRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
-        }));
-    };
-
-    return (
-        <GridToolbarContainer>
-            <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                Add new slot
-            </Button>
-        </GridToolbarContainer>
-    );
-}
+import { EditToolbar } from "./PackingSlotsToolbar";
 
 function getBaseAuditLogForPackingSlotAction(
     action: string,
@@ -510,13 +464,11 @@ const PackingSlotsTable: React.FC = () => {
             )}
             {rows && (
                 <StyledDataGrid
+                    aria-label="Packing Slots Table"
                     rows={rows}
                     columns={packingSlotsColumns}
                     editMode="row"
                     rowModesModel={rowModesModel}
-                    onProcessRowUpdateError={(error) => {
-                        setErrorMessage(error.message);
-                    }}
                     onRowModesModelChange={(newModel) => {
                         setRowModesModel(newModel);
 
@@ -531,12 +483,21 @@ const PackingSlotsTable: React.FC = () => {
                     onRowEditStart={handleRowEditStart}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
+                    onProcessRowUpdateError={(error) => {
+                        setErrorMessage(error.message);
+                    }}
                     slots={{
                         toolbar: EditToolbar,
-                        loadingOverlay: LinearProgress,
                     }}
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows },
+                        toolbar: {
+                            setPackingSlotRows: setRows,
+                            setPackingSlotRowModesModel: setRowModesModel,
+                            packingSlotRows: rows,
+                        },
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                        },
                     }}
                     loading={isLoading}
                     getRowClassName={(params) =>

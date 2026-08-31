@@ -29,8 +29,8 @@ const EditableTextAreaForDataGrid: React.FC<EditableTextAreaForDataGridProps> = 
             onChange={(event) => handleValueChange(event.target.value, id, field)}
             ref={ref}
             style={{
-                flex: 3,
                 resize: "none",
+                width: "100%",
                 height: 150,
                 borderWidth: 0,
                 paddingTop: 10,

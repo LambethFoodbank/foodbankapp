@@ -20,7 +20,7 @@ const ShoppingListPdfButton = ({
     parcels,
     onPdfCreationCompleted,
     onPdfCreationFailed,
-}: Props): React.ReactElement => {
+}: Props): React.ReactElement<any> => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<ShoppingListPdfData[], ShoppingListPdfErrorType>
     > => {

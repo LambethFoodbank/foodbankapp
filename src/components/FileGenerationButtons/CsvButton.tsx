@@ -38,7 +38,7 @@ const CsvButton = <
     disabled = false,
     focusOnButton = false,
     formSubmitButton = false,
-}: CsvButtonProps<Data, ErrorType>): React.ReactElement => {
+}: CsvButtonProps<Data, ErrorType>): React.ReactElement<any> => {
     const csvBlobGenerator = async (data: Data): Promise<Blob> => {
         // Override useKeysAsHeaders to make the keys user-friendly
         if (

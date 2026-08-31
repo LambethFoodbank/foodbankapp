@@ -9,7 +9,7 @@ import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { AuthError } from "@supabase/gotrue-js";
 
-export default function Page(): ReactElement {
+export default function Page(): ReactElement<any> {
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const accessToken = useRef<string | null>(null);

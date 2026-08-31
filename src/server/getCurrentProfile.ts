@@ -24,7 +24,7 @@ export async function getCurrentProfile(): Promise<CurrentProfileResponse> {
         return { data: null, error: userError };
     }
 
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await getSupabaseServerComponentClient();
 
     const { data: profileData, error: profileError } = await supabase
         .from("profiles")

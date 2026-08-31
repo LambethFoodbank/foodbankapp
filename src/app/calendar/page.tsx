@@ -10,7 +10,7 @@ import { logErrorReturnLogId } from "@/logger/logger";
 export const revalidate = 0;
 
 const getCollectionCentres = async (): Promise<Schema["collection_centres"]["name"][]> => {
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await getSupabaseServerComponentClient();
     const { data, error } = await supabase
         .from("collection_centres")
         .select("name")
@@ -24,7 +24,7 @@ const getCollectionCentres = async (): Promise<Schema["collection_centres"]["nam
 };
 
 const getParcelsWithCollectionDate = async (): Promise<ParcelsWithExtraFields[]> => {
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await getSupabaseServerComponentClient();
     const { data, error } = await supabase
         .from("parcels")
         .select(
@@ -51,7 +51,7 @@ const getParcelsWithCollectionDate = async (): Promise<ParcelsWithExtraFields[]>
     return data;
 };
 
-const CalendarPage = async (): Promise<React.ReactElement> => {
+const CalendarPage = async (): Promise<React.ReactElement<any>> => {
     const parcelsWithCollectionDate = await getParcelsWithCollectionDate();
     const collectionCentres = await getCollectionCentres();
 

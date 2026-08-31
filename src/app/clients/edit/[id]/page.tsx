@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import supabase from "@/supabaseClient";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { parseQueryParams } from "@/common/urlQueryParams";
 import { returnPathQueryParam } from "@/common/constants";
 import ClientForm, { ClientErrors } from "@/app/clients/form/ClientForm";
@@ -12,13 +12,8 @@ import { fetchClient, fetchFamily, fetchLatestParcelIdForClient } from "@/common
 import { Schema } from "@/databaseUtils";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 
-interface EditClientsParameters {
-    params: { id: string };
-}
-
-const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = ({
-    params,
-}: EditClientsParameters) => {
+const EditClientForm = (): React.ReactElement<any> => {
+    const { id: clientId } = useParams<{ id: string }>();
     const searchParams = useSearchParams();
 
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);
@@ -29,7 +24,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
 
     useEffect(() => {
         (async () => {
-            if (!params.id) {
+            if (!clientId) {
                 return;
             }
 
@@ -39,7 +34,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             }
 
             setError(null);
-            const { data: clientData, error: clientError } = await fetchClient(params.id, supabase);
+            const { data: clientData, error: clientError } = await fetchClient(clientId, supabase);
             if (clientError) {
                 switch (clientError.type) {
                     case "clientFetchFailed":
@@ -69,7 +64,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             setFamilyData(familyData);
 
             const { data: latestParcelId, error: latestParcelIdError } =
-                await fetchLatestParcelIdForClient(params.id, supabase);
+                await fetchLatestParcelIdForClient(clientId, supabase);
             if (latestParcelIdError) {
                 switch (latestParcelIdError.type) {
                     case "failedToFetchLatestParcelIdForClient":
@@ -82,7 +77,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
             }
             setLatestParcelId(latestParcelId);
         })();
-    }, [params.id, searchParams]);
+    }, [clientId, searchParams]);
 
     const initialFields = clientData && familyData ? autofill(clientData, familyData) : null;
 
@@ -109,7 +104,7 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
                         initialFields={initialFields}
                         initialFormErrors={initialFormErrors}
                         editConfig={{
-                            clientID: params.id,
+                            clientID: clientId,
                             editMode: true,
                             latestParcelId: latestParcelId,
                         }}
@@ -121,4 +116,4 @@ const EditClients: ({ params }: EditClientsParameters) => React.ReactElement = (
     );
 };
 
-export default EditClients;
+export default EditClientForm;

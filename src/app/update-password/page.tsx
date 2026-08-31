@@ -5,7 +5,7 @@ import AuthPanel, { AuthMain } from "@/components/AuthPanel";
 import { updatePassword } from "@/authentication/updatePassword";
 import { useRouter } from "next/navigation";
 
-export default function Page(): ReactElement {
+export default function Page(): ReactElement<any> {
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const router = useRouter();

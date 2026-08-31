@@ -29,7 +29,7 @@ const DriverOverviewPdfButton = ({
     onPdfCreationCompleted,
     onPdfCreationFailed,
     disabled,
-}: Props): React.ReactElement => {
+}: Props): React.ReactElement<any> => {
     const fetchDataAndFileName = async (): Promise<
         FileGenerationDataFetchResponse<DriverOverviewPdfData, DriverOverviewErrorType>
     > => {

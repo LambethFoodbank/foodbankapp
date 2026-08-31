@@ -32,7 +32,7 @@ export async function adminDeleteUser(userId: string): Promise<DeleteUserResult>
         };
     }
 
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await getSupabaseServerComponentClient();
     const { data: userProfile, error: userProfileError } = await supabase
         .from("profiles")
         .select("primary_key, role")

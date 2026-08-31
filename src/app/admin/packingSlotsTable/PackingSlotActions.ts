@@ -1,15 +1,24 @@
 import { PostgrestError } from "@supabase/supabase-js";
-import {
-    PackingSlotRow,
-    PackingSlotRowWithOriginalLastUpdated,
-} from "@/app/admin/packingSlotsTable/PackingSlotsTable";
 import { DatabaseError } from "@/app/errorClasses";
 import { Tables } from "@/databaseTypesFile";
 import { logErrorReturnLogId, logWarningReturnLogId } from "@/logger/logger";
 import supabase from "@/supabaseClient";
 
-type DbPackingSlot = Tables<"packing_slots">;
+type DbPackingSlot = Omit<Tables<"packing_slots">, "last_updated">;
 type NewDbPackingSlot = Omit<DbPackingSlot, "primary_key">;
+
+export interface PackingSlotRow {
+    id: string;
+    name: string;
+    isShown: boolean;
+    order: number;
+    isNew: boolean;
+    lastUpdated: string;
+}
+
+export interface PackingSlotRowWithOriginalLastUpdated extends PackingSlotRow {
+    originalLastUpdated: string;
+}
 
 export const fetchPackingSlots = async (): Promise<PackingSlotRow[]> => {
     const { data, error } = await supabase.from("packing_slots").select().order("order");
@@ -36,7 +45,6 @@ const formatExistingRowToDBPackingSlot = (row: PackingSlotRow): DbPackingSlot =>
         name: row.name,
         is_shown: row.isShown,
         order: row.order,
-        last_updated: row.lastUpdated,
     };
 };
 
@@ -45,7 +53,6 @@ const formatNewRowToDBPackingSlot = (newRow: PackingSlotRow): NewDbPackingSlot =
         name: newRow.name,
         is_shown: newRow.isShown,
         order: newRow.order,
-        last_updated: newRow.lastUpdated,
     };
 };
 
@@ -66,6 +73,7 @@ export const insertNewPackingSlot = async (
     newRow: PackingSlotRow
 ): Promise<InsertPackingSlotResult> => {
     const data = formatNewRowToDBPackingSlot(newRow);
+
     const { data: packingSlot, error } = await supabase
         .from("packing_slots")
         .insert(data)
@@ -98,21 +106,14 @@ export const updateDbPackingSlot = async (
 
     const { error, count } = await supabase
         .from("packing_slots")
-        .update(
-            {
-                name: processedData.name,
-                is_shown: processedData.is_shown,
-                order: processedData.order,
-            },
-            { count: "exact" }
-        )
+        .update(processedData, { count: "exact" })
         .eq("primary_key", processedData.primary_key)
         .eq("last_updated", lastUpdated);
 
     if (error) {
         const logId = await logErrorReturnLogId("Failed to update packing slot", {
             error,
-            newPackingSlotData: processedData,
+            packingSlotData: processedData,
         });
 
         return { error: { type: "UpdatePackingSlotsFailed", logId } };

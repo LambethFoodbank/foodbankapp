@@ -26,7 +26,7 @@ const ColumnTogglePopup = <Data extends MRT_RowData>({
     headers,
     columnVisibility,
     setColumnVisibility,
-}: ColumnTogglePopupProps<Data>): React.ReactElement => {
+}: ColumnTogglePopupProps<Data>): React.ReactElement<any> => {
     const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const checkboxKey = event.target.name;
         const columnGroup = toggleableColumnGroups?.find(

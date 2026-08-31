@@ -3,7 +3,8 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { RoleUpdateContext, pathsNotRequiringLogin } from "@/app/roles";
+import { RoleUpdateContext } from "@/app/roleManager";
+import { pathsNotRequiringLogin } from "./roles";
 import { DatabaseAutoType, UserRole } from "@/databaseUtils";
 import { fetchUserRole } from "@/common/fetchUserRole";
 

@@ -8,43 +8,29 @@ import {
 import React from "react";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import {
-    CollectionCentresTableRow,
-    initialCollectionAvailableDays,
-} from "@/app/admin/collectionCentresTable/CollectionCentreActions";
+import { PackingSlotRow } from "./PackingSlotActions";
 
 declare module "@mui/x-data-grid" {
     interface ToolbarPropsOverrides {
-        setCollectionCentreRows: React.Dispatch<React.SetStateAction<CollectionCentresTableRow[]>>;
-        setCollectionCentreRowModesModel: (
+        setPackingSlotRows: React.Dispatch<React.SetStateAction<PackingSlotRow[]>>;
+        setPackingSlotRowModesModel: (
             newModel: (oldModel: GridRowModesModel) => GridRowModesModel
         ) => void;
-        collectionCentreRows: CollectionCentresTableRow[];
+        packingSlotRows: PackingSlotRow[];
     }
 }
 
 export function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): React.JSX.Element {
-    const { setCollectionCentreRows, setCollectionCentreRowModesModel, collectionCentreRows } =
-        props;
+    const { setPackingSlotRows, setPackingSlotRowModesModel, packingSlotRows } = props;
 
     const handleClick = (): void => {
         // Include timestamp in the ID to ensure uniqueness, especially if rows are deleted and added quickly
-        const id = String(collectionCentreRows.length + 1) + "_" + Date.now();
-        setCollectionCentreRows((oldRows) => [
+        const id = String(packingSlotRows.length + 1) + "_" + Date.now();
+        setPackingSlotRows((oldRows) => [
             ...oldRows,
-            {
-                id,
-                name: "",
-                acronym: "",
-                isShown: false,
-                isDelivery: false,
-                timeSlots: [],
-                availableDays: initialCollectionAvailableDays,
-                isNew: true,
-                lastUpdated: "",
-            },
+            { id, name: "", isShown: false, order: Number(id), isNew: true, lastUpdated: "" },
         ]);
-        setCollectionCentreRowModesModel((oldModel) => ({
+        setPackingSlotRowModesModel((oldModel) => ({
             ...oldModel,
             [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
         }));
@@ -53,7 +39,7 @@ export function EditToolbar(props: GridToolbarProps & ToolbarPropsOverrides): Re
     return (
         <GridToolbarContainer>
             <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                Add a new collection centre
+                Add new slot
             </Button>
         </GridToolbarContainer>
     );

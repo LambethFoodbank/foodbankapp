@@ -10,12 +10,8 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel,
-    GridRowsProp,
     GridSortModel,
-    GridToolbarContainer,
 } from "@mui/x-data-grid";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -23,8 +19,8 @@ import {
     insertNewDeliveryAreas,
     fetchDeliveryAreas,
     deleteDbDeliveryAreas,
+    DeliveryAreasRow,
 } from "@/app/admin/deliveryAreasTable/DeliveryAreasActions";
-import { LinearProgress } from "@mui/material";
 import { logErrorReturnLogId } from "@/logger/logger";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import Header from "../websiteDataTable/Header";
@@ -32,44 +28,9 @@ import StyledDataGrid from "../common/StyledDataGrid";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import FloatingToast from "@/components/FloatingToast";
 import { prefixPostcodeRegex } from "@/common/format";
-
-interface EditToolbarProps {
-    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-    setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
-    rows: DeliveryAreasRow[];
-    setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-export interface DeliveryAreasRow {
-    id: string;
-    postcode: string;
-    postcodeSortKey: string;
-    isNew: boolean;
-}
+import { EditToolbar } from "./DeliveryAreasToolbar";
 
 const isValidPostcode = (value: string): boolean => prefixPostcodeRegex.test(value);
-
-function EditToolbar(props: EditToolbarProps): React.JSX.Element {
-    const { setRows, setRowModesModel, setErrorMessage } = props;
-    // The id was initialized as `number of rows+1`, which raised some issues and now it is generated randomly below
-    const handleClick = (): void => {
-        const id = `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        setErrorMessage(null);
-        setRows((oldRows) => [...oldRows, { id, postcode: "", isNew: true }]);
-        setRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "postcode", editable: true },
-        }));
-    };
-
-    return (
-        <GridToolbarContainer>
-            <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                Add new area
-            </Button>
-        </GridToolbarContainer>
-    );
-}
 
 function getBaseAuditLogForDeliveryAreasAction(
     action: string,
@@ -156,17 +117,17 @@ const DeliveryAreasTable: React.FC = () => {
         setIsLoading(true);
 
         if (!isValidPostcode(row.postcode)) {
+            let errorString = "";
             setIsLoading(false);
             if (row.postcode.length === 0) {
-                setErrorMessage("Please specify a delivery area.");
+                errorString = "Please specify a delivery area.";
             } else if (row.postcode.includes(" ")) {
-                setErrorMessage("The specified delivery area contains whitespaces.");
+                errorString = "The specified delivery area contains whitespaces.";
             } else {
-                setErrorMessage(
-                    "Invalid postcode format. Please enter a valid UK prefix postcode (e.g. EC1A)."
-                );
+                errorString =
+                    "Invalid postcode format. Please enter a valid UK prefix postcode (e.g. EC1A).";
             }
-            throw new Error("Invalid postcode format");
+            throw new Error(errorString);
         }
 
         row.postcode = row.postcode.toUpperCase();
@@ -175,9 +136,8 @@ const DeliveryAreasTable: React.FC = () => {
         const baseAuditLog = getBaseAuditLogForDeliveryAreasAction("add a delivery area", row);
 
         if (insertDeliveryAreasError) {
-            setErrorMessage("The specified delivery area already exists.");
             setIsLoading(false);
-            throw new Error("Duplicate postcode");
+            throw new Error("The specified delivery area already exists.");
         } else {
             setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== row.id));
             setRowModesModel((prev) => {
@@ -327,12 +287,21 @@ const DeliveryAreasTable: React.FC = () => {
                     onRowModesModelChange={setRowModesModel}
                     onRowEditStop={handleRowEditStop}
                     processRowUpdate={processRowUpdate}
+                    onProcessRowUpdateError={(error) => {
+                        setErrorMessage(error.message);
+                    }}
                     slots={{
                         toolbar: EditToolbar,
-                        loadingOverlay: LinearProgress,
                     }}
                     slotProps={{
-                        toolbar: { setRows, setRowModesModel, rows, setErrorMessage },
+                        toolbar: {
+                            setDeliveryAreasRows: setRows,
+                            setDeliveryAreasRowModesModel: setRowModesModel,
+                            deliveryAreasRows: rows,
+                        },
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                        },
                     }}
                     loading={isLoading}
                     getRowClassName={(params) =>

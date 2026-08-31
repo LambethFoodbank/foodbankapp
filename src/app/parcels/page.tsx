@@ -3,7 +3,7 @@ import React from "react";
 import ParcelsPage from "@/app/parcels/parcelsTable/ParcelsPage";
 import Title from "@/components/Title/Title";
 
-const Parcels: () => Promise<React.ReactElement> = async () => {
+const Parcels: () => Promise<React.ReactElement<any>> = async () => {
     return (
         <main>
             <Title>Parcels Page</Title>

@@ -17,14 +17,14 @@ interface ReportInputProps {
 
 interface ReportModalProps {
     actionModalProps: ActionModalProps;
-    csvButton: (props: ButtonProps) => React.ReactElement;
+    csvButton: (props: ButtonProps) => React.ReactElement<any>;
     reportName: string;
     reportType: "parcelList" | "dateInterval";
 }
 interface ContentProps {
     onFileCreationCompleted: () => void;
     onFileCreationFailed: (csvError: FetchReportError) => void;
-    csvButton: (props: ButtonProps) => React.ReactElement;
+    csvButton: (props: ButtonProps) => React.ReactElement<any>;
     dateRange?: DateRangeState;
     setRange?: (range: DateRangeState) => void;
     isInputValid?: boolean;

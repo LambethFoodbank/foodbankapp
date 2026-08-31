@@ -3,13 +3,17 @@ import { v4 as uuidv4 } from "uuid";
 describe("User invite on admins page", () => {
     beforeEach(() => {
         cy.login();
+        cy.intercept({ method: "GET", url: "**/rest/v1/profiles*" }).as("getProfiles");
         cy.visit("/admin");
+
+        // This isn't specifically needed for these tests, but it checks that page data has started loading
+        cy.wait("@getProfiles");
     });
 
     it("Invite a user without a phone number", () => {
         const email = generateRandomEmailAddress();
 
-        toggleCreateUserSection();
+        toggleCreateUserSectionOpen();
         fillEmail(email);
         fillFirstName("First");
         fillLastName("Last");
@@ -21,7 +25,7 @@ describe("User invite on admins page", () => {
     it("Invite a user without a phone number after typing a number first", () => {
         const email = generateRandomEmailAddress();
 
-        toggleCreateUserSection();
+        toggleCreateUserSectionOpen();
         fillEmail(email);
         fillFirstName("First");
         fillLastName("Last");
@@ -35,7 +39,7 @@ describe("User invite on admins page", () => {
     it("Invite a user with a phone number", () => {
         const email = generateRandomEmailAddress();
 
-        toggleCreateUserSection();
+        toggleCreateUserSectionOpen();
         fillEmail(email);
         fillFirstName("First");
         fillLastName("Last");
@@ -47,8 +51,10 @@ describe("User invite on admins page", () => {
 
     const createUserText = "create user";
 
-    function toggleCreateUserSection(): void {
+    function toggleCreateUserSectionOpen(): void {
         cy.contains(createUserText, { matchCase: false }).click();
+        // Long timeout because this page loads a lot of data
+        cy.get("#new-user-email-address", { timeout: 8000 }).should("be.visible");
     }
 
     function fillEmail(value: string): void {

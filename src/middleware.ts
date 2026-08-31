@@ -1,7 +1,7 @@
 import { DatabaseAutoType, UserRole } from "@/databaseUtils";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 import { NextMiddleware, NextRequest, NextResponse } from "next/server";
-import { roleCanAccessPage, pathsNotRequiringLogin } from "@/app/roles";
+import { pathsNotRequiringLogin, roleCanAccessPage } from "./app/roles";
 import { fetchUserRole } from "@/common/fetchUserRole";
 
 const middleware: NextMiddleware = async (req: NextRequest) => {

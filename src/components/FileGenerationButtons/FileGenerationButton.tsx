@@ -56,7 +56,7 @@ const FileGenerationButton = <Data, ErrorType extends string>({
     disabled = false,
     focusOnButton = false,
     formSubmitButton = false,
-}: FileGenerationButtonProps<Data, ErrorType>): React.ReactElement => {
+}: FileGenerationButtonProps<Data, ErrorType>): React.ReactElement<any> => {
     const onClick = async (event: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
         event.preventDefault();
         const { data, error } = await fetchDataAndFileName();

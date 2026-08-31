@@ -12,7 +12,7 @@ const linksToDisplay: AuthLink[] = [
     },
 ];
 
-export default function Login(): ReactElement {
+export default function Login(): ReactElement<any> {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);

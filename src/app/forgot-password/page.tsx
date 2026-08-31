@@ -11,7 +11,7 @@ const linksToDisplay: AuthLink[] = [
     },
 ];
 
-export default function Page(): ReactElement {
+export default function Page(): ReactElement<any> {
     const [email, setEmail] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);

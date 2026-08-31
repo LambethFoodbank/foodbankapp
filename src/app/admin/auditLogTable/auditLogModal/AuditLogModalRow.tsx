@@ -32,7 +32,7 @@ const AuditLogModalRow = <Data,>({
     getDataOrErrorMessage,
     RowComponentWhenSuccessful,
     header,
-}: AuditLogModalRowProps<Data>): React.ReactElement => {
+}: AuditLogModalRowProps<Data>): React.ReactElement<any> => {
     const [rowData, setRowData] = useState<Data | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 

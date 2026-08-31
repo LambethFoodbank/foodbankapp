@@ -45,7 +45,7 @@ export const saveParcelStatus = async (
         parcelId: eventToInsert.parcel_id,
     }));
 
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await getSupabaseServerComponentClient();
     const { data, error } = await supabase
         .from("events")
         .insert(eventsToInsert)

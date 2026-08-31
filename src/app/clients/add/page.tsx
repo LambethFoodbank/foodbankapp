@@ -7,7 +7,7 @@ import { parseQueryParams } from "@/common/urlQueryParams";
 import ClientForm, { ClientErrors, ClientFields } from "@/app/clients/form/ClientForm";
 import { Errors } from "@/components/Form/formFunctions";
 
-const AddClients: () => React.ReactElement = () => {
+const AddClients: () => React.ReactElement<any> = () => {
     const initialFields: ClientFields = {
         fullName: "",
         phoneNumber: "",
