@@ -53,7 +53,7 @@ export async function sendAuditLog(auditLogProps: AuditLog): Promise<void> {
         delivery_areas_id: auditLogProps.deliveryAreasId,
     };
 
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await getSupabaseServerComponentClient();
 
     const { error } = await supabase
         .from("audit_log")

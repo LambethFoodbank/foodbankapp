@@ -18,7 +18,7 @@ type FailureReason =
     | "fetch user role error";
 
 export async function authenticateAsAdmin(): Promise<Authenticated> {
-    const serverComponentClient = getSupabaseServerComponentClient();
+    const serverComponentClient = await getSupabaseServerComponentClient();
 
     const {
         data: { user },

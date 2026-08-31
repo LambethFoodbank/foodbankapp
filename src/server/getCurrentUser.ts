@@ -20,7 +20,7 @@ export interface CurrentUserError {
 }
 
 export async function getCurrentUser(): Promise<CurrentUserResponse> {
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await getSupabaseServerComponentClient();
 
     const { data, error } = await supabase.auth.getUser();
 

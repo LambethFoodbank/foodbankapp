@@ -3,9 +3,10 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies, UnsafeUnwrappedCookies } from "next/headers";
 import { SupabaseClient } from "@supabase/supabase-js";
 
-export function getSupabaseServerComponentClient(): SupabaseClient<Database> {
+export async function getSupabaseServerComponentClient(): Promise<SupabaseClient<Database>> {
+    const cookieStore = await cookies();
+
     return createServerComponentClient<Database>({
-        cookies: () =>
-            cookies() as unknown as UnsafeUnwrappedCookies as unknown as UnsafeUnwrappedCookies,
+        cookies: () => cookieStore as unknown as UnsafeUnwrappedCookies,
     });
 }

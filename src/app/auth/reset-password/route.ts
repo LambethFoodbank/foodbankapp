@@ -17,8 +17,9 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     try {
+        const cookieStore = await cookies();
         const supabase = createRouteHandlerClient({
-            cookies: () => cookies() as unknown as UnsafeUnwrappedCookies,
+            cookies: () => cookieStore as unknown as UnsafeUnwrappedCookies,
         });
 
         const { error } = await supabase.auth.exchangeCodeForSession(authCode);
