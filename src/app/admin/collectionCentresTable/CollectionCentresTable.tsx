@@ -29,7 +29,7 @@ import StyledDataGrid from "@/app/admin/common/StyledDataGrid";
 import Header from "@/app/admin/websiteDataTable/Header";
 import { subscriptionStatusRequiresErrorMessage } from "@/common/subscriptionStatusRequiresErrorMessage";
 import FloatingToast from "@/components/FloatingToast";
-import { logErrorReturnLogId, logInfoReturnLogId } from "@/logger/logger";
+import { logErrorReturnLogId } from "@/logger/logger";
 import { AuditLog, sendAuditLog } from "@/server/auditLog";
 import supabase from "@/supabaseClient";
 import CollectionCentreTimeSlotsModal from "./CollectionCentreTimeSlotsModal";
@@ -377,21 +377,6 @@ const CollectionCentresTable: React.FC = () => {
                 const handleEditCollectionCentreAvailableDays = (): void => {
                     const row = params.row as CollectionCentresTableRow;
 
-                    // QQ
-                    const availableDays = row.availableDays;
-
-                    if (!Array.isArray(availableDays)) {
-                        logInfoReturnLogId("[CollectionCentres] invalid available_days", {
-                            rowId: row.id,
-                            availableDays,
-                        });
-                    } else {
-                        logInfoReturnLogId("[CollectionCentres] *valid* available_days", {
-                            rowId: row.id,
-                            availableDays,
-                        });
-                    }
-
                     handleEditClick(row.id)();
                     setRowModesModel((currentValue) => ({
                         ...currentValue,
@@ -488,13 +473,6 @@ const CollectionCentresTable: React.FC = () => {
                         setErrorMessage(error.message);
                     }}
                     onRowModesModelChange={(newModel) => {
-                        // QQ
-                        logInfoReturnLogId("[CollectionCentres] row mode change", {
-                            newModel,
-                            isNullish: newModel == null,
-                            rowIds: rows.map((row) => row.id),
-                        });
-
                         const nextModel = newModel ?? {};
                         setRowModesModel(nextModel);
 

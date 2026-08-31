@@ -25,8 +25,6 @@ describe("Packing slots on admins page", () => {
         assertPackingSlotName({ rowIndex: 0, packingSlotName: "AM" });
         assertPackingSlotName({ rowIndex: 1, packingSlotName: "PM" });
     });
-
-    // QQ: This needs tests for creating and editing packing slots - see collectionCentres.cy.ts
 });
 
 function togglePackingSlotsSection(): void {
