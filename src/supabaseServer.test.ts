@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { getSupabaseServerComponentClient } from "./supabaseServer";
 
 let cookieStore: any = {};
 const mockCookies = jest.fn(() => Promise.resolve(cookieStore)) as any;
@@ -15,6 +14,8 @@ jest.mock("next/headers", () => ({
 jest.mock("@supabase/auth-helpers-nextjs", () => ({
     createServerComponentClient: mockCreateServerComponentClient,
 }));
+
+import { getSupabaseServerComponentClient } from "./supabaseServer";
 
 describe("getSupabaseServerComponentClient", () => {
     beforeEach(() => {
