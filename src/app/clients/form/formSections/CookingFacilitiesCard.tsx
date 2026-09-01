@@ -3,7 +3,7 @@ import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
 import { checkboxGroupToArray, onChangeCheckboxInGroup } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
-import { Checkbox, FormControlLabel } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel } from "@mui/material";
 import { FormElementWithSpacing } from "@/components/Form/formStyling";
 
 export const cookingFacilitiesOptions: string[] = [
@@ -33,11 +33,19 @@ const CookingFacilitiesCard: React.FC<ClientCardProps> = ({ fieldSetter, fields 
     };
 
     return (
-        <GenericFormCard
-            title="Cooking Facilities"
-            required={false}
-            text="What cooking facilities does the client have? For 'Other', put details in the 'Extra Information' section."
-        >
+        <GenericFormCard title="Cooking Facilities" required={false}>
+            <Alert severity="info" variant="outlined">
+                <p>Please verify what cooking facilities the client has available to them.</p>
+                <p>
+                    Even if they don&apos;t have it in their own home, they may be able to access
+                    elsewhere.
+                </p>
+                <p>
+                    They also may also may be able to utilise other appliances even if they
+                    don&apos;t have an oven or hob
+                </p>
+                <p>using an airfryer or microwave to serve the same purpose.</p>
+            </Alert>
             <FormControlLabel
                 control={
                     <Checkbox

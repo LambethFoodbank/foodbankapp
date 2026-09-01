@@ -3,7 +3,7 @@ import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
 import { checkboxGroupToArray, onChangeCheckboxInGroup } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientCardProps } from "../ClientForm";
-import { Checkbox, FormControlLabel } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel } from "@mui/material";
 import { FormElementWithSpacing } from "@/components/Form/formStyling";
 
 export const dietaryRequirementOptions: string[] = [
@@ -50,6 +50,27 @@ const DietaryRequirementCard: React.FC<ClientCardProps> = ({ fieldSetter, fields
 
     return (
         <GenericFormCard title="Dietary Requirements" required={false}>
+            <Alert severity="info" variant="outlined">
+                <p>
+                    When going through dietary requirements, please explain that this is all
+                    dependant on donations and
+                </p>
+                <p>
+                    we are unable to take specific brand requests. We will not be able to fulfil any
+                    toiletry requests except soap,
+                </p>
+                <p>
+                    toilet paper and sanitary products. We will periodically have toiletries
+                    available at our Hubs.
+                </p>
+                <br />
+                <p>
+                    If there are allergies in the household, please clarify who exactly has the
+                    allergy.
+                </p>
+                <br />
+                <p>Please see INFO section on the app for more details.</p>
+            </Alert>
             <FormControlLabel
                 control={
                     <Checkbox
