@@ -9,11 +9,6 @@ import { FormElementWithSpacing } from "@/components/Form/formStyling";
 export const dietaryRequirementOptions: string[] = [
     "Fresh Fruit",
     "Fresh Veg",
-    "Garlic",
-    "Ginger",
-    "Chillies",
-    "Spices",
-    "Eggs",
     "Bread",
     "Tea",
     "Coffee",
