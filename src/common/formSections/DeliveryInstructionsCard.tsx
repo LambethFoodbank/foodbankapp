@@ -11,6 +11,7 @@ import {
 } from "@/components/Form/formFunctions";
 import GenericFormCard from "@/components/Form/GenericFormCard";
 import { ClientFields } from "@/app/clients/form/ClientForm";
+import { Alert } from "@mui/material";
 
 export const MAX_CHARACTERS = 380;
 
@@ -26,6 +27,17 @@ const DeliveryInstructionsCard: React.FC<CommonCardProps> = ({
             required={false}
             text="For example: The doorbell does not work, use the door code: 123456."
         >
+            <Alert severity="info" variant="outlined">
+                <p>
+                    We are unable to offer time sensitive deliveries, please request the client is
+                    home all day
+                </p>
+                <p>
+                    and always ask about a safe space or neighbour to leave the parcel if they will
+                    not be in.
+                </p>
+            </Alert>
+            <br />
             <FreeFormTextInput
                 label="Delivery Instructions"
                 defaultValue={getDefaultTextValue(fields, "deliveryInstructions")}

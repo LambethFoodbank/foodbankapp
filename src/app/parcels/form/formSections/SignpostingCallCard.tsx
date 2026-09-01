@@ -8,7 +8,14 @@ import GenericFormCard from "@/components/Form/GenericFormCard";
 import RadioGroupInput from "@/components/DataInput/RadioGroupInput";
 import { FormElementWithSpacing } from "@/components/Form/formStyling";
 import CheckboxGroupInput from "@/components/DataInput/CheckboxGroupInput";
-import { Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
+import {
+    Alert,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
+} from "@mui/material";
 import { ParcelCardProps } from "@/app/parcels/form/ParcelForm";
 
 export const signpostingCallOptions: string[] = [
@@ -41,6 +48,16 @@ const SignpostingCallCard: React.FC<ParcelCardProps> = ({ fieldSetter, fields })
             required={true}
             text="Does this client require a signposting call?"
         >
+            <Alert severity="info" variant="outlined">
+                <p>
+                    If this is the first time a client is receiving a parcel, please always tick
+                    &apos;Yes&apos;, &apos;Generic&apos; and
+                </p>
+                <p>
+                    explain that we will provide them with a follow-up call to inform them of other
+                    services available in addition to the food.
+                </p>
+            </Alert>
             <RadioGroupInput
                 labelsAndValues={[
                     ["Yes", "Yes"],
@@ -62,7 +79,7 @@ const SignpostingCallCard: React.FC<ParcelCardProps> = ({ fieldSetter, fields })
                                     disabled={!fields["signpostingCall"]}
                                 />
                             }
-                            label="Don't Know"
+                            label="Generic"
                         />
                     </FormGroup>
                 </FormControl>

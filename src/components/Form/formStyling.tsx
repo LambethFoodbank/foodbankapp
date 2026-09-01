@@ -17,7 +17,7 @@ export const StyledForm = styled.form<{ $compact?: boolean }>`
     width: 70%;`
             : `
     padding: 2em;
-    max-width: 1500px;`}
+    max-width: 1000px;`}
 
     display: flex;
     gap: 1em;
