@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
     },
     page: {
         width: "97%",
-        lineHeight: "1.2pt",
         flexDirection: "column",
     },
     flexRow: {
@@ -62,8 +61,7 @@ const styles = StyleSheet.create({
     infoCell: {
         width: "100%",
         padding: "1pt",
-        borderStyle: "solid",
-        border: "1pt",
+        border: "1pt solid black",
     },
     tableRow: {
         textAlign: "left",
@@ -71,26 +69,22 @@ const styles = StyleSheet.create({
     tableItemDescription: {
         paddingVertical: "1pt",
         width: "34%",
-        border: "0.5pt",
-        borderStyle: "solid",
+        border: "0.5pt solid black",
     },
     tableQuantity: {
         paddingVertical: "1pt",
         width: "20%",
-        border: "0.5pt",
-        borderStyle: "solid",
+        border: "0.5pt solid black",
     },
     tableNotes: {
         paddingVertical: "1pt",
         width: "40%",
-        border: "0.5pt",
-        borderStyle: "solid",
+        border: "0.5pt solid black",
     },
     tableDone: {
         paddingVertical: "1pt",
         width: "6%",
-        border: "0.5pt",
-        borderStyle: "solid",
+        border: "0.5pt solid black",
     },
     title: {
         fontSize: "22pt",
@@ -106,11 +100,13 @@ const styles = StyleSheet.create({
     keyText: {
         fontSize: "11pt",
         fontFamily: "Helvetica-Bold",
+        lineHeight: 1.2,
         paddingLeft: "2pt",
     },
     normalText: {
         fontSize: "11pt",
         fontFamily: "Helvetica",
+        lineHeight: 1.2,
         paddingLeft: "2pt",
     },
     nonWrappingText: {
@@ -118,8 +114,7 @@ const styles = StyleSheet.create({
         textOverflow: "ellipsis",
     },
     tableCell: {
-        borderStyle: "solid",
-        border: "0.5pt",
+        border: "0.5pt solid black",
     },
     itemList: {
         alignItems: "center",
@@ -315,7 +310,7 @@ const SingleShoppingList: React.FC<SingleShoppingListProps> = ({ parcelData }) =
                         <DisplayParcelHeadlines data={parcelData.parcelInfo} noWrap={true} />
                     </View>
                     {/* eslint-disable-next-line jsx-a11y/alt-text -- React-PDF Image doesn't  have alt text property*/}
-                    <Image src="/logo.png" style={[styles.flexRow, styles.logoStyling]} />
+                    <Image src="/logo.png" style={styles.logoStyling} />
                 </View>
                 <DisplayClientSummaryAndExtraInfo
                     {...parcelData.clientSummary}
