@@ -8,7 +8,7 @@ import { returnPathQueryParam } from "@/common/constants";
 import ClientForm, { ClientErrors } from "@/app/clients/form/ClientForm";
 import { Errors } from "@/components/Form/formFunctions";
 import autofill from "@/app/clients/edit/[id]/autofill";
-import { fetchClient, fetchFamily, fetchLatestParcelIdForClient } from "@/common/fetch";
+import { fetchClient, fetchFamilyData, fetchLatestParcelIdForClient } from "@/common/fetch";
 import { Schema } from "@/databaseUtils";
 import { ErrorSecondaryText } from "@/app/errorStylingandMessages";
 
@@ -17,7 +17,7 @@ const EditClientForm = (): React.ReactElement<any> => {
     const searchParams = useSearchParams();
 
     const [clientData, setClientData] = useState<Schema["clients"] | null>(null);
-    const [familyData, setFamilyData] = useState<Schema["families"][] | null>(null);
+    const [familyMemberData, setFamilyMemberData] = useState<Schema["families"][] | null>(null);
     const [latestParcelId, setLatestParcelId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>();
     const [returnPath, setReturnPath] = useState<string | null>(null);
@@ -50,7 +50,7 @@ const EditClientForm = (): React.ReactElement<any> => {
             }
             setClientData(clientData);
 
-            const { data: familyData, error: familyError } = await fetchFamily(
+            const { data: familyData, error: familyError } = await fetchFamilyData(
                 clientData.family_id,
                 supabase
             );
@@ -61,7 +61,7 @@ const EditClientForm = (): React.ReactElement<any> => {
                 }
                 return;
             }
-            setFamilyData(familyData);
+            setFamilyMemberData(familyData.members);
 
             const { data: latestParcelId, error: latestParcelIdError } =
                 await fetchLatestParcelIdForClient(clientId, supabase);
@@ -79,7 +79,8 @@ const EditClientForm = (): React.ReactElement<any> => {
         })();
     }, [clientId, searchParams]);
 
-    const initialFields = clientData && familyData ? autofill(clientData, familyData) : null;
+    const initialFields =
+        clientData && familyMemberData ? autofill(clientData, familyMemberData) : null;
 
     const initialFormErrors: ClientErrors = {
         fullName: Errors.none,

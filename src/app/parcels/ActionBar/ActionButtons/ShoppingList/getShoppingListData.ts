@@ -11,7 +11,8 @@ import {
     FetchParcelErrorType,
     fetchClient,
     fetchListsComment,
-    fetchFamily,
+    fetchFamilyData,
+    FetchFamilyWithCountResponse,
 } from "@/common/fetch";
 import { prepareClientSummary, prepareRequirementSummary } from "@/common/formatClientsData";
 import { prepareHouseholdSummary } from "@/common/formatFamiliesData";
@@ -28,7 +29,7 @@ import { logErrorReturnLogId } from "@/logger/logger";
 
 interface ClientDataAndFamilyData {
     clientData: Schema["clients"];
-    familyData: Schema["families"][];
+    familyData: FetchFamilyWithCountResponse["data"];
 }
 
 type FetchShoppingListResponse =
@@ -54,7 +55,7 @@ const getClientAndFamilyData = async (clientID: string): Promise<FetchShoppingLi
         return { data: null, error: clientError };
     }
 
-    const { data: familyData, error: familyError } = await fetchFamily(
+    const { data: familyData, error: familyError } = await fetchFamilyData(
         clientData.family_id,
         supabase
     );
@@ -127,7 +128,7 @@ const getShoppingListDataForSingleParcel = async (
     ];
 
     const { data: itemsListData, error: itemsListError } = await prepareItemsListForHousehold(
-        familyData.length,
+        familyData?.count ?? 0,
         parcelInfoAndClientIdData.parcelInfo.listType,
         clientDiets
     );
@@ -137,7 +138,10 @@ const getShoppingListDataForSingleParcel = async (
     }
 
     const clientSummary = prepareClientSummary(clientData);
-    const householdSummary = prepareHouseholdSummary(familyData);
+    const householdSummary = prepareHouseholdSummary(
+        familyData?.count ?? 0,
+        familyData?.members ?? []
+    );
     const requirementSummary = prepareRequirementSummary(clientData);
 
     const { data: endNotes, error: listsCommentError } = await fetchListsComment(supabase);

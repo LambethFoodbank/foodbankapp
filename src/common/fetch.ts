@@ -297,9 +297,9 @@ export const fetchClient = async (
     return { data: data, error: null };
 };
 
-type FetchFamilyResponse =
+export type FetchFamilyWithCountResponse =
     | {
-          data: Schema["families"][];
+          data: { members: Schema["families"][]; count: number };
           error: null;
       }
     | {
@@ -309,16 +309,37 @@ type FetchFamilyResponse =
 
 export type FetchFamilyErrorType = "familyFetchFailed";
 
-export const fetchFamily = async (
+export const fetchFamilyData = async (
     familyID: string,
     supabase: Supabase
-): Promise<FetchFamilyResponse> => {
-    const { data, error } = await supabase.from("families").select().eq("family_id", familyID);
-    if (error) {
-        const logId = await logErrorReturnLogId("Error with fetch: Family data", error);
+): Promise<FetchFamilyWithCountResponse> => {
+    const { data: memberData, error: memberError } = await supabase
+        .from("families")
+        .select()
+        .eq("family_id", familyID);
+    if (memberError) {
+        const logId = await logErrorReturnLogId(
+            "Error with fetch: Family member data",
+            memberError
+        );
         return { data: null, error: { type: "familyFetchFailed", logId: logId } };
     }
-    return { data: data, error: null };
+
+    // Family count might be different from the number of members, if some are babies
+    const { data: countData, error: countError } = await supabase
+        .from("family_count")
+        .select()
+        .eq("family_id", familyID)
+        .single();
+    if (countError) {
+        const logId = await logErrorReturnLogId("Error with fetch: Family count", countError);
+        return { data: null, error: { type: "familyFetchFailed", logId: logId } };
+    }
+
+    return {
+        data: { members: memberData ?? [], count: countData?.family_count ?? 0 },
+        error: null,
+    };
 };
 
 type FetchLatestParcelIdForClientResponse =

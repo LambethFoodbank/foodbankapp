@@ -23,10 +23,6 @@ const getPersonSummary = (person: Person, age: string): string => {
     return `${age} ${genderString}`;
 };
 
-const convertPlural = (value: number, description: string): string => {
-    return `${value} ${description}${value !== 1 ? "s" : ""}`;
-};
-
 export const getFormattedPeople = (
     familyData: Schema["families"][],
     filterFunction: (person: Schema["families"]) => boolean
@@ -42,22 +38,18 @@ export const getFormattedPeople = (
     });
 };
 
-export const prepareHouseholdSummary = (familyData: Schema["families"][]): HouseholdSummary => {
+export const prepareHouseholdSummary = (
+    familyCount: number,
+    familyData: Schema["families"][]
+): HouseholdSummary => {
     const formattedChildren: Person[] = getFormattedPeople(familyData, isChildFamilyMember);
     const formattedAdults: Person[] = getFormattedPeople(familyData, isAdultFamilyMember);
-    const householdSize = familyData.length;
     const numberBabies = familyData.filter(
         (member) => member.birth_year === getCurrentYear()
     ).length;
 
-    const adultText = `${householdSize} (${convertPlural(
-        householdSize - formattedChildren.length,
-        "Adult"
-    )}`;
-    const childText = `${formattedChildren.length} Child${formattedChildren.length === 1 ? "" : "ren"})`;
-
     return {
-        householdSize: `${adultText} ${childText}`,
+        householdSize: `${familyCount}`,
         ageAndGenderOfAdults: displayList(
             formattedAdults.map((adult) =>
                 getPersonSummary(
