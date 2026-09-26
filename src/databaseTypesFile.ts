@@ -1018,7 +1018,6 @@ export type Database = {
       }
       parcels_events: {
         Row: {
-          all_events: string[] | null
           last_event_data: string | null
           last_event_is_successfully_completed: boolean | null
           last_event_name: string | null
@@ -1038,7 +1037,6 @@ export type Database = {
       }
       parcels_plus: {
         Row: {
-          all_events: string[] | null
           client_additional_phone_numbers_text: string | null
           client_address_postcode: string | null
           client_delivery_instructions: string | null

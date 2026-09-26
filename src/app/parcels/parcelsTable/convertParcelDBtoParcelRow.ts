@@ -67,7 +67,6 @@ const convertParcelDbtoParcelRow = async (
                     : null,
                 packingSlot: parcel.packing_slot_name,
                 lastStatus: processLastStatus(parcel),
-                allStatuses: parcel.all_events,
                 voucherNumber: parcel.voucher_number,
                 listType: parcel.list_type,
                 referralAgency: parcel.referral_agency,

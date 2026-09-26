@@ -29,7 +29,6 @@ export interface ParcelsTableRow {
         eventData: string | null;
         workflowOrder: number;
     } | null;
-    allStatuses: string[] | null;
     voucherNumber: string | null;
     listType: ListType | null;
     referralAgency: string | null;
