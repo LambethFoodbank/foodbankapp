@@ -315,7 +315,6 @@ export const buildPackingManagerPrimaryFilters = (
                 return {
                     ...filter,
                     state: pageViewTypePackingManager,
-                    isDisabled: true,
                     isHidden: true,
                     isHiddenInUrl: false,
                 } as ParcelsFilter<string>;
