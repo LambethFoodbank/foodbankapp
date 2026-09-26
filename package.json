@@ -144,7 +144,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-transformer-svg": "^2.1.0",
     "postgres": "^3.4.7",
-    "react-router-dom": "^6.30.3",
+    "react-router-dom": "^6.30.6",
     "react-test-renderer": "^19.2.6",
     "seedrandom": "^3.0.5",
     "supabase": "^2.84.2",
