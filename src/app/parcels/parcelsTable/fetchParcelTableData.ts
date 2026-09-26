@@ -44,7 +44,9 @@ const getParcelsQuery = (
         // We know that filter.method and filter.state are compatible, but it doesn't work with filter defined
         // through interfaces. Ideally we would rewrite filters to be classes so it's all consistent.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        query = filter.method(query, filter.state as any);
+        if (!filter.isDisabled) {
+            query = filter.method(query, filter.state as any);
+        }
     });
 
     if (sortState.sortEnabled && sortState.column.sortMethod) {
